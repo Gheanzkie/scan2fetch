@@ -83,12 +83,13 @@
                                     <tbody>
                                         <?php if (!empty($students)): ?>
                                             <?php $i = 1; foreach ($students as $s): ?>
+                                            <?php $studentPicUrl = !empty($s['picture']) ? base_url('uploads/students/' . $s['picture']) : ''; ?>
                                             <tr class="student-row" 
                                                 data-name="<?= esc(strtolower($s['fname'] . ' ' . $s['lname'])) ?>"
                                                 data-grade="<?= esc(strtolower($s['grade_section'])) ?>"
                                                 data-parent="<?= esc(strtolower(($s['pfname'] ?? '') . ' ' . ($s['plname'] ?? ''))) ?>">
                                                 <td><?= $i++ ?></td>
-                                                <td>
+                                                <td style="cursor:pointer;" onclick="openImageViewer('<?= $studentPicUrl ?>', '<?= esc($s['fname'] . ' ' . $s['lname']) ?>')" title="Click to view full photo">
                                                     <?php if (!empty($s['picture'])): ?>
                                                         <img src="<?= base_url('uploads/students/' . $s['picture']) ?>" class="img-circle" style="width:35px;height:35px;object-fit:cover;border:2px solid #667eea;">
                                                     <?php else: ?>
@@ -114,6 +115,25 @@
             </div>
         </div>
     </section>
+</div>
+
+<!-- Image Viewer Modal -->
+<div class="modal fade" id="imageViewerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow" style="background:#1a1a2e;">
+            <div class="modal-header border-0" style="background:#1a1a2e;">
+                <h5 class="text-white"><i class="fas fa-image mr-2"></i><span id="imageViewerTitle">Student Photo</span></h5>
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body text-center bg-white p-2">
+                <img id="imageViewerFull" src="" style="max-width:100%;max-height:70vh;">
+            </div>
+            <div class="modal-footer border-0" style="background:#1a1a2e;">
+                <a id="imageDownloadBtn" href="" download="student.png" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Download</a>
+                <button type="button" class="btn btn-outline-light btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -162,5 +182,15 @@ $(function() {
     $('#filterGrade').on('change', filterStudents);
     $('#filterSection').on('change', filterStudents);
 });
+
+// Image Viewer
+function openImageViewer(imageUrl, title) {
+    if (!imageUrl) return;
+    $('#imageViewerFull').attr('src', imageUrl);
+    $('#imageDownloadBtn').attr('href', imageUrl);
+    $('#imageDownloadBtn').attr('download', title.replace(/\s+/g, '_') + '.png');
+    $('#imageViewerTitle').text(title || 'Student Photo');
+    $('#imageViewerModal').modal('show');
+}
 </script>
 <?= $this->endSection() ?>

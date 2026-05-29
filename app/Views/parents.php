@@ -45,9 +45,10 @@
                                     <tbody>
                                         <?php if (!empty($parents)): ?>
                                             <?php $i = 1; foreach ($parents as $parent): ?>
+                                            <?php $parentPicUrl = !empty($parent['picture']) ? base_url('uploads/parents/' . $parent['picture']) : ''; ?>
                                             <tr>
                                                 <td><?= $i++ ?></td>
-                                                <td>
+                                                <td style="cursor:pointer;" onclick="openImageViewer('<?= $parentPicUrl ?>', '<?= esc($parent['fname'] . ' ' . $parent['lname']) ?>')" title="Click to view full photo">
                                                     <?php if (!empty($parent['picture'])): ?>
                                                         <img src="<?= base_url('uploads/parents/' . $parent['picture']) ?>" class="img-circle" style="width:40px;height:40px;object-fit:cover;border:2px solid #667eea;">
                                                     <?php else: ?>
@@ -75,6 +76,25 @@
     </section>
 </div>
 
+<!-- Image Viewer Modal -->
+<div class="modal fade" id="imageViewerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow" style="background:#1a1a2e;">
+            <div class="modal-header border-0" style="background:#1a1a2e;">
+                <h5 class="text-white"><i class="fas fa-image mr-2"></i><span id="imageViewerTitle">Parent Photo</span></h5>
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body text-center bg-white p-2">
+                <img id="imageViewerFull" src="" style="max-width:100%;max-height:70vh;">
+            </div>
+            <div class="modal-footer border-0" style="background:#1a1a2e;">
+                <a id="imageDownloadBtn" href="" download="parent.png" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Download</a>
+                <button type="button" class="btn btn-outline-light btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
 .card { border-radius: 10px; }
 .table td, .table th { vertical-align: middle; border-top: none; }
@@ -84,4 +104,18 @@
 .btn-secondary { background: #6b7280; border-color: #6b7280; }
 </style>
 
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
+// Image Viewer
+function openImageViewer(imageUrl, title) {
+    if (!imageUrl) return;
+    $('#imageViewerFull').attr('src', imageUrl);
+    $('#imageDownloadBtn').attr('href', imageUrl);
+    $('#imageDownloadBtn').attr('download', title.replace(/\s+/g, '_') + '.png');
+    $('#imageViewerTitle').text(title || 'Parent Photo');
+    $('#imageViewerModal').modal('show');
+}
+</script>
 <?= $this->endSection() ?>

@@ -23,14 +23,13 @@
                             <div class="card-header"><h5><i class="fas fa-user mr-2"></i>Parent Information</h5></div>
                             <div class="card-body">
                                 
-                                <!-- Profile Picture -->
                                 <div class="form-group text-center">
                                     <label>Profile Picture</label>
                                     <div id="parentPhotoPreview" style="width:150px;height:150px;margin:0 auto 10px;border-radius:50%;overflow:hidden;border:4px solid #667eea;background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
                                         <i class="fas fa-user fa-3x text-muted"></i>
                                     </div>
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <button type="button" class="btn btn-outline-secondary" id="openCameraBtn"><i class="fas fa-camera mr-1"></i> Take Photo</button>
+                                        <button type="button" class="btn btn-outline-secondary open-camera-btn" data-target="parent"><i class="fas fa-camera mr-1"></i> Take Photo</button>
                                         <label class="btn btn-outline-secondary mb-0" style="cursor:pointer;">
                                             <i class="fas fa-upload mr-1"></i> Upload
                                             <input type="file" name="picture" id="pictureInput" class="d-none" accept="image/*">
@@ -58,6 +57,20 @@
                             <div class="card-header d-flex justify-content-between"><h5 class="mb-0"><i class="fas fa-child mr-2"></i>Students</h5><button type="button" class="btn btn-outline-secondary btn-xs" id="addStudentBtn">+ Add Student</button></div>
                             <div class="card-body" id="studentsContainer">
                                 <div class="border rounded p-3 mb-2 student-entry">
+                                    <div class="form-group text-center">
+                                        <div class="student-photo-preview" style="width:80px;height:80px;margin:0 auto 5px;border-radius:50%;overflow:hidden;border:3px solid #667eea;background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
+                                            <i class="fas fa-child text-muted"></i>
+                                        </div>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button" class="btn btn-outline-secondary btn-xs open-camera-btn" data-target="student-0"><i class="fas fa-camera"></i></button>
+                                            <label class="btn btn-outline-secondary btn-xs mb-0" style="cursor:pointer;">
+                                                <i class="fas fa-upload"></i>
+                                                <input type="file" class="d-none student-pic-input" accept="image/*" data-index="0">
+                                            </label>
+                                        </div>
+                                        <input type="hidden" name="student_picture_capture[]" class="student-picture-capture" data-index="0">
+                                        <input type="file" name="student_picture[]" class="d-none student-picture-file" data-index="0">
+                                    </div>
                                     <div class="row">
                                         <div class="col-4"><label class="small">First Name</label><input type="text" name="student_fname[]" class="form-control form-control-sm" required></div>
                                         <div class="col-4"><label class="small">Middle Name</label><input type="text" name="student_mname[]" class="form-control form-control-sm"></div>
@@ -110,10 +123,27 @@
 <script>
 $(function() {
     var stream;
+    var currentTarget = 'parent';
+    var studentIndex = 0;
 
     // Add Student
     $('#addStudentBtn').click(function() {
+        studentIndex++;
         var html = `<div class="border rounded p-3 mb-2 student-entry"><button type="button" class="close remove-student">&times;</button>
+            <div class="form-group text-center">
+                <div class="student-photo-preview" style="width:80px;height:80px;margin:0 auto 5px;border-radius:50%;overflow:hidden;border:3px solid #667eea;background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-child text-muted"></i>
+                </div>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-secondary btn-xs open-camera-btn" data-target="student-${studentIndex}"><i class="fas fa-camera"></i></button>
+                    <label class="btn btn-outline-secondary btn-xs mb-0" style="cursor:pointer;">
+                        <i class="fas fa-upload"></i>
+                        <input type="file" class="d-none student-pic-input" accept="image/*" data-index="${studentIndex}">
+                    </label>
+                </div>
+                <input type="hidden" name="student_picture_capture[]" class="student-picture-capture" data-index="${studentIndex}">
+                <input type="file" name="student_picture[]" class="d-none student-picture-file" data-index="${studentIndex}">
+            </div>
             <div class="row">
                 <div class="col-4"><label class="small">First Name</label><input type="text" name="student_fname[]" class="form-control form-control-sm" required></div>
                 <div class="col-4"><label class="small">Middle Name</label><input type="text" name="student_mname[]" class="form-control form-control-sm"></div>
@@ -124,14 +154,30 @@ $(function() {
     });
     $(document).on('click','.remove-student',function(){$(this).closest('.student-entry').remove();});
 
-    // File Upload Preview
+    // File Upload - Parent
     $('#pictureInput').on('change',function(){
         var f=this.files[0];
         if(f){var r=new FileReader();r.onload=function(e){$('#parentPhotoPreview').html('<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;">');};r.readAsDataURL(f);}
     });
 
+    // File Upload - Student
+    $(document).on('change', '.student-pic-input', function() {
+        var index = $(this).data('index');
+        var f = this.files[0];
+        if (f) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $(this).closest('.student-entry').find('.student-photo-preview').html('<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;">');
+            }.bind(this);
+            reader.readAsDataURL(f);
+            $('.student-picture-file[data-index="'+index+'"]').prop('files', this.files);
+            $('.student-picture-capture[data-index="'+index+'"]').val('');
+        }
+    });
+
     // Open Camera
-    $('#openCameraBtn').click(function(){
+    $(document).on('click', '.open-camera-btn', function() {
+        currentTarget = $(this).data('target');
         $('#cameraModal').modal('show');
         setTimeout(function(){
             navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:400,height:400}})
@@ -146,13 +192,23 @@ $(function() {
         c.width=v.videoWidth||400;c.height=v.videoHeight||400;
         c.getContext('2d').drawImage(v,0,0);
         var d=c.toDataURL('image/png');
-        $('#parentPhotoPreview').html('<img src="'+d+'" style="width:100%;height:100%;object-fit:cover;">');
-        $('#pictureCapture').val(d);
+
+        if (currentTarget === 'parent') {
+            $('#parentPhotoPreview').html('<img src="'+d+'" style="width:100%;height:100%;object-fit:cover;">');
+            $('#pictureCapture').val(d);
+        } else {
+            // Student target like "student-0", "student-1"
+            var index = currentTarget.replace('student-', '');
+            $('.student-picture-capture[data-index="'+index+'"]').val(d);
+            $('.student-picture-file[data-index="'+index+'"]').val('');
+            // Find and update preview
+            $('.student-picture-capture[data-index="'+index+'"]').closest('.student-entry').find('.student-photo-preview').html('<img src="'+d+'" style="width:100%;height:100%;object-fit:cover;">');
+        }
+
         if(stream){stream.getTracks().forEach(function(t){t.stop();});}
         $('#cameraModal').modal('hide');
     });
 
-    // Close Camera
     $('#cameraModal').on('hidden.bs.modal',function(){if(stream){stream.getTracks().forEach(function(t){t.stop();});}});
 });
 </script>

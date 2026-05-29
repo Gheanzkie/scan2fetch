@@ -8,9 +8,13 @@ use App\Models\StudentModel;
 
 class Admin extends BaseController
 {
-    // =============================================
-    // PARENTS
-    // =============================================
+    public function __construct()
+    {
+        if (!session('logged_in')) {
+            return redirect()->to('/login')->send();
+        }
+    }
+
     public function parents()
     {
         $model = new ParentsModel();
@@ -21,21 +25,15 @@ class Admin extends BaseController
     public function saveParent()
     {
         $model = new ParentsModel();
-        
-        // Picture upload
         $picture = $this->request->getFile('picture');
         $pictureName = null;
         if ($picture && $picture->isValid() && !$picture->hasMoved()) {
             $pictureName = $picture->getRandomName();
             $picture->move('uploads/parents', $pictureName);
         }
-        
-        // Generate QR Code
         $qrValue = 'QR-' . strtoupper(bin2hex(random_bytes(6)));
         include_once(FCPATH . 'phpqrcode/qrlib.php');
-        $qrPath = FCPATH . 'uploads/qr/' . $qrValue . '.png';
-        \QRcode::png($qrValue, $qrPath, QR_ECLEVEL_H, 8, 2);
-        
+        \QRcode::png($qrValue, FCPATH . 'uploads/qr/' . $qrValue . '.png', QR_ECLEVEL_H, 8, 2);
         $model->save([
             'fname'      => $this->request->getPost('fname'),
             'mname'      => $this->request->getPost('mname'),
@@ -46,7 +44,6 @@ class Admin extends BaseController
             'qr_code'    => $qrValue,
             'created_by' => session('user_id'),
         ]);
-        
         return redirect()->to('/parents')->with('msg', 'Parent added');
     }
 
@@ -54,25 +51,21 @@ class Admin extends BaseController
     {
         $model = new ParentsModel();
         $id = $this->request->getPost('id');
-        
         $data = [
             'fname' => $this->request->getPost('fname'),
             'mname' => $this->request->getPost('mname'),
             'lname' => $this->request->getPost('lname'),
             'phone' => $this->request->getPost('phone'),
         ];
-        
         if ($this->request->getPost('password')) {
             $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
         }
-        
         $picture = $this->request->getFile('picture');
         if ($picture && $picture->isValid() && !$picture->hasMoved()) {
             $pictureName = $picture->getRandomName();
             $picture->move('uploads/parents', $pictureName);
             $data['picture'] = $pictureName;
         }
-        
         $model->update($id, $data);
         return redirect()->to('/parents')->with('msg', 'Parent updated');
     }
@@ -84,9 +77,6 @@ class Admin extends BaseController
         return redirect()->to('/parents')->with('msg', 'Parent deleted');
     }
 
-    // =============================================
-    // STAFFS
-    // =============================================
     public function staffs()
     {
         $model = new StaffsModel();
@@ -111,18 +101,15 @@ class Admin extends BaseController
     {
         $model = new StaffsModel();
         $id = $this->request->getPost('id');
-        
         $data = [
             'fname' => $this->request->getPost('fname'),
             'mname' => $this->request->getPost('mname'),
             'lname' => $this->request->getPost('lname'),
             'phone' => $this->request->getPost('phone'),
         ];
-        
         if ($this->request->getPost('password')) {
             $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
         }
-        
         $model->update($id, $data);
         return redirect()->to('/staffs')->with('msg', 'Staff updated');
     }
@@ -134,18 +121,13 @@ class Admin extends BaseController
         return redirect()->to('/staffs')->with('msg', 'Staff deleted');
     }
 
-    // =============================================
-    // STUDENTS
-    // =============================================
     public function students()
     {
         $db = \Config\Database::connect();
         $data['students'] = $db->table('students')
             ->select('students.*, parents.fname as parent_fname, parents.lname as parent_lname')
             ->join('parents', 'parents.id = students.parent_id', 'left')
-            ->orderBy('students.created_at', 'DESC')
-            ->get()
-            ->getResultArray();
+            ->orderBy('students.created_at', 'DESC')->get()->getResultArray();
         $data['parents'] = $db->table('parents')->get()->getResultArray();
         return view('students', $data);
     }
@@ -153,14 +135,12 @@ class Admin extends BaseController
     public function saveStudent()
     {
         $model = new StudentModel();
-        
         $picture = $this->request->getFile('picture');
         $pictureName = null;
         if ($picture && $picture->isValid() && !$picture->hasMoved()) {
             $pictureName = $picture->getRandomName();
             $picture->move('uploads/students', $pictureName);
         }
-        
         $model->save([
             'fname'         => $this->request->getPost('fname'),
             'mname'         => $this->request->getPost('mname'),
@@ -170,7 +150,6 @@ class Admin extends BaseController
             'picture'       => $pictureName,
             'created_by'    => session('user_id'),
         ]);
-        
         return redirect()->to('/students')->with('msg', 'Student added');
     }
 
@@ -178,7 +157,6 @@ class Admin extends BaseController
     {
         $model = new StudentModel();
         $id = $this->request->getPost('id');
-        
         $data = [
             'fname'         => $this->request->getPost('fname'),
             'mname'         => $this->request->getPost('mname'),
@@ -186,14 +164,12 @@ class Admin extends BaseController
             'grade_section' => $this->request->getPost('grade_section'),
             'parent_id'     => $this->request->getPost('parent_id'),
         ];
-        
         $picture = $this->request->getFile('picture');
         if ($picture && $picture->isValid() && !$picture->hasMoved()) {
             $pictureName = $picture->getRandomName();
             $picture->move('uploads/students', $pictureName);
             $data['picture'] = $pictureName;
         }
-        
         $model->update($id, $data);
         return redirect()->to('/students')->with('msg', 'Student updated');
     }
@@ -205,18 +181,13 @@ class Admin extends BaseController
         return redirect()->to('/students')->with('msg', 'Student deleted');
     }
 
-    // =============================================
-    // LOGS
-    // =============================================
     public function logs()
     {
         $db = \Config\Database::connect();
         $data['logs'] = $db->table('fetch_logs')
             ->select('fetch_logs.*, students.fname as sfname, students.lname as slname')
             ->join('students', 'students.id = fetch_logs.student_id')
-            ->orderBy('time_released', 'DESC')
-            ->get()
-            ->getResultArray();
+            ->orderBy('time_released', 'DESC')->get()->getResultArray();
         return view('logs', $data);
     }
 }

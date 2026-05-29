@@ -30,9 +30,10 @@
                     <div class="card shadow-sm border-0">
                         <div class="card-body text-center">
                             
-                            <!-- Parent Photo -->
+                            <!-- Parent Photo - Click to full view -->
                             <div class="mb-3">
-                                <div id="parentPhotoPreview" style="width:140px;height:140px;margin:0 auto 10px;border-radius:50%;overflow:hidden;border:4px solid #667eea;">
+                                <div id="parentPhotoPreview" style="width:140px;height:140px;margin:0 auto 10px;border-radius:50%;overflow:hidden;border:4px solid #667eea;cursor:pointer;" 
+                                     onclick="openImageViewer('<?= !empty($parent['picture']) ? base_url('uploads/parents/' . $parent['picture']) : '' ?>', 'Parent Photo')">
                                     <?php if (!empty($parent['picture'])): ?>
                                         <img src="<?= base_url('uploads/parents/' . $parent['picture']) ?>" style="width:100%;height:100%;object-fit:cover;">
                                     <?php else: ?>
@@ -93,7 +94,9 @@
                             <?php if (!empty($students)): ?>
                                 <?php foreach ($students as $s): ?>
                                 <div class="d-flex align-items-center border rounded p-3 mb-2">
-                                    <div class="mr-3">
+                                    <div class="mr-3" style="cursor:pointer;" 
+                                         onclick="openImageViewer('<?= !empty($s['picture']) ? base_url('uploads/students/' . $s['picture']) : '' ?>', '<?= esc($s['fname'] . ' ' . $s['lname']) ?>')"
+                                         title="Click to view full photo">
                                         <?php if (!empty($s['picture'])): ?>
                                             <img src="<?= base_url('uploads/students/' . $s['picture']) ?>" class="img-circle" style="width:50px;height:50px;object-fit:cover;border:2px solid #667eea;">
                                         <?php else: ?>
@@ -132,7 +135,6 @@
                 <input type="hidden" name="parent_id" value="<?= $parent['id'] ?>">
                 <div class="modal-header border-0 pb-0"><h5><i class="fas fa-user-plus mr-2"></i> Add Student</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div>
                 <div class="modal-body">
-                    <!-- Student Picture -->
                     <div class="form-group text-center">
                         <label class="small">Student Picture</label>
                         <div class="add-student-photo-preview" style="width:100px;height:100px;margin:0 auto 10px;border-radius:50%;overflow:hidden;border:3px solid #667eea;background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
@@ -185,7 +187,6 @@
                 <input type="hidden" name="parent_id" value="<?= $parent['id'] ?>">
                 <div class="modal-header border-0 pb-0"><h5><i class="fas fa-user-edit mr-2"></i> Edit Student</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div>
                 <div class="modal-body">
-                    <!-- Student Picture -->
                     <div class="form-group text-center">
                         <label class="small">Student Picture</label>
                         <div class="edit-student-photo-preview" style="width:100px;height:100px;margin:0 auto 10px;border-radius:50%;overflow:hidden;border:3px solid #667eea;background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
@@ -242,6 +243,25 @@
     </div>
 </div>
 
+<!-- Image Viewer Modal -->
+<div class="modal fade" id="imageViewerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow" style="background:#1a1a2e;">
+            <div class="modal-header border-0" style="background:#1a1a2e;">
+                <h5 class="text-white"><i class="fas fa-image mr-2"></i><span id="imageViewerTitle">Photo</span></h5>
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body text-center bg-white p-2">
+                <img id="imageViewerFull" src="" style="max-width:100%;max-height:70vh;">
+            </div>
+            <div class="modal-footer border-0" style="background:#1a1a2e;">
+                <a id="imageDownloadBtn" href="" download="photo.png" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Download</a>
+                <button type="button" class="btn btn-outline-light btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- QR Modal -->
 <div class="modal fade" id="qrModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -266,9 +286,8 @@
 <script>
 $(function() {
     var stream;
-    var currentTarget = null; // 'parent', 'add-student', 'edit-student'
+    var currentTarget = null;
 
-    // Edit Student Modal
     $('.edit-student-btn').click(function() {
         $('#editStudentId').val($(this).data('id'));
         $('#editSFname').val($(this).data('fname'));
@@ -277,57 +296,43 @@ $(function() {
         $('#editSGrade').val($(this).data('grade'));
     });
 
-    // ========== FILE UPLOAD HANDLERS ==========
-    // Parent picture upload
     $(document).on('change', '.parent-pic-input', function() {
         var f = this.files[0];
         if (f) {
-            var form = $(this).closest('.card-body').find('.picture-form');
+            var form = $('.picture-form');
             form.find('.picture-file').prop('files', this.files);
             form.find('.picture-capture').val('');
             form.submit();
         }
     });
 
-    // Add student picture upload
     $(document).on('change', '.add-student-pic-input', function() {
         var f = this.files[0];
         if (f) {
             var reader = new FileReader();
-            reader.onload = function(e) {
-                $('.add-student-photo-preview').html('<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;">');
-            };
+            reader.onload = function(e) { $('.add-student-photo-preview').html('<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;">'); };
             reader.readAsDataURL(f);
             $('.add-student-picture-file').prop('files', this.files);
             $('.add-student-picture-capture').val('');
         }
     });
 
-    // Edit student picture upload
     $(document).on('change', '.edit-student-pic-input', function() {
         var f = this.files[0];
         if (f) {
             var reader = new FileReader();
-            reader.onload = function(e) {
-                $('.edit-student-photo-preview').html('<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;">');
-            };
+            reader.onload = function(e) { $('.edit-student-photo-preview').html('<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;">'); };
             reader.readAsDataURL(f);
             $('.edit-student-picture-file').prop('files', this.files);
             $('.edit-student-picture-capture').val('');
         }
     });
 
-    // ========== OPEN CAMERA ==========
     $(document).on('click', '.open-camera-btn', function() {
-        // Determine which target
         var btn = $(this);
-        if (btn.closest('#parentPhotoPreview').length || btn.siblings('#parentPhotoPreview').length || btn.closest('.card-body').find('#parentPhotoPreview').length) {
-            currentTarget = 'parent';
-        } else if (btn.closest('#addStudentModal').length) {
-            currentTarget = 'add-student';
-        } else if (btn.closest('#editStudentModal').length) {
-            currentTarget = 'edit-student';
-        }
+        if (btn.closest('.card-body').find('#parentPhotoPreview').length) { currentTarget = 'parent'; }
+        else if (btn.closest('#addStudentModal').length) { currentTarget = 'add-student'; }
+        else if (btn.closest('#editStudentModal').length) { currentTarget = 'edit-student'; }
 
         $('#cameraModal').modal('show');
         setTimeout(function() {
@@ -337,11 +342,9 @@ $(function() {
         }, 500);
     });
 
-    // ========== CAPTURE ==========
     $('#captureBtn').click(function() {
         var v = $('#cameraVideo')[0], c = $('#cameraCanvas')[0];
-        c.width = v.videoWidth || 400;
-        c.height = v.videoHeight || 400;
+        c.width = v.videoWidth || 400; c.height = v.videoHeight || 400;
         c.getContext('2d').drawImage(v, 0, 0);
         var d = c.toDataURL('image/png');
 
@@ -365,12 +368,20 @@ $(function() {
         $('#cameraModal').modal('hide');
     });
 
-    // Close Camera
-    $('#cameraModal').on('hidden.bs.modal', function() {
-        if (stream) { stream.getTracks().forEach(function(t) { t.stop(); }); }
-    });
+    $('#cameraModal').on('hidden.bs.modal', function() { if (stream) { stream.getTracks().forEach(function(t) { t.stop(); }); } });
 });
 
+// ========== IMAGE VIEWER ==========
+function openImageViewer(imageUrl, title) {
+    if (!imageUrl) return;
+    $('#imageViewerFull').attr('src', imageUrl);
+    $('#imageDownloadBtn').attr('href', imageUrl);
+    $('#imageDownloadBtn').attr('download', title.replace(/\s+/g, '_') + '.png');
+    $('#imageViewerTitle').text(title);
+    $('#imageViewerModal').modal('show');
+}
+
+// ========== QR VIEWER ==========
 function openQrModal(url) {
     $('#qrFullImage').attr('src', url);
     $('#qrDownloadBtn').attr('href', url);

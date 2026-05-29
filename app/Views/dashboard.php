@@ -72,7 +72,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="row">
                 <div class="col-12">
                     <div class="card shadow-sm border-0">
@@ -194,8 +193,9 @@
                 <div class="col-md-4">
                     <div class="card shadow-sm border-0">
                         <div class="card-body text-center">
-                            <!-- Parent Photo -->
-                            <div style="width:130px;height:130px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #667eea;">
+                            <!-- Parent Photo - Click to full view -->
+                            <div style="width:130px;height:130px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #667eea;cursor:pointer;" 
+                                 onclick="openImageViewer('<?= !empty($parentProfile['picture']) ? base_url('uploads/parents/' . $parentProfile['picture']) : '' ?>', '<?= esc($parentProfile['fname'] . ' ' . $parentProfile['lname']) ?>')">
                                 <?php if (!empty($parentProfile['picture'])): ?>
                                     <img src="<?= base_url('uploads/parents/' . $parentProfile['picture']) ?>" style="width:100%;height:100%;object-fit:cover;">
                                 <?php else: ?>
@@ -228,7 +228,9 @@
                                     <?php foreach ($myChildren as $child): ?>
                                     <div class="col-md-6 mb-3">
                                         <div class="d-flex align-items-center border rounded p-3">
-                                            <div class="mr-3">
+                                            <div class="mr-3" style="cursor:pointer;" 
+                                                 onclick="openImageViewer('<?= !empty($child['picture']) ? base_url('uploads/students/' . $child['picture']) : '' ?>', '<?= esc($child['fname'] . ' ' . $child['lname']) ?>')"
+                                                 title="Click to view full photo">
                                                 <?php if (!empty($child['picture'])): ?>
                                                     <img src="<?= base_url('uploads/students/' . $child['picture']) ?>" class="img-circle" style="width:55px;height:55px;object-fit:cover;border:2px solid #667eea;">
                                                 <?php else: ?>
@@ -244,9 +246,7 @@
                                     <?php endforeach; ?>
                                 </div>
                             <?php else: ?>
-                                <div class="text-center text-muted py-4">
-                                    <i class="fas fa-child fa-2x mb-2 d-block"></i>No children registered
-                                </div>
+                                <div class="text-center text-muted py-4"><i class="fas fa-child fa-2x mb-2 d-block"></i>No children registered</div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -256,6 +256,25 @@
 
         </div>
     </section>
+</div>
+
+<!-- Image Viewer Modal -->
+<div class="modal fade" id="imageViewerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow" style="background:#1a1a2e;">
+            <div class="modal-header border-0" style="background:#1a1a2e;">
+                <h5 class="text-white"><i class="fas fa-image mr-2"></i><span id="imageViewerTitle">Photo</span></h5>
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body text-center bg-white p-2">
+                <img id="imageViewerFull" src="" style="max-width:100%;max-height:70vh;">
+            </div>
+            <div class="modal-footer border-0" style="background:#1a1a2e;">
+                <a id="imageDownloadBtn" href="" download="photo.png" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Download</a>
+                <button type="button" class="btn btn-outline-light btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- QR Modal -->
@@ -299,6 +318,15 @@ function openQrModal(url) {
     $('#qrFullImage').attr('src', url);
     $('#qrDownloadBtn').attr('href', url);
     $('#qrModal').modal('show');
+}
+
+function openImageViewer(imageUrl, title) {
+    if (!imageUrl) return;
+    $('#imageViewerFull').attr('src', imageUrl);
+    $('#imageDownloadBtn').attr('href', imageUrl);
+    $('#imageDownloadBtn').attr('download', title.replace(/\s+/g, '_') + '.png');
+    $('#imageViewerTitle').text(title || 'Photo');
+    $('#imageViewerModal').modal('show');
 }
 </script>
 <?= $this->endSection() ?>

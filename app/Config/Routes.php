@@ -36,11 +36,22 @@ $routes->post('authorization-send', 'Authorization::send');
 $routes->get('authorizations', 'Authorization::all');
 $routes->get('authorization-approve/(:num)', 'Authorization::approve/$1');
 $routes->get('authorization-release/(:num)', 'Authorization::release/$1');
+$routes->get('authorization-decline/(:num)', 'Authorization::decline/$1');
 
+// QR Scan
 // QR Scan
 $routes->get('scan', 'Scan::index');
 $routes->post('scan/verify', 'Scan::verify');
 $routes->post('scan/release', 'Scan::release');
+$routes->post('scan/decline', 'Scan::decline');
+
+// Students
+$routes->get('students', 'Students::index');
+$routes->post('students-save', 'Students::save');
+$routes->post('students-update', 'Students::update');
+$routes->get('students-delete/(:num)', 'Students::delete/$1');
+
 
 // Logs
 $routes->get('logs', 'Logs::index');
+$routes->get('sms-logs', 'Sms::index');

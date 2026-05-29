@@ -18,7 +18,6 @@
                 <!-- Left: Scanner + Manual Input -->
                 <div class="col-lg-5 col-md-6 col-12">
                     
-                    <!-- Camera Scanner -->
                     <div class="card shadow-sm border-0 mb-3">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0"><i class="fas fa-camera mr-2"></i>Camera</h5>
@@ -33,7 +32,6 @@
                         </div>
                     </div>
 
-                    <!-- Manual Input -->
                     <div class="card shadow-sm border-0">
                         <div class="card-header"><h5 class="mb-0"><i class="fas fa-keyboard mr-2"></i>Manual Input</h5></div>
                         <div class="card-body text-center">
@@ -48,7 +46,6 @@
                 <!-- Right: Parent Info -->
                 <div class="col-lg-7 col-md-6 col-12">
                     
-                    <!-- Empty State -->
                     <div class="card shadow-sm border-0" id="emptyState">
                         <div class="card-body text-center text-muted py-5">
                             <i class="fas fa-qrcode fa-5x mb-3 d-block" style="opacity:0.3;"></i>
@@ -57,7 +54,6 @@
                         </div>
                     </div>
 
-                    <!-- Parent Card -->
                     <div class="card shadow-sm border-0" id="parentCard" style="display:none;">
                         <div class="card-header bg-white d-flex justify-content-between align-items-center">
                             <h5 class="mb-0"><i class="fas fa-user-check mr-2 text-success"></i>Verified Parent</h5>
@@ -65,10 +61,8 @@
                         </div>
                         <div class="card-body">
                             
-                            <!-- Parent Profile -->
                             <div class="text-center mb-3">
-                                <!-- Iisang container lang -->
-                                <div id="parentPhotoContainer" style="width:140px;height:140px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #667eea;">
+                                <div id="parentPhotoContainer" style="width:140px;height:140px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #667eea;cursor:pointer;" onclick="openImageViewer($('#parentPic').attr('src'), $('#parentName').text())">
                                     <img id="parentPic" src="" style="width:100%;height:100%;object-fit:cover;display:none;">
                                     <div id="parentNoPic" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f3f4f6;">
                                         <i class="fas fa-user fa-3x text-muted"></i>
@@ -80,7 +74,6 @@
 
                             <hr>
 
-                            <!-- Students -->
                             <h6 class="mb-3"><i class="fas fa-child mr-2"></i>Students to Release</h6>
                             <div id="studentsList"></div>
                         </div>
@@ -93,6 +86,45 @@
     </section>
 </div>
 
+<!-- Confirm Action Modal (Decline / Release) -->
+<div class="modal fade" id="confirmActionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h6><i class="fas fa-question-circle text-warning mr-2"></i>Confirm Action</h6>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body text-center">
+                <p class="mb-1">What would you like to do?</p>
+                <p class="text-muted small mb-0"><strong id="confirmStudentName"></strong></p>
+            </div>
+            <div class="modal-footer border-0 pt-0 justify-content-center">
+                <button type="button" class="btn btn-danger btn-sm" id="confirmDecline"><i class="fas fa-times mr-1"></i> Decline</button>
+                <button type="button" class="btn btn-success btn-sm" id="confirmRelease"><i class="fas fa-check mr-1"></i> Release</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Viewer Modal -->
+<div class="modal fade" id="imageViewerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow" style="background:#1a1a2e;">
+            <div class="modal-header border-0" style="background:#1a1a2e;">
+                <h5 class="text-white"><i class="fas fa-image mr-2"></i><span id="imageViewerTitle">Photo</span></h5>
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body text-center bg-white p-2">
+                <img id="imageViewerFull" src="" style="max-width:100%;max-height:70vh;">
+            </div>
+            <div class="modal-footer border-0" style="background:#1a1a2e;">
+                <a id="imageDownloadBtn" href="" download="photo.png" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Download</a>
+                <button type="button" class="btn btn-outline-light btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
@@ -102,15 +134,15 @@
 $(function() {
     var html5QrCode;
     var isScanning = false;
+    var pendingStudentId = null;
+    var pendingParentId = null;
 
     startCamera();
-
     $('#startCameraBtn').click(function() { startCamera(); });
 
     function startCamera() {
         if (isScanning) return;
         isScanning = true;
-
         $('#reader').show();
         $('#startCameraBtn').hide();
         $('#stopCameraBtn').show();
@@ -165,7 +197,6 @@ $(function() {
                 $('#parentName').text(p.fname + ' ' + p.lname);
                 $('#parentPhone').html('<i class="fas fa-phone mr-1"></i> ' + p.phone);
                 
-                // Iisang container — show/hide
                 if (p.picture) {
                     $('#parentPic').attr('src', '<?= base_url('uploads/parents/') ?>' + p.picture).show();
                     $('#parentNoPic').hide();
@@ -176,17 +207,18 @@ $(function() {
 
                 var html = '';
                 res.students.forEach(function(s) {
+                    var studentPicUrl = s.picture ? '<?= base_url('uploads/students/') ?>' + s.picture : '';
                     html += `
                     <div class="d-flex align-items-center border rounded p-3 mb-2">
-                        <div class="mr-3">
+                        <div class="mr-3" style="cursor:pointer;" onclick="openImageViewer('${studentPicUrl}', '${s.fname} ${s.lname}')" title="Click to view full photo">
                             ${s.picture ? '<img src="<?= base_url('uploads/students/') ?>'+s.picture+'" class="img-circle" style="width:55px;height:55px;object-fit:cover;border:2px solid #667eea;">' : '<div class="img-circle bg-light d-flex align-items-center justify-content-center" style="width:55px;height:55px;border:2px solid #667eea;"><i class="fas fa-child text-muted"></i></div>'}
                         </div>
                         <div class="flex-grow-1">
                             <strong>${s.fname} ${s.lname}</strong>
                             <br><small class="text-muted">${s.grade_section}</small>
                         </div>
-                        <button class="btn btn-success btn-sm release-student-btn" data-student-id="${s.id}" data-parent-id="${res.parent.id}">
-                            <i class="fas fa-check mr-1"></i> Release
+                        <button class="btn btn-outline-secondary btn-sm action-btn" data-student-id="${s.id}" data-parent-id="${res.parent.id}" data-name="${s.fname} ${s.lname}">
+                            <i class="fas fa-ellipsis-h"></i> Action
                         </button>
                     </div>`;
                 });
@@ -204,33 +236,71 @@ $(function() {
         });
     }
 
-    $(document).on('click', '.release-student-btn', function() {
-        var studentId = $(this).data('student-id');
-        var parentId = $(this).data('parent-id');
-        var btn = $(this);
+    // Open Action Modal
+    $(document).on('click', '.action-btn', function() {
+        pendingStudentId = $(this).data('student-id');
+        pendingParentId = $(this).data('parent-id');
+        $('#confirmStudentName').text($(this).data('name'));
+        $('#confirmActionModal').modal('show');
+    });
 
-        if (!confirm('Release this student? SMS will be sent.')) return;
-        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+    // Release
+    $('#confirmRelease').click(function() {
+        $('#confirmActionModal').modal('hide');
+        if (!pendingStudentId) return;
 
         $.post('<?= base_url('scan/release') ?>', { 
-            student_id: studentId, parent_id: parentId, 
+            student_id: pendingStudentId, parent_id: pendingParentId, 
             '<?= csrf_token() ?>': '<?= csrf_hash() ?>' 
         }, function(res) {
             if (res.success) {
                 alert('Student released! SMS sent.');
-                $('#parentCard').hide();
-                $('#emptyState').show();
-                $('#qrInput').val('');
-                $('#qrResult').html('');
-                $('#scanResult').html('');
-                setTimeout(startCamera, 1000);
             } else {
                 alert('Error: ' + res.message);
-                btn.prop('disabled', false).html('<i class="fas fa-check mr-1"></i> Release');
             }
+            resetAndRestart();
         }, 'json');
     });
+
+    // Decline
+    $('#confirmDecline').click(function() {
+        $('#confirmActionModal').modal('hide');
+        if (!pendingStudentId) return;
+
+        $.post('<?= base_url('scan/decline') ?>', { 
+            student_id: pendingStudentId, parent_id: pendingParentId, 
+            '<?= csrf_token() ?>': '<?= csrf_hash() ?>' 
+        }, function(res) {
+            if (res.success) {
+                alert('Release declined. SMS sent to parent.');
+            } else {
+                alert('Error: ' + res.message);
+            }
+            resetAndRestart();
+        }, 'json');
+    });
+
+    function resetAndRestart() {
+        $('#parentCard').hide();
+        $('#emptyState').show();
+        $('#qrInput').val('');
+        $('#qrResult').html('');
+        $('#scanResult').html('');
+        pendingStudentId = null;
+        pendingParentId = null;
+        setTimeout(startCamera, 1000);
+    }
 });
+
+// Image Viewer
+function openImageViewer(imageUrl, title) {
+    if (!imageUrl) return;
+    $('#imageViewerFull').attr('src', imageUrl);
+    $('#imageDownloadBtn').attr('href', imageUrl);
+    $('#imageDownloadBtn').attr('download', title.replace(/\s+/g, '_') + '.png');
+    $('#imageViewerTitle').text(title || 'Photo');
+    $('#imageViewerModal').modal('show');
+}
 </script>
 
 <style>

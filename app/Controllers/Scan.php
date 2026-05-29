@@ -50,4 +50,26 @@ class Scan extends BaseController
         $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'release', 'scan', 'QR Release | Student: '.$student['fname'].' '.$student['lname'].' (ID: '.$studentId.') | Parent: '.$parent['fname'].' '.$parent['lname'].' | SMS sent');
         return $this->response->setJSON(['success' => true, 'message' => 'Student released! SMS sent.']);
     }
+
+    public function decline()
+    {
+        $studentId = $this->request->getPost('student_id');
+        $parentId  = $this->request->getPost('parent_id');
+
+        $parent  = $this->db->table('parents')->where('id', $parentId)->get()->getRowArray();
+        $student = $this->db->table('students')->where('id', $studentId)->get()->getRowArray();
+
+        if (!$parent || !$student) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Data not found']);
+        }
+
+        // Send SMS
+        $message = "Pickup attempt for {$student['fname']} {$student['lname']} has been DECLINED at " . date('h:i A') . ". Please contact the school. - BCC Scan2Fetch";
+        $this->db->table('sms_logs')->insert(['parent_phone' => $parent['phone'], 'message' => $message, 'status' => 'sent']);
+
+        // Activity Log
+        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'decline', 'scan', 'DECLINED release | Student: '.$student['fname'].' '.$student['lname'].' (ID: '.$studentId.') | Parent: '.$parent['fname'].' '.$parent['lname'].' | SMS sent');
+
+        return $this->response->setJSON(['success' => true, 'message' => 'Declined. SMS sent.']);
+    }
 }

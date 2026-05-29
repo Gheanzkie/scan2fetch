@@ -32,6 +32,7 @@
                         <i class="nav-icon fas fa-user-check"></i><p>Staffs</p>
                     </a>
                 </li>
+
                 <li class="nav-header">OPERATIONS</li>
                 <li class="nav-item">
                     <a href="<?= base_url('scan') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'scan') ? 'active' : '' ?>">
@@ -43,10 +44,16 @@
                         <i class="nav-icon fas fa-file-signature"></i><p>Authorizations</p>
                     </a>
                 </li>
+
                 <li class="nav-header">REPORTS</li>
                 <li class="nav-item">
                     <a href="<?= base_url('logs') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'logs') ? 'active' : '' ?>">
                         <i class="nav-icon fas fa-history"></i><p>Activity Logs</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= base_url('sms-logs') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'sms-logs') ? 'active' : '' ?>">
+                        <i class="nav-icon fas fa-sms"></i><p>SMS Logs</p>
                     </a>
                 </li>
                 <?php endif; ?>
@@ -72,6 +79,11 @@
                 <li class="nav-item">
                     <a href="<?= base_url('parents') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'parents') ? 'active' : '' ?>">
                         <i class="nav-icon fas fa-users"></i><p>Parents</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= base_url('sms-logs') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'sms-logs') ? 'active' : '' ?>">
+                        <i class="nav-icon fas fa-sms"></i><p>SMS Logs</p>
                     </a>
                 </li>
                 <?php endif; ?>
