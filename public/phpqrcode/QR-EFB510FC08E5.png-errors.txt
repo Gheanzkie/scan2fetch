@@ -1,0 +1,1 @@
+2026-05-29 06:02:03: imagepng(C:\xampp\htdocs\scan2fetch\public\uploads/qr/QR-EFB510FC08E5.png): Failed to open stream: No such file or directory
