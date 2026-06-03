@@ -17,6 +17,13 @@
                 <!-- ========== ADMIN ========== -->
                 <?php if (session('role') == 'admin'): ?>
                 <li class="nav-header">MANAGEMENT</li>
+
+                <li class="nav-item">
+                    <a href="<?= base_url('students-add') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'students-add') ? 'active' : '' ?>">
+                        <i class="nav-icon fas fa-user-plus"></i><p>Register Student & Parents</p>
+                    </a>
+                </li>
+
                 <li class="nav-item">
                     <a href="<?= base_url('parents') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'parents') ? 'active' : '' ?>">
                         <i class="nav-icon fas fa-users"></i><p>Parents</p>
@@ -32,6 +39,8 @@
                         <i class="nav-icon fas fa-user-check"></i><p>Staffs</p>
                     </a>
                 </li>
+
+                
 
                 <li class="nav-header">OPERATIONS</li>
                 <li class="nav-item">
@@ -86,6 +95,13 @@
                         <i class="nav-icon fas fa-sms"></i><p>SMS Logs</p>
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a href="<?= base_url('logs') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'logs') ? 'active' : '' ?>">
+                        <i class="nav-icon fas fa-history"></i><p>Activity Logs</p>
+                    </a>
+                </li>
+
                 <?php endif; ?>
 
                 <!-- ========== PARENT ========== -->

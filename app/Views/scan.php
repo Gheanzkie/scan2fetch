@@ -56,7 +56,7 @@
 
                     <div class="card shadow-sm border-0" id="parentCard" style="display:none;">
                         <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0"><i class="fas fa-user-check mr-2 text-success"></i>Verified Parent</h5>
+                            <h5 class="mb-0"><i class="fas fa-user-check mr-2 text-success"></i>Verified</h5>
                             <span class="badge badge-success">Verified</span>
                         </div>
                         <div class="card-body">
@@ -70,6 +70,7 @@
                                 </div>
                                 <h4 class="mt-2 mb-0" id="parentName"></h4>
                                 <p class="text-muted mb-0" id="parentPhone"></p>
+                                <span class="badge badge-info mt-1" id="fetcherType" style="display:none;"></span>
                             </div>
 
                             <hr>
@@ -86,18 +87,12 @@
     </section>
 </div>
 
-<!-- Confirm Action Modal (Decline / Release) -->
+<!-- Confirm Action Modal -->
 <div class="modal fade" id="confirmActionModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header border-0 pb-0">
-                <h6><i class="fas fa-question-circle text-warning mr-2"></i>Confirm Action</h6>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body text-center">
-                <p class="mb-1">What would you like to do?</p>
-                <p class="text-muted small mb-0"><strong id="confirmStudentName"></strong></p>
-            </div>
+            <div class="modal-header border-0 pb-0"><h6><i class="fas fa-question-circle text-warning mr-2"></i>Confirm Action</h6><button type="button" class="close" data-dismiss="modal">&times;</button></div>
+            <div class="modal-body text-center"><p class="mb-1">What would you like to do?</p><p class="text-muted small mb-0"><strong id="confirmStudentName"></strong></p></div>
             <div class="modal-footer border-0 pt-0 justify-content-center">
                 <button type="button" class="btn btn-danger btn-sm" id="confirmDecline"><i class="fas fa-times mr-1"></i> Decline</button>
                 <button type="button" class="btn btn-success btn-sm" id="confirmRelease"><i class="fas fa-check mr-1"></i> Release</button>
@@ -110,17 +105,9 @@
 <div class="modal fade" id="imageViewerModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow" style="background:#1a1a2e;">
-            <div class="modal-header border-0" style="background:#1a1a2e;">
-                <h5 class="text-white"><i class="fas fa-image mr-2"></i><span id="imageViewerTitle">Photo</span></h5>
-                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body text-center bg-white p-2">
-                <img id="imageViewerFull" src="" style="max-width:100%;max-height:70vh;">
-            </div>
-            <div class="modal-footer border-0" style="background:#1a1a2e;">
-                <a id="imageDownloadBtn" href="" download="photo.png" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Download</a>
-                <button type="button" class="btn btn-outline-light btn-sm" data-dismiss="modal">Close</button>
-            </div>
+            <div class="modal-header border-0" style="background:#1a1a2e;"><h5 class="text-white"><i class="fas fa-image mr-2"></i><span id="imageViewerTitle">Photo</span></h5><button type="button" class="close text-white" data-dismiss="modal">&times;</button></div>
+            <div class="modal-body text-center bg-white p-2"><img id="imageViewerFull" src="" style="max-width:100%;max-height:70vh;"></div>
+            <div class="modal-footer border-0" style="background:#1a1a2e;"><a id="imageDownloadBtn" href="" download="photo.png" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Download</a><button type="button" class="btn btn-outline-light btn-sm" data-dismiss="modal">Close</button></div>
         </div>
     </div>
 </div>
@@ -132,10 +119,7 @@
 
 <script>
 $(function() {
-    var html5QrCode;
-    var isScanning = false;
-    var pendingStudentId = null;
-    var pendingParentId = null;
+    var html5QrCode, isScanning = false, pendingStudentId = null, pendingParentId = null;
 
     startCamera();
     $('#startCameraBtn').click(function() { startCamera(); });
@@ -143,36 +127,29 @@ $(function() {
     function startCamera() {
         if (isScanning) return;
         isScanning = true;
-        $('#reader').show();
-        $('#startCameraBtn').hide();
-        $('#stopCameraBtn').show();
-
+        $('#reader').show(); $('#startCameraBtn').hide(); $('#stopCameraBtn').show();
         html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: { width: 250, height: 250 } },
+        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } },
             function(decodedText) {
                 $('#scanResult').html('<span class="text-success"><i class="fas fa-check-circle"></i> Scanned!</span>');
                 stopCamera(false);
                 verifyQrCode(decodedText);
             },
-            function(errorMessage) {}
+            function() {}
         ).catch(function(err) {
             isScanning = false;
             $('#scanResult').html('<span class="text-danger">Camera error</span>');
-            $('#startCameraBtn').show();
-            $('#stopCameraBtn').hide();
+            $('#startCameraBtn').show(); $('#stopCameraBtn').hide();
         });
     }
 
-    function stopCamera(showStartButton) {
+    function stopCamera(showStart) {
         if (html5QrCode) {
             html5QrCode.stop().then(function() {
                 isScanning = false;
-                $('#reader').hide();
-                $('#stopCameraBtn').hide();
-                if (showStartButton !== false) $('#startCameraBtn').show();
-            }).catch(function(err) {});
+                $('#reader').hide(); $('#stopCameraBtn').hide();
+                if (showStart !== false) $('#startCameraBtn').show();
+            }).catch(function() {});
         }
     }
 
@@ -186,57 +163,57 @@ $(function() {
 
     function verifyQrCode(qrCode) {
         $('#qrResult').html('<i class="fas fa-spinner fa-spin"></i> Verifying...');
-
-        $.post('<?= base_url('scan/verify') ?>', { 
-            qr_code: qrCode, 
-            '<?= csrf_token() ?>': '<?= csrf_hash() ?>' 
-        }, function(res) {
+        $.post('<?= base_url('scan/verify') ?>', { qr_code: qrCode, '<?= csrf_token() ?>': '<?= csrf_hash() ?>' }, function(res) {
             if (res.success) {
                 $('#qrResult').html('<span class="text-success"><i class="fas fa-check-circle"></i> Verified!</span>');
-                var p = res.parent;
-                $('#parentName').text(p.fname + ' ' + p.lname);
-                $('#parentPhone').html('<i class="fas fa-phone mr-1"></i> ' + p.phone);
+                var p = res.parent, f = res.fetcher;
+                
+                // Show fetcher name and type
+                if (f.type === 'Sub-Fetcher') {
+                    $('#parentName').text(f.fname + ' ' + f.lname);
+                    $('#parentPhone').html('<i class="fas fa-phone mr-1"></i> ' + f.phone);
+                    $('#fetcherType').text('Sub-Fetcher').show();
+                } else {
+                    $('#parentName').text(p.fname + ' ' + p.lname);
+                    $('#parentPhone').html('<i class="fas fa-phone mr-1"></i> ' + p.phone);
+                    $('#fetcherType').text('Main Parent').show();
+                }
                 
                 if (p.picture) {
                     $('#parentPic').attr('src', '<?= base_url('uploads/parents/') ?>' + p.picture).show();
                     $('#parentNoPic').hide();
                 } else {
-                    $('#parentPic').hide();
-                    $('#parentNoPic').show();
+                    $('#parentPic').hide(); $('#parentNoPic').show();
                 }
 
                 var html = '';
-                res.students.forEach(function(s) {
-                    var studentPicUrl = s.picture ? '<?= base_url('uploads/students/') ?>' + s.picture : '';
-                    html += `
-                    <div class="d-flex align-items-center border rounded p-3 mb-2">
-                        <div class="mr-3" style="cursor:pointer;" onclick="openImageViewer('${studentPicUrl}', '${s.fname} ${s.lname}')" title="Click to view full photo">
-                            ${s.picture ? '<img src="<?= base_url('uploads/students/') ?>'+s.picture+'" class="img-circle" style="width:55px;height:55px;object-fit:cover;border:2px solid #667eea;">' : '<div class="img-circle bg-light d-flex align-items-center justify-content-center" style="width:55px;height:55px;border:2px solid #667eea;"><i class="fas fa-child text-muted"></i></div>'}
-                        </div>
-                        <div class="flex-grow-1">
-                            <strong>${s.fname} ${s.lname}</strong>
-                            <br><small class="text-muted">${s.grade_section}</small>
-                        </div>
-                        <button class="btn btn-outline-secondary btn-sm action-btn" data-student-id="${s.id}" data-parent-id="${res.parent.id}" data-name="${s.fname} ${s.lname}">
-                            <i class="fas fa-ellipsis-h"></i> Action
-                        </button>
-                    </div>`;
-                });
+                if (res.students && res.students.length > 0) {
+                    res.students.forEach(function(s) {
+                        var pic = s.picture ? '<?= base_url('uploads/students/') ?>' + s.picture : '';
+                        html += `
+                        <div class="d-flex align-items-center border rounded p-3 mb-2">
+                            <div class="mr-3" style="cursor:pointer;" onclick="openImageViewer('${pic}', '${s.fname} ${s.lname}')">
+                                ${s.picture ? '<img src="<?= base_url('uploads/students/') ?>'+s.picture+'" class="img-circle" style="width:55px;height:55px;object-fit:cover;border:2px solid #667eea;">' : '<div class="img-circle bg-light d-flex align-items-center justify-content-center" style="width:55px;height:55px;border:2px solid #667eea;"><i class="fas fa-child text-muted"></i></div>'}
+                            </div>
+                            <div class="flex-grow-1"><strong>${s.fname} ${s.lname}</strong><br><small class="text-muted">${s.grade_section}</small></div>
+                            <button class="btn btn-outline-secondary btn-sm action-btn" data-student-id="${s.id}" data-parent-id="${res.parent.id}" data-name="${s.fname} ${s.lname}"><i class="fas fa-ellipsis-h"></i> Action</button>
+                        </div>`;
+                    });
+                } else {
+                    html = '<p class="text-center text-muted py-3">No students linked</p>';
+                }
                 $('#studentsList').html(html);
-                $('#parentCard').show();
-                $('#emptyState').hide();
-
+                $('#parentCard').show(); $('#emptyState').hide();
             } else {
-                $('#qrResult').html('<span class="text-danger"><i class="fas fa-times-circle"></i> Invalid QR</span>');
+                $('#qrResult').html('<span class="text-danger"><i class="fas fa-times-circle"></i> ' + (res.message || 'Invalid QR') + '</span>');
                 setTimeout(startCamera, 1500);
             }
         }, 'json').fail(function() {
-            $('#qrResult').html('<span class="text-danger">Error</span>');
+            $('#qrResult').html('<span class="text-danger">Connection error</span>');
             setTimeout(startCamera, 1500);
         });
     }
 
-    // Open Action Modal
     $(document).on('click', '.action-btn', function() {
         pendingStudentId = $(this).data('student-id');
         pendingParentId = $(this).data('parent-id');
@@ -244,63 +221,33 @@ $(function() {
         $('#confirmActionModal').modal('show');
     });
 
-    // Release
     $('#confirmRelease').click(function() {
         $('#confirmActionModal').modal('hide');
         if (!pendingStudentId) return;
-
-        $.post('<?= base_url('scan/release') ?>', { 
-            student_id: pendingStudentId, parent_id: pendingParentId, 
-            '<?= csrf_token() ?>': '<?= csrf_hash() ?>' 
-        }, function(res) {
-            if (res.success) {
-                alert('Student released! SMS sent.');
-            } else {
-                alert('Error: ' + res.message);
-            }
+        $.post('<?= base_url('scan/release') ?>', { student_id: pendingStudentId, parent_id: pendingParentId, '<?= csrf_token() ?>': '<?= csrf_hash() ?>' }, function(res) {
+            alert(res.success ? 'Student released! SMS sent.' : 'Error: ' + res.message);
             resetAndRestart();
         }, 'json');
     });
 
-    // Decline
     $('#confirmDecline').click(function() {
         $('#confirmActionModal').modal('hide');
         if (!pendingStudentId) return;
-
-        $.post('<?= base_url('scan/decline') ?>', { 
-            student_id: pendingStudentId, parent_id: pendingParentId, 
-            '<?= csrf_token() ?>': '<?= csrf_hash() ?>' 
-        }, function(res) {
-            if (res.success) {
-                alert('Release declined. SMS sent to parent.');
-            } else {
-                alert('Error: ' + res.message);
-            }
+        $.post('<?= base_url('scan/decline') ?>', { student_id: pendingStudentId, parent_id: pendingParentId, '<?= csrf_token() ?>': '<?= csrf_hash() ?>' }, function(res) {
+            alert(res.success ? 'Declined. SMS sent.' : 'Error: ' + res.message);
             resetAndRestart();
         }, 'json');
     });
 
     function resetAndRestart() {
-        $('#parentCard').hide();
-        $('#emptyState').show();
-        $('#qrInput').val('');
-        $('#qrResult').html('');
-        $('#scanResult').html('');
-        pendingStudentId = null;
-        pendingParentId = null;
+        $('#parentCard').hide(); $('#emptyState').show();
+        $('#qrInput').val(''); $('#qrResult').html(''); $('#scanResult').html('');
+        pendingStudentId = null; pendingParentId = null;
         setTimeout(startCamera, 1000);
     }
 });
 
-// Image Viewer
-function openImageViewer(imageUrl, title) {
-    if (!imageUrl) return;
-    $('#imageViewerFull').attr('src', imageUrl);
-    $('#imageDownloadBtn').attr('href', imageUrl);
-    $('#imageDownloadBtn').attr('download', title.replace(/\s+/g, '_') + '.png');
-    $('#imageViewerTitle').text(title || 'Photo');
-    $('#imageViewerModal').modal('show');
-}
+function openImageViewer(u, t) { if (!u) return; $('#imageViewerFull').attr('src', u); $('#imageDownloadBtn').attr('href', u); $('#imageDownloadBtn').attr('download', t.replace(/\s+/g, '_') + '.png'); $('#imageViewerTitle').text(t || 'Photo'); $('#imageViewerModal').modal('show'); }
 </script>
 
 <style>
@@ -310,8 +257,6 @@ function openImageViewer(imageUrl, title) {
 #reader { border-radius: 8px; overflow: hidden; }
 #reader video { border-radius: 8px; }
 #parentPhotoContainer { transition: all 0.3s; }
-@media (max-width: 768px) {
-    #parentPhotoContainer { width: 100px !important; height: 100px !important; }
-}
+@media (max-width: 768px) { #parentPhotoContainer { width: 100px !important; height: 100px !important; } }
 </style>
 <?= $this->endSection() ?>

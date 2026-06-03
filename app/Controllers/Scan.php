@@ -18,15 +18,65 @@ class Scan extends BaseController
         }
     }
 
-    public function index() { return view('scan'); }
+    public function index()
+    {
+        return view('scan');
+    }
 
     public function verify()
     {
-        $qrCode = $this->request->getPost('qr_code');
+        $qrCode = trim($this->request->getPost('qr_code'));
+
+        // Check parents table
         $parent = $this->db->table('parents')->where('qr_code', $qrCode)->get()->getRowArray();
-        if (!$parent) return $this->response->setJSON(['success' => false, 'message' => 'Invalid QR Code']);
-        $students = $this->db->table('students')->where('parent_id', $parent['id'])->get()->getResultArray();
-        return $this->response->setJSON(['success' => true, 'parent' => ['id' => $parent['id'], 'fname' => $parent['fname'], 'lname' => $parent['lname'], 'phone' => $parent['phone'], 'picture' => $parent['picture']], 'students' => $students]);
+        $fetcher = null;
+
+        // Check sub_fetchers table
+        if (!$parent) {
+            $subFetcher = $this->db->table('sub_fetchers')->where('qr_code', $qrCode)->get()->getRowArray();
+            if ($subFetcher) {
+                $parent = $this->db->table('parents')->where('id', $subFetcher['parent_id'])->get()->getRowArray();
+                $fetcher = [
+                    'fname' => $subFetcher['fname'],
+                    'lname' => $subFetcher['lname'],
+                    'phone' => $subFetcher['phone'],
+                    'type'  => 'Sub-Fetcher'
+                ];
+            }
+        }
+
+        if (!$parent) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Invalid QR Code']);
+        }
+
+        if (!$fetcher) {
+            $fetcher = [
+                'fname' => $parent['fname'],
+                'lname' => $parent['lname'],
+                'phone' => $parent['phone'],
+                'type'  => 'Main Parent'
+            ];
+        }
+
+        // Get students
+        $students = $this->db->table('student_parents')
+            ->select('students.*, student_parents.relation')
+            ->join('students', 'students.id = student_parents.student_id')
+            ->where('student_parents.parent_id', $parent['id'])
+            ->get()->getResultArray();
+
+        return $this->response->setJSON([
+            'success'  => true,
+            'parent'   => [
+                'id'      => $parent['id'],
+                'fname'   => $parent['fname'],
+                'lname'   => $parent['lname'],
+                'phone'   => $parent['phone'],
+                'picture' => $parent['picture']
+            ],
+            'fetcher'  => $fetcher,
+            'students' => $students
+        ]);
     }
 
     public function release()
@@ -34,20 +84,30 @@ class Scan extends BaseController
         $studentId = $this->request->getPost('student_id');
         $parentId  = $this->request->getPost('parent_id');
         $staffId   = session('user_id');
+
         $parent  = $this->db->table('parents')->where('id', $parentId)->get()->getRowArray();
         $student = $this->db->table('students')->where('id', $studentId)->get()->getRowArray();
-        if (!$parent || !$student) return $this->response->setJSON(['success' => false, 'message' => 'Data not found']);
+
+        if (!$parent || !$student) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Data not found']);
+        }
 
         $this->db->table('fetch_logs')->insert([
-            'student_id' => $studentId, 'parent_id' => $parentId, 'fetcher_fname' => $parent['fname'],
-            'fetcher_mname' => $parent['mname'], 'fetcher_lname' => $parent['lname'],
-            'fetcher_relation' => 'Parent', 'method' => 'QR', 'staff_id' => $staffId,
+            'student_id'       => $studentId,
+            'parent_id'        => $parentId,
+            'fetcher_fname'    => $parent['fname'],
+            'fetcher_mname'    => $parent['mname'],
+            'fetcher_lname'    => $parent['lname'],
+            'fetcher_relation' => 'Parent',
+            'method'           => 'QR',
+            'staff_id'         => $staffId,
         ]);
 
         $message = "Your child {$student['fname']} {$student['lname']} has been released at " . date('h:i A') . ". - BCC Scan2Fetch";
         $this->db->table('sms_logs')->insert(['parent_phone' => $parent['phone'], 'message' => $message, 'status' => 'sent']);
 
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'release', 'scan', 'QR Release | Student: '.$student['fname'].' '.$student['lname'].' (ID: '.$studentId.') | Parent: '.$parent['fname'].' '.$parent['lname'].' | SMS sent');
+        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'release', 'scan', 'QR Release | Student: '.$student['fname'].' '.$student['lname'].' (ID: '.$studentId.') | SMS sent');
+
         return $this->response->setJSON(['success' => true, 'message' => 'Student released! SMS sent.']);
     }
 
@@ -63,12 +123,10 @@ class Scan extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Data not found']);
         }
 
-        // Send SMS
-        $message = "Pickup attempt for {$student['fname']} {$student['lname']} has been DECLINED at " . date('h:i A') . ". Please contact the school. - BCC Scan2Fetch";
+        $message = "Pickup attempt for {$student['fname']} {$student['lname']} has been DECLINED at " . date('h:i A') . ". - BCC Scan2Fetch";
         $this->db->table('sms_logs')->insert(['parent_phone' => $parent['phone'], 'message' => $message, 'status' => 'sent']);
 
-        // Activity Log
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'decline', 'scan', 'DECLINED release | Student: '.$student['fname'].' '.$student['lname'].' (ID: '.$studentId.') | Parent: '.$parent['fname'].' '.$parent['lname'].' | SMS sent');
+        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'decline', 'scan', 'DECLINED | Student: '.$student['fname'].' '.$student['lname'].' (ID: '.$studentId.') | SMS sent');
 
         return $this->response->setJSON(['success' => true, 'message' => 'Declined. SMS sent.']);
     }

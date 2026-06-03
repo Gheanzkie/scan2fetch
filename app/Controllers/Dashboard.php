@@ -2,13 +2,36 @@
 
 namespace App\Controllers;
 
+use App\Models\StudentModel;
+use App\Models\ParentsModel;
+use App\Models\StaffsModel;
+use App\Models\FetchLogModel;
+use App\Models\AuthLetterModel;
+use App\Models\SmsLogModel;
+use App\Models\SubFetcherModel;
+
 class Dashboard extends BaseController
 {
-    protected $db;
+    protected $studentModel;
+    protected $parentsModel;
+    protected $staffsModel;
+    protected $fetchLogModel;
+    protected $authLetterModel;
+    protected $smsLogModel;
+    protected $subFetcherModel;
 
     public function __construct()
     {
-        $this->db = \Config\Database::connect();
+        if (!session('logged_in')) {
+            return redirect()->to('/login')->send();
+        }
+        $this->studentModel    = new StudentModel();
+        $this->parentsModel    = new ParentsModel();
+        $this->staffsModel     = new StaffsModel();
+        $this->fetchLogModel   = new FetchLogModel();
+        $this->authLetterModel = new AuthLetterModel();
+        $this->smsLogModel     = new SmsLogModel();
+        $this->subFetcherModel = new SubFetcherModel();
     }
 
     public function index()
@@ -25,41 +48,56 @@ class Dashboard extends BaseController
 
         // ========== ADMIN ==========
         if ($role == 'admin') {
-            $data['totalStudents']  = $this->db->table('students')->countAllResults();
-            $data['totalParents']   = $this->db->table('parents')->countAllResults();
-            $data['totalStaff']     = $this->db->table('staffs')->countAllResults();
-            $data['releasedToday']  = $this->db->table('fetch_logs')->where('DATE(time_released)', $today)->countAllResults();
-            $data['pendingAuth']    = $this->db->table('authorization_letters')->where('status', 'pending')->countAllResults();
-            $data['smsSentToday']   = $this->db->table('sms_logs')->where('DATE(sent_at)', $today)->countAllResults();
-            $data['qrReleases']     = $this->db->table('fetch_logs')->where('method', 'QR')->countAllResults();
-            $data['recentReleases'] = $this->db->table('fetch_logs')
+            $data['totalStudents']  = $this->studentModel->countAll();
+            $data['totalParents']   = $this->parentsModel->countAll();
+            $data['totalStaff']     = $this->staffsModel->countAll();
+            $data['releasedToday']  = $this->fetchLogModel->where('DATE(time_released)', $today)->countAllResults();
+            $data['pendingAuth']    = $this->authLetterModel->where('status', 'pending')->countAllResults();
+            $data['smsSentToday']   = $this->smsLogModel->where('DATE(sent_at)', $today)->countAllResults();
+            $data['qrReleases']     = $this->fetchLogModel->where('method', 'QR')->countAllResults();
+            $data['recentReleases'] = $this->fetchLogModel
                 ->select('fetch_logs.*, students.fname as sfname, students.lname as slname, staffs.fname as staff_fname')
                 ->join('students', 'students.id = fetch_logs.student_id')
                 ->join('staffs', 'staffs.id = fetch_logs.staff_id', 'left')
-                ->orderBy('time_released', 'DESC')->limit(10)->get()->getResultArray();
-            $data['smsLogs'] = $this->db->table('sms_logs')->orderBy('sent_at', 'DESC')->limit(10)->get()->getResultArray();
+                ->orderBy('time_released', 'DESC')->limit(10)->findAll();
+            $data['smsLogs'] = $this->smsLogModel->orderBy('sent_at', 'DESC')->limit(10)->findAll();
         }
 
         // ========== STAFF ==========
         if ($role == 'staff') {
-            $data['totalStudents']     = $this->db->table('students')->countAllResults();
-            $data['releasedToday']     = $this->db->table('fetch_logs')->where('staff_id', $userId)->where('DATE(time_released)', $today)->countAllResults();
-            $data['smsSentToday']      = $this->db->table('sms_logs')->where('DATE(sent_at)', $today)->countAllResults();
-            $data['pendingAuthLetters'] = $this->db->table('authorization_letters')
+            $data['totalStudents']     = $this->studentModel->countAll();
+            $data['releasedToday']     = $this->fetchLogModel->where('staff_id', $userId)->where('DATE(time_released)', $today)->countAllResults();
+            $data['smsSentToday']      = $this->smsLogModel->where('DATE(sent_at)', $today)->countAllResults();
+            $data['pendingAuthLetters'] = $this->authLetterModel
                 ->select('authorization_letters.*, students.fname as sfname, students.lname as slname')
                 ->join('students', 'students.id = authorization_letters.student_id')
-                ->where('authorization_letters.status', 'pending')->get()->getResultArray();
-            $data['todayReleases'] = $this->db->table('fetch_logs')
+                ->where('authorization_letters.status', 'pending')->findAll();
+            $data['todayReleases'] = $this->fetchLogModel
                 ->select('fetch_logs.*, students.fname as sfname, students.lname as slname')
                 ->join('students', 'students.id = fetch_logs.student_id')
                 ->where('fetch_logs.staff_id', $userId)->where('DATE(fetch_logs.time_released)', $today)
-                ->orderBy('time_released', 'DESC')->get()->getResultArray();
+                ->orderBy('time_released', 'DESC')->findAll();
         }
 
         // ========== PARENT ==========
         if ($role == 'parent') {
-            $data['parentProfile'] = $this->db->table('parents')->where('id', $userId)->get()->getRowArray();
-            $data['myChildren']    = $this->db->table('students')->where('parent_id', $userId)->get()->getResultArray();
+            // Parent profile
+            $data['parentProfile'] = $this->parentsModel->find($userId);
+
+            // Get students linked via student_parents using model
+            $data['myChildren'] = $this->parentsModel
+                ->select('students.*, student_parents.relation')
+                ->join('student_parents', 'student_parents.student_id = students.id')
+                ->where('student_parents.parent_id', $userId)
+                ->findAll();
+
+            // Fallback: students with old parent_id
+            if (empty($data['myChildren'])) {
+                $data['myChildren'] = $this->studentModel->where('parent_id', $userId)->findAll();
+            }
+
+            // Get sub-fetchers
+            $data['subFetchers'] = $this->subFetcherModel->where('parent_id', $userId)->findAll();
         }
 
         return view('dashboard', $data);

@@ -21,10 +21,12 @@ class Logs extends BaseController
         $filter = $this->request->getGet('filter') ?? 'all';
         $module = $this->request->getGet('module') ?? '';
         $date   = $this->request->getGet('date') ?? '';
+
         $data['logs']   = $this->logModel->getLogs($filter, $module, $date);
         $data['filter'] = $filter;
         $data['module'] = $module;
         $data['date']   = $date;
+
         return view('logs', $data);
     }
 }

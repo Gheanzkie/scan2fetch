@@ -19,6 +19,7 @@
             <?php endif; ?>
 
             <div class="row">
+                <!-- Send Authorization -->
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0">
                         <div class="card-header"><h5><i class="fas fa-pen mr-2"></i>Send Authorization</h5></div>
@@ -29,7 +30,7 @@
                                 <div class="form-group">
                                     <label>Student</label>
                                     <select name="student_id" class="form-control" required>
-                                        <option value="">-- Select Child --</option>
+                                        <option value="">Select Child</option>
                                         <?php foreach ($myChildren ?? [] as $child): ?>
                                             <option value="<?= $child['id'] ?>"><?= esc($child['fname']) ?> <?= esc($child['lname']) ?> (<?= esc($child['grade_section']) ?>)</option>
                                         <?php endforeach; ?>
@@ -51,7 +52,7 @@
                                         <i class="fas fa-user fa-3x text-muted"></i>
                                     </div>
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <button type="button" class="btn btn-outline-secondary" id="openCameraBtn"><i class="fas fa-camera mr-1"></i> Take Photo</button>
+                                        <button type="button" class="btn btn-outline-secondary open-camera-btn"><i class="fas fa-camera mr-1"></i> Take Photo</button>
                                         <label class="btn btn-outline-secondary mb-0" style="cursor:pointer;">
                                             <i class="fas fa-upload mr-1"></i> Upload
                                             <input type="file" name="fetcher_picture" id="pictureInput" class="d-none" accept="image/*">
@@ -63,7 +64,7 @@
                                 <div class="form-group">
                                     <label>Relation</label>
                                     <select name="relation" class="form-control" required>
-                                        <option value="">-- Select --</option>
+                                        <option value="">Select</option>
                                         <option value="Aunt">Aunt</option><option value="Uncle">Uncle</option>
                                         <option value="Grandparent">Grandparent</option><option value="Sibling">Sibling</option>
                                         <option value="Guardian">Guardian</option><option value="Other">Other</option>
@@ -76,6 +77,7 @@
                     </div>
                 </div>
 
+                <!-- My Authorizations -->
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0">
                         <div class="card-header"><h5><i class="fas fa-history mr-2"></i>My Authorizations</h5></div>
@@ -88,7 +90,7 @@
                                         <tr>
                                             <td><?= esc($a['sfname'] ?? '—') ?> <?= esc($a['slname'] ?? '') ?></td>
                                             <td><?= esc($a['fetcher_fname']) ?> <?= esc($a['fetcher_lname']) ?></td>
-                                            <td><span class="badge badge-<?= ($a['status'] ?? '') == 'approved' ? 'success' : (($a['status'] ?? '') == 'released' ? 'info' : 'warning') ?>"><?= ucfirst($a['status'] ?? '—') ?></span></td>
+                                            <td><span class="badge badge-<?= ($a['status'] ?? '') == 'approved' ? 'success' : (($a['status'] ?? '') == 'released' ? 'info' : (($a['status'] ?? '') == 'declined' ? 'danger' : 'warning')) ?>"><?= ucfirst($a['status'] ?? '—') ?></span></td>
                                             <td class="small"><?= date('M d', strtotime($a['created_at'])) ?></td>
                                         </tr>
                                         <?php endforeach; ?>
@@ -107,47 +109,16 @@
 
 <!-- Camera Modal -->
 <div class="modal fade" id="cameraModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header border-0 pb-0"><h6><i class="fas fa-camera mr-2"></i>Take Photo</h6><button type="button" class="close" data-dismiss="modal">&times;</button></div>
-            <div class="modal-body text-center p-2">
-                <video id="cameraVideo" autoplay playsinline style="width:100%;max-height:350px;border-radius:8px;background:#000;"></video>
-                <canvas id="cameraCanvas" style="display:none;"></canvas>
-                <button type="button" class="btn btn-primary btn-sm mt-2" id="captureBtn"><i class="fas fa-camera"></i> Capture</button>
-            </div>
-        </div>
-    </div>
-</div>
+    <div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0 shadow"><div class="modal-header border-0 pb-0"><h6><i class="fas fa-camera mr-2"></i>Take Photo</h6><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body text-center p-2"><video id="cameraVideo" autoplay playsinline style="width:100%;max-height:350px;border-radius:8px;background:#000;"></video><canvas id="cameraCanvas" style="display:none;"></canvas><button type="button" class="btn btn-primary btn-sm mt-2" id="captureBtn"><i class="fas fa-camera"></i> Capture</button></div></div></div></div>
 
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
-$(function() {
-    var stream;
-    $('#pictureInput').on('change',function(){
-        var f=this.files[0];
-        if(f){var r=new FileReader();r.onload=function(e){$('#fetcherPhotoPreview').html('<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;">');};r.readAsDataURL(f);}
-    });
-    $('#openCameraBtn').click(function(){
-        $('#cameraModal').modal('show');
-        setTimeout(function(){
-            navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:400,height:400}})
-            .then(function(s){stream=s;$('#cameraVideo')[0].srcObject=s;})
-            .catch(function(err){alert('Camera error: '+err.message);});
-        },500);
-    });
-    $('#captureBtn').click(function(){
-        var v=$('#cameraVideo')[0],c=$('#cameraCanvas')[0];
-        c.width=v.videoWidth||400;c.height=v.videoHeight||400;
-        c.getContext('2d').drawImage(v,0,0);
-        var d=c.toDataURL('image/png');
-        $('#fetcherPhotoPreview').html('<img src="'+d+'" style="width:100%;height:100%;object-fit:cover;">');
-        $('#pictureCapture').val(d);
-        if(stream){stream.getTracks().forEach(function(t){t.stop();});}
-        $('#cameraModal').modal('hide');
-    });
-    $('#cameraModal').on('hidden.bs.modal',function(){if(stream){stream.getTracks().forEach(function(t){t.stop();});}});
-});
+$(function(){var s;
+$('#pictureInput').on('change',function(){var f=this.files[0];if(f){var r=new FileReader();r.onload=function(e){$('#fetcherPhotoPreview').html('<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;">')};r.readAsDataURL(f)}});
+$('.open-camera-btn').click(function(){$('#cameraModal').modal('show');setTimeout(function(){navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:400,height:400}}).then(function(st){s=st;$('#cameraVideo')[0].srcObject=s}).catch(function(e){alert('Camera error: '+e.message)})},500)});
+$('#captureBtn').click(function(){var v=$('#cameraVideo')[0],c=$('#cameraCanvas')[0];c.width=v.videoWidth||400;c.height=v.videoHeight||400;c.getContext('2d').drawImage(v,0,0);var d=c.toDataURL('image/png');$('#fetcherPhotoPreview').html('<img src="'+d+'" style="width:100%;height:100%;object-fit:cover;">');$('#pictureCapture').val(d);if(s){s.getTracks().forEach(function(t){t.stop()})}$('#cameraModal').modal('hide')});
+$('#cameraModal').on('hidden.bs.modal',function(){if(s){s.getTracks().forEach(function(t){t.stop()})}})});
 </script>
 <?= $this->endSection() ?>

@@ -5,17 +5,8 @@
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0 font-weight-normal text-secondary">
-                        <i class="fas fa-history mr-2"></i>Release History
-                    </h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right bg-transparent">
-                        <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">Home</a></li>
-                        <li class="breadcrumb-item active">Release History</li>
-                    </ol>
-                </div>
+                <div class="col-sm-6"><h1 class="m-0 font-weight-normal text-secondary"><i class="fas fa-history mr-2"></i>Release History</h1></div>
+                <div class="col-sm-6"><ol class="breadcrumb float-sm-right"><li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">Home</a></li><li class="breadcrumb-item active">Release History</li></ol></div>
             </div>
         </div>
     </div>
@@ -37,34 +28,21 @@
                                 <table class="table table-hover table-sm mb-0">
                                     <thead class="bg-light">
                                         <tr class="small text-secondary">
-                                            <th>#</th>
-                                            <th>Date/Time</th>
-                                            <th>Student</th>
-                                            <th>Fetcher</th>
-                                            <th>Relation</th>
-                                            <th>Method</th>
+                                            <th>#</th><th>Date/Time</th><th>Student</th><th>Fetcher</th><th>Relation</th><th>Method</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php if (!empty($releases)): ?>
-                                            <?php $i = 1; foreach ($releases as $r): ?>
-                                            <tr>
-                                                <td><?= $i++ ?></td>
-                                                <td class="small"><?= date('M d, Y h:i A', strtotime($r['time_released'])) ?></td>
-                                                <td><strong><?= esc($r['sfname'] ?? '') ?> <?= esc($r['slname'] ?? '') ?></strong></td>
-                                                <td><?= esc($r['fetcher_fname']) ?> <?= esc($r['fetcher_lname']) ?></td>
-                                                <td><?= esc($r['fetcher_relation'] ?? 'Parent') ?></td>
-                                                <td><span class="badge badge-<?= ($r['method'] ?? '') == 'QR' ? 'primary' : 'info' ?>"><?= $r['method'] ?? '—' ?></span></td>
-                                            </tr>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
-                                            <tr>
-                                                <td colspan="6" class="text-center text-muted py-5">
-                                                    <i class="fas fa-history fa-3x mb-3 d-block"></i>
-                                                    <h5>No release history yet</h5>
-                                                    <p>Your children's release records will appear here.</p>
-                                                </td>
-                                            </tr>
+                                        <?php if (!empty($releases)): $i = 1; foreach ($releases as $r): ?>
+                                        <tr>
+                                            <td><?= $i++ ?></td>
+                                            <td class="small"><?= date('M d, Y h:i A', strtotime($r['time_released'])) ?></td>
+                                            <td><strong><?= esc($r['sfname'] ?? '') ?> <?= esc($r['slname'] ?? '') ?></strong></td>
+                                            <td><?= esc($r['fetcher_fname']) ?> <?= esc($r['fetcher_lname']) ?></td>
+                                            <td><?= esc($r['fetcher_relation'] ?? 'Parent') ?></td>
+                                            <td><span class="badge badge-<?= ($r['method'] ?? '') == 'QR' ? 'primary' : 'info' ?>"><?= $r['method'] ?? '—' ?></span></td>
+                                        </tr>
+                                        <?php endforeach; else: ?>
+                                        <tr><td colspan="6" class="text-center text-muted py-5"><i class="fas fa-history fa-3x mb-3 d-block"></i><h5>No release history yet</h5></td></tr>
                                         <?php endif; ?>
                                     </tbody>
                                 </table>
@@ -78,12 +56,5 @@
     </section>
 </div>
 
-<style>
-.card { border-radius: 10px; }
-.table td, .table th { vertical-align: middle; border-top: none; }
-.table tbody tr { border-bottom: 1px solid #f3f4f6; }
-.table tbody tr:hover { background: #f9fafb; }
-.badge { font-weight: 400; padding: 5px 8px; }
-</style>
-
+<style>.card{border-radius:10px}.table td,.table th{vertical-align:middle;border-top:none}.table tbody tr{border-bottom:1px solid #f3f4f6}.badge{font-weight:400;padding:5px 8px}</style>
 <?= $this->endSection() ?>
