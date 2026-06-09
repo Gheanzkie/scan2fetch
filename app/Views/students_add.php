@@ -8,7 +8,7 @@
         <form action="<?= base_url('students-save') ?>" method="post" enctype="multipart/form-data">
             <?= csrf_field() ?>
             <div class="row">
-                <!-- STUDENT INFO -->
+                
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0"><div class="card-header"><h5><i class="fas fa-user-graduate mr-2"></i>Student Information</h5></div><div class="card-body">
                         <div class="form-group text-center">
@@ -18,16 +18,16 @@
                             <input type="hidden" name="picture_capture" id="pictureCapture">
                         </div>
                         <div class="row"><div class="col-4"><label>First Name *</label><input type="text" name="fname" class="form-control" required></div><div class="col-4"><label>Middle Name</label><input type="text" name="mname" class="form-control"></div><div class="col-4"><label>Last Name *</label><input type="text" name="lname" class="form-control" required></div></div>
-                        <div class="form-group"><label>Grade & Section *</label><select name="grade_section" class="form-control" required><option value="">-- Select --</option><option>Kindergarten</option><option>Grade 1 - A</option><option>Grade 1 - B</option><option>Grade 2 - A</option><option>Grade 2 - B</option><option>Grade 3 - A</option><option>Grade 3 - B</option><option>Grade 4 - A</option><option>Grade 4 - B</option><option>Grade 5 - A</option><option>Grade 5 - B</option><option>Grade 6 - A</option><option>Grade 6 - B</option></select></div>
+                        <div class="form-group"><label>Grade & Section *</label><select name="grade_section" class="form-control" required><option value="">Select</option><option>Kindergarten</option><option>Grade 1 - A</option><option>Grade 1 - B</option><option>Grade 2 - A</option><option>Grade 2 - B</option><option>Grade 3 - A</option><option>Grade 3 - B</option><option>Grade 4 - A</option><option>Grade 4 - B</option><option>Grade 5 - A</option><option>Grade 5 - B</option><option>Grade 6 - A</option><option>Grade 6 - B</option></select></div>
                     </div></div>
                 </div>
 
-                <!-- PARENT + FETCHERS -->
+                
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0"><div class="card-header"><h5 class="mb-0"><i class="fas fa-users mr-2"></i>Parent / Guardians / Fetchers</h5></div>
                     <div class="card-body">
                         
-                        <!-- PARENT (Required) -->
+                        
                         <div class="border rounded p-3 mb-3" style="border-left: 4px solid #667eea;">
                             <h6 class="text-muted mb-2"><i class="fas fa-user mr-1"></i> Parent / Guardian (Required)</h6>
                             <div class="row"><div class="col-4"><label class="small">First Name *</label><input type="text" name="parent_fname[]" class="form-control form-control-sm" required></div><div class="col-4"><label class="small">Middle Name</label><input type="text" name="parent_mname[]" class="form-control form-control-sm"></div><div class="col-4"><label class="small">Last Name *</label><input type="text" name="parent_lname[]" class="form-control form-control-sm" required></div></div>
@@ -35,14 +35,14 @@
                             <input type="hidden" name="parent_relation[]" value="Parent">
                         </div>
 
-                        <!-- FETCHER 1 (Optional - sub_fetchers) -->
+                        
                         <div class="border rounded p-3 mb-2" style="border-left: 4px solid #28a745;">
                             <div class="d-flex justify-content-between"><h6 class="text-muted mb-2"><i class="fas fa-user-friends mr-1"></i> Fetcher 1 (Optional)</h6></div>
                             <div class="row"><div class="col-4"><label class="small">First Name</label><input type="text" name="fetcher_fname[]" class="form-control form-control-sm"></div><div class="col-4"><label class="small">Middle Name</label><input type="text" name="fetcher_mname[]" class="form-control form-control-sm"></div><div class="col-4"><label class="small">Last Name</label><input type="text" name="fetcher_lname[]" class="form-control form-control-sm"></div></div>
                             <div class="row"><div class="col-12"><label class="small">Phone</label><input type="text" name="fetcher_phone[]" class="form-control form-control-sm"></div></div>
                         </div>
 
-                        <!-- FETCHER 2 (Optional - sub_fetchers) -->
+                        
                         <div class="border rounded p-3 mb-2" style="border-left: 4px solid #ffc107;">
                             <div class="d-flex justify-content-between"><h6 class="text-muted mb-2"><i class="fas fa-user-friends mr-1"></i> Fetcher 2 (Optional)</h6></div>
                             <div class="row"><div class="col-4"><label class="small">First Name</label><input type="text" name="fetcher_fname[]" class="form-control form-control-sm"></div><div class="col-4"><label class="small">Middle Name</label><input type="text" name="fetcher_mname[]" class="form-control form-control-sm"></div><div class="col-4"><label class="small">Last Name</label><input type="text" name="fetcher_lname[]" class="form-control form-control-sm"></div></div>

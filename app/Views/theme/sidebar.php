@@ -1,20 +1,25 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4" id="mainSidebar">
-    <a href="<?= base_url('dashboard') ?>" class="brand-link">
-        <i class="fas fa-qrcode fa-2x ml-2" style="color:#fff;"></i>
-        <span class="brand-text font-weight-bold">BCC SCAN2FETCH</span>
-    </a>
+    <a href="<?= base_url('dashboard') ?>" class="brand-link d-flex align-items-center">
+    <img src="<?= base_url('image/BCC_LOGO.png') ?>" 
+         alt="BCC Logo" 
+         class="brand-image img-circle elevation-3" 
+         style="opacity: .8; max-height: 33px;">
+    <span class="brand-text font-weight-bold ml-2">
+        <i class="fas fa-qrcode mr-1" style="color:#fff;"></i> BCC SCAN2FETCH
+    </span>
+</a>
     <div class="sidebar">
         <nav class="mt-3">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
 
-                <!-- Dashboard -->
+                
                 <li class="nav-item">
                     <a href="<?= base_url('dashboard') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'dashboard') ? 'active' : '' ?>">
                         <i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p>
                     </a>
                 </li>
 
-                <!-- ========== ADMIN ========== -->
+                
                 <?php if (session('role') == 'admin'): ?>
                 <li class="nav-header">MANAGEMENT</li>
 
@@ -67,9 +72,16 @@
                 </li>
                 <?php endif; ?>
 
-                <!-- ========== STAFF ========== -->
+                
                 <?php if (session('role') == 'staff'): ?>
                 <li class="nav-header">OPERATIONS</li>
+
+                <li class="nav-item">
+                    <a href="<?= base_url('students-add') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'students-add') ? 'active' : '' ?>">
+                        <i class="nav-icon fas fa-user-plus"></i><p>Register Student & Parents</p>
+                    </a>
+                </li>
+
                 <li class="nav-item">
                     <a href="<?= base_url('scan') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'scan') ? 'active' : '' ?>">
                         <i class="nav-icon fas fa-qrcode"></i><p>QR Scan</p>
@@ -104,7 +116,7 @@
 
                 <?php endif; ?>
 
-                <!-- ========== PARENT ========== -->
+                
                 <?php if (session('role') == 'parent'): ?>
                 <li class="nav-header">MY ACCOUNT</li>
                 <li class="nav-item">

@@ -24,23 +24,31 @@ class ActivityLogModel extends Model
         ]);
     }
 
-    public function getLogs($filter = 'all', $module = '', $date = '', $limit = 200)
+    public function getLogs($filter = 'today', $module = '', $date = '', $limit = 200)
     {
         $builder = $this->orderBy('created_at', 'DESC');
 
-        if ($filter == 'today') {
+        // Time-based filters
+        if ($filter === 'today') {
             $builder->where('DATE(created_at)', date('Y-m-d'));
-        } elseif ($filter == 'week') {
+        } elseif ($filter === 'yesterday') {
+            $builder->where('DATE(created_at)', date('Y-m-d', strtotime('-1 day')));
+        } elseif ($filter === 'week') {
             $builder->where('created_at >=', date('Y-m-d', strtotime('-7 days')));
-        } elseif ($filter == 'month') {
+        } elseif ($filter === 'month') {
             $builder->where('created_at >=', date('Y-m-d', strtotime('-30 days')));
+        } elseif ($filter !== 'all' && !empty($filter)) {
+            // Specific action filter
+            $builder->where('action', $filter);
         }
 
-        if ($module) {
+        // Module filter
+        if (!empty($module)) {
             $builder->where('module', $module);
         }
 
-        if ($date) {
+        // Date filter (overrides time-based if set)
+        if (!empty($date)) {
             $builder->where('DATE(created_at)', $date);
         }
 

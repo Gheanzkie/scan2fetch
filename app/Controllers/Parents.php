@@ -8,8 +8,6 @@ use App\Models\ActivityLogModel;
 
 class Parents extends BaseController
 {
-    protected $parentsModel;
-    protected $subFetcherModel;
     protected $logModel;
 
     public function __construct()
@@ -17,133 +15,228 @@ class Parents extends BaseController
         if (!session('logged_in')) {
             return redirect()->to('/login')->send();
         }
-        $this->parentsModel    = new ParentsModel();
-        $this->subFetcherModel = new SubFetcherModel();
-        $this->logModel        = new ActivityLogModel();
+        $this->logModel = new ActivityLogModel();
     }
 
     public function index()
     {
+        $model = new ParentsModel();
         $db = \Config\Database::connect();
+        
+        // Get parents with their linked students
         $data['parents'] = $db->table('parents')
-            ->select('parents.*, student_parents.relation, students.grade_section as student_grade, students.fname as student_fname, students.lname as student_lname')
+            ->select('parents.*, students.fname as student_fname, students.lname as student_lname, students.grade_section as student_grade, student_parents.relation')
             ->join('student_parents', 'student_parents.parent_id = parents.id', 'left')
             ->join('students', 'students.id = student_parents.student_id', 'left')
-            ->orderBy('parents.created_at', 'DESC')->get()->getResultArray();
+            ->orderBy('parents.created_at', 'DESC')
+            ->get()
+            ->getResultArray();
+            
         return view('parents', $data);
     }
 
     public function view($id)
     {
-        $data['parent'] = $this->parentsModel->find($id);
-        if (!$data['parent']) return redirect()->to('/parents')->with('error', 'Parent not found');
+        $model = new ParentsModel();
+        $data['parent'] = $model->find($id);
+        if (!$data['parent']) {
+            return redirect()->to('/parents')->with('error', 'Parent not found');
+        }
 
+        // Get linked students via student_parents table
         $db = \Config\Database::connect();
+        
         $data['students'] = $db->table('student_parents')
-            ->select('student_parents.*, students.fname, students.mname, students.lname, students.grade_section, students.picture')
+            ->select('student_parents.*, students.fname, students.mname, students.lname, students.grade_section, students.picture, students.id as student_id')
             ->join('students', 'students.id = student_parents.student_id')
-            ->where('student_parents.parent_id', $id)->get()->getResultArray();
+            ->where('student_parents.parent_id', $id)
+            ->get()
+            ->getResultArray();
 
-        $data['subFetchers'] = $this->subFetcherModel->where('parent_id', $id)->findAll();
+        // Get sub-fetchers
+        $subFetcherModel = new SubFetcherModel();
+        $data['subFetchers'] = $subFetcherModel->where('parent_id', $id)->findAll();
 
         return view('parents_view', $data);
     }
 
-    public function add() { return view('parents_add'); }
+    public function add()
+    {
+        return view('parents_add');
+    }
 
     public function edit($id)
     {
-        $data['parent'] = $this->parentsModel->find($id);
-        if (!$data['parent']) return redirect()->to('/parents')->with('error', 'Parent not found');
+        $model = new ParentsModel();
+        $data['parent'] = $model->find($id);
+        if (!$data['parent']) {
+            return redirect()->to('/parents')->with('error', 'Parent not found');
+        }
         return view('parents_edit', $data);
     }
 
     public function save()
     {
+        $model = new ParentsModel();
         $picture = $this->uploadPicture('picture');
         $qrValue = $this->generateQR();
-        $this->parentsModel->insert([
-            'fname' => $this->request->getPost('fname'), 'mname' => $this->request->getPost('mname'),
-            'lname' => $this->request->getPost('lname'), 'phone' => $this->request->getPost('phone'),
+        $model->save([
+            'fname' => $this->request->getPost('fname'),
+            'mname' => $this->request->getPost('mname'),
+            'lname' => $this->request->getPost('lname'),
+            'phone' => $this->request->getPost('phone'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-            'picture' => $picture, 'qr_code' => $qrValue, 'created_by' => session('user_id'),
+            'picture' => $picture,
+            'qr_code' => $qrValue,
+            'created_by' => session('user_id'),
         ]);
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'create', 'parent', 'Created: '.$this->request->getPost('fname').' '.$this->request->getPost('lname'));
+        $this->logModel->addLog(
+            session('user_id'),
+            session('fname') . ' ' . session('lname'),
+            session('role'),
+            'create',
+            'parent',
+            'Created parent: ' . $this->request->getPost('fname') . ' ' . $this->request->getPost('lname')
+        );
         return redirect()->to('/parents')->with('msg', 'Parent added');
     }
 
     public function update()
     {
+        $model = new ParentsModel();
         $id = $this->request->getPost('id');
-        $data = ['fname' => $this->request->getPost('fname'), 'mname' => $this->request->getPost('mname'), 'lname' => $this->request->getPost('lname'), 'phone' => $this->request->getPost('phone')];
-        if ($this->request->getPost('password')) $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
+        $data = [
+            'fname' => $this->request->getPost('fname'),
+            'mname' => $this->request->getPost('mname'),
+            'lname' => $this->request->getPost('lname'),
+            'phone' => $this->request->getPost('phone')
+        ];
+        if ($this->request->getPost('password')) {
+            $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
+        }
         $picture = $this->uploadPicture('picture');
-        if ($picture) $data['picture'] = $picture;
-        $this->parentsModel->update($id, $data);
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'update', 'parent', 'Updated: '.$data['fname'].' '.$data['lname'].' (ID: '.$id.')');
+        if ($picture) {
+            $data['picture'] = $picture;
+        }
+        $model->update($id, $data);
+        $this->logModel->addLog(
+            session('user_id'),
+            session('fname') . ' ' . session('lname'),
+            session('role'),
+            'update',
+            'parent',
+            'Updated parent: ' . $data['fname'] . ' ' . $data['lname'] . ' (ID: ' . $id . ')'
+        );
         return redirect()->to('/parents')->with('msg', 'Parent updated');
     }
 
     public function delete($id)
     {
-        $parent = $this->parentsModel->find($id);
-        $this->parentsModel->delete($id);
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'delete', 'parent', 'Deleted: '.$parent['fname'].' '.$parent['lname'].' (ID: '.$id.')');
+        $model = new ParentsModel();
+        $parent = $model->find($id);
+        $model->delete($id);
+        $this->logModel->addLog(
+            session('user_id'),
+            session('fname') . ' ' . session('lname'),
+            session('role'),
+            'delete',
+            'parent',
+            'Deleted parent: ' . $parent['fname'] . ' ' . $parent['lname'] . ' (ID: ' . $id . ')'
+        );
         return redirect()->to('/parents')->with('msg', 'Parent deleted');
     }
 
     public function updatePicture()
     {
+        $model = new ParentsModel();
         $id = $this->request->getPost('id');
         $picture = $this->uploadPicture('picture');
-        if ($picture) $this->parentsModel->update($id, ['picture' => $picture]);
+        if ($picture) {
+            $model->update($id, ['picture' => $picture]);
+        }
         return redirect()->to('/parents-view/' . $id)->with('msg', 'Photo updated');
     }
 
     public function updateFromStudent()
     {
+        $model = new ParentsModel();
         $id = $this->request->getPost('id');
         $studentId = $this->request->getPost('student_id');
-        $data = ['fname' => $this->request->getPost('fname'), 'mname' => $this->request->getPost('mname'), 'lname' => $this->request->getPost('lname'), 'phone' => $this->request->getPost('phone')];
-        if ($this->request->getPost('password')) $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
+        $data = [
+            'fname' => $this->request->getPost('fname'),
+            'mname' => $this->request->getPost('mname'),
+            'lname' => $this->request->getPost('lname'),
+            'phone' => $this->request->getPost('phone')
+        ];
+        if ($this->request->getPost('password')) {
+            $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
+        }
         $picture = $this->uploadPicture('picture');
-        if ($picture) $data['picture'] = $picture;
-        $this->parentsModel->update($id, $data);
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'update', 'parent', 'Updated: '.$data['fname'].' '.$data['lname'].' (ID: '.$id.')');
+        if ($picture) {
+            $data['picture'] = $picture;
+        }
+        $model->update($id, $data);
+        $this->logModel->addLog(
+            session('user_id'),
+            session('fname') . ' ' . session('lname'),
+            session('role'),
+            'update',
+            'parent',
+            'Updated parent: ' . $data['fname'] . ' ' . $data['lname'] . ' (ID: ' . $id . ')'
+        );
         return redirect()->to('/students-view/' . $studentId)->with('msg', 'Parent updated');
     }
 
-        public function logs()
-        {
-            $userId = session('user_id');
-            $db = \Config\Database::connect();
-            
-            // Get students linked to this parent (from student_parents)
-            $studentIds = $db->table('student_parents')->select('student_id')->where('parent_id', $userId)->get()->getResultArray();
-            $ids = array_column($studentIds, 'student_id');
-            
-            // Also check old parent_id
-            $oldStudents = $db->table('students')->select('id')->where('parent_id', $userId)->get()->getResultArray();
-            foreach ($oldStudents as $s) { $ids[] = $s['id']; }
-            
-            // Also get students linked to sub-fetchers of this parent
-            $subFetcherStudents = $db->table('sub_fetchers')->select('student_id')->where('parent_id', $userId)->get()->getResultArray();
-            foreach ($subFetcherStudents as $s) { $ids[] = $s['student_id']; }
-            
-            $data['releases'] = [];
-            if (!empty($ids)) {
-                $data['releases'] = $db->table('fetch_logs')
-                    ->select('fetch_logs.*, students.fname as sfname, students.lname as slname')
-                    ->join('students', 'students.id = fetch_logs.student_id')
-                    ->whereIn('fetch_logs.student_id', array_unique($ids))
-                    ->orderBy('fetch_logs.time_released', 'DESC')
-                    ->limit(50)
-                    ->get()
-                    ->getResultArray();
-            }
-            
-            return view('parents_logs', $data);
+    public function logs()
+    {
+        $userId = session('user_id');
+        $studentModel = new \App\Models\StudentModel();
+        $subFetcherModel = new SubFetcherModel();
+        
+        $db = \Config\Database::connect();
+        $studentParents = $db->table('student_parents')
+            ->where('parent_id', $userId)
+            ->get()
+            ->getResultArray();
+        
+        $studentIds = [];
+        foreach ($studentParents as $sp) {
+            $studentIds[] = $sp['student_id'];
         }
+        
+        $oldStudents = $studentModel->where('parent_id', $userId)->findAll();
+        foreach ($oldStudents as $s) {
+            $studentIds[] = $s['id'];
+        }
+        
+        $subFetchers = $subFetcherModel->where('parent_id', $userId)->findAll();
+        foreach ($subFetchers as $sf) {
+            $studentIds[] = $sf['student_id'];
+        }
+        
+        $data['releases'] = [];
+        if (!empty($studentIds)) {
+            $studentIds = array_unique($studentIds);
+            $fetchLogModel = new \App\Models\FetchLogModel();
+            $releases = $fetchLogModel
+                ->whereIn('student_id', $studentIds)
+                ->orderBy('time_released', 'DESC')
+                ->limit(50)
+                ->findAll();
+            
+            foreach ($releases as &$release) {
+                $student = $studentModel->find($release['student_id']);
+                if ($student) {
+                    $release['sfname'] = $student['fname'];
+                    $release['smname'] = $student['mname'] ?? '';
+                    $release['slname'] = $student['lname'];
+                }
+            }
+            $data['releases'] = $releases;
+        }
+        
+        return view('parents_logs', $data);
+    }
 
     private function uploadPicture($fieldName)
     {

@@ -21,7 +21,7 @@
                         <div class="card-header bg-white border-0 pt-3 pb-2">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h3 class="card-title font-weight-normal text-secondary mb-0"><i class="fas fa-list mr-2"></i>Parent / Fetcher List</h3>
-                                <a href="<?= base_url('parents-add') ?>" class="btn btn-secondary btn-sm"><i class="fas fa-plus mr-1"></i> Add Parent</a>
+        
                             </div>
                         </div>
                         <div class="card-body pt-0">

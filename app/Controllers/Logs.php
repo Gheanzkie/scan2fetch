@@ -18,9 +18,9 @@ class Logs extends BaseController
 
     public function index()
     {
-        $filter = $this->request->getGet('filter') ?? 'all';
+        $filter = $this->request->getGet('filter') ?? 'today'; // Default: today
         $module = $this->request->getGet('module') ?? '';
-        $date   = $this->request->getGet('date') ?? '';
+        $date   = $this->request->getGet('date') ?? date('Y-m-d'); // Default: today's date
 
         $data['logs']   = $this->logModel->getLogs($filter, $module, $date);
         $data['filter'] = $filter;

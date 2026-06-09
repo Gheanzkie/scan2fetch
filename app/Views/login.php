@@ -28,6 +28,16 @@
         
         .brand-section { margin-bottom: 40px; text-align: center; }
         
+        .brand-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: contain;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 3px solid #e2e8f0;
+        }
+        
         .brand-icon {
             font-size: 50px; margin-bottom: 15px;
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -118,6 +128,20 @@
             text-align: center; color: white; padding: 60px; z-index: 10;
         }
         
+        .overlay-logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: contain;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 10px;
+        }
+        
         .overlay-icon {
             font-size: 100px; margin-bottom: 30px;
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -148,9 +172,17 @@
             padding: 12px 20px; border-radius: 40px; color: white;
             font-weight: 500; font-size: 14px;
             border: 1px solid rgba(255, 255, 255, 0.2); z-index: 10;
+            display: flex; align-items: center; gap: 8px;
         }
         
-        .system-badge i { margin-right: 8px; color: #667eea; }
+        .badge-logo {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: contain;
+        }
+        
+        .system-badge i { color: #667eea; }
         
         @media (max-width: 900px) {
             .image-side { display: none; }
@@ -166,18 +198,19 @@
 </head>
 <body>
 
-<!-- LEFT SIDE - LOGIN FORM -->
+
 <div class="login-side">
     <div class="login-container">
         
-        <!-- Brand -->
+        
         <div class="brand-section">
+            <img src="<?= base_url('image/BCC_LOGO.png') ?>" alt="BCC Logo" class="brand-logo">
             <div class="brand-icon"><i class="fas fa-qrcode"></i></div>
             <h1 class="brand-name">BCC <span>SCAN2FETCH</span></h1>
             <p class="brand-subtitle">Sign in to your account</p>
         </div>
 
-        <!-- Error Alert -->
+        
         <?php if (session()->getFlashdata('error')): ?>
             <div class="alert">
                 <i class="fas fa-exclamation-circle"></i>
@@ -185,7 +218,7 @@
             </div>
         <?php endif; ?>
         
-        <!-- Success Alert -->
+        
         <?php if (session()->getFlashdata('msg')): ?>
             <div class="alert alert-success">
                 <i class="fas fa-check-circle"></i>
@@ -193,7 +226,7 @@
             </div>
         <?php endif; ?>
 
-        <!-- Login Form -->
+        
         <form action="<?= base_url('login') ?>" method="post">
             <?= csrf_field() ?>
 
@@ -218,7 +251,7 @@
             </button>
         </form>
 
-        <!-- Footer -->
+        
         <div class="footer-note">
             &copy; <?= date('Y') ?> BCC Scan2Fetch. <a href="<?= base_url() ?>">Back to Home</a>
         </div>
@@ -226,14 +259,16 @@
     </div>
 </div>
 
-<!-- RIGHT SIDE -->
+
 <div class="image-side">
     
     <div class="system-badge">
+        <img src="<?= base_url('image/BCC_LOGO.png') ?>" alt="BCC" class="badge-logo">
         <i class="fas fa-qrcode"></i> BCC SCAN2FETCH
     </div>
     
     <div class="overlay-content">
+        <img src="<?= base_url('image/BCC_LOGO.png') ?>" alt="BCC Logo" class="overlay-logo">
         <div class="overlay-icon"><i class="fas fa-child"></i></div>
         <h2 class="overlay-title">Every Child's Safety<br><span>In Your Hands</span></h2>
         <p class="overlay-text">

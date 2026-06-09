@@ -46,7 +46,7 @@
                                     <i class="fas fa-list mr-2"></i>Staff List
                                 </h3>
                                 <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#addStaffModal">
-                                    <i class="fas fa-plus mr-1"></i> Add Staff
+                                    <i class="fas fa-plus mr-1"></i>Register Staff
                                 </button>
                             </div>
                         </div>

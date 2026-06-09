@@ -49,7 +49,7 @@ $routes->post('staffs-save', 'Staffs::save');
 $routes->post('staffs-update', 'Staffs::update');
 $routes->get('staffs-delete/(:num)', 'Staffs::delete/$1');
 
-// Scan
+// QR Scan
 $routes->get('scan', 'Scan::index');
 $routes->post('scan/verify', 'Scan::verify');
 $routes->post('scan/release', 'Scan::release');
@@ -60,7 +60,7 @@ $routes->post('subfetchers-save', 'SubFetchers::save');
 $routes->post('subfetchers-update', 'SubFetchers::update');
 $routes->get('subfetchers-delete/(:num)/(:num)', 'SubFetchers::delete/$1/$2');
 
-// ========== AUTHORIZATION ==========
+// Authorization
 $routes->get('authorization', 'Authorization::index');
 $routes->post('authorization-send', 'Authorization::send');
 $routes->get('authorizations', 'Authorization::all');
@@ -68,13 +68,13 @@ $routes->get('authorization-approve/(:num)', 'Authorization::approve/$1');
 $routes->get('authorization-release/(:num)', 'Authorization::release/$1');
 $routes->get('authorization-decline/(:num)', 'Authorization::decline/$1');
 
-// ========== LOGS ==========
+//logs
 $routes->get('logs', 'Logs::index');
 
-// ========== SMS LOGS ==========
+//sms logs 
 $routes->get('sms-logs', 'Sms::index');
 
-// 404 Override
+
 $routes->set404Override(function() {
     return view('errors/html/error_404');
 });

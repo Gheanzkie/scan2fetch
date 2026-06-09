@@ -36,7 +36,7 @@
                                         <tr>
                                             <td><?= $i++ ?></td>
                                             <td class="small"><?= date('M d, Y h:i A', strtotime($r['time_released'])) ?></td>
-                                            <td><strong><?= esc($r['sfname'] ?? '') ?> <?= esc($r['slname'] ?? '') ?></strong></td>
+                                            <td><strong><?= esc($r['sfname'] ?? '') ?> <?= esc($r['smname'] ?? '') ?> <?= esc($r['slname'] ?? '') ?></strong></td>
                                             <td><?= esc($r['fetcher_fname']) ?> <?= esc($r['fetcher_lname']) ?></td>
                                             <td><?= esc($r['fetcher_relation'] ?? 'Parent') ?></td>
                                             <td><span class="badge badge-<?= ($r['method'] ?? '') == 'QR' ? 'primary' : 'info' ?>"><?= $r['method'] ?? '—' ?></span></td>

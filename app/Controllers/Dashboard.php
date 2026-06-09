@@ -55,11 +55,7 @@ class Dashboard extends BaseController
             $data['pendingAuth']    = $this->authLetterModel->where('status', 'pending')->countAllResults();
             $data['smsSentToday']   = $this->smsLogModel->where('DATE(sent_at)', $today)->countAllResults();
             $data['qrReleases']     = $this->fetchLogModel->where('method', 'QR')->countAllResults();
-            $data['recentReleases'] = $this->fetchLogModel
-                ->select('fetch_logs.*, students.fname as sfname, students.lname as slname, staffs.fname as staff_fname')
-                ->join('students', 'students.id = fetch_logs.student_id')
-                ->join('staffs', 'staffs.id = fetch_logs.staff_id', 'left')
-                ->orderBy('time_released', 'DESC')->limit(10)->findAll();
+            $data['recentReleases'] = $this->fetchLogModel->orderBy('time_released', 'DESC')->limit(10)->findAll();
             $data['smsLogs'] = $this->smsLogModel->orderBy('sent_at', 'DESC')->limit(10)->findAll();
         }
 
@@ -68,15 +64,12 @@ class Dashboard extends BaseController
             $data['totalStudents']     = $this->studentModel->countAll();
             $data['releasedToday']     = $this->fetchLogModel->where('staff_id', $userId)->where('DATE(time_released)', $today)->countAllResults();
             $data['smsSentToday']      = $this->smsLogModel->where('DATE(sent_at)', $today)->countAllResults();
-            $data['pendingAuthLetters'] = $this->authLetterModel
-                ->select('authorization_letters.*, students.fname as sfname, students.lname as slname')
-                ->join('students', 'students.id = authorization_letters.student_id')
-                ->where('authorization_letters.status', 'pending')->findAll();
+            $data['pendingAuthLetters'] = $this->authLetterModel->where('status', 'pending')->findAll();
             $data['todayReleases'] = $this->fetchLogModel
-                ->select('fetch_logs.*, students.fname as sfname, students.lname as slname')
-                ->join('students', 'students.id = fetch_logs.student_id')
-                ->where('fetch_logs.staff_id', $userId)->where('DATE(fetch_logs.time_released)', $today)
-                ->orderBy('time_released', 'DESC')->findAll();
+                ->where('staff_id', $userId)
+                ->where('DATE(time_released)', $today)
+                ->orderBy('time_released', 'DESC')
+                ->findAll();
         }
 
         // ========== PARENT ==========
@@ -84,14 +77,25 @@ class Dashboard extends BaseController
             // Parent profile
             $data['parentProfile'] = $this->parentsModel->find($userId);
 
-            // Get students linked via student_parents using model
-            $data['myChildren'] = $this->parentsModel
-                ->select('students.*, student_parents.relation')
-                ->join('student_parents', 'student_parents.student_id = students.id')
-                ->where('student_parents.parent_id', $userId)
-                ->findAll();
+            // Get children via student_parents table
+            $db = \Config\Database::connect();
+            $studentParents = $db->table('student_parents')
+                ->where('parent_id', $userId)
+                ->get()
+                ->getResultArray();
+            
+            $data['myChildren'] = [];
+            if (!empty($studentParents)) {
+                foreach ($studentParents as $sp) {
+                    $student = $this->studentModel->find($sp['student_id']);
+                    if ($student) {
+                        $student['relation'] = $sp['relation'];
+                        $data['myChildren'][] = $student;
+                    }
+                }
+            }
 
-            // Fallback: students with old parent_id
+            // Fallback: check old parent_id field directly
             if (empty($data['myChildren'])) {
                 $data['myChildren'] = $this->studentModel->where('parent_id', $userId)->findAll();
             }

@@ -71,8 +71,16 @@ class Authorization extends BaseController
             'status'          => 'pending',
         ]);
 
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'create', 'authorization', 'Sent authorization | Fetcher: '.$this->request->getPost('fetcher_fname').' '.$this->request->getPost('fetcher_lname'));
-        return redirect()->to('/authorization')->with('msg', 'Authorization sent');
+        $this->logModel->addLog(
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'create', 
+            'authorization', 
+            'Sent authorization | Fetcher: '.$this->request->getPost('fetcher_fname').' '.$this->request->getPost('fetcher_lname')
+        );
+        
+        return redirect()->to('/authorization')->with('msg', 'Authorization sent successfully');
     }
 
     // ========== ADMIN/STAFF - VIEW ALL ==========
@@ -90,7 +98,16 @@ class Authorization extends BaseController
     public function approve($id)
     {
         $this->db->table('authorization_letters')->where('id', $id)->update(['status' => 'approved']);
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'approve', 'authorization', 'Approved authorization ID: '.$id);
+        
+        $this->logModel->addLog(
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'approve', 
+            'authorization', 
+            'Approved authorization ID: '.$id
+        );
+        
         return redirect()->to('/authorizations')->with('msg', 'Authorization approved');
     }
 
@@ -104,8 +121,8 @@ class Authorization extends BaseController
         // Update auth status
         $this->db->table('authorization_letters')->where('id', $id)->update(['status' => 'released']);
 
-        // Insert fetch log
-        $this->db->table('fetch_logs')->insert([
+        // Build fetch log data
+        $fetchData = [
             'student_id'       => $auth['student_id'],
             'parent_id'        => $auth['parent_id'],
             'auth_letter_id'   => $id,
@@ -114,14 +131,35 @@ class Authorization extends BaseController
             'fetcher_lname'    => $auth['fetcher_lname'],
             'fetcher_relation' => $auth['relation'],
             'method'           => 'LETTER',
-            'staff_id'         => session('user_id'),
-        ]);
+            'time_released'    => date('Y-m-d H:i:s'),
+        ];
+
+        // Only set staff_id if user is staff
+        $userRole = session('role');
+        if ($userRole === 'staff') {
+            $fetchData['staff_id'] = session('user_id');
+        }
+
+        // Insert fetch log
+        $this->db->table('fetch_logs')->insert($fetchData);
 
         // Send SMS
         $message = "Your child {$student['fname']} {$student['lname']} has been released at " . date('h:i A') . " to {$auth['fetcher_fname']} {$auth['fetcher_lname']} ({$auth['relation']}). - BCC Scan2Fetch";
-        $this->db->table('sms_logs')->insert(['parent_phone' => $parent['phone'], 'message' => $message, 'status' => 'sent']);
+        $this->db->table('sms_logs')->insert([
+            'parent_phone' => $parent['phone'], 
+            'message' => $message, 
+            'status' => 'sent'
+        ]);
 
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'release', 'authorization', 'Released via authorization ID: '.$id.' | Student: '.$student['fname'].' '.$student['lname'].' | SMS sent');
+        $this->logModel->addLog(
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'release', 
+            'authorization', 
+            'Released via authorization ID: '.$id.' | Student: '.$student['fname'].' '.$student['lname'].' | SMS sent'
+        );
+        
         return redirect()->to('/authorizations')->with('msg', 'Student released! SMS sent.');
     }
 
@@ -137,9 +175,21 @@ class Authorization extends BaseController
 
         // Send SMS
         $message = "Authorization for {$student['fname']} {$student['lname']} has been DECLINED at " . date('h:i A') . ". Please contact the school. - BCC Scan2Fetch";
-        $this->db->table('sms_logs')->insert(['parent_phone' => $parent['phone'], 'message' => $message, 'status' => 'sent']);
+        $this->db->table('sms_logs')->insert([
+            'parent_phone' => $parent['phone'], 
+            'message' => $message, 
+            'status' => 'sent'
+        ]);
 
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'decline', 'authorization', 'DECLINED authorization ID: '.$id.' | SMS sent');
+        $this->logModel->addLog(
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'decline', 
+            'authorization', 
+            'DECLINED authorization ID: '.$id.' | SMS sent'
+        );
+        
         return redirect()->to('/authorizations')->with('msg', 'Authorization declined. SMS sent.');
     }
 }

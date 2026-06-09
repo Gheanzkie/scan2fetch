@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BCC Scan2Fetch - Home</title>
-    <link rel="icon" href="<?= base_url('public/assets/dist/img/favicon.ico') ?>">
+    <link rel="icon" href="<?= base_url('image/BCC_LOGO.png') ?>">
     <link rel="stylesheet" href="<?= base_url('public/assets/plugins/fontawesome-free/css/all.min.css') ?>">
     <link rel="stylesheet" href="<?= base_url('public/assets/dist/css/adminlte.min.css') ?>">
     
@@ -62,6 +62,14 @@
             gap: 10px;
             color: #fff;
             text-decoration: none;
+        }
+
+        .nav-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: contain;
+            border: 2px solid rgba(102, 126, 234, 0.3);
         }
 
         .navbar-left i {
@@ -134,13 +142,26 @@
         }
 
         .hero-logo {
-            font-size: 80px;
-            margin-bottom: 20px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: contain;
+            margin: 0 auto 20px;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            padding: 15px;
+        }
+
+        .hero-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: float 3s ease-in-out infinite;
         }
 
         @keyframes float {
@@ -201,16 +222,19 @@
         }
 
         @media (max-width: 768px) {
-            .hero-logo { font-size: 60px; }
+            .hero-logo { width: 120px; height: 120px; }
+            .hero-icon { font-size: 40px; }
             .main-heading { font-size: 34px; }
             .navbar { padding: 10px 15px; }
             .navbar-right { gap: 12px; }
             .btn-login { padding: 6px 16px; font-size: 12px; }
             .brand-text { font-size: 16px; }
+            .nav-logo { width: 30px; height: 30px; }
         }
 
         @media (max-width: 480px) {
-            .hero-logo { font-size: 50px; }
+            .hero-logo { width: 100px; height: 100px; }
+            .hero-icon { font-size: 35px; }
             .main-heading { font-size: 26px; }
             .main-content { padding: 80px 16px 30px; }
             .navbar-right { gap: 8px; }
@@ -222,6 +246,7 @@
     <!-- Navigation -->
     <nav class="navbar">
         <a href="<?= base_url() ?>" class="navbar-left">
+            <img src="<?= base_url('image/BCC_LOGO.png') ?>" alt="BCC Logo" class="nav-logo">
             <i class="fas fa-qrcode"></i>
             <div class="brand-text">BCC<span> SCAN2FETCH</span></div>
         </a>
@@ -235,7 +260,9 @@
     <div class="main-content">
         <div class="welcome-container">
             
-            <div class="hero-logo">
+            <img src="<?= base_url('image/BCC_LOGO.png') ?>" alt="BCC Logo" class="hero-logo">
+            
+            <div class="hero-icon">
                 <i class="fas fa-qrcode"></i>
             </div>
             
