@@ -42,6 +42,7 @@ class Database extends Config
         'strictOn'     => false,
         'failover'     => [],
         'port'         => 3306,
+        'initCommands' => "SET time_zone = '+08:00'",
         'numberNative' => false,
         'foundRows'    => false,
         'dateFormat'   => [

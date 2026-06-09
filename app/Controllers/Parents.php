@@ -23,7 +23,6 @@ class Parents extends BaseController
         $model = new ParentsModel();
         $db = \Config\Database::connect();
         
-        // Get parents with their linked students
         $data['parents'] = $db->table('parents')
             ->select('parents.*, students.fname as student_fname, students.lname as student_lname, students.grade_section as student_grade, student_parents.relation')
             ->join('student_parents', 'student_parents.parent_id = parents.id', 'left')
@@ -43,7 +42,6 @@ class Parents extends BaseController
             return redirect()->to('/parents')->with('error', 'Parent not found');
         }
 
-        // Get linked students via student_parents table
         $db = \Config\Database::connect();
         
         $data['students'] = $db->table('student_parents')
@@ -53,7 +51,6 @@ class Parents extends BaseController
             ->get()
             ->getResultArray();
 
-        // Get sub-fetchers
         $subFetcherModel = new SubFetcherModel();
         $data['subFetchers'] = $subFetcherModel->where('parent_id', $id)->findAll();
 
@@ -256,11 +253,65 @@ class Parents extends BaseController
         return null;
     }
 
+    /**
+     * Generate QR code with text label below it
+     */
     private function generateQR()
     {
         $qrValue = 'QR-' . strtoupper(bin2hex(random_bytes(6)));
         include_once('phpqrcode/qrlib.php');
-        \QRcode::png($qrValue, 'uploads/qr/' . $qrValue . '.png', QR_ECLEVEL_H, 8, 2);
+        
+        // Generate the QR code image first
+        $qrImagePath = 'uploads/qr/' . $qrValue . '_qrcode.png';
+        \QRcode::png($qrValue, $qrImagePath, QR_ECLEVEL_H, 8, 2);
+        
+        // Create a new image with space for text below QR code
+        $qrImage = imagecreatefrompng($qrImagePath);
+        $qrWidth = imagesx($qrImage);
+        $qrHeight = imagesy($qrImage);
+        
+        // Set dimensions for the combined image
+        $textHeight = 40; // Space for text below QR
+        $padding = 10;
+        $totalWidth = $qrWidth;
+        $totalHeight = $qrHeight + $textHeight + $padding;
+        
+        // Create new canvas
+        $combinedImage = imagecreatetruecolor($totalWidth, $totalHeight);
+        
+        // White background
+        $white = imagecolorallocate($combinedImage, 255, 255, 255);
+        imagefill($combinedImage, 0, 0, $white);
+        
+        // Copy QR code to top
+        imagecopy($combinedImage, $qrImage, 0, 0, 0, 0, $qrWidth, $qrHeight);
+        
+        // Add text below QR code
+        $black = imagecolorallocate($combinedImage, 0, 0, 0);
+        $fontSize = 5; // Built-in GD font size (1-5)
+        $text = $qrValue;
+        
+        // Calculate text position (centered)
+        $textWidth = imagefontwidth($fontSize) * strlen($text);
+        $textX = ($totalWidth - $textWidth) / 2;
+        $textY = $qrHeight + 12;
+        
+        // Draw text
+        imagestring($combinedImage, $fontSize, $textX, $textY, $text, $black);
+        
+        // Save the combined image
+        $finalPath = 'uploads/qr/' . $qrValue . '.png';
+        imagepng($combinedImage, $finalPath);
+        
+        // Clean up
+        imagedestroy($qrImage);
+        imagedestroy($combinedImage);
+        
+        // Delete the QR-only file
+        if (file_exists($qrImagePath)) {
+            unlink($qrImagePath);
+        }
+        
         return $qrValue;
     }
 }

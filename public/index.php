@@ -1,5 +1,7 @@
 <?php
 
+date_default_timezone_set('Asia/Manila');
+
 use CodeIgniter\Boot;
 use Config\Paths;
 

@@ -24,7 +24,7 @@
                 <li class="nav-header">MANAGEMENT</li>
 
                 <li class="nav-item">
-                    <a href="<?= base_url('students-add') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'students-add') ? 'active' : '' ?>">
+                    <a href="<?= base_url('register') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'students-add') ? 'active' : '' ?>">
                         <i class="nav-icon fas fa-user-plus"></i><p>Register Student & Parents</p>
                     </a>
                 </li>
@@ -53,6 +53,14 @@
                         <i class="nav-icon fas fa-qrcode"></i><p>QR Scan</p>
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a href="<?= base_url('scan-monitor') ?>" class="nav-link">
+                        <i class="nav-icon fas fa-desktop"></i>
+                        <p>Scan Monitor</p>
+                    </a>
+                </li>
+
                 <li class="nav-item">
                     <a href="<?= base_url('authorizations') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'authorizations') ? 'active' : '' ?>">
                         <i class="nav-icon fas fa-file-signature"></i><p>Authorizations</p>
@@ -77,7 +85,7 @@
                 <li class="nav-header">OPERATIONS</li>
 
                 <li class="nav-item">
-                    <a href="<?= base_url('students-add') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'students-add') ? 'active' : '' ?>">
+                    <a href="<?= base_url('register') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'students-add') ? 'active' : '' ?>">
                         <i class="nav-icon fas fa-user-plus"></i><p>Register Student & Parents</p>
                     </a>
                 </li>
@@ -87,6 +95,14 @@
                         <i class="nav-icon fas fa-qrcode"></i><p>QR Scan</p>
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a href="<?= base_url('scan-monitor') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'scan-monitor') ? 'active' : '' ?>">
+                        <i class="nav-icon fas fa-desktop"></i>
+                        <p>Scan Monitor</p>
+                    </a>
+                </li>
+
                 <li class="nav-item">
                     <a href="<?= base_url('authorizations') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'authorizations') ? 'active' : '' ?>">
                         <i class="nav-icon fas fa-file-signature"></i><p>Authorizations</p>

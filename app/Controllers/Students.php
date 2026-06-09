@@ -53,7 +53,7 @@ class Students extends BaseController
     // ========== ADD FORM ==========
     public function add()
     {
-        return view('students_add');
+        return view('register');
     }
 
     // ========== EDIT FORM ==========
@@ -79,8 +79,9 @@ class Students extends BaseController
         ]);
 
         $firstParentId = null;
+        $registeredParents = [];
 
-        // Save parents
+        // Save parents (max 3)
         $parentFnames = $this->request->getPost('parent_fname');
         if ($parentFnames) {
             $parentMnames    = $this->request->getPost('parent_mname');
@@ -107,6 +108,14 @@ class Students extends BaseController
                     $firstParentId = $parentId;
                 }
 
+                // Store parent info for flash message
+                $registeredParents[] = [
+                    'fname'    => $fname,
+                    'lname'    => $parentLnames[$i],
+                    'qr_code'  => $qrValue,
+                    'relation' => $parentRelations[$i] ?? 'Parent',
+                ];
+
                 $this->parentsModel->db->table('student_parents')->insert([
                     'student_id' => $studentId,
                     'parent_id'  => $parentId,
@@ -115,10 +124,10 @@ class Students extends BaseController
             }
         }
 
-        // Save fetchers to sub_fetchers table
-        // Save fetchers to sub_fetchers table
+        // Save fetchers to sub_fetchers table (max 2)
+        $registeredFetchers = [];
         $fetcherFnames = $this->request->getPost('fetcher_fname');
-        if ($fetcherFnames) {
+        if ($fetcherFnames && $firstParentId) {
             $fetcherMnames = $this->request->getPost('fetcher_mname');
             $fetcherLnames = $this->request->getPost('fetcher_lname');
             $fetcherPhones = $this->request->getPost('fetcher_phone');
@@ -137,11 +146,32 @@ class Students extends BaseController
                     'qr_code'    => $qrValue,
                     'created_by' => session('user_id'),
                 ]);
+
+                $registeredFetchers[] = [
+                    'fname'   => $fname,
+                    'lname'   => $fetcherLnames[$i],
+                    'qr_code' => $qrValue,
+                ];
             }
         }
 
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'create', 'student', 'Created: '.$this->request->getPost('fname').' '.$this->request->getPost('lname'));
-        return redirect()->to('/students')->with('msg', 'Student, Parents & Fetchers registered');
+        $this->logModel->addLog(
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'create', 
+            'student', 
+            'Created: '.$this->request->getPost('fname').' '.$this->request->getPost('lname')
+        );
+
+        // Store registration data in flash session for result display
+        session()->setFlashdata('registration_success', true);
+        session()->setFlashdata('student_name', $this->request->getPost('fname') . ' ' . $this->request->getPost('lname'));
+        session()->setFlashdata('registered_parents', $registeredParents);
+        session()->setFlashdata('registered_fetchers', $registeredFetchers);
+        session()->setFlashdata('student_id', $studentId);
+
+        return redirect()->to('/students')->with('showResult', true);
     }
 
     // ========== UPDATE STUDENT ==========
@@ -157,7 +187,14 @@ class Students extends BaseController
         $pictureName = $this->uploadStudentPicture();
         if ($pictureName) $data['picture'] = $pictureName;
         $this->studentModel->update($id, $data);
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'update', 'student', 'Updated: '.$data['fname'].' '.$data['lname'].' (ID: '.$id.')');
+        $this->logModel->addLog(
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'update', 
+            'student', 
+            'Updated: '.$data['fname'].' '.$data['lname'].' (ID: '.$id.')'
+        );
         return redirect()->to('/students-view/' . $id)->with('msg', 'Student updated');
     }
 
@@ -166,7 +203,14 @@ class Students extends BaseController
     {
         $student = $this->studentModel->find($id);
         $this->studentModel->delete($id);
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'delete', 'student', 'Deleted: '.$student['fname'].' '.$student['lname'].' (ID: '.$id.')');
+        $this->logModel->addLog(
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'delete', 
+            'student', 
+            'Deleted: '.$student['fname'].' '.$student['lname'].' (ID: '.$id.')'
+        );
         return redirect()->to('/students')->with('msg', 'Student deleted');
     }
 
@@ -181,7 +225,14 @@ class Students extends BaseController
             $this->parentsModel->delete($parentId);
         }
 
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'update', 'student', 'Removed parent (ID: '.$parentId.') from student (ID: '.$studentId.')');
+        $this->logModel->addLog(
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'update', 
+            'student', 
+            'Removed parent (ID: '.$parentId.') from student (ID: '.$studentId.')'
+        );
         return redirect()->to('/students-view/' . $studentId)->with('msg', 'Parent removed');
     }
 
@@ -214,7 +265,14 @@ class Students extends BaseController
             'relation'   => $this->request->getPost('relation') ?? 'Parent',
         ]);
 
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'create', 'parent', 'Added: '.$this->request->getPost('fname').' '.$this->request->getPost('lname'));
+        $this->logModel->addLog(
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'create', 
+            'parent', 
+            'Added: '.$this->request->getPost('fname').' '.$this->request->getPost('lname')
+        );
         return redirect()->to('/students-view/' . $studentId)->with('msg', 'Parent added');
     }
 
@@ -255,11 +313,67 @@ class Students extends BaseController
         return null;
     }
 
+    /**
+     * Generate QR code with text label below it
+     */
     private function generateQR()
     {
         $qrValue = 'QR-' . strtoupper(bin2hex(random_bytes(6)));
         include_once('phpqrcode/qrlib.php');
-        \QRcode::png($qrValue, 'uploads/qr/' . $qrValue . '.png', QR_ECLEVEL_H, 8, 2);
+        
+        // Generate the QR code image first (temporary)
+        $qrImagePath = 'uploads/qr/' . $qrValue . '_tmp.png';
+        \QRcode::png($qrValue, $qrImagePath, QR_ECLEVEL_H, 8, 2);
+        
+        // Get QR image dimensions
+        $qrImage = imagecreatefrompng($qrImagePath);
+        $qrWidth = imagesx($qrImage);
+        $qrHeight = imagesy($qrImage);
+        
+        // Set dimensions for combined image
+        $textHeight = 35;
+        $totalHeight = $qrHeight + $textHeight;
+        $totalWidth = $qrWidth;
+        
+        // Create new canvas
+        $combinedImage = imagecreatetruecolor($totalWidth, $totalHeight);
+        
+        // White background
+        $white = imagecolorallocate($combinedImage, 255, 255, 255);
+        imagefill($combinedImage, 0, 0, $white);
+        
+        // Copy QR code to top portion
+        imagecopy($combinedImage, $qrImage, 0, 0, 0, 0, $qrWidth, $qrHeight);
+        
+        // Add text label below QR code
+        $black = imagecolorallocate($combinedImage, 0, 0, 0);
+        $fontSize = 5;
+        $text = $qrValue;
+        
+        // Center the text
+        $textWidth = imagefontwidth($fontSize) * strlen($text);
+        $textX = max(0, ($totalWidth - $textWidth) / 2);
+        $textY = $qrHeight + 8;
+        
+        // Draw border line above text
+        imageline($combinedImage, 0, $qrHeight, $totalWidth, $qrHeight, $black);
+        
+        // Draw the text
+        imagestring($combinedImage, $fontSize, (int)$textX, $textY, $text, $black);
+        
+        // Save final image
+        $finalPath = 'uploads/qr/' . $qrValue . '.png';
+        imagepng($combinedImage, $finalPath);
+        
+        // Clean up
+        imagedestroy($qrImage);
+        imagedestroy($combinedImage);
+        
+        // Delete temporary file
+        if (file_exists($qrImagePath)) {
+            unlink($qrImagePath);
+        }
+        
         return $qrValue;
     }
 }

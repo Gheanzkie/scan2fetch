@@ -17,7 +17,7 @@ $routes->get('dashboard', 'Dashboard::index');
 
 // ========== STUDENTS ==========
 $routes->get('students', 'Students::index');
-$routes->get('students-add', 'Students::add');
+$routes->get('register', 'Students::add');
 $routes->get('students-view/(:num)', 'Students::view/$1');
 $routes->get('students-edit/(:num)', 'Students::edit/$1');
 $routes->post('students-save', 'Students::save');
@@ -54,6 +54,7 @@ $routes->get('scan', 'Scan::index');
 $routes->post('scan/verify', 'Scan::verify');
 $routes->post('scan/release', 'Scan::release');
 $routes->post('scan/decline', 'Scan::decline');
+$routes->get('scan-monitor', 'ScanMonitor::index');
 
 // Sub-Fetchers
 $routes->post('subfetchers-save', 'SubFetchers::save');
