@@ -13,6 +13,10 @@ class ScanMonitor extends BaseController
 
     public function index()
     {
+        if (!session('logged_in')) {
+            return redirect()->to('/login')->send();
+        }
+        
         $db = \Config\Database::connect();
         $today = date('Y-m-d');
 

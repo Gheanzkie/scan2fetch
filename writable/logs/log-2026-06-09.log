@@ -899,3 +899,233 @@ DEBUG - 2026-06-09 21:50:18 --> Session: Class initialized using 'CodeIgniter\Se
 DEBUG - 2026-06-09 21:50:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2026-06-09 21:50:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2026-06-09 21:50:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:51:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:51:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:51:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:51:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:51:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:51:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:51:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:51:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:51:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:51:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:51:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:51:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:51:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:51:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:51:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:54:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:57:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:57:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:57:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:57:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:58:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:58:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 21:58:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:11:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:11:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:11:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:12:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:12:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:14:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:15:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:18:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:21:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:21:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:21:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:23:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:24:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:27:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:27:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:28:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:28:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:28:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:28:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:28:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:28:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:29:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:29:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:29:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:29:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2026-06-09 22:29:31 --> [DEPRECATED] ucfirst(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Views\theme\navbar.php on line 23.
+ 1 APPPATH\Views\theme\navbar.php(23): ucfirst(null)
+ 2 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\navbar.php')
+ 3 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\View\View.php(489): CodeIgniter\View\View->render('theme/navbar', null, true)
+ 5 APPPATH\Views\theme\template.php(25): CodeIgniter\View\View->include('theme/navbar')
+ 6 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\template.php')
+ 7 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(256): CodeIgniter\View\View->render('theme/template', [], true)
+ 9 SYSTEMPATH\Common.php(1254): CodeIgniter\View\View->render('parents_view', [], true)
+10 APPPATH\Controllers\Parents.php(57): view('parents_view', [...])
+11 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Parents->view('29')
+12 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Parents))
+13 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(61): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\scan2fetch\\public\\index.php')
+WARNING - 2026-06-09 22:29:31 --> [DEPRECATED] ucfirst(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Views\theme\navbar.php on line 28.
+ 1 APPPATH\Views\theme\navbar.php(28): ucfirst(null)
+ 2 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\navbar.php')
+ 3 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\View\View.php(489): CodeIgniter\View\View->render('theme/navbar', null, true)
+ 5 APPPATH\Views\theme\template.php(25): CodeIgniter\View\View->include('theme/navbar')
+ 6 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\template.php')
+ 7 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(256): CodeIgniter\View\View->render('theme/template', [], true)
+ 9 SYSTEMPATH\Common.php(1254): CodeIgniter\View\View->render('parents_view', [], true)
+10 APPPATH\Controllers\Parents.php(57): view('parents_view', [...])
+11 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Parents->view('29')
+12 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Parents))
+13 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(61): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\scan2fetch\\public\\index.php')
+DEBUG - 2026-06-09 22:30:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:30:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:30:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:30:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:30:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:30:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:30:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:30:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:30:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:30:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2026-06-09 22:30:49 --> [DEPRECATED] ucfirst(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Views\theme\navbar.php on line 23.
+ 1 APPPATH\Views\theme\navbar.php(23): ucfirst(null)
+ 2 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\navbar.php')
+ 3 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\View\View.php(489): CodeIgniter\View\View->render('theme/navbar', null, true)
+ 5 APPPATH\Views\theme\template.php(25): CodeIgniter\View\View->include('theme/navbar')
+ 6 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\template.php')
+ 7 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(256): CodeIgniter\View\View->render('theme/template', [], true)
+ 9 SYSTEMPATH\Common.php(1254): CodeIgniter\View\View->render('parents', [], true)
+10 APPPATH\Controllers\Parents.php(34): view('parents', [...])
+11 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Parents->index()
+12 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Parents))
+13 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(61): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\scan2fetch\\public\\index.php')
+WARNING - 2026-06-09 22:30:49 --> [DEPRECATED] ucfirst(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Views\theme\navbar.php on line 28.
+ 1 APPPATH\Views\theme\navbar.php(28): ucfirst(null)
+ 2 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\navbar.php')
+ 3 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\View\View.php(489): CodeIgniter\View\View->render('theme/navbar', null, true)
+ 5 APPPATH\Views\theme\template.php(25): CodeIgniter\View\View->include('theme/navbar')
+ 6 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\template.php')
+ 7 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(256): CodeIgniter\View\View->render('theme/template', [], true)
+ 9 SYSTEMPATH\Common.php(1254): CodeIgniter\View\View->render('parents', [], true)
+10 APPPATH\Controllers\Parents.php(34): view('parents', [...])
+11 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Parents->index()
+12 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Parents))
+13 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(61): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\scan2fetch\\public\\index.php')
+DEBUG - 2026-06-09 22:31:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-09 22:31:04 --> Error: Call to a member function orderBy() on null
+[Method: GET, Route: students]
+in APPPATH\Controllers\Students.php on line 31.
+ 1 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Students->index()
+ 2 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Students))
+ 3 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(61): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 7 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\scan2fetch\\public\\index.php')
+DEBUG - 2026-06-09 22:31:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:32:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:32:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:32:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:32:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:32:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2026-06-09 22:32:26 --> [DEPRECATED] ucfirst(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Views\theme\navbar.php on line 23.
+ 1 APPPATH\Views\theme\navbar.php(23): ucfirst(null)
+ 2 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\navbar.php')
+ 3 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\View\View.php(489): CodeIgniter\View\View->render('theme/navbar', null, true)
+ 5 APPPATH\Views\theme\template.php(25): CodeIgniter\View\View->include('theme/navbar')
+ 6 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\template.php')
+ 7 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(256): CodeIgniter\View\View->render('theme/template', [], true)
+ 9 SYSTEMPATH\Common.php(1254): CodeIgniter\View\View->render('parents', [], true)
+10 APPPATH\Controllers\Parents.php(34): view('parents', [...])
+11 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Parents->index()
+12 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Parents))
+13 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(61): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\scan2fetch\\public\\index.php')
+WARNING - 2026-06-09 22:32:26 --> [DEPRECATED] ucfirst(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Views\theme\navbar.php on line 28.
+ 1 APPPATH\Views\theme\navbar.php(28): ucfirst(null)
+ 2 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\navbar.php')
+ 3 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\View\View.php(489): CodeIgniter\View\View->render('theme/navbar', null, true)
+ 5 APPPATH\Views\theme\template.php(25): CodeIgniter\View\View->include('theme/navbar')
+ 6 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\template.php')
+ 7 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(256): CodeIgniter\View\View->render('theme/template', [], true)
+ 9 SYSTEMPATH\Common.php(1254): CodeIgniter\View\View->render('parents', [], true)
+10 APPPATH\Controllers\Parents.php(34): view('parents', [...])
+11 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Parents->index()
+12 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Parents))
+13 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(61): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\scan2fetch\\public\\index.php')
+DEBUG - 2026-06-09 22:32:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2026-06-09 22:32:29 --> [DEPRECATED] ucfirst(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Views\theme\navbar.php on line 23.
+ 1 APPPATH\Views\theme\navbar.php(23): ucfirst(null)
+ 2 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\navbar.php')
+ 3 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\View\View.php(489): CodeIgniter\View\View->render('theme/navbar', null, true)
+ 5 APPPATH\Views\theme\template.php(25): CodeIgniter\View\View->include('theme/navbar')
+ 6 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\template.php')
+ 7 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(256): CodeIgniter\View\View->render('theme/template', [], true)
+ 9 SYSTEMPATH\Common.php(1254): CodeIgniter\View\View->render('parents_view', [], true)
+10 APPPATH\Controllers\Parents.php(57): view('parents_view', [...])
+11 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Parents->view('29')
+12 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Parents))
+13 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(61): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\scan2fetch\\public\\index.php')
+WARNING - 2026-06-09 22:32:29 --> [DEPRECATED] ucfirst(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Views\theme\navbar.php on line 28.
+ 1 APPPATH\Views\theme\navbar.php(28): ucfirst(null)
+ 2 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\navbar.php')
+ 3 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\View\View.php(489): CodeIgniter\View\View->render('theme/navbar', null, true)
+ 5 APPPATH\Views\theme\template.php(25): CodeIgniter\View\View->include('theme/navbar')
+ 6 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\scan2fetch\\app\\Views\\theme\\template.php')
+ 7 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(256): CodeIgniter\View\View->render('theme/template', [], true)
+ 9 SYSTEMPATH\Common.php(1254): CodeIgniter\View\View->render('parents_view', [], true)
+10 APPPATH\Controllers\Parents.php(57): view('parents_view', [...])
+11 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Parents->view('29')
+12 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Parents))
+13 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(61): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\scan2fetch\\public\\index.php')
+DEBUG - 2026-06-09 22:32:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:32:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:33:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:33:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:33:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:35:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:35:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:35:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:35:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-09 22:35:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

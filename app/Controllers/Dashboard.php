@@ -46,7 +46,7 @@ class Dashboard extends BaseController
 
         $data = ['title' => 'Dashboard'];
 
-        // ========== ADMIN ==========
+        
         if ($role == 'admin') {
             $data['totalStudents']  = $this->studentModel->countAll();
             $data['totalParents']   = $this->parentsModel->countAll();
@@ -59,7 +59,7 @@ class Dashboard extends BaseController
             $data['smsLogs'] = $this->smsLogModel->orderBy('sent_at', 'DESC')->limit(10)->findAll();
         }
 
-        // ========== STAFF ==========
+        
         if ($role == 'staff') {
             $data['totalStudents']     = $this->studentModel->countAll();
             $data['releasedToday']     = $this->fetchLogModel->where('staff_id', $userId)->where('DATE(time_released)', $today)->countAllResults();
@@ -72,12 +72,12 @@ class Dashboard extends BaseController
                 ->findAll();
         }
 
-        // ========== PARENT ==========
+        
         if ($role == 'parent') {
-            // Parent profile
+            
             $data['parentProfile'] = $this->parentsModel->find($userId);
 
-            // Get children via student_parents table
+            
             $db = \Config\Database::connect();
             $studentParents = $db->table('student_parents')
                 ->where('parent_id', $userId)
@@ -95,12 +95,12 @@ class Dashboard extends BaseController
                 }
             }
 
-            // Fallback: check old parent_id field directly
+            
             if (empty($data['myChildren'])) {
                 $data['myChildren'] = $this->studentModel->where('parent_id', $userId)->findAll();
             }
 
-            // Get sub-fetchers
+            
             $data['subFetchers'] = $this->subFetcherModel->where('parent_id', $userId)->findAll();
         }
 

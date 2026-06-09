@@ -18,6 +18,10 @@ class Logs extends BaseController
 
     public function index()
     {
+        if (!session('logged_in')) {
+            return redirect()->to('/login')->send();
+        }
+        
         $filter = $this->request->getGet('filter') ?? 'today'; // Default: today
         $module = $this->request->getGet('module') ?? '';
         $date   = $this->request->getGet('date') ?? date('Y-m-d'); // Default: today's date

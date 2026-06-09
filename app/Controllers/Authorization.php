@@ -21,6 +21,10 @@ class Authorization extends BaseController
     // ========== PARENT - SEND AUTHORIZATION PAGE ==========
     public function index()
     {
+        if (!session('logged_in')) {
+            return redirect()->to('/login')->send();
+        }
+        
         $userId = session('user_id');
         $data['myChildren'] = $this->db->table('students')->where('parent_id', $userId)->get()->getResultArray();
         // Also get students linked via student_parents

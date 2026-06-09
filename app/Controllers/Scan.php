@@ -11,6 +11,10 @@ class Scan extends BaseController
 {
     public function index()
     {
+        if (!session('logged_in')) {
+            return redirect()->to('/login')->send();
+        }
+        
         return view('scan');
     }
 
