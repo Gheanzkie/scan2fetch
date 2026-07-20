@@ -18,10 +18,7 @@ class Sms extends BaseController
 
     public function index()
     {
-        if (!session('logged_in')) {
-            return redirect()->to('/login')->send();
-        }
-        
+
         $data['smsLogs']      = $this->smsLogModel->getAll(200);
         $data['totalSms']     = $this->smsLogModel->countAll();
         $data['sentCount']    = $this->smsLogModel->getSentCount();

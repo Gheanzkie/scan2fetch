@@ -28,10 +28,7 @@ class Students extends BaseController
     // ========== LIST ==========
     public function index()
     {
-        if (!session('logged_in')) {
-            return redirect()->to('/login')->send();
-        }
-        
+
         $data['students'] = $this->studentModel->orderBy('created_at', 'DESC')->findAll();
         return view('students', $data);
     }

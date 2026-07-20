@@ -20,10 +20,6 @@ class Parents extends BaseController
 
     public function index()
     {
-        if (!session('logged_in')) {
-            return redirect()->to('/login')->send();
-        }
-        
         $model = new ParentsModel();
         $db = \Config\Database::connect();
         

@@ -19,10 +19,6 @@ class Staffs extends BaseController
 
     public function index()
     {
-        if (!session('logged_in')) {
-            return redirect()->to('/login')->send();
-        }
-        
         $model = new StaffsModel();
         $data['staffs'] = $model->orderBy('created_at', 'DESC')->findAll();
         return view('staffs', $data);
