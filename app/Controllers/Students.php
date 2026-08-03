@@ -2,12 +2,16 @@
 
 namespace App\Controllers;
 
+use App\Models\StudentModel;
 use App\Models\ParentsModel;
 use App\Models\SubFetcherModel;
 use App\Models\ActivityLogModel;
 
-class Parents extends BaseController
+class Students extends BaseController
 {
+    protected $studentModel;
+    protected $parentsModel;
+    protected $subFetcherModel;
     protected $logModel;
 
     public function __construct()
@@ -15,441 +19,416 @@ class Parents extends BaseController
         if (!session('logged_in')) {
             return redirect()->to('/login')->send();
         }
-        $this->logModel = new ActivityLogModel();
+        $this->studentModel    = new StudentModel();
+        $this->parentsModel    = new ParentsModel();
+        $this->subFetcherModel = new SubFetcherModel();
+        $this->logModel        = new ActivityLogModel();
     }
 
+    // ========== LIST ==========
     public function index()
     {
-        $model = new ParentsModel();
-        $db = \Config\Database::connect();
-        
-        $data['parents'] = $db->table('parents')
-            ->select('parents.*, students.fname as student_fname, students.lname as student_lname, students.grade_section as student_grade, student_parents.relation')
-            ->join('student_parents', 'student_parents.parent_id = parents.id', 'left')
-            ->join('students', 'students.id = student_parents.student_id', 'left')
-            ->orderBy('parents.created_at', 'DESC')
-            ->get()
-            ->getResultArray();
-            
-        return view('parents', $data);
+        $data['students'] = $this->studentModel->orderBy('created_at', 'DESC')->findAll();
+        return view('students', $data);
     }
 
+    // ========== VIEW ==========
     public function view($id)
     {
-        $model = new ParentsModel();
-        $data['parent'] = $model->find($id);
-        if (!$data['parent']) {
-            return redirect()->to('/parents')->with('error', 'Parent not found');
-        }
+        $data['student'] = $this->studentModel->find($id);
+        if (!$data['student']) return redirect()->to('/students')->with('error', 'Student not found');
 
-        $db = \Config\Database::connect();
-        
-        $data['students'] = $db->table('student_parents')
-            ->select('student_parents.*, students.fname, students.mname, students.lname, students.grade_section, students.picture, students.id as student_id')
-            ->join('students', 'students.id = student_parents.student_id')
-            ->where('student_parents.parent_id', $id)
-            ->get()
-            ->getResultArray();
+        $data['parents'] = $this->parentsModel
+            ->select('parents.*, student_parents.relation, parents.id as parent_id')
+            ->join('student_parents', 'student_parents.parent_id = parents.id')
+            ->where('student_parents.student_id', $id)
+            ->findAll();
 
-        $subFetcherModel = new SubFetcherModel();
-        $data['subFetchers'] = $subFetcherModel->where('parent_id', $id)->findAll();
+        $data['parentCount'] = count($data['parents']);
+        $data['subFetchers'] = $this->subFetcherModel->where('student_id', $id)->findAll();
 
-        return view('parents_view', $data);
+        return view('students_view', $data);
     }
 
+    // ========== ADD FORM ==========
+    public function add()
+    {
+        return view('register');
+    }
+
+    // ========== EDIT FORM ==========
     public function edit($id)
     {
-        $model = new ParentsModel();
-        $data['parent'] = $model->find($id);
-        if (!$data['parent']) {
-            return redirect()->to('/parents')->with('error', 'Parent not found');
-        }
-        return view('parents_edit', $data);
+        $data['student'] = $this->studentModel->find($id);
+        if (!$data['student']) return redirect()->to('/students')->with('error', 'Student not found');
+        return view('students_edit', $data);
     }
 
+    // ========== SAVE STUDENT + PARENTS + FETCHERS ==========
     public function save()
     {
-        $model = new ParentsModel();
-        $picture = $this->uploadPicture('picture');
-        $qrValue = $this->generateQR();
-        $model->save([
-            'fname' => $this->request->getPost('fname'),
-            'mname' => $this->request->getPost('mname'),
-            'lname' => $this->request->getPost('lname'),
-            'phone' => $this->request->getPost('phone'),
-            'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-            'picture' => $picture,
-            'qr_code' => $qrValue,
-            'created_by' => session('user_id'),
-        ]);
-        $this->logModel->addLog(
-            session('user_id'),
-            session('fname') . ' ' . session('lname'),
-            session('role'),
-            'create',
-            'parent',
-            'Created parent: ' . $this->request->getPost('fname') . ' ' . $this->request->getPost('lname')
-        );
-        return redirect()->to('/parents')->with('msg', 'Parent added');
+        $db = \Config\Database::connect();
+        
+        $db->transStart();
+
+        try {
+            $pictureName = $this->uploadStudentPicture();
+
+            $studentId = $this->studentModel->insert([
+                'fname'         => $this->request->getPost('fname'),
+                'mname'         => $this->request->getPost('mname'),
+                'lname'         => $this->request->getPost('lname'),
+                'grade_section' => $this->request->getPost('grade_section'),
+                'picture'       => $pictureName,
+                'created_by'    => session('user_id'),
+            ]);
+
+            if (!$studentId) {
+                throw new \Exception('Failed to save student');
+            }
+
+            $firstParentId = null;
+            $registeredParents = [];
+
+            // Save parents (max 3)
+            $parentFnames = $this->request->getPost('parent_fname');
+            if ($parentFnames) {
+                $parentMnames    = $this->request->getPost('parent_mname');
+                $parentLnames    = $this->request->getPost('parent_lname');
+                $parentPhones    = $this->request->getPost('parent_phone');
+                $parentRelations = $this->request->getPost('parent_relation');
+                $parentPasswords = $this->request->getPost('parent_password');
+                $parentPictures  = $this->uploadParentPictures();
+
+                foreach ($parentFnames as $i => $fname) {
+                    if (empty($fname) || $i >= 3) continue;
+
+                    $qrValue = $this->generateQR();
+                    $parentId = $this->parentsModel->insert([
+                        'fname'      => $fname,
+                        'mname'      => $parentMnames[$i] ?? null,
+                        'lname'      => $parentLnames[$i],
+                        'phone'      => $parentPhones[$i],
+                        'password'   => password_hash($parentPasswords[$i] ?? 'parent123', PASSWORD_DEFAULT),
+                        'qr_code'    => $qrValue,
+                        'picture'    => $parentPictures[$i] ?? null,
+                        'created_by' => session('user_id'),
+                    ]);
+
+                    if (!$parentId) {
+                        throw new \Exception('Failed to save parent');
+                    }
+
+                    if ($firstParentId === null) {
+                        $firstParentId = $parentId;
+                    }
+
+                    // Store with QR code
+                    $registeredParents[] = [
+                        'fname'    => $fname,
+                        'lname'    => $parentLnames[$i],
+                        'qr_code'  => $qrValue,
+                        'relation' => $parentRelations[$i] ?? 'Parent',
+                    ];
+
+                    $linked = $this->parentsModel->db->table('student_parents')->insert([
+                        'student_id' => $studentId,
+                        'parent_id'  => $parentId,
+                        'relation'   => $parentRelations[$i] ?? 'Parent',
+                    ]);
+
+                    if (!$linked) {
+                        throw new \Exception('Failed to link parent to student');
+                    }
+                }
+            }
+
+            // Save fetchers to sub_fetchers table (max 2)
+            $registeredFetchers = [];
+            $fetcherFnames = $this->request->getPost('fetcher_fname');
+            if ($fetcherFnames && $firstParentId) {
+                $fetcherMnames = $this->request->getPost('fetcher_mname');
+                $fetcherLnames = $this->request->getPost('fetcher_lname');
+                $fetcherPhones = $this->request->getPost('fetcher_phone');
+                $fetcherPictures = $this->uploadFetcherPictures();
+
+                foreach ($fetcherFnames as $i => $fname) {
+                    if (empty($fname) || $i >= 2) continue;
+
+                    $qrValue = $this->generateQR();
+                    $fetcherId = $this->subFetcherModel->insert([
+                        'parent_id'  => $firstParentId,
+                        'student_id' => $studentId,
+                        'fname'      => $fname,
+                        'mname'      => $fetcherMnames[$i] ?? null,
+                        'lname'      => $fetcherLnames[$i],
+                        'phone'      => $fetcherPhones[$i],
+                        'picture'    => $fetcherPictures[$i] ?? null,
+                        'qr_code'    => $qrValue,
+                        'created_by' => session('user_id'),
+                    ]);
+
+                    if (!$fetcherId) {
+                        throw new \Exception('Failed to save fetcher');
+                    }
+
+                    $registeredFetchers[] = [
+                        'fname'   => $fname,
+                        'lname'   => $fetcherLnames[$i],
+                        'qr_code' => $qrValue,
+                    ];
+                }
+            }
+
+            $this->logModel->addLog(
+                session('user_id'), 
+                session('fname').' '.session('lname'), 
+                session('role'), 
+                'create', 
+                'student', 
+                'Created: '.$this->request->getPost('fname').' '.$this->request->getPost('lname')
+            );
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                throw new \Exception('Transaction failed');
+            }
+
+            // Store all data in flashdata
+            session()->setFlashdata('registration_success', true);
+            session()->setFlashdata('student_name', $this->request->getPost('fname') . ' ' . $this->request->getPost('lname'));
+            session()->setFlashdata('registered_parents', $registeredParents);
+            session()->setFlashdata('registered_fetchers', $registeredFetchers);
+            session()->setFlashdata('student_id', $studentId);
+            session()->setFlashdata('showResult', true);
+
+            return redirect()->to('/register')->with('showResult', true);
+
+        } catch (\Exception $e) {
+            $db->transRollback();
+            log_message('error', 'Registration failed: ' . $e->getMessage());
+            return redirect()->to('/register')->with('error', 'Registration failed: ' . $e->getMessage());
+        }
     }
 
+    // ========== UPDATE STUDENT ==========
     public function update()
     {
-        $model = new ParentsModel();
         $id = $this->request->getPost('id');
         $data = [
             'fname' => $this->request->getPost('fname'),
             'mname' => $this->request->getPost('mname'),
             'lname' => $this->request->getPost('lname'),
-            'phone' => $this->request->getPost('phone')
+            'grade_section' => $this->request->getPost('grade_section'),
         ];
-        if ($this->request->getPost('password')) {
-            $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
-        }
-        $picture = $this->uploadPicture('picture');
-        if ($picture) {
-            $data['picture'] = $picture;
-        }
-        $model->update($id, $data);
+        $pictureName = $this->uploadStudentPicture();
+        if ($pictureName) $data['picture'] = $pictureName;
+        $this->studentModel->update($id, $data);
         $this->logModel->addLog(
-            session('user_id'),
-            session('fname') . ' ' . session('lname'),
-            session('role'),
-            'update',
-            'parent',
-            'Updated parent: ' . $data['fname'] . ' ' . $data['lname'] . ' (ID: ' . $id . ')'
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'update', 
+            'student', 
+            'Updated: '.$data['fname'].' '.$data['lname'].' (ID: '.$id.')'
         );
-        return redirect()->to('/parents')->with('msg', 'Parent updated');
+        return redirect()->to('/students-view/' . $id)->with('msg', 'Student updated');
     }
 
+    // ========== DELETE STUDENT ==========
     public function delete($id)
     {
-        $model = new ParentsModel();
-        $parent = $model->find($id);
-        $model->delete($id);
+        $student = $this->studentModel->find($id);
+        $this->studentModel->delete($id);
         $this->logModel->addLog(
-            session('user_id'),
-            session('fname') . ' ' . session('lname'),
-            session('role'),
-            'delete',
-            'parent',
-            'Deleted parent: ' . $parent['fname'] . ' ' . $parent['lname'] . ' (ID: ' . $id . ')'
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'delete', 
+            'student', 
+            'Deleted: '.$student['fname'].' '.$student['lname'].' (ID: '.$id.')'
         );
-        return redirect()->to('/parents')->with('msg', 'Parent deleted');
+        return redirect()->to('/students')->with('msg', 'Student deleted');
     }
 
-    public function updatePicture()
+    // ========== REMOVE PARENT ==========
+    public function removeParent($studentId, $parentId)
     {
-        $model = new ParentsModel();
-        $id = $this->request->getPost('id');
-        $picture = $this->uploadPicture('picture');
-        if ($picture) {
-            $model->update($id, ['picture' => $picture]);
+        $db = \Config\Database::connect();
+        $db->table('student_parents')->where('student_id', $studentId)->where('parent_id', $parentId)->delete();
+
+        $count = $db->table('student_parents')->where('parent_id', $parentId)->countAllResults();
+        if ($count == 0) {
+            $this->parentsModel->delete($parentId);
         }
-        return redirect()->to('/parents-view/' . $id)->with('msg', 'Photo updated');
+
+        $this->logModel->addLog(
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'update', 
+            'student', 
+            'Removed parent (ID: '.$parentId.') from student (ID: '.$studentId.')'
+        );
+        return redirect()->to('/students-view/' . $studentId)->with('msg', 'Parent removed');
     }
 
-    public function updateFromStudent()
+    // ========== ADD PARENT ==========
+    public function addParent()
     {
-        $model = new ParentsModel();
-        $id = $this->request->getPost('id');
         $studentId = $this->request->getPost('student_id');
-        $data = [
-            'fname' => $this->request->getPost('fname'),
-            'mname' => $this->request->getPost('mname'),
-            'lname' => $this->request->getPost('lname'),
-            'phone' => $this->request->getPost('phone')
-        ];
-        if ($this->request->getPost('password')) {
-            $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
+        $db = \Config\Database::connect();
+        if ($db->table('student_parents')->where('student_id', $studentId)->countAllResults() >= 3) {
+            return redirect()->to('/students-view/' . $studentId)->with('error', 'Maximum 3 parents');
         }
-        $picture = $this->uploadPicture('picture');
-        if ($picture) {
-            $data['picture'] = $picture;
-        }
-        $model->update($id, $data);
+
+        $pictureName = $this->uploadParentPicture();
+        $qrValue = $this->generateQR();
+
+        $parentId = $this->parentsModel->insert([
+            'fname'      => $this->request->getPost('fname'),
+            'mname'      => $this->request->getPost('mname'),
+            'lname'      => $this->request->getPost('lname'),
+            'phone'      => $this->request->getPost('phone'),
+            'password'   => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+            'picture'    => $pictureName,
+            'qr_code'    => $qrValue,
+            'created_by' => session('user_id'),
+        ]);
+
+        $db->table('student_parents')->insert([
+            'student_id' => $studentId,
+            'parent_id'  => $parentId,
+            'relation'   => $this->request->getPost('relation') ?? 'Parent',
+        ]);
+
         $this->logModel->addLog(
-            session('user_id'),
-            session('fname') . ' ' . session('lname'),
-            session('role'),
-            'update',
-            'parent',
-            'Updated parent: ' . $data['fname'] . ' ' . $data['lname'] . ' (ID: ' . $id . ')'
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'create', 
+            'parent', 
+            'Added: '.$this->request->getPost('fname').' '.$this->request->getPost('lname')
         );
-        return redirect()->to('/students-view/' . $studentId)->with('msg', 'Parent updated');
+        return redirect()->to('/students-view/' . $studentId)->with('msg', 'Parent added');
     }
 
-    // ===== RELEASE HISTORY (Separate Method) =====
-    public function releases()
-    {
-        $userId = session('user_id');
-        $studentModel = new \App\Models\StudentModel();
-        $subFetcherModel = new SubFetcherModel();
-        $db = \Config\Database::connect();
-        
-        // Get student IDs linked to this parent
-        $studentParents = $db->table('student_parents')
-            ->where('parent_id', $userId)
-            ->get()
-            ->getResultArray();
-        
-        $studentIds = [];
-        foreach ($studentParents as $sp) {
-            $studentIds[] = $sp['student_id'];
-        }
-        
-        // Get sub-fetchers
-        $subFetchers = $subFetcherModel->where('parent_id', $userId)->findAll();
-        foreach ($subFetchers as $sf) {
-            $studentIds[] = $sf['student_id'];
-        }
-        
-        $studentIds = array_unique($studentIds);
-        
-        // Get release history
-        $data['releases'] = [];
-        if (!empty($studentIds)) {
-            $fetchLogModel = new \App\Models\FetchLogModel();
-            $releases = $fetchLogModel
-                ->whereIn('student_id', $studentIds)
-                ->orderBy('time_released', 'DESC')
-                ->limit(50)
-                ->findAll();
-            
-            foreach ($releases as &$release) {
-                $student = $studentModel->find($release['student_id']);
-                if ($student) {
-                    $release['sfname'] = $student['fname'];
-                    $release['smname'] = $student['mname'] ?? '';
-                    $release['slname'] = $student['lname'];
-                    $release['grade_section'] = $student['grade_section'] ?? '';
-                }
-            }
-            $data['releases'] = $releases;
-        }
-        
-        return view('parents_releases', $data);
-    }
-
-    // ===== SMS NOTIFICATIONS (Fixed - Includes Declined) =====
-    public function notifications()
-    {
-        $db = \Config\Database::connect();
-        
-        // Get parent phone from session
-        $parentPhone = session('phone');
-        $data['smsNotifications'] = [];
-        
-        if (!empty($parentPhone)) {
-            // Get ALL SMS logs for this parent (including declined)
-            $smsLogs = $db->table('sms_logs')
-                ->select('sms_logs.*')
-                ->where('parent_phone', $parentPhone)
-                ->orderBy('sent_at', 'DESC')
-                ->limit(50)
-                ->get()
-                ->getResultArray();
-            
-            // Try to match with students by extracting from message
-            foreach ($smsLogs as &$log) {
-                $message = $log['message'] ?? '';
-                $log['student_fname'] = 'Unknown';
-                $log['student_lname'] = '';
-                $log['grade_section'] = '';
-                $log['is_declined'] = false;
-                
-                // Check if this is a declined message
-                if (stripos($message, 'DECLINED') !== false || stripos($message, 'declined') !== false) {
-                    $log['is_declined'] = true;
-                }
-                
-                // Try to extract student name from message
-                if (preg_match('/child\s+([^\s]+)\s+([^\s]+)/i', $message, $matches)) {
-                    $log['student_fname'] = $matches[1];
-                    $log['student_lname'] = $matches[2] ?? '';
-                } elseif (preg_match('/for\s+([^\s]+)\s+([^\s]+)/i', $message, $matches)) {
-                    $log['student_fname'] = $matches[1];
-                    $log['student_lname'] = $matches[2] ?? '';
-                } elseif (preg_match('/Your\s+child\s+([^\s]+)\s+([^\s]+)/i', $message, $matches)) {
-                    $log['student_fname'] = $matches[1];
-                    $log['student_lname'] = $matches[2] ?? '';
-                } elseif (preg_match('/Student:\s*([^\s]+)\s*([^\s]+)/i', $message, $matches)) {
-                    $log['student_fname'] = $matches[1];
-                    $log['student_lname'] = $matches[2] ?? '';
-                }
-            }
-            $data['smsNotifications'] = $smsLogs;
-        }
-        
-        return view('parents_notifications', $data);
-    }
-
-    // ===== LEGACY: Combined logs (for backward compatibility) =====
-    public function logs()
-    {
-        $userId = session('user_id');
-        $studentModel = new \App\Models\StudentModel();
-        $subFetcherModel = new SubFetcherModel();
-        $db = \Config\Database::connect();
-        
-        // Get student IDs linked to this parent
-        $studentParents = $db->table('student_parents')
-            ->where('parent_id', $userId)
-            ->get()
-            ->getResultArray();
-        
-        $studentIds = [];
-        foreach ($studentParents as $sp) {
-            $studentIds[] = $sp['student_id'];
-        }
-        
-        // Get sub-fetchers
-        $subFetchers = $subFetcherModel->where('parent_id', $userId)->findAll();
-        foreach ($subFetchers as $sf) {
-            $studentIds[] = $sf['student_id'];
-        }
-        
-        $studentIds = array_unique($studentIds);
-        
-        // Get release history
-        $data['releases'] = [];
-        if (!empty($studentIds)) {
-            $fetchLogModel = new \App\Models\FetchLogModel();
-            $releases = $fetchLogModel
-                ->whereIn('student_id', $studentIds)
-                ->orderBy('time_released', 'DESC')
-                ->limit(50)
-                ->findAll();
-            
-            foreach ($releases as &$release) {
-                $student = $studentModel->find($release['student_id']);
-                if ($student) {
-                    $release['sfname'] = $student['fname'];
-                    $release['smname'] = $student['mname'] ?? '';
-                    $release['slname'] = $student['lname'];
-                    $release['grade_section'] = $student['grade_section'] ?? '';
-                }
-            }
-            $data['releases'] = $releases;
-        }
-
-        // Get SMS notifications
-        $data['smsNotifications'] = [];
-        $parentPhone = session('phone');
-        
-        if (!empty($parentPhone)) {
-            $smsLogs = $db->table('sms_logs')
-                ->select('sms_logs.*')
-                ->where('parent_phone', $parentPhone)
-                ->orderBy('sent_at', 'DESC')
-                ->limit(50)
-                ->get()
-                ->getResultArray();
-            
-            foreach ($smsLogs as &$log) {
-                $message = $log['message'] ?? '';
-                $log['student_fname'] = 'Unknown';
-                $log['student_lname'] = '';
-                $log['grade_section'] = '';
-                $log['is_declined'] = false;
-                
-                if (stripos($message, 'DECLINED') !== false || stripos($message, 'declined') !== false) {
-                    $log['is_declined'] = true;
-                }
-                
-                if (preg_match('/child\s+([^\s]+)\s+([^\s]+)/i', $message, $matches)) {
-                    $log['student_fname'] = $matches[1];
-                    $log['student_lname'] = $matches[2] ?? '';
-                } elseif (preg_match('/for\s+([^\s]+)\s+([^\s]+)/i', $message, $matches)) {
-                    $log['student_fname'] = $matches[1];
-                    $log['student_lname'] = $matches[2] ?? '';
-                } elseif (preg_match('/Your\s+child\s+([^\s]+)\s+([^\s]+)/i', $message, $matches)) {
-                    $log['student_fname'] = $matches[1];
-                    $log['student_lname'] = $matches[2] ?? '';
-                } elseif (preg_match('/Student:\s*([^\s]+)\s*([^\s]+)/i', $message, $matches)) {
-                    $log['student_fname'] = $matches[1];
-                    $log['student_lname'] = $matches[2] ?? '';
-                }
-            }
-            $data['smsNotifications'] = $smsLogs;
-        }
-        
-        return view('parents_logs', $data);
-    }
-
-    private function uploadPicture($fieldName)
+    // ========== HELPERS ==========
+    private function uploadStudentPicture()
     {
         $captureData = $this->request->getPost('picture_capture');
         if ($captureData && strpos($captureData, 'data:image') === 0) {
             $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $captureData));
-            $pictureName = 'photo_' . time() . '.png';
-            file_put_contents('uploads/parents/' . $pictureName, $imageData);
-            return $pictureName;
+            $name = 'student_' . time() . '.png';
+            file_put_contents('uploads/students/' . $name, $imageData);
+            return $name;
         }
-        $file = $this->request->getFile($fieldName);
+        $file = $this->request->getFile('picture');
         if ($file && $file->isValid() && !$file->hasMoved()) {
-            $pictureName = $file->getRandomName();
-            $file->move('uploads/parents', $pictureName);
-            return $pictureName;
+            $name = $file->getRandomName();
+            $file->move('uploads/students', $name);
+            return $name;
         }
         return null;
     }
 
-    /**
-     * Generate QR code with text label below it
-     */
+    private function uploadParentPicture()
+    {
+        $captureData = $this->request->getPost('parent_picture_capture');
+        if ($captureData && strpos($captureData, 'data:image') === 0) {
+            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $captureData));
+            $name = 'parent_' . time() . '.png';
+            file_put_contents('uploads/parents/' . $name, $imageData);
+            return $name;
+        }
+        $file = $this->request->getFile('parent_picture');
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            $name = $file->getRandomName();
+            $file->move('uploads/parents', $name);
+            return $name;
+        }
+        return null;
+    }
+
+    private function uploadParentPictures()
+    {
+        $pictures = [];
+        $parentPictures = $this->request->getFileMultiple('parent_picture');
+        
+        if ($parentPictures) {
+            foreach ($parentPictures as $file) {
+                if ($file && $file->isValid() && !$file->hasMoved()) {
+                    $name = 'parent_' . time() . '_' . uniqid() . '.png';
+                    $file->move('uploads/parents', $name);
+                    $pictures[] = $name;
+                } else {
+                    $pictures[] = null;
+                }
+            }
+        }
+        
+        return $pictures;
+    }
+
+    private function uploadFetcherPictures()
+    {
+        $pictures = [];
+        $fetcherPictures = $this->request->getFileMultiple('fetcher_picture');
+        
+        if ($fetcherPictures) {
+            foreach ($fetcherPictures as $file) {
+                if ($file && $file->isValid() && !$file->hasMoved()) {
+                    $name = 'fetcher_' . time() . '_' . uniqid() . '.png';
+                    $file->move('uploads/parents', $name);
+                    $pictures[] = $name;
+                } else {
+                    $pictures[] = null;
+                }
+            }
+        }
+        
+        return $pictures;
+    }
+
     private function generateQR()
     {
         $qrValue = 'QR-' . strtoupper(bin2hex(random_bytes(6)));
         include_once('phpqrcode/qrlib.php');
         
-        // Generate the QR code image first
-        $qrImagePath = 'uploads/qr/' . $qrValue . '_qrcode.png';
+        $qrImagePath = 'uploads/qr/' . $qrValue . '_tmp.png';
         \QRcode::png($qrValue, $qrImagePath, QR_ECLEVEL_H, 8, 2);
         
-        // Create a new image with space for text below QR code
         $qrImage = imagecreatefrompng($qrImagePath);
         $qrWidth = imagesx($qrImage);
         $qrHeight = imagesy($qrImage);
         
-        // Set dimensions for the combined image
-        $textHeight = 40;
-        $padding = 10;
+        $textHeight = 35;
+        $totalHeight = $qrHeight + $textHeight;
         $totalWidth = $qrWidth;
-        $totalHeight = $qrHeight + $textHeight + $padding;
         
-        // Create new canvas
         $combinedImage = imagecreatetruecolor($totalWidth, $totalHeight);
-        
-        // White background
         $white = imagecolorallocate($combinedImage, 255, 255, 255);
         imagefill($combinedImage, 0, 0, $white);
-        
-        // Copy QR code to top
         imagecopy($combinedImage, $qrImage, 0, 0, 0, 0, $qrWidth, $qrHeight);
         
-        // Add text below QR code
         $black = imagecolorallocate($combinedImage, 0, 0, 0);
         $fontSize = 5;
         $text = $qrValue;
         
-        // Calculate text position (centered)
         $textWidth = imagefontwidth($fontSize) * strlen($text);
-        $textX = ($totalWidth - $textWidth) / 2;
-        $textY = $qrHeight + 12;
+        $textX = max(0, ($totalWidth - $textWidth) / 2);
+        $textY = $qrHeight + 8;
         
-        // Draw text
-        imagestring($combinedImage, $fontSize, $textX, $textY, $text, $black);
+        imageline($combinedImage, 0, $qrHeight, $totalWidth, $qrHeight, $black);
+        imagestring($combinedImage, $fontSize, (int)$textX, $textY, $text, $black);
         
-        // Save the combined image
         $finalPath = 'uploads/qr/' . $qrValue . '.png';
         imagepng($combinedImage, $finalPath);
         
-        // Clean up
         imagedestroy($qrImage);
         imagedestroy($combinedImage);
         
-        // Delete the QR-only file
         if (file_exists($qrImagePath)) {
             unlink($qrImagePath);
         }

@@ -420,28 +420,6 @@ label .text-danger {
     overflow-y: auto !important;
 }
 
-/* ===== QR CODE DISPLAY ===== */
-.qr-code-display {
-    background: rgba(255,255,255,0.5);
-    border-radius: 15px;
-    padding: 10px;
-    text-align: center;
-    border: 1px solid rgba(108,140,255,0.08);
-}
-
-.qr-code-display img {
-    max-width: 80px;
-    max-height: 80px;
-    border-radius: 8px;
-}
-
-.qr-code-display .qr-label {
-    font-size: 10px;
-    color: #8888aa;
-    margin-top: 4px;
-    word-break: break-all;
-}
-
 @media (max-width: 768px) {
     .card-body {
         padding: 1rem !important;

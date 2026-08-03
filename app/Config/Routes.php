@@ -8,7 +8,6 @@ $routes->get('/', 'Welcome::index');
 $routes->get('login', 'Login::index');
 $routes->post('login', 'Auth::auth');
 
-
 $routes->group('', ['filter' => 'auth'], function($routes) {
     
     // Logout
@@ -28,7 +27,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('students-remove-parent/(:num)/(:num)', 'Students::removeParent/$1/$2');
     $routes->post('students-add-parent', 'Students::addParent');
 
-    // ===== PARENTS (Updated Routes) =====
+    // ===== PARENTS =====
     $routes->get('parents', 'Parents::index');
     $routes->get('parents-view/(:num)', 'Parents::view/$1');
     $routes->get('parents-edit/(:num)', 'Parents::edit/$1');
@@ -37,11 +36,9 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('parents-delete/(:num)', 'Parents::delete/$1');
     $routes->post('parents-update-picture', 'Parents::updatePicture');
     $routes->post('parents-update-from-student', 'Parents::updateFromStudent');
-
-    // ===== PARENT LOGS (Separate Pages) =====
-    $routes->get('parents-releases', 'Parents::releases');         // Release History only
-    $routes->get('parents-notifications', 'Parents::notifications'); // SMS Notifications only
-    $routes->get('parents-logs', 'Parents::logs');                 // Combined (legacy)
+    $routes->get('parents-releases', 'Parents::releases');
+    $routes->get('parents-notifications', 'Parents::notifications');
+    $routes->get('parents-logs', 'Parents::logs');
 
     // ===== SUB-FETCHERS =====
     $routes->post('subfetchers-save', 'SubFetchers::save');
