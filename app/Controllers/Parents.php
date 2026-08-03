@@ -57,11 +57,6 @@ class Parents extends BaseController
         return view('parents_view', $data);
     }
 
-    public function add()
-    {
-        return view('parents_add');
-    }
-
     public function edit($id)
     {
         $model = new ParentsModel();
@@ -184,13 +179,15 @@ class Parents extends BaseController
         return redirect()->to('/students-view/' . $studentId)->with('msg', 'Parent updated');
     }
 
-    public function logs()
+    // ===== RELEASE HISTORY (With Declined) =====
+    public function releases()
     {
         $userId = session('user_id');
         $studentModel = new \App\Models\StudentModel();
         $subFetcherModel = new SubFetcherModel();
-        
         $db = \Config\Database::connect();
+        
+        // Get student IDs linked to this parent
         $studentParents = $db->table('student_parents')
             ->where('parent_id', $userId)
             ->get()
@@ -201,19 +198,17 @@ class Parents extends BaseController
             $studentIds[] = $sp['student_id'];
         }
         
-        $oldStudents = $studentModel->where('parent_id', $userId)->findAll();
-        foreach ($oldStudents as $s) {
-            $studentIds[] = $s['id'];
-        }
-        
+        // Get sub-fetchers
         $subFetchers = $subFetcherModel->where('parent_id', $userId)->findAll();
         foreach ($subFetchers as $sf) {
             $studentIds[] = $sf['student_id'];
         }
         
+        $studentIds = array_unique($studentIds);
+        
+        // ===== GET RELEASE HISTORY (from fetch_logs) =====
         $data['releases'] = [];
         if (!empty($studentIds)) {
-            $studentIds = array_unique($studentIds);
             $fetchLogModel = new \App\Models\FetchLogModel();
             $releases = $fetchLogModel
                 ->whereIn('student_id', $studentIds)
@@ -227,9 +222,196 @@ class Parents extends BaseController
                     $release['sfname'] = $student['fname'];
                     $release['smname'] = $student['mname'] ?? '';
                     $release['slname'] = $student['lname'];
+                    $release['grade_section'] = $student['grade_section'] ?? '';
+                    $release['action'] = 'release';
                 }
             }
             $data['releases'] = $releases;
+        }
+
+        // ===== GET DECLINED HISTORY (from activity_logs) =====
+        $data['declined'] = [];
+        if (!empty($studentIds)) {
+            $declined = $db->table('activity_logs')
+                ->select('activity_logs.*')
+                ->where('action', 'decline')
+                ->where('module', 'scan')
+                ->orderBy('created_at', 'DESC')
+                ->limit(50)
+                ->get()
+                ->getResultArray();
+            
+            foreach ($declined as &$d) {
+                $desc = $d['description'] ?? '';
+                $studentName = 'Unknown';
+                $studentId = null;
+                
+                // Extract student name from description
+                if (preg_match('/Student:\s*([^\s]+)\s*([^\s]+)\s*\(ID:\s*(\d+)\)/', $desc, $matches)) {
+                    $studentName = $matches[1] . ' ' . $matches[2];
+                    $studentId = $matches[3];
+                } elseif (preg_match('/Student:\s*([^\s]+)\s*([^\s]+)/', $desc, $matches)) {
+                    $studentName = $matches[1] . ' ' . $matches[2];
+                }
+                
+                // Check if student belongs to this parent
+                if ($studentId && in_array($studentId, $studentIds)) {
+                    $d['sfname'] = $studentName;
+                    $d['slname'] = '';
+                    $d['grade_section'] = '—';
+                    $d['action'] = 'decline';
+                    $d['time_released'] = $d['created_at'];
+                    $d['fetcher_fname'] = $d['user_name'] ?? 'System';
+                    $d['fetcher_lname'] = '';
+                    $d['fetcher_relation'] = $d['role'] ?? 'Staff';
+                    $data['declined'][] = $d;
+                }
+            }
+        }
+
+        // ===== MERGE RELEASES AND DECLINED =====
+        $allLogs = array_merge($data['releases'], $data['declined']);
+        
+        // Sort by time (latest first)
+        usort($allLogs, function($a, $b) {
+            return strtotime($b['time_released']) - strtotime($a['time_released']);
+        });
+        
+        $data['logs'] = $allLogs;
+        
+        return view('parents_releases', $data);
+    }
+
+    // ===== SMS NOTIFICATIONS (SMS Logs Only) =====
+    public function notifications()
+    {
+        $db = \Config\Database::connect();
+        
+        // Get parent phone from session
+        $parentPhone = session('phone');
+        $data['smsNotifications'] = [];
+        
+        if (!empty($parentPhone)) {
+            // Get SMS logs for this parent only
+            $smsLogs = $db->table('sms_logs')
+                ->select('sms_logs.*')
+                ->where('parent_phone', $parentPhone)
+                ->orderBy('sent_at', 'DESC')
+                ->limit(50)
+                ->get()
+                ->getResultArray();
+            
+            // Try to match with students by extracting from message
+            foreach ($smsLogs as &$log) {
+                $message = $log['message'] ?? '';
+                $log['student_fname'] = 'Unknown';
+                $log['student_lname'] = '';
+                $log['grade_section'] = '';
+                
+                // Try to extract student name from message
+                if (preg_match('/child\s+([^\s]+)\s+([^\s]+)/i', $message, $matches)) {
+                    $log['student_fname'] = $matches[1];
+                    $log['student_lname'] = $matches[2] ?? '';
+                } elseif (preg_match('/for\s+([^\s]+)\s+([^\s]+)/i', $message, $matches)) {
+                    $log['student_fname'] = $matches[1];
+                    $log['student_lname'] = $matches[2] ?? '';
+                } elseif (preg_match('/Your\s+child\s+([^\s]+)\s+([^\s]+)/i', $message, $matches)) {
+                    $log['student_fname'] = $matches[1];
+                    $log['student_lname'] = $matches[2] ?? '';
+                } elseif (preg_match('/Student:\s*([^\s]+)\s*([^\s]+)/i', $message, $matches)) {
+                    $log['student_fname'] = $matches[1];
+                    $log['student_lname'] = $matches[2] ?? '';
+                }
+            }
+            $data['smsNotifications'] = $smsLogs;
+        }
+        
+        return view('parents_notifications', $data);
+    }
+
+    // ===== LEGACY: Combined logs (for backward compatibility) =====
+    public function logs()
+    {
+        $userId = session('user_id');
+        $studentModel = new \App\Models\StudentModel();
+        $subFetcherModel = new SubFetcherModel();
+        $db = \Config\Database::connect();
+        
+        // Get student IDs linked to this parent
+        $studentParents = $db->table('student_parents')
+            ->where('parent_id', $userId)
+            ->get()
+            ->getResultArray();
+        
+        $studentIds = [];
+        foreach ($studentParents as $sp) {
+            $studentIds[] = $sp['student_id'];
+        }
+        
+        // Get sub-fetchers
+        $subFetchers = $subFetcherModel->where('parent_id', $userId)->findAll();
+        foreach ($subFetchers as $sf) {
+            $studentIds[] = $sf['student_id'];
+        }
+        
+        $studentIds = array_unique($studentIds);
+        
+        // Get release history
+        $data['releases'] = [];
+        if (!empty($studentIds)) {
+            $fetchLogModel = new \App\Models\FetchLogModel();
+            $releases = $fetchLogModel
+                ->whereIn('student_id', $studentIds)
+                ->orderBy('time_released', 'DESC')
+                ->limit(50)
+                ->findAll();
+            
+            foreach ($releases as &$release) {
+                $student = $studentModel->find($release['student_id']);
+                if ($student) {
+                    $release['sfname'] = $student['fname'];
+                    $release['smname'] = $student['mname'] ?? '';
+                    $release['slname'] = $student['lname'];
+                    $release['grade_section'] = $student['grade_section'] ?? '';
+                }
+            }
+            $data['releases'] = $releases;
+        }
+
+        // Get SMS notifications
+        $data['smsNotifications'] = [];
+        $parentPhone = session('phone');
+        
+        if (!empty($parentPhone)) {
+            $smsLogs = $db->table('sms_logs')
+                ->select('sms_logs.*')
+                ->where('parent_phone', $parentPhone)
+                ->orderBy('sent_at', 'DESC')
+                ->limit(50)
+                ->get()
+                ->getResultArray();
+            
+            foreach ($smsLogs as &$log) {
+                $message = $log['message'] ?? '';
+                $log['student_fname'] = 'Unknown';
+                $log['student_lname'] = '';
+                $log['grade_section'] = '';
+                
+                if (preg_match('/child\s+([^\s]+)\s+([^\s]+)/i', $message, $matches)) {
+                    $log['student_fname'] = $matches[1];
+                    $log['student_lname'] = $matches[2] ?? '';
+                } elseif (preg_match('/for\s+([^\s]+)\s+([^\s]+)/i', $message, $matches)) {
+                    $log['student_fname'] = $matches[1];
+                    $log['student_lname'] = $matches[2] ?? '';
+                } elseif (preg_match('/Your\s+child\s+([^\s]+)\s+([^\s]+)/i', $message, $matches)) {
+                    $log['student_fname'] = $matches[1];
+                    $log['student_lname'] = $matches[2] ?? '';
+                } elseif (preg_match('/Student:\s*([^\s]+)\s*([^\s]+)/i', $message, $matches)) {
+                    $log['student_fname'] = $matches[1];
+                    $log['student_lname'] = $matches[2] ?? '';
+                }
+            }
+            $data['smsNotifications'] = $smsLogs;
         }
         
         return view('parents_logs', $data);
@@ -271,7 +453,7 @@ class Parents extends BaseController
         $qrHeight = imagesy($qrImage);
         
         // Set dimensions for the combined image
-        $textHeight = 40; // Space for text below QR
+        $textHeight = 40;
         $padding = 10;
         $totalWidth = $qrWidth;
         $totalHeight = $qrHeight + $textHeight + $padding;
@@ -288,7 +470,7 @@ class Parents extends BaseController
         
         // Add text below QR code
         $black = imagecolorallocate($combinedImage, 0, 0, 0);
-        $fontSize = 5; // Built-in GD font size (1-5)
+        $fontSize = 5;
         $text = $qrValue;
         
         // Calculate text position (centered)

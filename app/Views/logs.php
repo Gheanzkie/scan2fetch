@@ -104,21 +104,24 @@ body {
 
 /* ===== TABLE ===== */
 .table {
-    color: #3d3d5c !important;
+    color: #2d2d4a !important;  /* FIXED: Dark text for whole table */
 }
 
+/* ===== TABLE HEADER ===== */
 .table thead.bg-light {
     background: linear-gradient(135deg, var(--soft-blue), var(--soft-pink)) !important;
 }
 
 .table thead th {
-    color: #fff !important;
-    font-weight: 600 !important;
+    color: #2d2d4a !important;  /* DARK TEXT - HINDI PUTI */
+    font-weight: 700 !important;
     border-bottom: none !important;
     padding: 14px 10px !important;
     font-size: 13px !important;
+    white-space: nowrap;
 }
 
+/* ===== TABLE BODY - ALL DARK TEXT ===== */
 .table tbody tr {
     border-bottom: 1px solid rgba(160,160,180,0.06) !important;
     transition: all 0.3s ease !important;
@@ -130,20 +133,19 @@ body {
 }
 
 .table tbody td {
-    color: #4a4a6a !important;
+    color: #2d2d4a !important;  /* DARK TEXT */
     vertical-align: middle !important;
     border-top: none !important;
     padding: 12px 10px !important;
     font-size: 13px !important;
 }
 
-.table .text-muted {
-    color: #7a7a9a !important;
+.table tbody td strong {
+    color: #2d2d4a !important;  /* DARK TEXT for strong */
 }
 
-.table .small {
+.table tbody td .text-muted {
     color: #7a7a9a !important;
-    font-size: 12px !important;
 }
 
 /* ===== BADGES ===== */
@@ -426,6 +428,14 @@ select.form-control option {
     color: #b0b0c8 !important;
 }
 
+/* ===== DESCRIPTION CELL ===== */
+.desc-cell {
+    max-width: 400px;
+    word-wrap: break-word;
+    white-space: normal;
+    line-height: 1.5;
+}
+
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar {
     width: 8px;
@@ -482,6 +492,9 @@ select.form-control option {
         min-width: 100% !important;
         flex: 1 1 100% !important;
     }
+    .desc-cell {
+        max-width: 150px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -499,6 +512,10 @@ select.form-control option {
     .btn {
         font-size: 10px !important;
         padding: 4px 10px !important;
+    }
+    .desc-cell {
+        max-width: 100px;
+        font-size: 10px !important;
     }
 }
 </style>
@@ -677,11 +694,11 @@ select.form-control option {
                                 <table class="table table-hover mb-0">
                                     <thead>
                                         <tr>
-                                            <th style="width:40px;">#</th>
-                                            <th style="width:155px;">📅 Date/Time</th>
-                                            <th>👤 User</th>
+                                            <th style="width:45px;">#</th>
+                                            <th style="width:150px;">📅 Date/Time</th>
+                                            <th style="width:120px;">👤 User</th>
                                             <th style="width:80px;">🎭 Role</th>
-                                            <th style="width:110px;">⚡ Action</th>
+                                            <th style="width:100px;">⚡ Action</th>
                                             <th style="width:100px;">📦 Module</th>
                                             <th>📝 Description</th>
                                         </tr>
@@ -707,13 +724,15 @@ select.form-control option {
                                             else { $ab = 'secondary'; $ai = '•'; }
                                         ?>
                                         <tr>
-                                            <td style="color: #b0b0c8; font-size: 12px;"><?= $i++ ?></td>
+                                            <td style="color: #b0b0c8; font-size: 12px; font-weight: 700;"><?= $i++ ?></td>
                                             <td style="color: #7a7a9a; font-size: 12px;"><?= date('M d, Y h:i A', strtotime($log['created_at'])) ?></td>
-                                            <td><strong style="color: #3d3d5c;"><?= esc($log['user_name'] ?? 'System') ?></strong></td>
+                                            <td style="color: #2d2d4a; font-weight: 600;"><?= esc($log['user_name'] ?? 'System') ?></td>
                                             <td><span class="badge badge-<?= $rb ?>"><?= ucfirst($role ?: '—') ?></span></td>
                                             <td><span class="badge badge-<?= $ab ?>"><?= $ai ?> <?= ucfirst($action) ?></span></td>
                                             <td><span class="badge badge-light"><?= ucfirst(str_replace('_', ' ', $log['module'] ?? '')) ?></span></td>
-                                            <td style="color: #5a5a7a; font-size: 13px;"><?= esc($log['description'] ?? '') ?></td>
+                                            <td class="desc-cell" style="color: #2d2d4a; font-size: 13px;">
+                                                <?= esc($log['description'] ?? '') ?>
+                                            </td>
                                         </tr>
                                         <?php endforeach; else: ?>
                                         <tr>

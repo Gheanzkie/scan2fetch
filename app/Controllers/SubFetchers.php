@@ -24,9 +24,31 @@ class SubFetchers extends BaseController
         $parentId  = $this->request->getPost('parent_id');
         $studentId = $this->request->getPost('student_id');
 
-        if ($this->subFetcherModel->where('parent_id', $parentId)->countAllResults() >= 2) {
-            return redirect()->to('/parents-view/' . $parentId)->with('error', 'Maximum 2 sub-fetchers');
+        // Validate: parent must exist
+        $parentModel = new \App\Models\ParentsModel();
+        $parent = $parentModel->find($parentId);
+        if (!$parent) {
+            return redirect()->to('/parents')->with('error', 'Parent not found');
         }
+
+        // Check: maximum 2 sub-fetchers per parent
+        if ($this->subFetcherModel->where('parent_id', $parentId)->countAllResults() >= 2) {
+            return redirect()->to('/parents-view/' . $parentId)->with('error', 'Maximum 2 sub-fetchers allowed per parent');
+        }
+
+        // Validate: student must be linked to this parent
+        $db = \Config\Database::connect();
+        $isLinked = $db->table('student_parents')
+            ->where('student_id', $studentId)
+            ->where('parent_id', $parentId)
+            ->countAllResults() > 0;
+            
+        if (!$isLinked) {
+            return redirect()->to('/parents-view/' . $parentId)->with('error', 'Student is not linked to this parent');
+        }
+
+        // Handle picture upload
+        $pictureName = $this->uploadFetcherPicture();
 
         $qrValue = $this->generateQR();
 
@@ -37,12 +59,21 @@ class SubFetchers extends BaseController
             'mname'      => $this->request->getPost('mname'),
             'lname'      => $this->request->getPost('lname'),
             'phone'      => $this->request->getPost('phone'),
+            'picture'    => $pictureName,
             'qr_code'    => $qrValue,
             'created_by' => session('user_id'),
         ]);
 
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'create', 'sub_fetcher', 'Added: '.$this->request->getPost('fname').' '.$this->request->getPost('lname'));
-        return redirect()->to('/parents-view/' . $parentId)->with('msg', 'Sub-Fetcher added');
+        $this->logModel->addLog(
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'create', 
+            'sub_fetcher', 
+            'Added sub-fetcher: '.$this->request->getPost('fname').' '.$this->request->getPost('lname').' for parent '.$parent['fname'].' '.$parent['lname']
+        );
+        
+        return redirect()->to('/parents-view/' . $parentId)->with('msg', 'Sub-Fetcher added successfully! 🎉');
     }
 
     public function update()
@@ -57,6 +88,7 @@ class SubFetchers extends BaseController
             'phone' => $this->request->getPost('phone'),
         ];
 
+        // Handle photo upload
         $captureData = $this->request->getPost('picture_capture');
         if ($captureData && strpos($captureData, 'data:image') === 0) {
             $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $captureData));
@@ -73,15 +105,48 @@ class SubFetchers extends BaseController
         }
 
         $this->subFetcherModel->update($id, $data);
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'update', 'sub_fetcher', 'Updated ID: '.$id);
-        return redirect()->to('/parents-view/' . $parentId)->with('msg', 'Sub-Fetcher updated');
+        $this->logModel->addLog(
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'update', 
+            'sub_fetcher', 
+            'Updated sub-fetcher ID: '.$id
+        );
+        return redirect()->to('/parents-view/' . $parentId)->with('msg', 'Sub-Fetcher updated successfully! ✅');
     }
 
     public function delete($parentId, $id)
     {
         $this->subFetcherModel->delete($id);
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'delete', 'sub_fetcher', 'Deleted ID: '.$id);
-        return redirect()->to('/parents-view/' . $parentId)->with('msg', 'Sub-Fetcher removed');
+        $this->logModel->addLog(
+            session('user_id'), 
+            session('fname').' '.session('lname'), 
+            session('role'), 
+            'delete', 
+            'sub_fetcher', 
+            'Deleted sub-fetcher ID: '.$id
+        );
+        return redirect()->to('/parents-view/' . $parentId)->with('msg', 'Sub-Fetcher removed successfully! 🗑️');
+    }
+
+    // ===== UPLOAD FETCHER PICTURE =====
+    private function uploadFetcherPicture()
+    {
+        $captureData = $this->request->getPost('picture_capture');
+        if ($captureData && strpos($captureData, 'data:image') === 0) {
+            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $captureData));
+            $pictureName = 'fetcher_' . time() . '.png';
+            file_put_contents('uploads/parents/' . $pictureName, $imageData);
+            return $pictureName;
+        }
+        $file = $this->request->getFile('picture');
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            $pictureName = $file->getRandomName();
+            $file->move('uploads/parents', $pictureName);
+            return $pictureName;
+        }
+        return null;
     }
 
     /**

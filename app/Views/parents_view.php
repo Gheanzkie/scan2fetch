@@ -142,6 +142,15 @@ body {
 
 .btn-xs { padding: 4px 12px !important; font-size: 11px !important; border-radius: 50px !important; }
 
+.btn-kid-success {
+    background: linear-gradient(135deg, var(--soft-green), #43a047) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(76,175,80,0.2) !important;
+}
+
+.btn-kid-success:hover { box-shadow: 0 8px 25px rgba(76,175,80,0.3) !important; }
+
 /* ===== BADGES ===== */
 .badge {
     font-weight: 700 !important;
@@ -151,6 +160,10 @@ body {
 }
 
 .badge-primary { background: var(--soft-blue) !important; color: #fff !important; }
+.badge-info { background: var(--soft-teal) !important; color: #fff !important; }
+.badge-success { background: var(--soft-green) !important; color: #fff !important; }
+.badge-warning { background: var(--soft-orange) !important; color: #fff !important; }
+.badge-light { background: rgba(108,140,255,0.08) !important; color: #2d2d4a !important; }
 
 /* ===== ALERTS ===== */
 .alert {
@@ -171,6 +184,12 @@ body {
     background: rgba(255,107,122,0.12) !important;
     border-color: rgba(255,107,122,0.2) !important;
     color: #aa4a5a !important;
+}
+
+.alert-info {
+    background: rgba(108,140,255,0.10) !important;
+    border-color: rgba(108,140,255,0.2) !important;
+    color: #4a5a8a !important;
 }
 
 /* ===== BREADCRUMB ===== */
@@ -205,6 +224,38 @@ body {
 
 #parentPhotoContainer:hover { transform: scale(1.03); }
 
+/* ===== PHOTO PREVIEW ===== */
+.photo-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid rgba(168,192,255,0.25);
+    background: rgba(255,255,255,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0 auto;
+}
+
+.photo-preview:hover {
+    border-color: var(--soft-pink);
+    transform: scale(1.05);
+}
+
+.photo-preview i {
+    color: rgba(160,160,180,0.2);
+    font-size: 30px;
+}
+
+.photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 /* ===== KID EMOJI ===== */
 .kid-emoji {
     display: inline-block;
@@ -216,12 +267,109 @@ body {
     50% { transform: scale(1.15) rotate(8deg); }
 }
 
+/* ===== MODAL ===== */
+.modal-content {
+    border-radius: 28px !important;
+    border: 2px solid rgba(255,255,255,0.7) !important;
+    background: rgba(255,255,255,0.92) !important;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 20px 60px rgba(108,140,255,0.08) !important;
+}
+
+.modal-header {
+    border-bottom: 2px solid rgba(108,140,255,0.08) !important;
+    border-radius: 28px 28px 0 0 !important;
+    background: rgba(255,255,255,0.5) !important;
+    padding: 1.2rem 1.8rem !important;
+}
+
+.modal-header h5 {
+    color: #2d2d4a !important;
+    font-weight: 700 !important;
+    font-size: 1.3rem !important;
+}
+
+.modal-footer {
+    border-top: 2px solid rgba(108,140,255,0.08) !important;
+    border-radius: 0 0 28px 28px !important;
+    background: rgba(255,255,255,0.3) !important;
+    padding: 1rem 1.8rem !important;
+}
+
+.modal-body {
+    padding: 1.8rem !important;
+}
+
+.modal-body label {
+    font-weight: 700 !important;
+    color: #2d2d4a !important;
+    font-size: 14px !important;
+}
+
+/* ===== FORM CONTROLS ===== */
+.form-control {
+    background: rgba(255,255,255,0.85) !important;
+    border: 2px solid rgba(108,140,255,0.12) !important;
+    color: #2d2d4a !important;
+    border-radius: 14px !important;
+    padding: 12px 18px !important;
+    transition: all 0.3s ease !important;
+    font-size: 15px !important;
+    height: 46px !important;
+}
+
+.form-control:focus {
+    background: rgba(255,255,255,0.95) !important;
+    border-color: var(--soft-blue) !important;
+    box-shadow: 0 0 0 4px rgba(108,140,255,0.15) !important;
+    color: #2d2d4a !important;
+}
+
+.form-control::placeholder {
+    color: #b0b0c8 !important;
+    font-size: 14px !important;
+}
+
+.form-control-sm {
+    border-radius: 12px !important;
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+    height: 40px !important;
+}
+
+.input-group-text {
+    background: rgba(255,255,255,0.5) !important;
+    border: 2px solid rgba(108,140,255,0.12) !important;
+    border-right: none !important;
+    color: #8888aa !important;
+    border-radius: 14px 0 0 14px !important;
+    font-size: 15px !important;
+    padding: 0 18px !important;
+}
+
+.input-group .form-control {
+    border-radius: 0 14px 14px 0 !important;
+    border-left: none !important;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .card-body { padding: 1rem !important; }
     .content-header h1 { font-size: 1.5rem !important; }
     .floating-shapes .shape { font-size: 2rem !important; }
     #parentPhotoContainer { width: 100px !important; height: 100px !important; }
+    .photo-preview { width: 60px; height: 60px; }
+    .btn { font-size: 12px !important; padding: 6px 14px !important; }
+    .form-control { font-size: 14px !important; height: 42px !important; }
+}
+
+@media (max-width: 480px) {
+    .card { border-radius: 18px !important; }
+    .floating-shapes .shape { display: none !important; }
+    #parentPhotoContainer { width: 80px !important; height: 80px !important; }
+    .photo-preview { width: 50px; height: 50px; }
+    .modal-body { padding: 1rem !important; }
+    .btn { font-size: 11px !important; padding: 4px 10px !important; }
 }
 </style>
 
@@ -448,20 +596,33 @@ body {
             <form action="<?= base_url('subfetchers-save') ?>" method="post" enctype="multipart/form-data">
                 <?= csrf_field() ?>
                 <input type="hidden" name="parent_id" value="<?= $parent['id'] ?>">
+                <?php if(!empty($students)): ?>
+                    <input type="hidden" name="student_id" value="<?= $students[0]['student_id'] ?>">
+                <?php endif; ?>
+                
                 <div class="modal-header">
-                    <h5>Add Sub-Fetcher ➕</h5>
+                    <h5><i class="fas fa-user-plus mr-2" style="color: var(--soft-green);"></i>Add Sub-Fetcher ➕</h5>
                     <button type="button" class="close" data-dismiss="modal" style="color: #2d2d4a;">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label>Link to Student <span class="text-danger">*</span></label>
-                        <select name="student_id" class="form-control" required>
-                            <option value="">Select Student</option>
-                            <?php foreach($students??[] as $s): ?>
-                            <option value="<?= $s['student_id'] ?>"><?= esc($s['fname']) ?> <?= esc($s['lname']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                    <div class="alert alert-info mb-3" style="font-size:13px;padding:10px 14px;">
+                        <i class="fas fa-info-circle mr-1"></i> 
+                        Sub-fetcher will be linked to <strong><?= esc($parent['fname']) ?> <?= esc($parent['lname']) ?></strong>'s account.
+                        <?php if(!empty($students)): ?>
+                            <br>Authorized to pick up: <strong><?= esc($students[0]['fname']) ?> <?= esc($students[0]['lname']) ?></strong>
+                        <?php endif; ?>
                     </div>
+                    
+                    <!-- Sub-Fetcher Photo -->
+                    <div class="text-center mb-3">
+                        <div class="photo-preview" id="subFetcherPhotoPreview" onclick="$('#subFetcherPictureInput').click()">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <input type="file" id="subFetcherPictureInput" class="d-none" accept="image/*" name="picture">
+                        <input type="hidden" name="picture_capture" id="subFetcherPictureCapture">
+                        <small class="d-block text-muted" style="font-size:11px;">Click photo to upload 📸</small>
+                    </div>
+                    
                     <div class="row">
                         <div class="col-4">
                             <label>First Name <span class="text-danger">*</span></label>
@@ -501,7 +662,7 @@ body {
                 <input type="hidden" name="id" id="editSubFetcherId">
                 <input type="hidden" name="parent_id" value="<?= $parent['id'] ?>">
                 <div class="modal-header">
-                    <h5>Edit Sub-Fetcher ✏️</h5>
+                    <h5><i class="fas fa-edit mr-2" style="color: var(--soft-orange);"></i>Edit Sub-Fetcher ✏️</h5>
                     <button type="button" class="close" data-dismiss="modal" style="color: #2d2d4a;">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -522,6 +683,16 @@ body {
                     <div class="form-group">
                         <label>📱 Phone <span class="text-danger">*</span></label>
                         <input type="text" name="phone" id="editSubFetcherPhone" class="form-control form-control-sm" required>
+                    </div>
+                    
+                    <!-- Edit Sub-Fetcher Photo -->
+                    <div class="text-center mb-3">
+                        <div class="photo-preview" id="editSubFetcherPhotoPreview" onclick="$('#editSubFetcherPictureInput').click()">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <input type="file" id="editSubFetcherPictureInput" class="d-none" accept="image/*" name="picture">
+                        <input type="hidden" name="picture_capture" id="editSubFetcherPictureCapture">
+                        <small class="d-block text-muted" style="font-size:11px;">Click photo to update 📸</small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -614,6 +785,29 @@ $(function(){
         }
     });
 
+    // ===== SUB-FETCHER PHOTO PREVIEW =====
+    $('#subFetcherPictureInput').on('change', function() {
+        var file = this.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('#subFetcherPhotoPreview').html('<img src="' + e.target.result + '">');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    $('#editSubFetcherPictureInput').on('change', function() {
+        var file = this.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('#editSubFetcherPhotoPreview').html('<img src="' + e.target.result + '">');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
     // ===== EDIT SUB-FETCHER - POPULATE FIELDS =====
     $(document).on('click', '.edit-subfetcher-btn', function() {
         $('#editSubFetcherId').val($(this).data('id'));
@@ -621,6 +815,9 @@ $(function(){
         $('#editSubFetcherMname').val($(this).data('mname'));
         $('#editSubFetcherLname').val($(this).data('lname'));
         $('#editSubFetcherPhone').val($(this).data('phone'));
+        
+        // Reset photo preview for edit
+        $('#editSubFetcherPhotoPreview').html('<i class="fas fa-user"></i>');
     });
 
     // ===== CAMERA FUNCTIONS =====
@@ -652,9 +849,9 @@ $(function(){
             form.find('.parent-picture-file').val('');
             form.submit();
         } else {
-            $('.edit-subfetcher-photo-preview').html('<img src="' + d + '" style="width:100%;height:100%;object-fit:cover;">');
-            $('.edit-subfetcher-picture-capture').val(d);
-            $('.edit-subfetcher-picture-file').val('');
+            // For sub-fetcher
+            $('#subFetcherPhotoPreview').html('<img src="' + d + '">');
+            $('#subFetcherPictureCapture').val(d);
         }
         
         if (s) { s.getTracks().forEach(function(t) { t.stop(); }); }

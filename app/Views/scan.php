@@ -827,6 +827,7 @@ $(function() {
         var formData = new FormData();
         formData.append('student_id', pendingStudentId);
         formData.append('parent_id', pendingParentId);
+        formData.append('qr_code', $('#qrInput').val().trim().toUpperCase());
         formData.append(CSRF_NAME, CSRF_HASH);
         
         fetch(BASE_URL + 'scan/release', { method: 'POST', body: formData })
@@ -854,6 +855,7 @@ $(function() {
         var formData = new FormData();
         formData.append('student_id', pendingStudentId);
         formData.append('parent_id', pendingParentId);
+        formData.append('qr_code', $('#qrInput').val().trim().toUpperCase());
         formData.append(CSRF_NAME, CSRF_HASH);
         
         fetch(BASE_URL + 'scan/decline', { method: 'POST', body: formData })

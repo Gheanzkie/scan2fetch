@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en" style="font-size: 14px;">
 <head>
-    <link rel="icon" href="<?= base_url('image/BCC_LOGO.png') ?>">
+    <link rel="icon" href="<?= base_url('image/qr-code-76.png') ?>">
     <meta name="csrf-name" content="<?= csrf_token() ?>">
     <meta name="csrf-token" content="<?= csrf_hash() ?>">
     <meta charset="utf-8">
@@ -453,7 +453,7 @@
                     <strong style="color: rgba(255,255,255,0.6);">
                         &copy; <?= date('Y') ?> 
                         <span style="background:linear-gradient(135deg, #a8c0ff, #f093fb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-                            BCC Scan2Fetch
+                            Scan2Fetch
                         </span>
                     </strong>
                     <span style="color: rgba(255,255,255,0.3); margin-left: 8px;">

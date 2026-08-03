@@ -25,6 +25,25 @@
     </ul>
 
     <ul class="navbar-nav ml-auto align-items-center">
+        <!-- ===== LIVE TIMER (Admin & Staff Only) ===== -->
+        <?php 
+        $role = session('role');
+        if ($role == 'admin' || $role == 'staff'): 
+        ?>
+        <li class="nav-item d-none d-md-block mr-2">
+            <div class="live-timer-container">
+                <div class="live-dot"></div>
+                <span class="live-label">LIVE</span>
+                <span class="live-time" id="liveTimeDisplay">
+                    <?= date('h:i:s A') ?>
+                </span>
+                <span class="live-date" id="liveDateDisplay">
+                    <?= date('M d, Y') ?>
+                </span>
+            </div>
+        </li>
+        <?php endif; ?>
+        
         <!-- Sparkle Decor -->
         <li class="nav-item d-none d-md-block">
             <span style="font-size: 20px; animation: sparkle 2s ease-in-out infinite; display: inline-block;">
@@ -40,7 +59,6 @@
                 <span class="badge px-3 py-1 ml-1" 
                      style="background: rgba(255,255,255,0.2); color: #fff; border-radius: 50px; font-size: 11px;">
                     <?php 
-                        $role = session('role');
                         if ($role == 'admin') echo '👨‍🏫 Admin';
                         elseif ($role == 'staff') echo '🧑‍🏫 Staff';
                         elseif ($role == 'parent') echo '👨‍👩 Parent';
@@ -132,15 +150,125 @@
         0%, 100% { transform: scale(1) rotate(0deg); }
         50% { transform: scale(1.2) rotate(10deg); }
     }
-    
-    @media (max-width: 768px) {
-        .navbar-nav .nav-link {
-            padding-left: 10px !important;
-            padding-right: 10px !important;
+
+    /* ===== LIVE TIMER STYLES ===== */
+    .live-timer-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 4px 16px 4px 12px;
+        border-radius: 50px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .live-dot {
+        width: 10px;
+        height: 10px;
+        background: #00ff88;
+        border-radius: 50%;
+        animation: livePulse 1.5s ease-in-out infinite;
+        box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+
+    @keyframes livePulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .live-label {
+        color: #00ff88;
+        font-weight: 700;
+        font-size: 11px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    }
+
+    .live-time {
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 14px;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 1px;
+        min-width: 70px;
+        text-align: center;
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .live-date {
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+        font-size: 11px;
+        border-left: 1px solid rgba(255, 255, 255, 0.15);
+        padding-left: 10px;
+    }
+
+    @media (max-width: 1200px) {
+        .live-date {
+            display: none;
         }
-        .navbar .badge {
-            font-size: 9px !important;
-            padding: 3px 10px !important;
+        .live-timer-container {
+            padding: 4px 12px 4px 10px;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .live-timer-container {
+            padding: 3px 10px 3px 8px;
+        }
+        .live-label {
+            font-size: 9px;
+        }
+        .live-time {
+            font-size: 12px;
+            min-width: 60px;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .live-timer-container {
+            display: none;
         }
     }
 </style>
+
+<!-- ===== LIVE TIMER JAVASCRIPT ===== -->
+<script>
+<?php 
+$role = session('role');
+if ($role == 'admin' || $role == 'staff'): 
+?>
+$(document).ready(function() {
+    function updateLiveTimer() {
+        var now = new Date();
+        var timeString = now.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit',
+            hour12: true 
+        });
+        var dateString = now.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric', 
+            year: 'numeric' 
+        });
+        
+        $('#liveTimeDisplay').text(timeString);
+        $('#liveDateDisplay').text(dateString);
+    }
+
+    // Update immediately
+    updateLiveTimer();
+    
+    // Update every second
+    setInterval(updateLiveTimer, 1000);
+});
+<?php endif; ?>
+</script>

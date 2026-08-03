@@ -6,9 +6,9 @@
     <!-- ===== BRAND ===== -->
     <a href="<?= base_url('dashboard') ?>" class="brand-link d-flex align-items-center" 
        style="border-bottom: 2px solid rgba(102,126,234,0.15); padding: 15px 20px;">
-        <div style="width:45px;height:45px;border-radius:50%;background:linear-gradient(135deg, #667eea, #f093fb);
-                    display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(102,126,234,0.3);">
-            <i class="fas fa-child" style="color:#fff;font-size:20px;"></i>
+        <div style="width:45px;height:45px;
+                    display:flex;align-items:center;justify-content:center;">
+            <img src="<?= base_url('image/qr-code-76.png') ?>" alt="SCAN2FETCH Logo" style="width:100%;height:100%;border-radius:50%;">
         </div>
         <span class="brand-text font-weight-bold ml-3" 
               style="font-size:18px;background:linear-gradient(135deg, #a8c0ff, #f093fb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
@@ -109,7 +109,7 @@
                     <a href="<?= base_url('scan-monitor') ?>" class="nav-link"
                        style="border-radius: 14px; margin: 2px 0; transition: all 0.3s ease;">
                         <i class="nav-icon fas fa-desktop" style="color: #4fc3f7;"></i>
-                        <p>🖥️ Scan Monitor</p>
+                        <p>🖥️ Students Status</p>
                     </a>
                 </li>
 
@@ -162,7 +162,7 @@
                     <a href="<?= base_url('scan-monitor') ?>" class="nav-link"
                        style="border-radius: 14px; margin: 2px 0; transition: all 0.3s ease;">
                         <i class="nav-icon fas fa-desktop" style="color: #4fc3f7;"></i>
-                        <p>🖥️ Scan Monitor</p>
+                        <p>🖥️ Students Status</p>
                     </a>
                 </li>
 
@@ -207,19 +207,18 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="<?= base_url('dashboard') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'dashboard') ? 'active' : '' ?>"
-                       style="border-radius: 14px; margin: 2px 0; transition: all 0.3s ease;">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
-                        <p>🏠 Dashboard</p>
-                    </a>
-                </li>
+            <a href="<?= base_url('parents-releases') ?>" class="nav-link">
+                <i class="fas fa-history nav-icon"></i>
+                <p>📋 Release History</p>
+            </a>
+        </li>
 
-                <li class="nav-item">
-                    <a href="<?= base_url('parents-logs') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'parents-logs') ? 'active' : '' ?>"
-                       style="border-radius: 14px; margin: 2px 0; transition: all 0.3s ease;">
-                        <i class="nav-icon fas fa-history" style="color: #ffb74d;"></i>
-                        <p>📋 Release History</p>
-                    </a>
+        <li class="nav-item">
+            <a href="<?= base_url('parents-notifications') ?>" class="nav-link">
+                <i class="fas fa-sms nav-icon"></i>
+                <p>📱 SMS Notifications</p>
+            </a>
+        </li>
                 </li>
                 <?php endif; ?>
 

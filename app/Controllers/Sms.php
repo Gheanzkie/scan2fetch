@@ -18,14 +18,42 @@ class Sms extends BaseController
 
     public function index()
     {
-
-        $data['smsLogs']      = $this->smsLogModel->getAll(200);
-        $data['totalSms']     = $this->smsLogModel->countAll();
-        $data['sentCount']    = $this->smsLogModel->getSentCount();
-        $data['pendingCount'] = $this->smsLogModel->getPendingCount();
-        $data['failedCount']  = $this->smsLogModel->getFailedCount();
-        $data['todayCount']   = $this->smsLogModel->getTodayCount();
+        $db = \Config\Database::connect();
+        
+        // ===== GET SMS LOGS ONLY (No grouping) =====
+        $data['smsLogs'] = $db->table('sms_logs')
+            ->orderBy('sent_at', 'DESC')
+            ->limit(200)
+            ->get()
+            ->getResultArray();
+        
+        // Get stats
+        $data['totalSms'] = $db->table('sms_logs')->countAllResults();
         
         return view('sms_logs', $data);
+    }
+
+    // ===== GET SMS DETAILS =====
+    public function getSmsDetails($id)
+    {
+        if (!session('logged_in')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        $db = \Config\Database::connect();
+        
+        $sms = $db->table('sms_logs')
+            ->where('id', $id)
+            ->get()
+            ->getRowArray();
+
+        if (!$sms) {
+            return $this->response->setJSON(['success' => false, 'message' => 'SMS not found']);
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'sms' => $sms
+        ]);
     }
 }

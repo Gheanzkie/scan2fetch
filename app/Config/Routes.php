@@ -17,7 +17,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     // Dashboard
     $routes->get('dashboard', 'Dashboard::index');
 
-    //STUDENTS
+    // ===== STUDENTS =====
     $routes->get('students', 'Students::index');
     $routes->get('register', 'Students::add');
     $routes->get('students-view/(:num)', 'Students::view/$1');
@@ -28,9 +28,8 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('students-remove-parent/(:num)/(:num)', 'Students::removeParent/$1/$2');
     $routes->post('students-add-parent', 'Students::addParent');
 
-    //PARENTS
+    // ===== PARENTS (Updated Routes) =====
     $routes->get('parents', 'Parents::index');
-    $routes->get('parents-add', 'Parents::add');
     $routes->get('parents-view/(:num)', 'Parents::view/$1');
     $routes->get('parents-edit/(:num)', 'Parents::edit/$1');
     $routes->post('parents-save', 'Parents::save');
@@ -38,31 +37,40 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('parents-delete/(:num)', 'Parents::delete/$1');
     $routes->post('parents-update-picture', 'Parents::updatePicture');
     $routes->post('parents-update-from-student', 'Parents::updateFromStudent');
-    $routes->get('parents-logs', 'Parents::logs');
 
-    // SUB-FETCHERS
+    // ===== PARENT LOGS (Separate Pages) =====
+    $routes->get('parents-releases', 'Parents::releases');         // Release History only
+    $routes->get('parents-notifications', 'Parents::notifications'); // SMS Notifications only
+    $routes->get('parents-logs', 'Parents::logs');                 // Combined (legacy)
+
+    // ===== SUB-FETCHERS =====
     $routes->post('subfetchers-save', 'SubFetchers::save');
     $routes->post('subfetchers-update', 'SubFetchers::update');
     $routes->get('subfetchers-delete/(:num)/(:num)', 'SubFetchers::delete/$1/$2');
 
-    //STAFFS 
+    // ===== STAFFS =====
     $routes->get('staffs', 'Staffs::index');
     $routes->post('staffs-save', 'Staffs::save');
     $routes->post('staffs-update', 'Staffs::update');
     $routes->get('staffs-delete/(:num)', 'Staffs::delete/$1');
 
-    // QR Scan
+    // ===== QR SCAN =====
     $routes->get('scan', 'Scan::index');
     $routes->post('scan/verify', 'Scan::verify');
     $routes->post('scan/release', 'Scan::release');
     $routes->post('scan/decline', 'Scan::decline');
+
+    // ===== SCAN MONITOR =====
     $routes->get('scan-monitor', 'ScanMonitor::index');
+    $routes->get('scan-monitor/get-pending-list', 'ScanMonitor::getPendingList');
+    $routes->post('scan-monitor/send-notifications', 'ScanMonitor::sendPendingNotifications');
 
-    // Logs
-    $routes->get('logs', 'Logs::index');
-
-    // SMS Logs 
+    // ===== SMS LOGS =====
     $routes->get('sms-logs', 'Sms::index');
+    $routes->get('sms-logs/details/(:num)', 'Sms::getSmsDetails/$1');
+
+    // ===== ACTIVITY LOGS =====
+    $routes->get('logs', 'Logs::index');
 
 });
 
