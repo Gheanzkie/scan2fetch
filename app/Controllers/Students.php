@@ -123,7 +123,6 @@ class Students extends BaseController
                         $firstParentId = $parentId;
                     }
 
-                    // Store with QR code
                     $registeredParents[] = [
                         'fname'    => $fname,
                         'lname'    => $parentLnames[$i],
@@ -195,7 +194,6 @@ class Students extends BaseController
                 throw new \Exception('Transaction failed');
             }
 
-            // Store all data in flashdata
             session()->setFlashdata('registration_success', true);
             session()->setFlashdata('student_name', $this->request->getPost('fname') . ' ' . $this->request->getPost('lname'));
             session()->setFlashdata('registered_parents', $registeredParents);
@@ -236,20 +234,87 @@ class Students extends BaseController
         return redirect()->to('/students-view/' . $id)->with('msg', 'Student updated');
     }
 
-    // ========== DELETE STUDENT ==========
+    // ========== DELETE STUDENT (With Cascade) ==========
     public function delete($id)
     {
+        $db = \Config\Database::connect();
         $student = $this->studentModel->find($id);
-        $this->studentModel->delete($id);
-        $this->logModel->addLog(
-            session('user_id'), 
-            session('fname').' '.session('lname'), 
-            session('role'), 
-            'delete', 
-            'student', 
-            'Deleted: '.$student['fname'].' '.$student['lname'].' (ID: '.$id.')'
-        );
-        return redirect()->to('/students')->with('msg', 'Student deleted');
+        
+        if (!$student) {
+            return redirect()->to('/students')->with('error', 'Student not found');
+        }
+
+        $db->transStart();
+
+        try {
+            // 1. Get all parents linked to this student
+            $parentLinks = $db->table('student_parents')
+                ->where('student_id', $id)
+                ->get()
+                ->getResultArray();
+
+            $parentIds = array_column($parentLinks, 'parent_id');
+
+            // 2. Delete sub-fetchers linked to this student
+            $db->table('sub_fetchers')->where('student_id', $id)->delete();
+
+            // 3. Delete fetch_logs linked to this student
+            $db->table('fetch_logs')->where('student_id', $id)->delete();
+
+            // 4. Delete student_parents links
+            $db->table('student_parents')->where('student_id', $id)->delete();
+
+            // 5. Delete the student
+            $this->studentModel->delete($id);
+
+            // 6. Delete parents that are no longer linked to any student
+            $deletedParents = [];
+            foreach ($parentIds as $parentId) {
+                $remainingLinks = $db->table('student_parents')
+                    ->where('parent_id', $parentId)
+                    ->countAllResults();
+
+                if ($remainingLinks == 0) {
+                    $parent = $db->table('parents')
+                        ->where('id', $parentId)
+                        ->get()
+                        ->getRowArray();
+                    
+                    if ($parent) {
+                        $db->table('sub_fetchers')->where('parent_id', $parentId)->delete();
+                        $db->table('parents')->where('id', $parentId)->delete();
+                        $deletedParents[] = $parent['fname'] . ' ' . $parent['lname'];
+                    }
+                }
+            }
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                throw new \Exception('Transaction failed');
+            }
+
+            $message = 'Student: ' . $student['fname'] . ' ' . $student['lname'] . ' deleted successfully! 🗑️';
+            if (!empty($deletedParents)) {
+                $message .= ' Parents deleted (no other students): ' . implode(', ', $deletedParents);
+            }
+
+            $this->logModel->addLog(
+                session('user_id'), 
+                session('fname').' '.session('lname'), 
+                session('role'), 
+                'delete', 
+                'student', 
+                'Deleted: '.$student['fname'].' '.$student['lname'].' (ID: '.$id.') with parents and sub-fetchers'
+            );
+
+            return redirect()->to('/students')->with('msg', $message);
+
+        } catch (\Exception $e) {
+            $db->transRollback();
+            log_message('error', 'Delete student failed: ' . $e->getMessage());
+            return redirect()->to('/students')->with('error', 'Delete failed: ' . $e->getMessage());
+        }
     }
 
     // ========== REMOVE PARENT ==========
