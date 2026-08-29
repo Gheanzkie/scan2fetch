@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 22, 2026 at 01:27 AM
+-- Generation Time: Aug 29, 2026 at 04:26 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -44,86 +44,29 @@ CREATE TABLE `activity_logs` (
 --
 
 INSERT INTO `activity_logs` (`id`, `user_id`, `user_name`, `role`, `action`, `module`, `description`, `ip_address`, `created_at`) VALUES
-(211, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to jea f for student arr arrr', '::1', '2026-08-03 16:20:02'),
-(212, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to jea ff for student fdf fdfd', '::1', '2026-08-03 16:20:02'),
-(213, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to wawa 2qq for student ee eee', '::1', '2026-08-03 16:20:02'),
-(214, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to hghg ghghg for student hfghfhf hfghfh', '::1', '2026-08-03 16:20:02'),
-(215, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to gfgf gfgfgf for student fgdf gdgdg', '::1', '2026-08-03 16:20:02'),
-(216, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to ertetret tertetert for student 414141 dgdg', '::1', '2026-08-03 16:20:02'),
-(217, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-08-03 16:20:33'),
-(218, 31, 'jea f', 'parent', 'login', 'auth', 'Parent logged in | Phone: 1122', '::1', '2026-08-03 16:20:40'),
-(219, 31, 'jea f', 'parent', 'logout', 'auth', 'User logged out', '::1', '2026-08-03 16:20:52'),
-(220, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-08-03 16:20:55'),
-(221, 1, 'Admin ', 'admin', 'release', 'scan', 'QR Release | Student: arr arrr (ID: 31) | Parent: jea f | SMS sent', '::1', '2026-08-03 16:21:05'),
-(222, 1, 'Admin ', 'admin', 'decline', 'scan', 'DECLINED | Student: arr arrr (ID: 31) | Parent: jea f | SMS sent', '::1', '2026-08-03 16:21:12'),
-(223, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-08-03 16:22:32'),
-(224, 31, 'jea f', 'parent', 'login', 'auth', 'Parent logged in | Phone: 1122', '::1', '2026-08-03 16:22:37'),
-(225, 31, 'jea f', 'parent', 'logout', 'auth', 'User logged out', '::1', '2026-08-03 16:23:09'),
-(226, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-08-03 16:23:13'),
-(227, 1, 'Admin ', 'admin', 'create', 'student', 'Created: JAYLIAN ff', '::1', '2026-08-03 16:46:34'),
-(228, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to jea ff for student fdf fdfd', '::1', '2026-08-03 16:47:15'),
-(229, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to wawa 2qq for student ee eee', '::1', '2026-08-03 16:47:15'),
-(230, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to hghg ghghg for student hfghfhf hfghfh', '::1', '2026-08-03 16:47:15'),
-(231, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to gfgf gfgfgf for student fgdf gdgdg', '::1', '2026-08-03 16:47:15'),
-(232, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to ertetret tertetert for student 414141 dgdg', '::1', '2026-08-03 16:47:15'),
-(233, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to shhaa ddd for student JAYLIAN ff', '::1', '2026-08-03 16:47:15'),
-(234, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-08-03 16:47:41'),
-(235, 38, 'shhaa ddd', 'parent', 'login', 'auth', 'Parent logged in | Phone: 1', '::1', '2026-08-03 16:47:45'),
-(236, 38, 'shhaa ddd', 'parent', 'logout', 'auth', 'User logged out', '::1', '2026-08-03 16:47:57'),
-(237, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-08-03 16:48:42'),
-(238, 1, 'Admin ', 'admin', 'update', 'staff', 'Updated staff: PEDRO CERNA (ID: 4)', '::1', '2026-08-03 16:49:07'),
-(239, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-08-03 16:49:09'),
-(240, 4, 'PEDRO CERNA', 'staff', 'login', 'auth', 'Staff logged in | Phone: 2', '::1', '2026-08-03 16:49:14'),
-(241, 4, 'PEDRO CERNA', 'staff', 'logout', 'auth', 'User logged out', '::1', '2026-08-03 16:49:59'),
-(242, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-08-07 11:54:51'),
-(243, 1, 'Admin ', 'admin', 'delete', 'parent', 'Deleted parent: shhaa ddd (ID: 38)', '::1', '2026-08-07 11:55:38'),
-(244, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to jea f for student arr arrr', '::1', '2026-08-07 11:56:39'),
-(245, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to jea ff for student fdf fdfd', '::1', '2026-08-07 11:56:39'),
-(246, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to wawa 2qq for student ee eee', '::1', '2026-08-07 11:56:39'),
-(247, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to hghg ghghg for student hfghfhf hfghfh', '::1', '2026-08-07 11:56:39'),
-(248, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to gfgf gfgfgf for student fgdf gdgdg', '::1', '2026-08-07 11:56:39'),
-(249, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to ertetret tertetert for student 414141 dgdg', '::1', '2026-08-07 11:56:39'),
-(250, 1, 'Admin ', 'admin', 'delete', 'parent', 'Deleted parent: ertetret tertetert (ID: 37)', '::1', '2026-08-07 11:58:38'),
-(251, 1, 'Admin ', 'admin', 'delete', 'parent', 'Deleted parent: gfgf gfgfgf (ID: 35)', '::1', '2026-08-07 11:58:44'),
-(252, 1, 'Admin ', 'admin', 'delete', 'parent', 'Deleted parent: hghg ghghg (ID: 34)', '::1', '2026-08-07 11:58:49'),
-(253, 1, 'Admin ', 'admin', 'delete', 'parent', 'Deleted parent: wawa 2qq (ID: 33)', '::1', '2026-08-07 11:58:54'),
-(254, 1, 'Admin ', 'admin', 'delete', 'parent', 'Deleted parent: jea ff (ID: 32)', '::1', '2026-08-07 11:58:58'),
-(255, 1, 'Admin ', 'admin', 'delete', 'parent', 'Deleted parent: jea f (ID: 31)', '::1', '2026-08-07 11:59:02'),
-(256, 1, 'Admin ', 'admin', 'delete', 'student', 'Deleted: arr arrr (ID: 31)', '::1', '2026-08-07 11:59:10'),
-(257, 1, 'Admin ', 'admin', 'delete', 'student', 'Deleted: JAYLIAN ff (ID: 38)', '::1', '2026-08-07 11:59:14'),
-(258, 1, 'Admin ', 'admin', 'delete', 'student', 'Deleted: 414141 dgdg (ID: 37)', '::1', '2026-08-07 11:59:19'),
-(259, 1, 'Admin ', 'admin', 'delete', 'student', 'Deleted: fdf fdfd (ID: 32)', '::1', '2026-08-07 11:59:23'),
-(260, 1, 'Admin ', 'admin', 'delete', 'student', 'Deleted: ee eee (ID: 33)', '::1', '2026-08-07 11:59:27'),
-(261, 1, 'Admin ', 'admin', 'delete', 'student', 'Deleted: fgdf gdgdg (ID: 35)', '::1', '2026-08-07 11:59:32'),
-(262, 1, 'Admin ', 'admin', 'delete', 'student', 'Deleted: hfghfhf hfghfh (ID: 34)', '::1', '2026-08-07 11:59:36'),
-(263, 1, 'Admin ', 'admin', 'create', 'student', 'Created: gfdg dgg', '::1', '2026-08-07 12:04:17'),
-(264, 1, 'Admin ', 'admin', 'delete', 'student', 'Deleted: gfdg dgg (ID: 39)', '::1', '2026-08-07 12:11:17'),
-(265, 1, 'Admin ', 'admin', 'delete', 'parent', 'Deleted parent: gfdgd gdfgdfgd (ID: 39)', '::1', '2026-08-07 12:11:29'),
-(266, 1, 'Admin ', 'admin', 'create', 'student', 'Created: gfdgfd gdgfd', '::1', '2026-08-07 12:13:27'),
-(267, 1, 'Admin ', 'admin', 'delete', 'parent', 'Deleted parent: fdsfsd sdfsdfsd (ID: 40)', '::1', '2026-08-07 12:13:42'),
-(268, 1, 'Admin ', 'admin', 'delete', 'student', 'Deleted: gfdgfd gdgfd (ID: 40)', '::1', '2026-08-07 12:13:49'),
-(269, 1, 'Admin ', 'admin', 'create', 'student', 'Created: bcvbvc bcbcb', '::1', '2026-08-07 12:19:02'),
-(270, 1, 'Admin ', 'admin', 'delete', 'student', 'Deleted: bcvbvc bcbcb (ID: 41) with parents and sub-fetchers', '::1', '2026-08-07 12:19:19'),
-(271, 1, 'Admin ', 'admin', 'create', 'student', 'Created: bxxvb xbvxbxbx', '::1', '2026-08-07 12:20:26'),
-(272, 1, 'Admin ', 'admin', 'delete', 'parent', 'Deleted parent: bvbcbc bcbcv (ID: 42) with sub-fetchers', '::1', '2026-08-07 12:22:11'),
-(273, 1, 'Admin ', 'admin', 'delete', 'student', 'Deleted: bxxvb xbvxbxbx (ID: 42) with parents and sub-fetchers', '::1', '2026-08-07 12:22:21'),
-(274, 1, 'Admin ', 'admin', 'create', 'student', 'Created: bvcbc bcvbcvbc', '::1', '2026-08-07 12:26:47'),
-(275, 1, 'Admin ', 'admin', 'delete', 'parent', 'Deleted parent: bvcbcv bcbcbc (ID: 43) with sub-fetchers. Orphaned students: bvcbc bcvbcvbc', '::1', '2026-08-07 12:26:56'),
-(276, 1, 'Admin ', 'admin', 'create', 'student', 'Created: gfdgdf gdfgdgd', '::1', '2026-08-07 12:28:22'),
-(277, 1, 'Admin ', 'admin', 'delete', 'parent', 'Deleted parent: gdfgd gdfgdfgdf (ID: 44) with sub-fetchers. Orphaned students: gfdgdf gdfgdgd', '::1', '2026-08-07 12:28:36'),
-(278, 1, 'Admin ', 'admin', 'create', 'student', 'Created: gfdgfd dgdgdgdf', '::1', '2026-08-07 12:30:19'),
-(279, 1, 'Admin ', 'admin', 'delete', 'parent', 'Deleted parent: jhjfghgfhfg bnvnvgf (ID: 45) with sub-fetchers. Students deleted: gfdgfd dgdgdgdf', '::1', '2026-08-07 12:30:29'),
-(280, 1, 'Admin ', 'admin', 'delete', 'student', 'Deleted: gfdgdf gdfgdgd (ID: 44) with parents and sub-fetchers', '::1', '2026-08-07 12:31:06'),
-(281, 1, 'Admin ', 'admin', 'delete', 'student', 'Deleted: bvcbc bcvbcvbc (ID: 43) with parents and sub-fetchers', '::1', '2026-08-07 12:31:10'),
-(282, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-08-07 12:32:25'),
-(283, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-08-14 11:48:48'),
-(284, 1, 'Admin ', 'admin', 'create', 'student', 'Created: jaylia agaga', '::1', '2026-08-14 11:50:25'),
-(285, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to jea 43 for student jaylia agaga', '::1', '2026-08-14 11:53:22'),
-(286, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-08-14 11:53:44'),
-(287, 46, 'jea 43', 'parent', 'login', 'auth', 'Parent logged in | Phone: 123456', '::1', '2026-08-14 11:53:49'),
-(288, 46, 'jea 43', 'parent', 'logout', 'auth', 'User logged out', '::1', '2026-08-14 11:55:03'),
-(289, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-08-14 11:55:07'),
-(290, 1, 'Admin ', 'admin', 'release', 'scan', 'QR Release | Student: jaylia agaga (ID: 46) | Parent: jea 43 | SMS sent', '::1', '2026-08-14 11:58:17');
+(22, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '192.168.1.2', '2026-08-29 13:27:46'),
+(23, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '192.168.1.2', '2026-08-29 13:39:07'),
+(24, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '192.168.1.2', '2026-08-29 14:01:39'),
+(25, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '192.168.1.2', '2026-08-29 14:01:44'),
+(26, 1, 'Admin ', 'admin', 'update', 'password', 'Admin changed their password', '192.168.1.2', '2026-08-29 14:09:01'),
+(27, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '192.168.1.2', '2026-08-29 14:09:06'),
+(28, 1, 'Ghean Cruz', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '192.168.1.2', '2026-08-29 14:09:11'),
+(29, 1, 'Ghean Cruz', 'admin', 'create', 'student', 'Created: juan cruz', '192.168.1.2', '2026-08-29 14:10:19'),
+(30, 1, 'Ghean Cruz', 'admin', 'logout', 'auth', 'User logged out', '192.168.1.2', '2026-08-29 14:11:28'),
+(31, 1, 'jea da', 'parent', 'login', 'auth', 'Parent logged in | Phone: 110417', '192.168.1.2', '2026-08-29 14:11:32'),
+(32, 1, 'jea da', 'parent', 'update', 'password', 'Parent changed their password', '192.168.1.2', '2026-08-29 14:11:53'),
+(33, 1, 'jea da', 'parent', 'logout', 'auth', 'User logged out', '192.168.1.2', '2026-08-29 14:12:10'),
+(34, 1, 'Ghean Cruz', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '192.168.1.2', '2026-08-29 14:12:13'),
+(35, 1, 'Ghean Cruz', 'admin', 'settings', 'settings', 'SMS mode changed to Automatic (scheduled 2026-08-29 22:13:00)', '192.168.1.2', '2026-08-29 14:12:55'),
+(36, 1, 'Ghean Cruz', 'admin', 'notify', 'scan', 'SMS notification sent to jea da for student juan cruz', '192.168.1.2', '2026-08-29 14:13:05'),
+(37, 1, 'Ghean Cruz', 'admin', 'notify', 'scan', 'SMS notification sent to teacher SHANA MATILLANO for student juan cruz', '192.168.1.2', '2026-08-29 14:13:05'),
+(38, 1, 'Ghean Cruz', 'admin', 'logout', 'auth', 'User logged out', '192.168.1.2', '2026-08-29 14:13:23'),
+(39, 1, 'jea da', 'parent', 'login', 'auth', 'Parent logged in | Phone: 110417', '192.168.1.2', '2026-08-29 14:13:28'),
+(40, 1, 'Ghean Cruz', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '192.168.1.13', '2026-08-29 14:14:28'),
+(41, 1, 'Ghean Cruz', 'admin', 'release', 'scan', 'QR Release | Student: juan cruz (ID: 1) | Parent: jea da | SMS sent', '192.168.1.13', '2026-08-29 14:14:50'),
+(42, 1, 'jea da', 'parent', 'logout', 'auth', 'User logged out', '192.168.1.2', '2026-08-29 14:16:24'),
+(43, 1, 'Ghean Cruz', 'admin', 'logout', 'auth', 'User logged out', '192.168.1.10', '2026-08-29 14:20:08'),
+(44, 1, 'Ghean Cruz', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '192.168.1.2', '2026-08-29 14:20:14');
 
 -- --------------------------------------------------------
 
@@ -136,9 +79,9 @@ CREATE TABLE `admin` (
   `fname` varchar(50) NOT NULL,
   `mname` varchar(50) DEFAULT NULL,
   `lname` varchar(50) NOT NULL,
+  `picture` varchar(255) DEFAULT NULL,
   `phone` varchar(15) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `picture` varchar(255) DEFAULT NULL COMMENT 'Admin profile photo',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -146,8 +89,8 @@ CREATE TABLE `admin` (
 -- Dumping data for table `admin`
 --
 
-INSERT INTO `admin` (`id`, `fname`, `mname`, `lname`, `phone`, `password`, `picture`, `created_at`) VALUES
-(1, 'Admin', NULL, '', 'admin', '$2y$10$KiImoTImSTwssZrLWAzEXuu/vaJ1dOsRV45w9HKv/GPxI2K9k67em', NULL, '2026-05-28 16:23:06');
+INSERT INTO `admin` (`id`, `fname`, `mname`, `lname`, `picture`, `phone`, `password`, `created_at`) VALUES
+(1, 'Ghean', 'De La', 'Cruz', '', 'admin', '$2y$10$i9.Cv8kZ2QBwgWcXhCiqxOz9E2c9CQn0fDFOCIWouhhZlPUnFb9rO', '2026-05-28 16:23:06');
 
 -- --------------------------------------------------------
 
@@ -189,7 +132,31 @@ CREATE TABLE `fetch_logs` (
 --
 
 INSERT INTO `fetch_logs` (`id`, `student_id`, `parent_id`, `auth_letter_id`, `fetcher_fname`, `fetcher_mname`, `fetcher_lname`, `fetcher_relation`, `method`, `staff_id`, `time_released`) VALUES
-(1, 46, 46, NULL, 'jea', '', '43', 'Parent', 'QR', NULL, '2026-08-14 11:58:14');
+(1, 1, 1, NULL, 'jea', '', 'da', 'Parent', 'QR', NULL, '2026-08-29 14:14:50');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `messages`
+--
+
+CREATE TABLE `messages` (
+  `id` int(11) NOT NULL,
+  `sender_id` int(11) NOT NULL,
+  `sender_role` varchar(20) NOT NULL,
+  `receiver_id` int(11) DEFAULT NULL,
+  `message` text NOT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `messages`
+--
+
+INSERT INTO `messages` (`id`, `sender_id`, `sender_role`, `receiver_id`, `message`, `is_read`, `created_at`) VALUES
+(1, 1, 'parent', NULL, '4DLg6IKpAhUv9LG1a69sIk7H3iXWHJR+j77AatSGimTBpOHNCWXY1/huBqthHa9zpFVEgVHvuIZ1b9H6OPsNceYnHIfZ6uB2x07vbULxrXwCPt4G1fM9u+Q8vLe7iduUuQv0q+D4LPkbv5Ag/gyx4Ic=', 1, '2026-08-29 22:12:07'),
+(2, 1, 'admin', 1, 'S5dnUYYoh9BZ0ZuCYPfI4SJkzj59eH9gvh4sR6gSP7mz7mKE8VcX1GsnCYxp2MKIjgSxXIdb9vazQM2FxakNxmUjBHQqmAVWbn3FEEVLMX1FgE2oCKlWf/zvoD0kssMmTygnRQ==', 1, '2026-08-29 22:12:31');
 
 -- --------------------------------------------------------
 
@@ -215,7 +182,30 @@ CREATE TABLE `parents` (
 --
 
 INSERT INTO `parents` (`id`, `fname`, `mname`, `lname`, `phone`, `password`, `qr_code`, `picture`, `created_by`, `created_at`) VALUES
-(46, 'jea', 'DE ', '43', '123456', '$2y$10$EQ0N.sFFp8TKV.XeURMIwewHRjwdDxCNHZGgmzjq37wMif3p/6942', 'QR-3DADFA367F9A', NULL, 1, '2026-08-14 11:50:25');
+(1, 'jea', 'DE ', 'da', '110417', '$2y$10$gT54ebFkgSPgQDnI9RVSfObG2mI4WzothGDJV221a0h6VWuLOzi2i', 'QR-8W25Z', '1788012653_928c175ca7a18a59d1c5.jpg', 1, '2026-08-29 14:10:19');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `settings`
+--
+
+CREATE TABLE `settings` (
+  `id` int(11) NOT NULL,
+  `setting_key` varchar(100) NOT NULL,
+  `setting_value` text DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `settings`
+--
+
+INSERT INTO `settings` (`id`, `setting_key`, `setting_value`, `updated_at`) VALUES
+(1, 'sms_mode', 'auto', '2026-08-29 22:12:55'),
+(2, 'auto_sms_interval', '60', '2026-08-29 15:04:30'),
+(3, 'auto_sms_datetime', '2026-08-29 22:13:00', '2026-08-29 22:12:55'),
+(4, 'auto_sms_last_run', '2026-08-29 22:13:00', '2026-08-29 22:13:05');
 
 -- --------------------------------------------------------
 
@@ -236,28 +226,11 @@ CREATE TABLE `sms_logs` (
 --
 
 INSERT INTO `sms_logs` (`id`, `parent_phone`, `message`, `status`, `sent_at`) VALUES
-(70, '1122', 'Reminder: Your child arr arrr has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-03 16:20:02'),
-(71, '1133', 'Reminder: Your child fdf fdfd has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-03 16:20:02'),
-(72, '1144', 'Reminder: Your child ee eee has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-03 16:20:02'),
-(73, '111', 'Reminder: Your child hfghfhf hfghfh has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-03 16:20:02'),
-(74, '11', 'Reminder: Your child fgdf gdgdg has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-03 16:20:02'),
-(75, '1111', 'Reminder: Your child 414141 dgdg has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-03 16:20:02'),
-(76, '1122', 'Your child arr arrr has been released at 12:21 AM. - BCC Scan2Fetch', 'sent', '2026-08-03 16:21:05'),
-(77, '1122', 'Pickup attempt for arr arrr has been DECLINED at 12:21 AM. - BCC Scan2Fetch', 'sent', '2026-08-03 16:21:12'),
-(78, '1133', 'Reminder: Your child fdf fdfd has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-03 16:47:15'),
-(79, '1144', 'Reminder: Your child ee eee has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-03 16:47:15'),
-(80, '111', 'Reminder: Your child hfghfhf hfghfh has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-03 16:47:15'),
-(81, '11', 'Reminder: Your child fgdf gdgdg has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-03 16:47:15'),
-(82, '1111', 'Reminder: Your child 414141 dgdg has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-03 16:47:15'),
-(83, '1', 'Reminder: Your child JAYLIAN ff has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-03 16:47:15'),
-(84, '1122', 'Reminder: Your child arr arrr has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-07 11:56:39'),
-(85, '1133', 'Reminder: Your child fdf fdfd has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-07 11:56:39'),
-(86, '1144', 'Reminder: Your child ee eee has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-07 11:56:39'),
-(87, '111', 'Reminder: Your child hfghfhf hfghfh has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-07 11:56:39'),
-(88, '11', 'Reminder: Your child fgdf gdgdg has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-07 11:56:39'),
-(89, '1111', 'Reminder: Your child 414141 dgdg has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-07 11:56:39'),
-(90, '123456', 'Reminder: Your child jaylia agaga has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-14 11:53:22'),
-(91, '123456', 'Your child jaylia agaga has been released at 07:58 PM. - BCC Scan2Fetch', 'sent', '2026-08-14 11:58:17');
+(4, '09995011147', 'Your Scan2Fetch teacher account password is: tVdccU5u (recorded in SMS logs).', 'sent', '2026-08-29 12:51:02'),
+(5, '110417', 'Your Scan2Fetch account password is: VpEwZTxE (recorded in SMS logs).', 'sent', '2026-08-29 14:10:19'),
+(6, '110417', 'Reminder: Your child juan cruz has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-29 14:13:05'),
+(7, '09995011147', 'Reminder: juan cruz (Grade 1 - A) has not been picked up yet and is still at school. - BCC Scan2Fetch', 'sent', '2026-08-29 14:13:05'),
+(8, '110417', 'Your child juan cruz has been released at 10:14 PM. - BCC Scan2Fetch', 'sent', '2026-08-29 14:14:50');
 
 -- --------------------------------------------------------
 
@@ -280,25 +253,8 @@ CREATE TABLE `sms_notification_logs` (
 --
 
 INSERT INTO `sms_notification_logs` (`id`, `student_id`, `parent_id`, `message`, `status`, `sent_by`, `sent_at`) VALUES
-(27, 31, 31, 'Reminder: Your child arr arrr has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-04 00:20:02'),
-(28, 32, 32, 'Reminder: Your child fdf fdfd has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-04 00:20:02'),
-(29, 33, 33, 'Reminder: Your child ee eee has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-04 00:20:02'),
-(30, 34, 34, 'Reminder: Your child hfghfhf hfghfh has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-04 00:20:02'),
-(31, 35, 35, 'Reminder: Your child fgdf gdgdg has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-04 00:20:02'),
-(32, 37, 37, 'Reminder: Your child 414141 dgdg has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-04 00:20:02'),
-(33, 32, 32, 'Reminder: Your child fdf fdfd has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-04 00:47:15'),
-(34, 33, 33, 'Reminder: Your child ee eee has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-04 00:47:15'),
-(35, 34, 34, 'Reminder: Your child hfghfhf hfghfh has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-04 00:47:15'),
-(36, 35, 35, 'Reminder: Your child fgdf gdgdg has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-04 00:47:15'),
-(37, 37, 37, 'Reminder: Your child 414141 dgdg has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-04 00:47:15'),
-(38, 38, 38, 'Reminder: Your child JAYLIAN ff has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-04 00:47:15'),
-(39, 31, 31, 'Reminder: Your child arr arrr has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-07 19:56:39'),
-(40, 32, 32, 'Reminder: Your child fdf fdfd has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-07 19:56:39'),
-(41, 33, 33, 'Reminder: Your child ee eee has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-07 19:56:39'),
-(42, 34, 34, 'Reminder: Your child hfghfhf hfghfh has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-07 19:56:39'),
-(43, 35, 35, 'Reminder: Your child fgdf gdgdg has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-07 19:56:39'),
-(44, 37, 37, 'Reminder: Your child 414141 dgdg has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-07 19:56:39'),
-(45, 46, 46, 'Reminder: Your child jaylia agaga has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-14 19:53:22');
+(1, 1, 1, 'Reminder: Your child juan cruz has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-29 22:13:05'),
+(2, 1, 3, 'Reminder: juan cruz (Grade 1 - A) has not been picked up yet and is still at school. - BCC Scan2Fetch', 'sent', 1, '2026-08-29 22:13:05');
 
 -- --------------------------------------------------------
 
@@ -311,17 +267,11 @@ CREATE TABLE `staffs` (
   `fname` varchar(50) NOT NULL,
   `mname` varchar(50) DEFAULT NULL,
   `lname` varchar(50) NOT NULL,
+  `picture` varchar(255) DEFAULT NULL,
   `phone` varchar(15) NOT NULL,
   `password` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `staffs`
---
-
-INSERT INTO `staffs` (`id`, `fname`, `mname`, `lname`, `phone`, `password`, `created_at`) VALUES
-(4, 'PEDRO', 'DELA', 'CERNA', '2', '$2y$10$cn37WEvA8GbXn30KM5ANPu73JxTpRN1KBDj3CEsflisKFZ/Kmy7d6', '2026-06-09 15:06:57');
 
 -- --------------------------------------------------------
 
@@ -346,7 +296,7 @@ CREATE TABLE `students` (
 --
 
 INSERT INTO `students` (`id`, `fname`, `mname`, `lname`, `grade_section`, `picture`, `created_by`, `created_at`, `last_sms_notification`) VALUES
-(46, 'jaylia', 'de', 'agaga', 'Kindergarten - A', NULL, 1, '2026-08-14 11:50:24', '2026-08-14 19:53:22');
+(1, 'juan', 'dela ', 'cruz', 'Grade 1 - A', '1788012619_e6116c9aef1ded91938f.jpg', 1, '2026-08-29 14:10:19', '2026-08-29 22:13:05');
 
 -- --------------------------------------------------------
 
@@ -367,7 +317,7 @@ CREATE TABLE `student_parents` (
 --
 
 INSERT INTO `student_parents` (`id`, `student_id`, `parent_id`, `relation`, `created_at`) VALUES
-(7, 46, 46, 'Parent', '2026-08-14 11:50:25');
+(1, 1, 1, 'Parent', '2026-08-29 14:10:19');
 
 -- --------------------------------------------------------
 
@@ -388,6 +338,32 @@ CREATE TABLE `sub_fetchers` (
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `teachers`
+--
+
+CREATE TABLE `teachers` (
+  `id` int(11) NOT NULL,
+  `fname` varchar(50) NOT NULL,
+  `mname` varchar(50) DEFAULT NULL,
+  `lname` varchar(50) NOT NULL,
+  `picture` varchar(255) DEFAULT NULL,
+  `phone` varchar(20) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `grade_section` varchar(50) NOT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `teachers`
+--
+
+INSERT INTO `teachers` (`id`, `fname`, `mname`, `lname`, `picture`, `phone`, `password`, `grade_section`, `created_by`, `created_at`) VALUES
+(3, 'SHANA', 'JOY', 'MATILLANO', '1788007862_cec08cf549e13d5b9e37.png', '09995011147', '$2y$10$I4f3JyZBamgnXDXDs2fjO.C2biYx.8g74ef6zSJH09R8HrT4sP3U.', 'Grade 1 - A', 1, '2026-08-29 12:51:02');
 
 --
 -- Indexes for dumped tables
@@ -424,11 +400,24 @@ ALTER TABLE `fetch_logs`
   ADD KEY `staff_id` (`staff_id`);
 
 --
+-- Indexes for table `messages`
+--
+ALTER TABLE `messages`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `parents`
 --
 ALTER TABLE `parents`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `phone` (`phone`);
+
+--
+-- Indexes for table `settings`
+--
+ALTER TABLE `settings`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `setting_key` (`setting_key`);
 
 --
 -- Indexes for table `sms_logs`
@@ -474,6 +463,12 @@ ALTER TABLE `sub_fetchers`
   ADD KEY `student_id` (`student_id`);
 
 --
+-- Indexes for table `teachers`
+--
+ALTER TABLE `teachers`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -481,13 +476,13 @@ ALTER TABLE `sub_fetchers`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=291;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `daily_reset_log`
@@ -502,46 +497,64 @@ ALTER TABLE `fetch_logs`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `messages`
+--
+ALTER TABLE `messages`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `parents`
 --
 ALTER TABLE `parents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `settings`
+--
+ALTER TABLE `settings`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `sms_logs`
 --
 ALTER TABLE `sms_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `sms_notification_logs`
 --
 ALTER TABLE `sms_notification_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `staffs`
 --
 ALTER TABLE `staffs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `student_parents`
 --
 ALTER TABLE `student_parents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `sub_fetchers`
 --
 ALTER TABLE `sub_fetchers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `teachers`
+--
+ALTER TABLE `teachers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
