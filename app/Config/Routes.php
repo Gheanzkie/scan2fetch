@@ -34,6 +34,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('parents-save', 'Parents::save');
     $routes->post('parents-update', 'Parents::update');
     $routes->get('parents-delete/(:num)', 'Parents::delete/$1');
+    $routes->get('parents-send-password/(:num)', 'Parents::sendPassword/$1');
     $routes->post('parents-update-picture', 'Parents::updatePicture');
     $routes->post('parents-update-from-student', 'Parents::updateFromStudent');
     $routes->get('parents-releases', 'Parents::releases');
@@ -51,6 +52,15 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('staffs-update', 'Staffs::update');
     $routes->get('staffs-delete/(:num)', 'Staffs::delete/$1');
 
+    // ===== TEACHERS =====
+    $routes->get('teachers', 'Teachers::index');
+    $routes->get('teachers-view/(:num)', 'Teachers::view/$1');
+    $routes->get('teachers-notifications', 'Teachers::notifications');
+    $routes->post('teachers-save', 'Teachers::save');
+    $routes->post('teachers-update', 'Teachers::update');
+    $routes->get('teachers-delete/(:num)', 'Teachers::delete/$1');
+    $routes->get('teachers-send-password/(:num)', 'Teachers::sendPassword/$1');
+
     // ===== QR SCAN =====
     $routes->get('scan', 'Scan::index');
     $routes->post('scan/verify', 'Scan::verify');
@@ -61,6 +71,8 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('scan-monitor', 'ScanMonitor::index');
     $routes->get('scan-monitor/get-pending-list', 'ScanMonitor::getPendingList');
     $routes->post('scan-monitor/send-notifications', 'ScanMonitor::sendPendingNotifications');
+    $routes->post('scan-monitor/save-sms-mode', 'ScanMonitor::saveSmsMode');
+    $routes->get('scan-monitor/check-and-fire', 'ScanMonitor::checkAndFireAutoSms');
 
     // ===== SMS LOGS =====
     $routes->get('sms-logs', 'Sms::index');
@@ -68,6 +80,22 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
 
     // ===== ACTIVITY LOGS =====
     $routes->get('logs', 'Logs::index');
+
+    // ===== ACCOUNT =====
+    $routes->post('change-password', 'Auth::changePassword');
+    $routes->post('update-profile', 'Auth::updateProfile');
+
+    // ===== MESSAGES (parent <-> admin/staff chat) =====
+    $routes->get('messages', 'Messages::index');
+    $routes->post('messages/send', 'Messages::send');
+    $routes->get('messages/thread/(:num)', 'Messages::getThread/$1');
+    $routes->get('messages/unread', 'Messages::unread');
+
+    // For admin profile update
+    $routes->post('admin/updateProfile', 'Admin::updateProfile');
+
+// For other roles
+    $routes->post('update-profile', 'Auth::updateProfile');
 
 });
 

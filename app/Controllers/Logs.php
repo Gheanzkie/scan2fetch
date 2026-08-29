@@ -21,6 +21,12 @@ class Logs extends BaseController
         if (!session('logged_in')) {
             return redirect()->to('/login')->send();
         }
+
+        // Activity logs are for admin/staff only.
+        $role = session('role');
+        if ($role != 'admin' && $role != 'staff') {
+            return redirect()->to('/dashboard');
+        }
         
         $filter = $this->request->getGet('filter') ?? 'today'; // Default: today
         $module = $this->request->getGet('module') ?? '';

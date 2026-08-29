@@ -31,19 +31,24 @@ class Admin extends BaseController
             $pictureName = $picture->getRandomName();
             $picture->move('uploads/parents', $pictureName);
         }
-        $qrValue = 'QR-' . strtoupper(bin2hex(random_bytes(6)));
+        $qrValue = $this->generateQrValue();
         include_once(FCPATH . 'phpqrcode/qrlib.php');
         \QRcode::png($qrValue, FCPATH . 'uploads/qr/' . $qrValue . '.png', QR_ECLEVEL_H, 8, 2);
+        $password = $this->generatePassword();
         $model->save([
             'fname'      => $this->request->getPost('fname'),
             'mname'      => $this->request->getPost('mname'),
             'lname'      => $this->request->getPost('lname'),
             'phone'      => $this->request->getPost('phone'),
-            'password'   => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+            'password'   => password_hash($password, PASSWORD_DEFAULT),
             'picture'    => $pictureName,
             'qr_code'    => $qrValue,
             'created_by' => session('user_id'),
         ]);
+        $this->sendLocalSms(
+            $this->request->getPost('phone'),
+            'Your Scan2Fetch account password is: ' . $password . ' (recorded in SMS logs).'
+        );
         return redirect()->to('/parents')->with('msg', 'Parent added');
     }
 

@@ -11,10 +11,23 @@ class ScanMonitor extends BaseController
         }
     }
 
+    // The students-status/sms monitor is for admin/staff only.
+    private function guardStaffOnly()
+    {
+        if (session('role') != 'admin' && session('role') != 'staff') {
+            return redirect()->to('/dashboard');
+        }
+        return null;
+    }
+
     public function index()
     {
         if (!session('logged_in')) {
             return redirect()->to('/login')->send();
+        }
+        $guard = $this->guardStaffOnly();
+        if ($guard) {
+            return $guard;
         }
 
         $db = \Config\Database::connect();
@@ -27,6 +40,30 @@ class ScanMonitor extends BaseController
         $search = $this->request->getGet('search') ?? '';
         $grade = $this->request->getGet('grade') ?? '';
         $tab = $this->request->getGet('tab') ?? 'released';
+
+        // ===== SMS MODE SETTING =====
+        $settingsModel = new \App\Models\SettingsModel();
+        $data['smsMode'] = $settingsModel->getSetting('sms_mode', 'manual');
+        $data['autoSmsDatetime'] = $settingsModel->getSetting('auto_sms_datetime', '');
+        $data['autoSmsLastRun'] = $settingsModel->getSetting('auto_sms_last_run', '');
+
+        // Auto reminder: when mode is 'auto' and a schedule is set and the
+        // scheduled date/time has been reached (and not run yet for this
+        // schedule), automatically notify all pending parents.
+        if ($data['smsMode'] === 'auto' && !empty($data['autoSmsDatetime'])) {
+            $scheduleTs = strtotime($data['autoSmsDatetime']);
+            if ($scheduleTs !== false && time() >= $scheduleTs && $data['autoSmsLastRun'] !== $data['autoSmsDatetime']) {
+                $autoResult = $this->sendReminders('');
+                if (!empty($autoResult['sent']) && $autoResult['sent'] > 0) {
+                    $data['autoSmsNote'] = 'Scheduled reminder sent to ' . $autoResult['sent'] . ' parent(s).';
+                } elseif (($autoResult['total'] ?? 0) == 0) {
+                    $data['autoSmsNote'] = 'Scheduled reminder fired - no parents to notify.';
+                }
+                if (!$this->request->isAJAX()) {
+                    $settingsModel->setSetting('auto_sms_last_run', $data['autoSmsDatetime']);
+                }
+            }
+        }
         
         // ===== STATS =====
         // Released count
@@ -265,6 +302,10 @@ class ScanMonitor extends BaseController
         if (!session('logged_in')) {
             return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
         }
+        $guard = $this->guardStaffOnly();
+        if ($guard) {
+            return $guard;
+        }
 
         $db = \Config\Database::connect();
         $today = date('Y-m-d');
@@ -306,10 +347,146 @@ class ScanMonitor extends BaseController
         if (!session('logged_in')) {
             return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
         }
+        if (session('role') != 'admin' && session('role') != 'staff') {
+            return $this->response->setJSON(['success' => false, 'message' => 'Forbidden']);
+        }
+
+        $customMessage = $this->request->getPost('custom_message') ?? '';
+        $result = $this->sendReminders($customMessage);
+
+        if ($result['total'] === 0) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'No pending students to notify.'
+            ]);
+        }
+
+        return $this->response->setJSON(array_merge(['success' => $result['sent'] > 0], $result));
+    }
+
+    // ===== CHECK AND FIRE AUTO-SMS (called via AJAX, no refresh needed) =====
+    public function checkAndFireAutoSms()
+    {
+        if (!session('logged_in')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+        if (session('role') != 'admin' && session('role') != 'staff') {
+            return $this->response->setJSON(['success' => false, 'message' => 'Forbidden']);
+        }
+
+        $settingsModel = new \App\Models\SettingsModel();
+        $mode = $settingsModel->getSetting('sms_mode', 'manual');
+        $schedule = $settingsModel->getSetting('auto_sms_datetime', '');
+        $lastRun = $settingsModel->getSetting('auto_sms_last_run', '');
+
+        $response = [
+            'success' => true,
+            'mode'    => $mode,
+            'fired'   => false,
+            'sent'    => 0,
+            'total'   => 0,
+            'next'    => $schedule,
+            'lastRun' => $lastRun
+        ];
+
+        if ($mode === 'auto' && !empty($schedule)) {
+            $scheduleTs = strtotime($schedule);
+            if ($scheduleTs !== false && time() >= $scheduleTs && $lastRun !== $schedule) {
+                $result = $this->sendReminders('');
+                $settingsModel->setSetting('auto_sms_last_run', $schedule);
+
+                $response['fired'] = true;
+                $response['sent'] = $result['sent'] ?? 0;
+                $response['total'] = $result['total'] ?? 0;
+                $response['lastRun'] = $schedule;
+            }
+        }
+
+        return $this->response->setJSON($response);
+    }
+
+    // ===== SAVE SMS MODE (auto / manual) =====
+    public function saveSmsMode()
+    {
+        if (!session('logged_in')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+        if (session('role') != 'admin' && session('role') != 'staff') {
+            return $this->response->setJSON(['success' => false, 'message' => 'Forbidden']);
+        }
+
+        $mode = $this->request->getPost('mode');
+        if (!in_array($mode, ['auto', 'manual'], true)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Invalid mode']);
+        }
+
+        $settingsModel = new \App\Models\SettingsModel();
+
+        // Build schedule datetime from date + hour + minute + AM/PM fields.
+        $scheduleDatetime = '';
+        if ($mode === 'auto') {
+            $sDate    = trim((string) $this->request->getPost('sched_date'));
+            $sHour    = (int) $this->request->getPost('sched_hour');
+            $sMinute  = (int) $this->request->getPost('sched_minute');
+            $sAmpm    = strtoupper(trim((string) $this->request->getPost('sched_ampm')));
+
+            $hour24 = $sHour;
+            if ($sAmpm === 'PM' && $sHour < 12) {
+                $hour24 = $sHour + 12;
+            } elseif ($sAmpm === 'AM' && $sHour === 12) {
+                $hour24 = 0;
+            }
+
+            if (!empty($sDate) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $sDate)) {
+                $scheduleDatetime = sprintf('%s %02d:%02d:00', $sDate, $hour24, $sMinute);
+                $scheduleTs = strtotime($scheduleDatetime);
+                if ($scheduleTs === false) {
+                    return $this->response->setJSON(['success' => false, 'message' => 'Invalid schedule']);
+                }
+                if ($scheduleTs <= time()) {
+                    return $this->response->setJSON(['success' => false, 'message' => 'Schedule must be in the future.']);
+                }
+            } else {
+                return $this->response->setJSON(['success' => false, 'message' => 'Please choose a date for the schedule.']);
+            }
+        }
+
+        $settingsModel->setSetting('sms_mode', $mode);
+        $settingsModel->setSetting('auto_sms_datetime', $scheduleDatetime);
+
+        // If the schedule changed, allow it to fire again on its next run.
+        if ($settingsModel->getSetting('auto_sms_last_run', '') !== $scheduleDatetime) {
+            $settingsModel->setSetting('auto_sms_last_run', '');
+        }
 
         $db = \Config\Database::connect();
+        $logModel = new \App\Models\ActivityLogModel();
+        $logModel->addLog(
+            session('user_id'),
+            session('fname') . ' ' . session('lname'),
+            session('role'),
+            'settings',
+            'settings',
+            "SMS mode changed to " . ($mode === 'auto' ? 'Automatic' : 'Manual') .
+                ($mode === 'auto' && !empty($scheduleDatetime) ? ' (scheduled ' . $scheduleDatetime . ')' : '')
+        );
+
+        return $this->response->setJSON([
+            'success'  => true,
+            'mode'     => $mode,
+            'schedule' => $scheduleDatetime
+        ]);
+    }
+
+    /**
+     * Shared logic for sending pending-parent reminders.
+     *
+     * @param string $customMessage Extra message appended to the default text.
+     */
+    protected function sendReminders(string $customMessage = ''): array
+    {
+        $db = \Config\Database::connect();
         $today = date('Y-m-d');
-        $customMessage = $this->request->getPost('custom_message') ?? '';
         
         $releasedIds = $db->table('fetch_logs')
             ->select('student_id')
@@ -334,13 +511,6 @@ class ScanMonitor extends BaseController
         $pendingStudents = array_filter($pendingStudents, function($s) {
             return !empty($s['parent_phone']);
         });
-        
-        if (empty($pendingStudents)) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'No pending students to notify.'
-            ]);
-        }
         
         $sentCount = 0;
         $failedCount = 0;
@@ -392,17 +562,64 @@ class ScanMonitor extends BaseController
                     'scan',
                     "SMS notification sent to {$student['parent_fname']} {$student['parent_lname']} for student {$student['fname']} {$student['lname']}"
                 );
+
+                // ===== Also notify the teacher of this student's grade/section =====
+                $teacher = $db->table('teachers')
+                    ->where('grade_section', $student['grade_section'])
+                    ->get()
+                    ->getRowArray();
+                if (!empty($teacher)) {
+                    $teacherMessage = "Reminder: {$student['fname']} {$student['lname']} ({$student['grade_section']}) has not been picked up yet and is still at school. - BCC Scan2Fetch";
+                    if (!empty($customMessage)) {
+                        $teacherMessage .= "\n\n" . $customMessage;
+                    }
+
+                    $teacherSmsId = $db->table('sms_logs')->insert([
+                        'parent_phone' => $teacher['phone'],
+                        'message'      => $teacherMessage,
+                        'status'       => 'sent',
+                        'sent_at'      => date('Y-m-d H:i:s')
+                    ]);
+
+                    if ($teacherSmsId) {
+                        $sentCount++;
+                        $messages[] = [
+                            'student' => $student['fname'] . ' ' . $student['lname'],
+                            'parent' => $teacher['fname'] . ' ' . $teacher['lname'] . ' (Teacher)',
+                            'phone' => $teacher['phone']
+                        ];
+
+                        $db->table('sms_notification_logs')->insert([
+                            'student_id' => $student['id'],
+                            'parent_id' => $teacher['id'],
+                            'message' => $teacherMessage,
+                            'status' => 'sent',
+                            'sent_by' => session('user_id'),
+                            'sent_at' => date('Y-m-d H:i:s')
+                        ]);
+
+                        $logModel->addLog(
+                            session('user_id'),
+                            session('fname') . ' ' . session('lname'),
+                            session('role'),
+                            'notify',
+                            'scan',
+                            "SMS notification sent to teacher {$teacher['fname']} {$teacher['lname']} for student {$student['fname']} {$student['lname']}"
+                        );
+                    } else {
+                        $failedCount++;
+                    }
+                }
             } else {
                 $failedCount++;
             }
         }
         
-        return $this->response->setJSON([
-            'success' => true,
+        return [
             'sent' => $sentCount,
             'failed' => $failedCount,
             'messages' => $messages,
             'total' => count($pendingStudents)
-        ]);
+        ];
     }
 }

@@ -138,6 +138,7 @@ CREATE TABLE `admin` (
   `lname` varchar(50) NOT NULL,
   `phone` varchar(15) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `picture` varchar(255) DEFAULT NULL COMMENT 'Admin profile photo',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -145,8 +146,8 @@ CREATE TABLE `admin` (
 -- Dumping data for table `admin`
 --
 
-INSERT INTO `admin` (`id`, `fname`, `mname`, `lname`, `phone`, `password`, `created_at`) VALUES
-(1, 'Admin', NULL, '', 'admin', '$2y$10$KiImoTImSTwssZrLWAzEXuu/vaJ1dOsRV45w9HKv/GPxI2K9k67em', '2026-05-28 16:23:06');
+INSERT INTO `admin` (`id`, `fname`, `mname`, `lname`, `phone`, `password`, `picture`, `created_at`) VALUES
+(1, 'Admin', NULL, '', 'admin', '$2y$10$KiImoTImSTwssZrLWAzEXuu/vaJ1dOsRV45w9HKv/GPxI2K9k67em', NULL, '2026-05-28 16:23:06');
 
 -- --------------------------------------------------------
 

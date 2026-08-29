@@ -145,7 +145,7 @@ class SubFetchers extends BaseController
 
     private function generateQR()
     {
-        $qrValue = 'QR-' . strtoupper(bin2hex(random_bytes(6)));
+        $qrValue = $this->generateQrValue();
         include_once('phpqrcode/qrlib.php');
         
         $qrImagePath = 'uploads/qr/' . $qrValue . '_qrcode.png';

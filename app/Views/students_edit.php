@@ -17,47 +17,16 @@ body {
 
 .content-wrapper { background: transparent !important; position: relative; z-index: 1; }
 
-.floating-shapes {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-    z-index: 0;
-    pointer-events: none;
-}
-
-.floating-shapes .shape {
-    position: absolute;
-    font-size: 3.5rem;
-    opacity: 0.08;
-    animation: floatShape 20s ease-in-out infinite;
-}
-
-.floating-shapes .shape:nth-child(1) { top: 5%; left: 3%; animation-delay: 0s; }
-.floating-shapes .shape:nth-child(2) { top: 15%; right: 5%; animation-delay: 2.5s; }
-.floating-shapes .shape:nth-child(3) { bottom: 20%; left: 4%; animation-delay: 5s; }
-.floating-shapes .shape:nth-child(4) { bottom: 10%; right: 3%; animation-delay: 1.5s; }
-.floating-shapes .shape:nth-child(5) { top: 45%; left: 45%; animation-delay: 3.5s; font-size: 5rem; opacity: 0.06; }
-
-@keyframes floatShape {
-    0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-    25% { transform: translateY(-30px) rotate(8deg) scale(1.05); }
-    75% { transform: translateY(20px) rotate(-5deg) scale(0.95); }
-}
-
 .card {
     border-radius: 28px !important;
     border: 2px solid rgba(255,255,255,0.7) !important;
     background: rgba(255,255,255,0.85) !important;
-    backdrop-filter: blur(15px);
     box-shadow: 0 8px 32px rgba(108,140,255,0.08) !important;
     overflow: hidden !important;
     transition: all 0.3s ease !important;
 }
 
-.card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(108,140,255,0.12) !important; }
+.card:hover { box-shadow: 0 16px 48px rgba(108,140,255,0.12) !important; }
 
 .card-header {
     background: rgba(255,255,255,0.6) !important;
@@ -121,8 +90,6 @@ label {
     font-size: 15px !important;
 }
 
-.btn:hover { transform: translateY(-3px) scale(1.03); }
-
 .btn-warning {
     background: linear-gradient(135deg, var(--soft-orange), #f57c00) !important;
     border: none !important;
@@ -168,139 +135,118 @@ label {
     transition: all 0.3s ease !important;
 }
 
-#studentPhotoPreview:hover { transform: scale(1.03); }
-
-.kid-emoji {
-    display: inline-block;
-    animation: sparkle 2s ease-in-out infinite;
-}
-
-@keyframes sparkle {
-    0%, 100% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.15) rotate(8deg); }
-}
-
 @media (max-width: 768px) {
     .card-body { padding: 1rem !important; }
     .content-header h1 { font-size: 1.5rem !important; }
     .form-control { font-size: 14px !important; height: 46px !important; }
     .btn { font-size: 12px !important; padding: 8px 16px !important; }
-    .floating-shapes .shape { font-size: 2rem !important; }
 }
 </style>
 
-<!-- Floating Shapes -->
-<div class="floating-shapes">
-    <div class="shape">🌈</div>
-    <div class="shape">⭐</div>
-    <div class="shape">🎈</div>
-    <div class="shape">🌸</div>
-    <div class="shape">☁️</div>
-    <div class="shape">🌟</div>
-    <div class="shape">🎉</div>
-</div>
-
 <div class="content-wrapper" style="background: transparent;">
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>
-                        <i class="fas fa-user-edit mr-2"></i>
-                        Edit Student ✏️
-                        <span class="kid-emoji">🌟</span>
-                    </h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right bg-transparent">
-                        <li class="breadcrumb-item"><a href="<?= base_url('students') ?>">🎓 Students</a></li>
-                        <li class="breadcrumb-item active">✏️ Edit</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </div>
+ <div class="content-header">
+ <div class="container-fluid">
+ <div class="row mb-2">
+ <div class="col-sm-6">
+ <h1>
+ <i class="fas fa-user-edit mr-2"></i>
+                        Edit Student
+ </h1>
+ </div>
+ <div class="col-sm-6">
+ <ol class="breadcrumb float-sm-right">
+ <li class="breadcrumb-item"><a href="<?= base_url('students') ?>">Students</a></li>
+ <li class="breadcrumb-item active">Edit</li>
+ </ol>
+ </div>
+ </div>
+ </div>
+ </div>
 
-    <section class="content">
-        <div class="container-fluid">
-            <form action="<?= base_url('students-update') ?>" method="post" enctype="multipart/form-data">
-                <?= csrf_field() ?>
-                <input type="hidden" name="id" value="<?= $student['id'] ?>">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>📝 Student Information</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="form-group text-center">
-                                    <label>📸 Student Picture</label>
-                                    <div id="studentPhotoPreview" style="width:130px;height:130px;margin:0 auto 10px;border-radius:50%;overflow:hidden;border:4px solid var(--soft-blue);background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
-                                        <?php if(!empty($student['picture'])): ?>
-                                            <img src="<?= base_url('uploads/students/'.$student['picture']) ?>" style="width:100%;height:100%;object-fit:cover;">
-                                        <?php else: ?>
-                                            <i class="fas fa-child fa-3x" style="color: #b0b0c8;"></i>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <button type="button" class="btn btn-outline-secondary open-camera-btn"><i class="fas fa-camera mr-1"></i> Take Photo 📷</button>
-                                        <label class="btn btn-outline-secondary mb-0" style="cursor:pointer;"><i class="fas fa-upload mr-1"></i> Upload ⬆️<input type="file" name="picture" id="pictureInput" class="d-none" accept="image/*"></label>
-                                    </div>
-                                    <input type="hidden" name="picture_capture" id="pictureCapture">
-                                </div>
-                                <div class="row">
-                                    <div class="col-4">
-                                        <label>First Name <span class="text-danger">*</span></label>
-                                        <input type="text" name="fname" class="form-control" value="<?= esc($student['fname']) ?>" required>
-                                    </div>
-                                    <div class="col-4">
-                                        <label>Middle Name</label>
-                                        <input type="text" name="mname" class="form-control" value="<?= esc($student['mname']??'') ?>">
-                                    </div>
-                                    <div class="col-4">
-                                        <label>Last Name <span class="text-danger">*</span></label>
-                                        <input type="text" name="lname" class="form-control" value="<?= esc($student['lname']) ?>" required>
-                                    </div>
-                                </div>
-                                <div class="form-group mt-3">
-                                    <label>📚 Grade & Section <span class="text-danger">*</span></label>
-                                    <select name="grade_section" class="form-control" required>
-                                        <option value="">-- Select --</option>
-                                        <?php $g=['Kindergarten','Grade 1 - A','Grade 1 - B','Grade 2 - A','Grade 2 - B','Grade 3 - A','Grade 3 - B','Grade 4 - A','Grade 4 - B','Grade 5 - A','Grade 5 - B','Grade 6 - A','Grade 6 - B'];foreach($g as $x): ?>
-                                            <option value="<?= $x ?>" <?= $student['grade_section']==$x?'selected':'' ?>><?= $x ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-right mt-3" style="display: flex; gap: 10px; justify-content: flex-end;">
-                    <a href="<?= base_url('students-view/'.$student['id']) ?>" class="btn btn-outline-secondary">Cancel ❌</a>
-                    <button type="submit" class="btn btn-warning px-4">
-                        <i class="fas fa-check mr-1"></i> Update Student ✅
-                    </button>
-                </div>
-            </form>
-        </div>
-    </section>
+ <section class="content">
+ <div class="container-fluid">
+ <form action="<?= base_url('students-update') ?>" method="post" enctype="multipart/form-data">
+ <?= csrf_field() ?>
+ <input type="hidden" name="id" value="<?= $student['id'] ?>">
+ <div class="row">
+ <div class="col-md-6">
+ <div class="card">
+ <div class="card-header">
+ <h5> Student Information</h5>
+ </div>
+ <div class="card-body">
+ <div class="form-group text-center">
+ <label> Student Picture</label>
+ <div id="studentPhotoPreview" style="width:130px;height:130px;margin:0 auto 10px;border-radius:50%;overflow:hidden;border:4px solid var(--soft-blue);background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
+ <?php if(!empty($student['picture'])): ?>
+ <img src="<?= base_url('uploads/students/'.$student['picture']) ?>" style="width:100%;height:100%;object-fit:cover;">
+ <?php else: ?>
+ <i class="fas fa-child fa-3x" style="color: #b0b0c8;"></i>
+ <?php endif; ?>
+ </div>
+ <div class="btn-group btn-group-sm" role="group">
+ <button type="button" class="btn btn-outline-secondary open-camera-btn"><i class="fas fa-camera mr-1"></i> Take Photo</button>
+ <label class="btn btn-outline-secondary mb-0" style="cursor:pointer;"><i class="fas fa-upload mr-1"></i> Upload<input type="file" name="picture" id="pictureInput" class="d-none" accept="image/*"></label>
+ </div>
+ <input type="hidden" name="picture_capture" id="pictureCapture">
+ </div>
+ <div class="row">
+ <div class="col-4">
+ <label>First Name <span class="text-danger">*</span></label>
+ <input type="text" name="fname" class="form-control" value="<?= esc($student['fname']) ?>" required>
+ </div>
+ <div class="col-4">
+ <label>Middle Name</label>
+ <input type="text" name="mname" class="form-control" value="<?= esc($student['mname']??'') ?>">
+ </div>
+ <div class="col-4">
+ <label>Last Name <span class="text-danger">*</span></label>
+ <input type="text" name="lname" class="form-control" value="<?= esc($student['lname']) ?>" required>
+ </div>
+ </div>
+ <div class="form-group mt-3">
+ <label> Grade & Section <span class="text-danger">*</span></label>
+ <select name="grade_section" class="form-control" required>
+ <option value="">-- Select --</option>
+ <?php $g=['Kindergarten','Grade 1 - A','Grade 1 - B','Grade 2 - A','Grade 2 - B','Grade 3 - A','Grade 3 - B','Grade 4 - A','Grade 4 - B','Grade 5 - A','Grade 5 - B','Grade 6 - A','Grade 6 - B'];foreach($g as $x): ?>
+ <option value="<?= $x ?>" <?= $student['grade_section']==$x?'selected':'' ?>><?= $x ?></option>
+ <?php endforeach; ?>
+ </select>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ <div class="text-right mt-3" style="display: flex; gap: 10px; justify-content: flex-end;">
+ <a href="<?= base_url('students-view/'.$student['id']) ?>" class="btn btn-outline-secondary">Cancel</a>
+ <button type="submit" class="btn btn-warning px-4">
+ <i class="fas fa-check mr-1"></i> Update Student
+ </button>
+ </div>
+ </form>
+ </div>
+ </section>
 </div>
 
 <!-- Camera Modal -->
 <div class="modal fade" id="cameraModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h6><i class="fas fa-camera mr-2" style="color: var(--soft-blue);"></i>Take Photo 📸</h6>
-                <button type="button" class="close" data-dismiss="modal" style="color: #2d2d4a;">&times;</button>
-            </div>
-            <div class="modal-body text-center p-2" style="background: #f5f0ff; border-radius: 0 0 20px 20px;">
-                <video id="cameraVideo" autoplay playsinline style="width:100%;max-height:350px;border-radius:12px;background:#000;"></video>
-                <canvas id="cameraCanvas" style="display:none;"></canvas>
-                <button type="button" class="btn btn-primary btn-sm mt-2" id="captureBtn"><i class="fas fa-camera"></i> Capture 📷</button>
-            </div>
-        </div>
-    </div>
+ <div class="modal-dialog modal-dialog-centered">
+ <div class="modal-content">
+ <div class="modal-header">
+ <h6><i class="fas fa-camera mr-2" style="color: var(--soft-blue);"></i>Take Photo</h6>
+ <button type="button" class="close" data-dismiss="modal" style="color: #2d2d4a;">&times;</button>
+ </div>
+ <div class="modal-body text-center p-2" style="background: #f5f0ff; border-radius: 0 0 20px 20px;">
+ <video id="cameraVideo" autoplay playsinline style="width:100%;max-height:350px;border-radius:12px;background:#000;"></video>
+ <canvas id="cameraCanvas" style="display:none;"></canvas>
+ <button type="button" class="btn btn-primary btn-sm mt-2" id="captureBtn"><i class="fas fa-camera"></i> Capture</button>
+ <button type="button" class="btn btn-outline-secondary btn-sm mt-2 ml-1" id="cameraFallbackBtn">
+ <i class="fas fa-mobile-alt mr-1"></i> Use Phone Camera / Upload
+ </button>
+ <input type="file" id="cameraFallbackInput" class="d-none" accept="image/*" capture="environment">
+ </div>
+ </div>
+ </div>
 </div>
 
 <?= $this->endSection() ?>
@@ -323,11 +269,34 @@ $(function() {
 
     $('.open-camera-btn').click(function() {
         $('#cameraModal').modal('show');
+        // Chrome blocks the in-page camera on plain http:// (non-localhost).
+        // Open the phone's native camera app directly instead.
+        if (!window.isSecureContext && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+            $('#cameraFallbackInput').click();
+            return;
+        }
         setTimeout(function() {
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: 400, height: 400 } })
             .then(function(st) { s = st; $('#cameraVideo')[0].srcObject = s; })
-            .catch(function(e) { alert('Camera error: ' + e.message); });
+            .catch(function() { $('#cameraFallbackBtn').show(); });
         }, 500);
+    });
+
+    $('#cameraFallbackBtn').click(function() {
+        $('#cameraFallbackInput').click();
+    });
+
+    $('#cameraFallbackInput').on('change', function() {
+        var f = this.files[0];
+        if (!f) return;
+        var r2 = new FileReader();
+        r2.onload = function(e) {
+            $('#studentPhotoPreview').html('<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;">');
+            $('#pictureCapture').val(e.target.result);
+            $('#cameraModal').modal('hide');
+        };
+        r2.readAsDataURL(f);
+        this.value = '';
     });
 
     $('#captureBtn').click(function() {

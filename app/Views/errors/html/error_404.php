@@ -30,23 +30,15 @@
             position: relative;
         }
         
-        /* Animated background circles */
+        /* Background circles */
         .bg-circle {
             position: absolute;
             border-radius: 50%;
             opacity: 0.05;
-            animation: floatCircle 20s infinite ease-in-out;
         }
-        .bg-circle:nth-child(1) { width: 600px; height: 600px; background: #667eea; top: -200px; left: -200px; animation-delay: 0s; }
-        .bg-circle:nth-child(2) { width: 400px; height: 400px; background: #764ba2; bottom: -100px; right: -100px; animation-delay: -5s; }
-        .bg-circle:nth-child(3) { width: 300px; height: 300px; background: #667eea; top: 50%; left: 50%; animation-delay: -10s; }
-        
-        @keyframes floatCircle {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(50px, -30px) scale(1.1); }
-            50% { transform: translate(-20px, 40px) scale(0.9); }
-            75% { transform: translate(-40px, -20px) scale(1.05); }
-        }
+        .bg-circle:nth-child(1) { width: 600px; height: 600px; background: #667eea; top: -200px; left: -200px; }
+        .bg-circle:nth-child(2) { width: 400px; height: 400px; background: #764ba2; bottom: -100px; right: -100px; }
+        .bg-circle:nth-child(3) { width: 300px; height: 300px; background: #667eea; top: 50%; left: 50%; }
         
         .error-container {
             position: relative;
@@ -63,12 +55,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
         }
         
         .error-code {
@@ -122,7 +108,6 @@
         }
         
         .btn-home:hover {
-            transform: translateY(-3px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
             color: #fff;
             text-decoration: none;
@@ -162,15 +147,9 @@
             height: 8px;
             border-radius: 50%;
             background: rgba(255,255,255,0.3);
-            animation: dotPulse 1.5s infinite ease-in-out;
         }
-        .dot:nth-child(2) { animation-delay: 0.2s; }
-        .dot:nth-child(3) { animation-delay: 0.4s; }
-        
-        @keyframes dotPulse {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.5); }
-        }
+        .dot:nth-child(2) { background: rgba(255,255,255,0.5); }
+        .dot:nth-child(3) { background: rgba(255,255,255,0.7); }
         
         @media (max-width: 480px) {
             .error-code { font-size: 100px; }
@@ -181,7 +160,7 @@
 </head>
 <body>
     
-    <!-- Animated Background -->
+    <!-- Background -->
     <div class="bg-circle"></div>
     <div class="bg-circle"></div>
     <div class="bg-circle"></div>
@@ -213,7 +192,7 @@
             </a>
         </div>
         
-        <!-- Animated Dots -->
+        <!-- Dots -->
         <div class="dots">
             <div class="dot"></div>
             <div class="dot"></div>

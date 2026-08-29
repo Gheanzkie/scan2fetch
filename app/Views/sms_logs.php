@@ -26,14 +26,12 @@ body {
     border-radius: 25px !important;
     border: 1px solid rgba(255,255,255,0.6) !important;
     background: rgba(255,255,255,0.7) !important;
-    backdrop-filter: blur(15px);
     box-shadow: 0 8px 30px rgba(0,0,0,0.04) !important;
     overflow: hidden !important;
     transition: all 0.3s ease !important;
 }
 
 .card:hover {
-    transform: translateY(-3px);
     box-shadow: 0 12px 40px rgba(0,0,0,0.06) !important;
 }
 
@@ -76,7 +74,6 @@ body {
 
 .table tbody tr:hover {
     background: rgba(168,192,255,0.06) !important;
-    transform: scale(1.01);
 }
 
 .table tbody td {
@@ -107,30 +104,27 @@ body {
 }
 
 .btn:hover {
-    transform: translateY(-3px) scale(1.03);
 }
 
 .btn-group .btn {
-    border-radius: 50px !important;
-    border: 1px solid rgba(160,160,180,0.15) !important;
-    background: rgba(255,255,255,0.5) !important;
-    color: #7a7a9a !important;
-    transition: all 0.3s ease !important;
-    font-weight: 500 !important;
+    border-radius: 6px !important;
+    border: 1px solid #cbd5e1 !important;
+    background: #fff !important;
+    color: #475569 !important;
+    font-weight: 600 !important;
     padding: 6px 16px !important;
     font-size: 12px !important;
 }
 
 .btn-group .btn:hover {
-    background: rgba(168,192,255,0.1) !important;
-    color: var(--soft-purple) !important;
+    background: #f1f5f9 !important;
+    color: #1e293b !important;
 }
 
 .btn-group .btn.active {
-    background: linear-gradient(135deg, var(--soft-blue), var(--soft-purple)) !important;
+    background: #4361ee !important;
     color: #fff !important;
-    border-color: var(--soft-blue) !important;
-    box-shadow: 0 4px 15px rgba(63,43,150,0.2) !important;
+    border-color: #4361ee !important;
 }
 
 .btn-outline-secondary {
@@ -163,7 +157,8 @@ body {
 }
 
 .form-control::placeholder {
-    color: #b0b0c8 !important;
+    color: #8f8fae !important;
+    opacity: 1;
 }
 
 .form-control-sm {
@@ -183,7 +178,7 @@ body {
 }
 
 .input-group .form-control {
-    border-radius: 0 12px 12px 0 !important;
+    border-radius: 0 6px 6px 0 !important;
     border-left: none !important;
 }
 
@@ -294,124 +289,124 @@ body {
 </style>
 
 <div class="content-wrapper" style="background: transparent;">
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>
-                        <i class="fas fa-sms mr-2"></i>
-                        SMS Logs 💬
-                    </h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right bg-transparent">
-                        <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">🏠 Home</a></li>
-                        <li class="breadcrumb-item active">💬 SMS Logs</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </div>
+ <div class="content-header">
+ <div class="container-fluid">
+ <div class="row mb-2">
+ <div class="col-sm-6">
+ <h1>
+ <i class="fas fa-sms mr-2"></i>
+                        SMS Logs
+ </h1>
+ </div>
+ <div class="col-sm-6">
+ <ol class="breadcrumb float-sm-right">
+ <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">Home</a></li>
+ <li class="breadcrumb-item active">SMS Logs</li>
+ </ol>
+ </div>
+ </div>
+ </div>
+ </div>
 
-    <section class="content">
-        <div class="container-fluid">
+ <section class="content">
+ <div class="container-fluid">
 
-            <!-- ===== SMS LOGS TABLE ===== -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header pt-3 pb-2">
-                            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-list mr-2" style="color: var(--soft-blue);"></i>
-                                    SMS History 📋
-                                    <span class="badge badge-light ml-2"><?= count($smsLogs ?? []) ?></span>
-                                </h5>
-                                <div class="btn-group btn-group-sm mt-1 mt-md-0" style="flex-wrap: wrap; gap: 4px;">
-                                    <button class="btn active" id="btnToday">📅 Today</button>
-                                    <button class="btn" id="btnYesterday">📆 Yesterday</button>
-                                    <button class="btn" id="btnWeek">📊 Week</button>
-                                    <button class="btn" id="btnAll">📋 All</button>
-                                    <button class="btn btn-outline-secondary" id="btnRefresh" title="Refresh">
-                                        <i class="fas fa-sync-alt"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body pt-0">
+ <!-- ===== SMS LOGS TABLE ===== -->
+ <div class="row">
+ <div class="col-12">
+ <div class="card">
+ <div class="card-header pt-3 pb-2">
+ <div class="d-flex justify-content-between align-items-center flex-wrap">
+ <h5 class="mb-0">
+ <i class="fas fa-list mr-2" style="color: var(--soft-blue);"></i>
+                                    SMS History
+ <span class="badge badge-light ml-2"><?= count($smsLogs ?? []) ?></span>
+ </h5>
+ <div class="btn-group btn-group-sm mt-1 mt-md-0" style="flex-wrap: wrap; gap: 4px;">
+ <button class="btn active" id="btnToday"> Today</button>
+ <button class="btn" id="btnYesterday"> Yesterday</button>
+ <button class="btn" id="btnWeek"> Week</button>
+ <button class="btn" id="btnAll"> All</button>
+ <button class="btn btn-outline-secondary" id="btnRefresh" title="Refresh">
+ <i class="fas fa-sync-alt"></i>
+ </button>
+ </div>
+ </div>
+ </div>
+ <div class="card-body pt-0">
                             
-                            <!-- ===== FILTERS ===== -->
-                            <div class="filter-section">
-                                <div class="filter-row">
-                                    <div class="filter-item">
-                                        <label class="filter-label">🔍 Search</label>
-                                        <div class="input-group input-group-sm">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                            </div>
-                                            <input type="text" id="searchFilter" class="form-control form-control-sm" placeholder="Search phone or message...">
-                                        </div>
-                                    </div>
-                                    <div class="filter-item">
-                                        <label class="filter-label">📅 Date</label>
-                                        <input type="date" id="dateFilter" class="form-control form-control-sm" value="<?= date('Y-m-d') ?>">
-                                    </div>
-                                    <div class="filter-item-sm">
-                                        <label class="filter-label">&nbsp;</label>
-                                        <button class="btn btn-outline-secondary btn-sm" id="resetFilterBtn" style="width:100%;">
-                                            <i class="fas fa-times"></i> Clear
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+ <!-- ===== FILTERS ===== -->
+ <div class="filter-section">
+ <div class="filter-row">
+ <div class="filter-item">
+ <label class="filter-label"> Search</label>
+ <div class="input-group input-group-sm">
+ <div class="input-group-prepend">
+ <span class="input-group-text"><i class="fas fa-search"></i></span>
+ </div>
+ <input type="text" id="searchFilter" class="form-control form-control-sm" placeholder="Search phone or message...">
+ </div>
+ </div>
+ <div class="filter-item">
+ <label class="filter-label"> Date</label>
+ <input type="date" id="dateFilter" class="form-control form-control-sm" value="<?= date('Y-m-d') ?>">
+ </div>
+ <div class="filter-item-sm">
+ <label class="filter-label">&nbsp;</label>
+ <button class="btn btn-outline-secondary btn-sm" id="resetFilterBtn" style="width:100%;">
+ <i class="fas fa-times"></i> Clear
+ </button>
+ </div>
+ </div>
+ </div>
 
-                            <!-- ===== TABLE ===== -->
-                            <div class="table-responsive">
-                                <table class="table table-hover mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th style="width:40px;">#</th>
-                                            <th style="width:150px;">📱 Phone</th>
-                                            <th>💬 Message</th>
-                                            <th style="width:170px;">⏰ Date/Time</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php if (!empty($smsLogs)): ?>
-                                            <?php $i = 1; foreach ($smsLogs as $sms): ?>
-                                            <tr class="sms-row" 
+ <!-- ===== TABLE ===== -->
+ <div class="table-responsive">
+ <table class="table table-hover mb-0">
+ <thead>
+ <tr>
+ <th style="width:40px;">#</th>
+ <th style="width:150px;"> Phone</th>
+ <th> Message</th>
+ <th style="width:170px;"> Date/Time</th>
+ </tr>
+ </thead>
+ <tbody>
+ <?php if (!empty($smsLogs)): ?>
+ <?php $i = 1; foreach ($smsLogs as $sms): ?>
+ <tr class="sms-row" 
                                                 data-search="<?= esc(strtolower($sms['parent_phone'] . ' ' . $sms['message'])) ?>"
                                                 data-date="<?= date('Y-m-d', strtotime($sms['sent_at'])) ?>">
-                                                <td style="color: #b0b0c8; font-size: 12px;"><?= $i++ ?></td>
-                                                <td><code><?= esc($sms['parent_phone']) ?></code></td>
-                                                <td style="color: #5a5a7a; font-size: 13px;"><?= esc($sms['message']) ?></td>
-                                                <td style="color: #7a7a9a; font-size: 12px;"><?= date('M d, Y h:i A', strtotime($sms['sent_at'])) ?></td>
-                                            </tr>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
-                                            <tr>
-                                                <td colspan="4" class="text-center py-5">
-                                                    <i class="fas fa-sms fa-3x mb-3 d-block" style="color: rgba(160,160,180,0.15);"></i>
-                                                    <h5 style="color: #7a7a9a;">No SMS records found</h5>
-                                                    <p style="color: #b0b0c8; font-size: 14px;">SMS notifications will appear here when sent. ✨</p>
-                                                </td>
-                                            </tr>
-                                        <?php endif; ?>
-                                    </tbody>
-                                </table>
-                            </div>
+ <td style="color: #b0b0c8; font-size: 12px;"><?= $i++ ?></td>
+ <td><code><?= esc($sms['parent_phone']) ?></code></td>
+ <td style="color: #5a5a7a; font-size: 13px;"><?= esc($sms['message']) ?></td>
+ <td style="color: #7a7a9a; font-size: 12px;"><?= date('M d, Y h:i A', strtotime($sms['sent_at'])) ?></td>
+ </tr>
+ <?php endforeach; ?>
+ <?php else: ?>
+ <tr>
+ <td colspan="4" class="text-center py-5">
+ <i class="fas fa-sms fa-3x mb-3 d-block" style="color: rgba(160,160,180,0.15);"></i>
+ <h5 style="color: #7a7a9a;">No SMS records found</h5>
+ <p style="color: #b0b0c8; font-size: 14px;">SMS notifications will appear here when sent.</p>
+ </td>
+ </tr>
+ <?php endif; ?>
+ </tbody>
+ </table>
+ </div>
 
-                            <!-- ===== FOOTER ===== -->
-                            <div class="text-muted small mt-2" style="color: #b0b0c8 !important;">
+ <!-- ===== FOOTER ===== -->
+ <div class="text-muted small mt-2" style="color: #b0b0c8 !important;">
                                 Showing <span id="showingCount"><?= count($smsLogs ?? []) ?></span> of <?= $totalSms ?? 0 ?> records
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
 
-        </div>
-    </section>
+ </div>
+ </section>
 </div>
 
 <?= $this->endSection() ?>

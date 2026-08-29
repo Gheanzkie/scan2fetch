@@ -2,224 +2,200 @@
 <?= $this->section('content') ?>
 
 <style>
+/* ===== SHARED PROFESSIONAL PASTEL THEME - PARENTS ===== */
 :root {
-    --soft-blue: #6C8CFF;
-    --soft-purple: #7C6CFF;
-    --soft-pink: #FF8A9B;
-    --soft-rose: #FF6B7A;
-    --soft-teal: #4FC3F7;
-    --soft-green: #66BB6A;
-    --soft-orange: #FFB74D;
+    --soft-blue: #a8c0ff;
+    --soft-purple: #3f2b96;
+    --soft-pink: #f093fb;
+    --soft-rose: #f5576c;
+    --soft-teal: #4facfe;
+    --soft-green: #81c784;
+    --soft-orange: #ffb74d;
+    --soft-yellow: #ffd54f;
+    --ink: #3d3d5c;
+    --muted: #7a7a9a;
+    --faint: #b0b0c8;
 }
 
 body {
-    background: linear-gradient(135deg, #f5f0ff 0%, #ffe8f0 100%) !important;
-    color: #2d2d4a !important;
+    background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%) !important;
+    color: var(--ink) !important;
 }
 
-.content-wrapper {
-    background: transparent !important;
-    position: relative;
-    z-index: 1;
+.content-wrapper { background: transparent !important; position: relative; z-index: 1; }
+
+/* ===== CONTENT HEADER ===== */
+.content-header h1 {
+    color: var(--ink) !important;
+    font-weight: 700 !important;
+    font-size: 1.7rem !important;
 }
 
-/* ===== FLOATING SHAPES ===== */
-.floating-shapes {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-    z-index: 0;
-    pointer-events: none;
-}
-
-.floating-shapes .shape {
-    position: absolute;
-    font-size: 3.5rem;
-    opacity: 0.08;
-    animation: floatShape 20s ease-in-out infinite;
-}
-
-.floating-shapes .shape:nth-child(1) { top: 5%; left: 3%; animation-delay: 0s; }
-.floating-shapes .shape:nth-child(2) { top: 15%; right: 5%; animation-delay: 2.5s; }
-.floating-shapes .shape:nth-child(3) { bottom: 20%; left: 4%; animation-delay: 5s; }
-.floating-shapes .shape:nth-child(4) { bottom: 10%; right: 3%; animation-delay: 1.5s; }
-.floating-shapes .shape:nth-child(5) { top: 45%; left: 45%; animation-delay: 3.5s; font-size: 5rem; opacity: 0.06; }
-
-@keyframes floatShape {
-    0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-    25% { transform: translateY(-30px) rotate(8deg) scale(1.05); }
-    75% { transform: translateY(20px) rotate(-5deg) scale(0.95); }
+.content-header h1 i {
+    background: linear-gradient(135deg, var(--soft-blue), var(--soft-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 /* ===== CARDS ===== */
 .card {
-    border-radius: 28px !important;
-    border: 2px solid rgba(255,255,255,0.7) !important;
-    background: rgba(255,255,255,0.85) !important;
-    backdrop-filter: blur(15px);
-    box-shadow: 0 8px 32px rgba(108,140,255,0.08) !important;
+    border-radius: 22px !important;
+    border: 1px solid rgba(255,255,255,0.7) !important;
+    background: rgba(255,255,255,0.78) !important;
+    box-shadow: 0 8px 30px rgba(63,43,150,0.05) !important;
     overflow: hidden !important;
-    transition: all 0.3s ease !important;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 16px 48px rgba(108,140,255,0.12) !important;
 }
 
 .card-header {
     background: rgba(255,255,255,0.6) !important;
-    border-bottom: 2px solid rgba(255,255,255,0.3) !important;
-    padding: 1.2rem 1.8rem !important;
+    border-bottom: 1px solid rgba(63,43,150,0.06) !important;
+    padding: 1rem 1.5rem !important;
 }
 
 .card-header h5 {
-    color: #2d2d4a !important;
+    color: var(--ink) !important;
     font-weight: 700 !important;
-    font-size: 1.25rem !important;
+    font-size: 1.05rem !important;
 }
 
-.card-body {
-    padding: 0 !important;
-}
+.card-body { padding: 1.4rem !important; }
 
 /* ===== TABLE ===== */
-.table {
-    color: #2d2d4a !important;
-}
-
-.table thead.bg-light {
-    background: linear-gradient(135deg, #e8e0f0, #d5c8e8) !important;
-}
+.table { margin-bottom: 0; }
 
 .table thead th {
-    color: #2d2d4a !important;
+    color: #5a5280 !important;
     font-weight: 700 !important;
-    font-size: 14px !important;
-    border-bottom: none !important;
-    padding: 16px 14px !important;
-    text-shadow: none !important;
-}
-
-.table tbody tr {
-    border-bottom: 1px solid rgba(108,140,255,0.08) !important;
-    transition: all 0.3s ease !important;
-}
-
-.table tbody tr:hover {
-    background: rgba(108,140,255,0.06) !important;
-    transform: scale(1.02);
+    font-size: 12.5px !important;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    background: rgba(168,192,255,0.12) !important;
+    border-bottom: 1px solid rgba(63,43,150,0.10) !important;
+    padding: 12px 14px !important;
+    white-space: nowrap;
 }
 
 .table tbody td {
-    color: #2d2d4a !important;
+    color: var(--ink) !important;
     vertical-align: middle !important;
-    border-top: none !important;
-    padding: 14px 14px !important;
-    font-size: 15px !important;
+    border-top: 1px solid rgba(63,43,150,0.05) !important;
+    padding: 13px 14px !important;
+    font-size: 14px !important;
 }
 
-.table .text-muted {
-    color: #8888aa !important;
-}
+.table tbody tr { transition: background 0.25s ease !important; }
+.table tbody tr:hover { background: rgba(168,192,255,0.06) !important; }
 
-.table .small {
-    color: #8888aa !important;
-    font-size: 13px !important;
+.table .num { color: var(--faint) !important; font-weight: 700 !important; font-size: 13px !important; }
+.table .muted { color: var(--muted) !important; font-size: 13px !important; }
+
+.parent-name {
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 14px;
 }
 
 /* ===== BADGES ===== */
 .badge {
     font-weight: 700 !important;
-    padding: 8px 20px !important;
+    padding: 6px 14px !important;
     border-radius: 50px !important;
-    font-size: 13px !important;
+    font-size: 11.5px !important;
 }
 
-.badge-primary { background: var(--soft-blue) !important; color: #fff !important; }
-.badge-info { background: var(--soft-teal) !important; color: #fff !important; }
+.badge-soft {
+    background: rgba(168,192,255,0.15) !important;
+    color: #5a5280 !important;
+}
+
 .badge-success { background: var(--soft-green) !important; color: #fff !important; }
 .badge-warning { background: var(--soft-orange) !important; color: #fff !important; }
-.badge-light { background: rgba(108,140,255,0.08) !important; color: #2d2d4a !important; }
+.badge-info { background: var(--soft-teal) !important; color: #fff !important; }
+.badge-primary { background: var(--soft-blue) !important; color: #fff !important; }
 
 /* ===== BUTTONS ===== */
 .btn {
     border-radius: 50px !important;
     font-weight: 700 !important;
-    transition: all 0.3s ease !important;
-    padding: 12px 32px !important;
-    font-size: 15px !important;
+    transition: box-shadow 0.25s ease, color 0.25s ease, background 0.25s ease, border-color 0.25s ease !important;
 }
 
-.btn:hover {
-    transform: translateY(-3px) scale(1.03);
-}
-
-.btn-primary {
+.btn-kid-primary {
     background: linear-gradient(135deg, var(--soft-blue), var(--soft-purple)) !important;
-    border: none !important;
     color: #fff !important;
-    box-shadow: 0 4px 15px rgba(108,140,255,0.3) !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(63,43,150,0.20) !important;
 }
 
-.btn-primary:hover {
-    box-shadow: 0 8px 25px rgba(108,140,255,0.4) !important;
+.btn-kid-primary:hover { box-shadow: 0 8px 25px rgba(63,43,150,0.30) !important; color: #fff !important; }
+
+.btn-kid-success {
+    background: linear-gradient(135deg, var(--soft-green), #43a047) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(76,175,80,0.20) !important;
+}
+
+.btn-kid-success:hover { box-shadow: 0 8px 25px rgba(76,175,80,0.30) !important; color: #fff !important; }
+
+.btn-outline-kid {
+    border: 1.5px solid rgba(63,43,150,0.15) !important;
+    color: var(--muted) !important;
+    background: rgba(255,255,255,0.4) !important;
+}
+
+.btn-outline-kid:hover {
+    border-color: var(--soft-blue) !important;
+    color: var(--soft-purple) !important;
+    background: rgba(168,192,255,0.10) !important;
+}
+
+/* table row action button (consistent across modules) */
+.btn-action {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 6px 14px !important;
+    font-size: 12.5px !important;
+    border-radius: 50px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    white-space: nowrap;
 }
 
 .btn-action-view {
-    background: linear-gradient(135deg, #b8d4ff, #a8c0ff) !important;
-    border: 2px solid rgba(168,192,255,0.3) !important;
-    color: #2d2d4a !important;
-    padding: 6px 18px !important;
-    font-size: 13px !important;
-    border-radius: 50px !important;
-    font-weight: 700 !important;
-    transition: all 0.3s ease !important;
-    text-decoration: none !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
+    background: linear-gradient(135deg, var(--soft-blue), var(--soft-purple)) !important;
+    border: none !important;
+    color: #fff !important;
+    box-shadow: 0 3px 10px rgba(63,43,150,0.15) !important;
+    transition: box-shadow 0.25s ease !important;
 }
 
 .btn-action-view:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 4px 15px rgba(168,192,255,0.3) !important;
-    color: #1a1a2e !important;
-    text-decoration: none !important;
+    box-shadow: 0 6px 18px rgba(63,43,150,0.28) !important;
+    color: #fff !important;
 }
 
-.btn-outline-secondary {
-    border: 2px solid rgba(108,140,255,0.15) !important;
-    color: #6a6a8a !important;
-    background: rgba(255,255,255,0.3) !important;
-    padding: 10px 24px !important;
-    font-size: 14px !important;
-}
-
-.btn-outline-secondary:hover {
-    background: rgba(108,140,255,0.08) !important;
-    border-color: var(--soft-blue) !important;
-    color: var(--soft-purple) !important;
-}
+.btn-sm { padding: 7px 16px !important; font-size: 12.5px !important; }
 
 /* ===== FILTER SECTION ===== */
 .filter-section {
-    background: rgba(255,255,255,0.6);
-    border-radius: 20px;
-    padding: 20px 24px 16px 24px;
-    margin: 20px 20px 16px 20px;
-    border: 2px solid rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 16px;
+    padding: 18px 20px 16px 20px;
+    margin-bottom: 18px;
 }
 
 .filter-section .filter-label {
-    font-size: 16px;
-    font-weight: 700;
-    color: #2d2d4a;
-    margin-bottom: 10px;
     display: block;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+    margin-bottom: 8px;
 }
 
 .filter-section .filter-row {
@@ -229,386 +205,354 @@ body {
     align-items: flex-end;
 }
 
-.filter-section .filter-item {
-    flex: 1;
-    min-width: 200px;
-}
+.filter-section .filter-item { flex: 1; min-width: 200px; }
 
 /* ===== FORM CONTROLS ===== */
 .form-control {
-    background: rgba(255,255,255,0.85) !important;
-    border: 2px solid rgba(108,140,255,0.12) !important;
-    color: #2d2d4a !important;
-    border-radius: 14px !important;
-    padding: 14px 20px !important;
-    transition: all 0.3s ease !important;
-    font-size: 16px !important;
-    height: 52px !important;
+    background: rgba(255,255,255,0.8) !important;
+    border: 1.5px solid rgba(63,43,150,0.10) !important;
+    color: var(--ink) !important;
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease !important;
+    font-size: 13.5px !important;
+    height: 44px !important;
 }
 
 .form-control:focus {
     background: rgba(255,255,255,0.95) !important;
     border-color: var(--soft-blue) !important;
-    box-shadow: 0 0 0 4px rgba(108,140,255,0.15) !important;
-    color: #2d2d4a !important;
+    box-shadow: 0 0 0 4px rgba(168,192,255,0.15) !important;
+    color: var(--ink) !important;
 }
 
-.form-control::placeholder {
-    color: #b0b0c8 !important;
-    font-size: 15px !important;
-}
+.form-control::placeholder { color: #8f8fae !important; opacity: 1; }
 
 .form-control-sm {
-    border-radius: 12px !important;
-    padding: 12px 18px !important;
-    font-size: 15px !important;
-    height: 46px !important;
+    border-radius: 10px !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    height: 40px !important;
 }
 
 .input-group-text {
-    background: rgba(255,255,255,0.5) !important;
-    border: 2px solid rgba(108,140,255,0.12) !important;
+    background: rgba(168,192,255,0.12) !important;
+    border: 1.5px solid rgba(63,43,150,0.10) !important;
     border-right: none !important;
-    color: #8888aa !important;
-    border-radius: 14px 0 0 14px !important;
-    font-size: 16px !important;
-    padding: 0 20px !important;
+    color: var(--soft-purple) !important;
+    border-radius: 12px 0 0 12px !important;
+    font-size: 13px !important;
 }
 
 .input-group .form-control {
-    border-radius: 0 14px 14px 0 !important;
+    border-radius: 0 6px 6px 0 !important;
     border-left: none !important;
 }
 
+select.form-control option {
+    background: #ffffff !important;
+    color: var(--ink) !important;
+    padding: 10px !important;
+    font-size: 13px !important;
+}
+
+/* ===== PHOTO THUMB ===== */
+.img-circle {
+    border-radius: 50% !important;
+    border: 2px solid rgba(168,192,255,0.35) !important;
+    object-fit: cover !important;
+    transition: border-color 0.25s ease !important;
+}
+
+.img-circle:hover { border-color: var(--soft-pink) !important; }
+
+.photo-empty {
+    border-radius: 50% !important;
+    border: 2px solid rgba(168,192,255,0.25) !important;
+    background: rgba(168,192,255,0.08) !important;
+}
+
+/* ===== QR THUMB ===== */
+.qr-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(63,43,150,0.10);
+    cursor: pointer;
+    object-fit: cover;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.qr-thumb:hover { border-color: var(--soft-blue); box-shadow: 0 4px 12px rgba(63,43,150,0.12); }
+
 /* ===== ALERTS ===== */
 .alert {
-    border-radius: 20px !important;
-    padding: 18px 26px !important;
-    font-size: 16px !important;
-    border: 2px solid transparent !important;
+    border-radius: 16px !important;
+    padding: 14px 20px !important;
+    font-size: 13.5px !important;
+    border: 1.5px solid transparent !important;
     font-weight: 600 !important;
 }
 
 .alert-success {
-    background: rgba(102,187,106,0.12) !important;
-    border-color: rgba(102,187,106,0.2) !important;
-    color: #3a7a3a !important;
+    background: rgba(129,199,132,0.12) !important;
+    border-color: rgba(129,199,132,0.22) !important;
+    color: #2e6b4f !important;
 }
 
 .alert-danger {
-    background: rgba(255,107,122,0.12) !important;
-    border-color: rgba(255,107,122,0.2) !important;
-    color: #aa4a5a !important;
+    background: rgba(245,87,108,0.10) !important;
+    border-color: rgba(245,87,108,0.20) !important;
+    color: #a83748 !important;
 }
 
 /* ===== BREADCRUMB ===== */
-.breadcrumb {
-    background: transparent !important;
-    padding: 0 !important;
-}
+.breadcrumb { background: transparent !important; padding: 0 !important; }
 
 .breadcrumb-item a {
-    color: #8888aa !important;
+    color: var(--muted) !important;
     font-weight: 600 !important;
+    font-size: 13px !important;
     text-decoration: none !important;
-    font-size: 16px !important;
+    transition: color 0.25s ease !important;
 }
 
-.breadcrumb-item a:hover {
-    color: var(--soft-purple) !important;
-}
+.breadcrumb-item a:hover { color: var(--soft-purple) !important; }
 
-.breadcrumb-item.active {
-    color: #2d2d4a !important;
-    font-weight: 700 !important;
-    font-size: 16px !important;
-}
-
-.breadcrumb-item + .breadcrumb-item::before {
-    color: #c0c0d8 !important;
-    content: "›" !important;
-}
-
-/* ===== CONTENT HEADER ===== */
-.content-header h1 {
-    color: #2d2d4a !important;
-    font-weight: 800 !important;
-    font-size: 2.2rem !important;
-}
-
-.content-header h1 i {
-    background: linear-gradient(135deg, var(--soft-blue), var(--soft-pink));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-/* ===== IMAGES ===== */
-.img-circle {
-    border-radius: 50% !important;
-    transition: all 0.3s ease !important;
-    object-fit: cover !important;
-}
-
-.img-circle:hover {
-    transform: scale(1.1);
-}
-
-/* ===== QR CODE ===== */
-.qr-thumb {
-    width: 50px;
-    height: 50px;
-    border-radius: 10px;
-    border: 2px solid rgba(108,140,255,0.1);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    object-fit: cover;
-}
-
-.qr-thumb:hover {
-    transform: scale(1.1);
-    border-color: var(--soft-blue);
-}
+.breadcrumb-item.active { color: var(--ink) !important; font-weight: 700 !important; font-size: 13px !important; }
+.breadcrumb-item + .breadcrumb-item::before { color: var(--faint) !important; content: "›" !important; }
 
 /* ===== EMPTY STATE ===== */
-.text-center.py-5 {
-    color: #b0b0c8 !important;
+.empty-state { color: var(--faint) !important; }
+.empty-state h5 { color: var(--muted) !important; font-size: 1.1rem !important; }
+.empty-state p { color: var(--faint) !important; font-size: 13.5px !important; }
+.empty-state i { color: rgba(168,192,255,0.35) !important; }
+
+/* ===== MODAL ===== */
+.modal-content {
+    border-radius: 20px !important;
+    border: 1px solid rgba(255,255,255,0.8) !important;
+    background: rgba(255,255,255,0.97) !important;
+    box-shadow: 0 20px 60px rgba(63,43,150,0.12) !important;
 }
 
-.text-center.py-5 h5 {
-    color: #7a7a9a !important;
-    font-size: 20px !important;
+.modal-header {
+    border-bottom: 1px solid rgba(63,43,150,0.06) !important;
+    border-radius: 20px 20px 0 0 !important;
+    background: rgba(255,255,255,0.6) !important;
+    padding: 1rem 1.5rem !important;
 }
 
-.text-center.py-5 i {
-    color: rgba(108,140,255,0.12) !important;
+.modal-header h5 { color: var(--ink) !important; font-weight: 700 !important; font-size: 1.05rem !important; }
+
+.modal-footer {
+    border-top: 1px solid rgba(63,43,150,0.06) !important;
+    border-radius: 0 0 20px 20px !important;
+    background: rgba(255,255,255,0.5) !important;
+    padding: 0.9rem 1.5rem !important;
 }
 
-/* ===== KID EMOJI ===== */
-.kid-emoji {
-    display: inline-block;
-    animation: sparkle 2s ease-in-out infinite;
-}
+.modal-body { padding: 1.5rem !important; }
 
-@keyframes sparkle {
-    0%, 100% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.15) rotate(8deg); }
-}
+.modal-content .modal-body img { max-width: 100%; }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .card-body { padding: 1rem !important; }
-    .content-header h1 { font-size: 1.5rem !important; }
-    .table td, .table th { padding: 10px 6px !important; font-size: 12px !important; }
-    .floating-shapes .shape { font-size: 2rem !important; }
-    .btn { font-size: 12px !important; padding: 8px 16px !important; }
-    .filter-section .filter-item { min-width: 100% !important; flex: 1 1 100% !important; }
-    .filter-section { padding: 16px 16px 12px 16px !important; margin: 12px 12px 12px 12px !important; }
-    .btn-action-view { font-size: 11px !important; padding: 4px 12px !important; }
+    .content-header h1 { font-size: 1.35rem !important; }
+    .filter-section { padding: 14px 14px 12px 14px !important; }
+    .filter-section .filter-item { flex: 1 1 100% !important; min-width: 100% !important; }
+    .btn { font-size: 12px !important; padding: 6px 14px !important; }
+    .table thead th { font-size: 11px !important; padding: 10px 8px !important; }
+    .table tbody td { font-size: 12.5px !important; padding: 10px 8px !important; }
+    .btn-action { font-size: 11px !important; padding: 5px 10px !important; }
 }
 
 @media (max-width: 480px) {
-    .card { border-radius: 18px !important; }
-    .table td, .table th { font-size: 10px !important; padding: 6px 3px !important; }
-    .floating-shapes .shape { display: none !important; }
-    .btn-action-view { font-size: 10px !important; padding: 3px 8px !important; }
-    .qr-thumb { width: 35px; height: 35px; }
+    .card { border-radius: 16px !important; }
 }
 </style>
 
-<!-- ===== FLOATING SHAPES ===== -->
-<div class="floating-shapes">
-    <div class="shape">🌈</div>
-    <div class="shape">⭐</div>
-    <div class="shape">🎈</div>
-    <div class="shape">🌸</div>
-    <div class="shape">☁️</div>
-    <div class="shape">🌟</div>
-    <div class="shape">🎉</div>
-</div>
-
 <div class="content-wrapper" style="background: transparent;">
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>
-                        <i class="fas fa-user-friends mr-2"></i>
-                        Parents Management 👨‍👩
-                        <span class="kid-emoji">🌟</span>
-                    </h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right bg-transparent">
-                        <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">🏠 Home</a></li>
-                        <li class="breadcrumb-item active">👨‍👩 Parents</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </div>
+ <div class="content-header">
+ <div class="container-fluid">
+ <div class="row mb-2">
+ <div class="col-sm-6">
+ <h1>
+ <i class="fas fa-user-friends mr-2"></i>
+                        Parents Management
+ </h1>
+ </div>
+ <div class="col-sm-6">
+ <ol class="breadcrumb float-sm-right">
+ <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">Home</a></li>
+ <li class="breadcrumb-item active">Parents</li>
+ </ol>
+ </div>
+ </div>
+ </div>
+ </div>
 
-    <section class="content">
-        <div class="container-fluid">
-            
-            <!-- ALERTS -->
-            <?php if (session()->getFlashdata('msg')): ?>
-            <div class="alert alert-success alert-dismissible fade show">
-                <i class="fas fa-check-circle mr-2"></i> <?= session()->getFlashdata('msg') ?> ✨
-                <button type="button" class="close" data-dismiss="alert" style="color: #2d2d4a;">&times;</button>
-            </div>
-            <?php endif; ?>
+ <section class="content">
+ <div class="container-fluid">
 
-            <?php if (session()->getFlashdata('error')): ?>
-            <div class="alert alert-danger alert-dismissible fade show">
-                <i class="fas fa-exclamation-circle mr-2"></i> <?= session()->getFlashdata('error') ?>
-                <button type="button" class="close" data-dismiss="alert" style="color: #2d2d4a;">&times;</button>
-            </div>
-            <?php endif; ?>
+ <!-- ALERTS -->
+ <?php if (session()->getFlashdata('msg')): ?>
+ <div class="alert alert-success alert-dismissible fade show">
+ <i class="fas fa-check-circle mr-2"></i> <?= session()->getFlashdata('msg') ?>
+ <button type="button" class="close" data-dismiss="alert" style="color: var(--ink);">&times;</button>
+ </div>
+ <?php endif; ?>
 
-            <!-- MAIN CARD -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header pt-3 pb-2">
-                            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-list mr-2" style="color: var(--soft-blue);"></i>
-                                    Parent List 📋
-                                    <span class="badge" style="background: rgba(108,140,255,0.08); color: #2d2d4a; margin-left: 8px; font-weight: 700; font-size: 14px; padding: 8px 18px;">
-                                        <?= count($parents ?? []) ?>
-                                    </span>
-                                </h5>
-                                <span style="color: #b0b0c8; font-size: 13px;">
-                                    <i class="fas fa-info-circle"></i> Parents are added via Student Registration
-                                </span>
-                            </div>
-                        </div>
-                        <div class="card-body pt-0">
-                            
-                            <!-- FILTER SECTION -->
-                            <div class="filter-section">
-                                <div class="filter-row">
-                                    <div class="filter-item">
-                                        <label class="filter-label">🔍 Search Parent</label>
-                                        <div class="input-group input-group-sm">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                            </div>
-                                            <input type="text" id="searchParent" class="form-control form-control-sm" placeholder="Search name or phone...">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+ <?php if (session()->getFlashdata('error')): ?>
+ <div class="alert alert-danger alert-dismissible fade show">
+ <i class="fas fa-exclamation-circle mr-2"></i> <?= session()->getFlashdata('error') ?>
+ <button type="button" class="close" data-dismiss="alert" style="color: var(--ink);">&times;</button>
+ </div>
+ <?php endif; ?>
 
-                            <!-- TABLE -->
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead class="bg-light">
-                                        <tr>
-                                            <th style="width:50px;">#</th>
-                                            <th style="width:70px;">📸 Photo</th>
-                                            <th>👤 Name</th>
-                                            <th style="width:130px;">📱 Phone</th>
-                                            <th>🎓 Student/Grade</th>
-                                            <th style="width:100px;">🤝 Relation</th>
-                                            <th style="width:80px;">📱 QR</th>
-                                            <th style="width:130px;">📅 Created</th>
-                                            <th style="width:100px;">👁️ View</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php if (!empty($parents)): ?>
-                                            <?php $i = 1; foreach ($parents as $p): ?>
-                                            <tr class="parent-row" data-search="<?= esc(strtolower($p['fname'].' '.($p['mname']??'').' '.$p['lname'].' '.$p['phone'])) ?>">
-                                                <td style="color: #b0b0c8; font-size: 15px; font-weight: 700;"><?= $i++ ?></td>
-                                                <td>
-                                                    <?php if(!empty($p['picture'])): ?>
-                                                        <img src="<?= base_url('uploads/parents/'.$p['picture']) ?>" class="img-circle" style="width:50px;height:50px;border:3px solid var(--soft-blue);">
-                                                    <?php else: ?>
-                                                        <div class="img-circle d-flex align-items-center justify-content-center" style="width:50px;height:50px;border:3px solid var(--soft-blue);background:rgba(255,255,255,0.3);">
-                                                            <i class="fas fa-user fa-2x" style="color: #b0b0c8;"></i>
-                                                        </div>
-                                                    <?php endif; ?>
-                                                </td>
-                                                <td>
-                                                    <strong style="color: #2d2d4a; font-size: 16px;"><?= esc($p['fname']) ?> <?= esc($p['lname']) ?></strong>
-                                                    <?php if(!empty($p['mname'])): ?>
-                                                        <br><small style="color: #b0b0c8; font-size: 13px;"><?= esc($p['mname']) ?></small>
-                                                    <?php endif; ?>
-                                                </td>
-                                                <td><code><?= esc($p['phone']) ?></code></td>
-                                                <td>
-                                                    <?php if(!empty($p['student_fname'])): ?>
-                                                        <strong style="color: #2d2d4a;"><?= esc($p['student_fname']) ?> <?= esc($p['student_lname'] ?? '') ?></strong>
-                                                        <br><small style="color: #b0b0c8;"><?= esc($p['student_grade'] ?? '') ?></small>
-                                                    <?php else: ?>
-                                                        <span style="color: #b0b0c8;">No students</span>
-                                                    <?php endif; ?>
-                                                </td>
-                                                <td>
-                                                    <?php if(!empty($p['relation'])): ?>
-                                                        <span class="badge badge-primary"><?= esc($p['relation']) ?></span>
-                                                    <?php else: ?>
-                                                        <span class="badge badge-light">Parent</span>
-                                                    <?php endif; ?>
-                                                </td>
-                                                <td>
-                                                    <?php if(!empty($p['qr_code'])): ?>
-                                                        <img src="<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>" 
+ <!-- MAIN CARD -->
+ <div class="row">
+ <div class="col-12">
+ <div class="card">
+ <div class="card-header">
+ <div class="d-flex justify-content-between align-items-center flex-wrap">
+ <h5 class="mb-0">
+ <i class="fas fa-list-ul mr-2" style="color: var(--soft-blue);"></i>
+                                    Parent List
+ <span class="badge badge-soft ml-2"><?= count($parents ?? []) ?></span>
+ </h5>
+ <span style="color: var(--faint); font-size: 12.5px;">
+ <i class="fas fa-info-circle mr-1"></i>Passwords are auto-generated and sent via SMS on registration
+ </span>
+ </div>
+ </div>
+ <div class="card-body pt-0">
+
+ <!-- FILTER SECTION -->
+ <div class="filter-section">
+ <div class="filter-row">
+ <div class="filter-item">
+ <label class="filter-label">Search Parent</label>
+ <div class="input-group input-group-sm">
+ <div class="input-group-prepend">
+ <span class="input-group-text"><i class="fas fa-search"></i></span>
+ </div>
+ <input type="text" id="searchParent" class="form-control form-control-sm" placeholder="Search name or phone...">
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- TABLE -->
+ <div class="table-responsive">
+ <table class="table table-hover">
+ <thead>
+ <tr>
+ <th style="width:50px;">#</th>
+ <th style="width:60px;">Photo</th>
+ <th>Name</th>
+ <th>Phone</th>
+ <th>Student / Grade</th>
+ <th>Relation</th>
+ <th style="width:70px;">QR</th>
+ <th>Created</th>
+ <th class="text-center" style="width:120px;">Action</th>
+ </tr>
+ </thead>
+ <tbody>
+ <?php if (!empty($parents)): ?>
+ <?php $i = 1; foreach ($parents as $p): ?>
+ <tr class="parent-row" data-search="<?= esc(strtolower($p['fname'].' '.($p['mname']??'').' '.$p['lname'].' '.$p['phone'])) ?>">
+ <td class="num"><?= $i++ ?></td>
+ <td>
+ <?php if(!empty($p['picture'])): ?>
+ <img src="<?= base_url('uploads/parents/'.$p['picture']) ?>" class="img-circle" style="width:42px;height:42px;">
+ <?php else: ?>
+ <div class="photo-empty d-flex align-items-center justify-content-center" style="width:42px;height:42px;">
+ <i class="fas fa-user" style="color: var(--faint); font-size: 16px;"></i>
+ </div>
+ <?php endif; ?>
+ </td>
+ <td>
+ <div class="parent-name"><?= esc($p['fname']) ?> <?= esc($p['lname']) ?></div>
+ <?php if(!empty($p['mname'])): ?>
+ <div class="muted"><?= esc($p['mname']) ?></div>
+ <?php endif; ?>
+ </td>
+ <td><code><?= esc($p['phone']) ?></code></td>
+ <td>
+ <?php if(!empty($p['student_fname'])): ?>
+ <div class="parent-name"><?= esc($p['student_fname']) ?> <?= esc($p['student_lname'] ?? '') ?></div>
+ <div class="muted"><?= esc($p['student_grade'] ?? '') ?></div>
+ <?php else: ?>
+ <span class="muted">No students</span>
+ <?php endif; ?>
+ </td>
+ <td>
+ <?php if(!empty($p['relation'])): ?>
+ <span class="badge badge-primary"><?= esc($p['relation']) ?></span>
+ <?php else: ?>
+ <span class="badge badge-soft">Parent</span>
+ <?php endif; ?>
+ </td>
+ <td>
+ <?php if(!empty($p['qr_code'])): ?>
+ <img src="<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>"
                                                              class="qr-thumb"
                                                              onclick="openQrModal('<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>')"
-                                                             title="Click to enlarge 📱">
-                                                    <?php else: ?>
-                                                        <span style="color: #b0b0c8; font-size: 12px;">No QR</span>
-                                                    <?php endif; ?>
-                                                </td>
-                                                <td style="color: #8888aa; font-size: 14px;"><?= date('M d, Y', strtotime($p['created_at'])) ?></td>
-                                                <td>
-                                                    <a href="<?= base_url('parents-view/'.$p['id']) ?>" class="btn-action-view" title="View Parent Details 👁️">
-                                                        <i class="fas fa-eye"></i> View
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
-                                            <tr>
-                                                <td colspan="9" class="text-center py-5">
-                                                    <i class="fas fa-user-friends fa-3x mb-3 d-block" style="color: rgba(108,140,255,0.12);"></i>
-                                                    <h5 style="color: #7a7a9a; font-size: 20px;">No parents registered yet 😊</h5>
-                                                    <p style="color: #b0b0c8; font-size: 16px;">Parents are automatically registered when adding a student. ✨</p>
-                                                </td>
-                                            </tr>
-                                        <?php endif; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+                                                             title="Click to enlarge">
+ <?php else: ?>
+ <span class="muted" style="font-size:12px;">No QR</span>
+ <?php endif; ?>
+ </td>
+ <td class="muted"><?= date('M d, Y', strtotime($p['created_at'])) ?></td>
+ <td class="text-center">
+ <a href="<?= base_url('parents-view/'.$p['id']) ?>" class="btn-action btn-action-view" title="View Parent Details">
+ <i class="fas fa-eye"></i> View
+ </a>
+ </td>
+ </tr>
+ <?php endforeach; ?>
+ <?php else: ?>
+ <tr>
+ <td colspan="9" class="text-center py-5 empty-state">
+ <i class="fas fa-user-friends fa-3x mb-3 d-block"></i>
+ <h5>No parents registered yet</h5>
+ <p>Parents are automatically registered when adding a student. Their password is sent via SMS.</p>
+ </td>
+ </tr>
+ <?php endif; ?>
+ </tbody>
+ </table>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </section>
 </div>
 
 <!-- ===== QR MODAL ===== -->
 <div class="modal fade" id="qrModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5><i class="fas fa-qrcode mr-2" style="color: var(--soft-blue);"></i>QR Code 📱</h5>
-                <button type="button" class="close" data-dismiss="modal" style="color: #2d2d4a;">&times;</button>
-            </div>
-            <div class="modal-body text-center" style="background: #fff; border-radius: 0 0 25px 25px; padding: 30px;">
-                <img id="qrFullImage" src="" style="max-width:100%;max-height:65vh;">
-            </div>
-            <div class="modal-footer">
-                <a id="qrDownloadBtn" href="" download="qr.png" class="btn btn-primary btn-sm">
-                    <i class="fas fa-download"></i> Download 💾
-                </a>
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">Close ❌</button>
-            </div>
-        </div>
-    </div>
+ <div class="modal-dialog modal-dialog-centered modal-lg">
+ <div class="modal-content">
+ <div class="modal-header">
+ <h5><i class="fas fa-qrcode mr-2" style="color: var(--soft-blue);"></i>QR Code</h5>
+ <button type="button" class="close" data-dismiss="modal" style="color: var(--ink);">&times;</button>
+ </div>
+ <div class="modal-body text-center" style="background: #fff;">
+ <img id="qrFullImage" src="" style="max-width:100%;max-height:65vh;border-radius:12px;">
+ </div>
+ <div class="modal-footer">
+ <a id="qrDownloadBtn" href="" download="qr.png" class="btn btn-kid-primary btn-sm">
+ <i class="fas fa-download mr-1"></i> Download
+ </a>
+ <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">Close</button>
+ </div>
+ </div>
+ </div>
 </div>
 
 <?= $this->endSection() ?>
@@ -629,7 +573,7 @@ $(function(){
 // ===== OPEN QR MODAL =====
 function openQrModal(u) {
     if (!u) { 
-        alert('📱 No QR code available. 😊'); 
+        alert('No QR code available.'); 
         return; 
     }
     $('#qrFullImage').attr('src', u);

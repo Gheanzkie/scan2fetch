@@ -53,6 +53,15 @@ class Parents extends BaseController
             ->get()
             ->getResultArray();
 
+        $teachers = $db->table('teachers')->get()->getResultArray();
+        $teacherMap = [];
+        foreach ($teachers as $t) {
+            if (!isset($teacherMap[$t['grade_section']])) {
+                $teacherMap[$t['grade_section']] = $t['fname'] . ' ' . $t['lname'];
+            }
+        }
+        $data['teacherMap'] = $teacherMap;
+
         $data['subFetchers'] = $this->subFetcherModel->where('parent_id', $id)->findAll();
 
         return view('parents_view', $data);
@@ -71,12 +80,14 @@ class Parents extends BaseController
     {
         $picture = $this->uploadPicture('picture');
         $qrValue = $this->generateQR();
+        $password = $this->generatePassword();
+
         $this->parentsModel->save([
             'fname' => $this->request->getPost('fname'),
             'mname' => $this->request->getPost('mname'),
             'lname' => $this->request->getPost('lname'),
             'phone' => $this->request->getPost('phone'),
-            'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+            'password' => password_hash($password, PASSWORD_DEFAULT),
             'picture' => $picture,
             'qr_code' => $qrValue,
             'created_by' => session('user_id'),
@@ -89,7 +100,43 @@ class Parents extends BaseController
             'parent',
             'Created parent: ' . $this->request->getPost('fname') . ' ' . $this->request->getPost('lname')
         );
-        return redirect()->to('/parents')->with('msg', 'Parent added');
+
+        $this->sendLocalSms(
+            $this->request->getPost('phone'),
+            'Your Scan2Fetch account password is: ' . $password . ' (recorded in SMS logs).'
+        );
+
+        $msg = 'Parent added';
+        return redirect()->to('/parents')->with('msg', $msg);
+    }
+
+    // ===== SEND / RESET PASSWORD VIA SMS =====
+    public function sendPassword($id)
+    {
+        $parent = $this->parentsModel->find($id);
+        if (!$parent) {
+            return redirect()->to('/parents')->with('error', 'Parent not found');
+        }
+
+        $password = $this->generatePassword();
+        $this->parentsModel->update($id, ['password' => password_hash($password, PASSWORD_DEFAULT)]);
+
+        $this->sendLocalSms(
+            $parent['phone'],
+            'Your new Scan2Fetch account password is: ' . $password . ' (recorded in SMS logs).'
+        );
+
+        $this->logModel->addLog(
+            session('user_id'),
+            session('fname') . ' ' . session('lname'),
+            session('role'),
+            'update',
+            'parent',
+            'Reset password and sent via SMS for parent: ' . $parent['fname'] . ' ' . $parent['lname'] . ' (ID: ' . $id . ')'
+        );
+
+        $msg = 'New password recorded in SMS logs.';
+        return redirect()->to('/parents-view/' . $id)->with('msg', $msg);
     }
 
     public function update()
@@ -476,7 +523,7 @@ class Parents extends BaseController
 
     private function generateQR()
     {
-        $qrValue = 'QR-' . strtoupper(bin2hex(random_bytes(6)));
+        $qrValue = $this->generateQrValue();
         include_once('phpqrcode/qrlib.php');
         
         $qrImagePath = 'uploads/qr/' . $qrValue . '_qrcode.png';

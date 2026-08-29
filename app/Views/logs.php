@@ -28,14 +28,12 @@ body {
     border-radius: 25px !important;
     border: 1px solid rgba(255,255,255,0.6) !important;
     background: rgba(255,255,255,0.7) !important;
-    backdrop-filter: blur(15px);
     box-shadow: 0 8px 30px rgba(0,0,0,0.04) !important;
     overflow: hidden !important;
     transition: all 0.3s ease !important;
 }
 
 .card:hover {
-    transform: translateY(-3px);
     box-shadow: 0 12px 40px rgba(0,0,0,0.06) !important;
 }
 
@@ -65,13 +63,11 @@ body {
     border-radius: 20px !important;
     border: 1px solid rgba(255,255,255,0.5) !important;
     background: rgba(255,255,255,0.6) !important;
-    backdrop-filter: blur(10px);
     transition: all 0.3s ease !important;
     box-shadow: 0 4px 15px rgba(0,0,0,0.03) !important;
 }
 
 .info-box:hover {
-    transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0,0,0,0.06) !important;
 }
 
@@ -129,7 +125,6 @@ body {
 
 .table tbody tr:hover {
     background: rgba(168,192,255,0.06) !important;
-    transform: scale(1.01);
 }
 
 .table tbody td {
@@ -171,104 +166,62 @@ body {
 
 /* ===== BUTTONS ===== */
 .btn {
-    border-radius: 50px !important;
+    border-radius: 6px !important;
     font-weight: 600 !important;
-    transition: all 0.3s ease !important;
-    padding: 8px 20px !important;
+    transition: all .15s ease !important;
+    padding: 8px 16px !important;
     font-size: 13px !important;
 }
 
-.btn:hover {
-    transform: translateY(-3px) scale(1.03);
-}
-
 .btn-group .btn {
-    border-radius: 50px !important;
-    border: 1px solid rgba(160,160,180,0.15) !important;
-    background: rgba(255,255,255,0.5) !important;
-    color: #7a7a9a !important;
-    transition: all 0.3s ease !important;
-    font-weight: 500 !important;
-    padding: 8px 18px !important;
+    border-radius: 6px !important;
+    border: 1px solid #cbd5e1 !important;
+    background: #fff !important;
+    color: #475569 !important;
+    font-weight: 600 !important;
+    padding: 7px 16px !important;
     font-size: 13px !important;
 }
 
 .btn-group .btn:hover {
-    background: rgba(168,192,255,0.1) !important;
-    color: var(--soft-purple) !important;
+    background: #f1f5f9 !important;
+    color: #1e293b !important;
 }
 
 .btn-group .btn.active {
-    background: linear-gradient(135deg, var(--soft-blue), var(--soft-purple)) !important;
+    background: #4361ee !important;
     color: #fff !important;
-    border-color: var(--soft-blue) !important;
-    box-shadow: 0 4px 15px rgba(63,43,150,0.2) !important;
-}
-
-.btn-outline-primary {
-    border-color: rgba(168,192,255,0.3) !important;
-    color: #5a5a8a !important;
+    border-color: #4361ee !important;
 }
 
 .btn-outline-primary.active {
-    background: linear-gradient(135deg, var(--soft-blue), var(--soft-purple)) !important;
+    background: #4361ee !important;
     color: #fff !important;
-    border-color: var(--soft-blue) !important;
-}
-
-.btn-outline-success {
-    border-color: rgba(129,199,132,0.3) !important;
-    color: #5a7a5a !important;
+    border-color: #4361ee !important;
 }
 
 .btn-outline-success.active {
-    background: var(--soft-green) !important;
+    background: #16a34a !important;
     color: #fff !important;
-    border-color: var(--soft-green) !important;
-}
-
-.btn-outline-danger {
-    border-color: rgba(245,87,108,0.3) !important;
-    color: #8a5a5a !important;
+    border-color: #16a34a !important;
 }
 
 .btn-outline-danger.active {
-    background: var(--soft-rose) !important;
+    background: #dc2626 !important;
     color: #fff !important;
-    border-color: var(--soft-rose) !important;
-}
-
-.btn-outline-warning {
-    border-color: rgba(255,183,77,0.3) !important;
-    color: #8a7a4a !important;
+    border-color: #dc2626 !important;
 }
 
 .btn-outline-warning.active {
-    background: var(--soft-orange) !important;
+    background: #d97706 !important;
     color: #fff !important;
-    border-color: var(--soft-orange) !important;
-}
-
-.btn-outline-dark {
-    border-color: rgba(160,160,180,0.2) !important;
-    color: #7a7a9a !important;
+    border-color: #d97706 !important;
 }
 
 .btn-outline-dark.active {
-    background: rgba(160,160,180,0.15) !important;
-    color: #4a4a6a !important;
-    border-color: rgba(160,160,180,0.2) !important;
-}
-
-.btn-outline-secondary {
-    border-color: rgba(160,160,180,0.15) !important;
-    color: #7a7a9a !important;
-    background: rgba(255,255,255,0.3) !important;
-}
-
-.btn-outline-secondary:hover {
-    background: rgba(168,192,255,0.08) !important;
-    color: var(--soft-purple) !important;
+    background: #1e293b !important;
+    color: #fff !important;
+    border-color: #1e293b !important;
 }
 
 /* ===== FILTERS SECTION ===== */
@@ -325,7 +278,8 @@ body {
 }
 
 .form-control::placeholder {
-    color: #b0b0c8 !important;
+    color: #8f8fae !important;
+    opacity: 1;
 }
 
 .form-control-sm {
@@ -361,7 +315,7 @@ select.form-control option {
 }
 
 .input-group .form-control {
-    border-radius: 0 12px 12px 0 !important;
+    border-radius: 0 6px 6px 0 !important;
     border-left: none !important;
 }
 
@@ -521,191 +475,191 @@ select.form-control option {
 </style>
 
 <div class="content-wrapper" style="background: transparent;">
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>
-                        <i class="fas fa-history mr-2"></i>
-                        Activity Logs 📋
-                    </h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right bg-transparent">
-                        <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">🏠 Home</a></li>
-                        <li class="breadcrumb-item active">📋 Activity Logs</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </div>
+ <div class="content-header">
+ <div class="container-fluid">
+ <div class="row mb-2">
+ <div class="col-sm-6">
+ <h1>
+ <i class="fas fa-history mr-2"></i>
+                        Activity Logs
+ </h1>
+ </div>
+ <div class="col-sm-6">
+ <ol class="breadcrumb float-sm-right">
+ <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">Home</a></li>
+ <li class="breadcrumb-item active">Activity Logs</li>
+ </ol>
+ </div>
+ </div>
+ </div>
+ </div>
 
-    <section class="content">
-        <div class="container-fluid">
+ <section class="content">
+ <div class="container-fluid">
 
-            <?php 
+ <?php 
             $f = $_GET['filter'] ?? 'today'; 
             $m = $_GET['module'] ?? ''; 
             $d = $_GET['date'] ?? date('Y-m-d'); 
             ?>
 
-            <!-- ===== QUICK STATS ===== -->
-            <div class="row">
-                <div class="col-lg-3 col-6 mb-3">
-                    <div class="info-box">
-                        <span class="info-box-icon" style="background: linear-gradient(135deg, var(--soft-blue), var(--soft-purple));">
-                            <i class="fas fa-list"></i>
-                        </span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">📊 Total Logs</span>
-                            <span class="info-box-number" id="totalCount"><?= count($logs ?? []) ?></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6 mb-3">
-                    <div class="info-box">
-                        <span class="info-box-icon" style="background: linear-gradient(135deg, var(--soft-green), #43a047);">
-                            <i class="fas fa-check-circle"></i>
-                        </span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">✅ Releases</span>
-                            <span class="info-box-number" id="releaseCount"><?= count(array_filter($logs ?? [], function($l){ return ($l['action']??'') == 'release'; })) ?></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6 mb-3">
-                    <div class="info-box">
-                        <span class="info-box-icon" style="background: linear-gradient(135deg, var(--soft-rose), #d32f2f);">
-                            <i class="fas fa-times-circle"></i>
-                        </span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">❌ Declined</span>
-                            <span class="info-box-number" id="declineCount"><?= count(array_filter($logs ?? [], function($l){ return ($l['action']??'') == 'decline'; })) ?></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6 mb-3">
-                    <div class="info-box">
-                        <span class="info-box-icon" style="background: linear-gradient(135deg, var(--soft-teal), #00897b);">
-                            <i class="fas fa-calendar-day"></i>
-                        </span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">📅 Today</span>
-                            <span class="info-box-number"><?= count(array_filter($logs ?? [], function($l){ return date('Y-m-d', strtotime($l['created_at']??'')) == date('Y-m-d'); })) ?></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+ <!-- ===== QUICK STATS ===== -->
+ <div class="row">
+ <div class="col-lg-3 col-6 mb-3">
+ <div class="info-box">
+ <span class="info-box-icon" style="background: #4361ee; color: #fff;">
+ <i class="fas fa-list"></i>
+ </span>
+ <div class="info-box-content">
+ <span class="info-box-text"> Total Logs</span>
+ <span class="info-box-number" id="totalCount"><?= count($logs ?? []) ?></span>
+ </div>
+ </div>
+ </div>
+ <div class="col-lg-3 col-6 mb-3">
+ <div class="info-box">
+ <span class="info-box-icon" style="background: #16a34a; color: #fff;">
+ <i class="fas fa-check-circle"></i>
+ </span>
+ <div class="info-box-content">
+ <span class="info-box-text"> Releases</span>
+ <span class="info-box-number" id="releaseCount"><?= count(array_filter($logs ?? [], function($l){ return ($l['action']??'') == 'release'; })) ?></span>
+ </div>
+ </div>
+ </div>
+ <div class="col-lg-3 col-6 mb-3">
+ <div class="info-box">
+ <span class="info-box-icon" style="background: #dc2626; color: #fff;">
+ <i class="fas fa-times-circle"></i>
+ </span>
+ <div class="info-box-content">
+ <span class="info-box-text"> Declined</span>
+ <span class="info-box-number" id="declineCount"><?= count(array_filter($logs ?? [], function($l){ return ($l['action']??'') == 'decline'; })) ?></span>
+ </div>
+ </div>
+ </div>
+ <div class="col-lg-3 col-6 mb-3">
+ <div class="info-box">
+ <span class="info-box-icon" style="background: #0284c7; color: #fff;">
+ <i class="fas fa-calendar-day"></i>
+ </span>
+ <div class="info-box-content">
+ <span class="info-box-text"> Today</span>
+ <span class="info-box-number"><?= count(array_filter($logs ?? [], function($l){ return date('Y-m-d', strtotime($l['created_at']??'')) == date('Y-m-d'); })) ?></span>
+ </div>
+ </div>
+ </div>
+ </div>
 
-            <!-- ===== FILTERS ===== -->
-            <div class="filter-section">
-                <form method="get" action="<?= base_url('logs') ?>" id="filterForm">
-                    <div class="filter-row">
-                        <!-- Date Filters -->
-                        <div class="filter-item">
-                            <label class="filter-label">📅 Date Filter</label>
-                            <div class="btn-group btn-group-sm" style="flex-wrap: wrap; gap: 4px;">
-                                <a href="<?= base_url('logs?filter=today') ?>" class="btn <?= ($f == 'today') ? 'active' : 'btn-outline-primary' ?>">Today</a>
-                                <a href="<?= base_url('logs?filter=yesterday') ?>" class="btn <?= ($f == 'yesterday') ? 'active' : 'btn-outline-primary' ?>">Yesterday</a>
-                                <a href="<?= base_url('logs?filter=week') ?>" class="btn <?= ($f == 'week') ? 'active' : 'btn-outline-primary' ?>">Week</a>
-                                <a href="<?= base_url('logs?filter=month') ?>" class="btn <?= ($f == 'month') ? 'active' : 'btn-outline-primary' ?>">Month</a>
-                                <a href="<?= base_url('logs') ?>" class="btn <?= ($f == '' || $f == 'all') ? 'active' : 'btn-outline-primary' ?>">All</a>
-                            </div>
-                        </div>
+ <!-- ===== FILTERS ===== -->
+ <div class="filter-section">
+ <form method="get" action="<?= base_url('logs') ?>" id="filterForm">
+ <div class="filter-row">
+ <!-- Date Filters -->
+ <div class="filter-item">
+ <label class="filter-label"> Date Filter</label>
+ <div class="btn-group btn-group-sm" style="flex-wrap: wrap; gap: 4px;">
+ <a href="<?= base_url('logs?filter=today') ?>" class="btn <?= ($f == 'today') ? 'active' : 'btn-outline-primary' ?>">Today</a>
+ <a href="<?= base_url('logs?filter=yesterday') ?>" class="btn <?= ($f == 'yesterday') ? 'active' : 'btn-outline-primary' ?>">Yesterday</a>
+ <a href="<?= base_url('logs?filter=week') ?>" class="btn <?= ($f == 'week') ? 'active' : 'btn-outline-primary' ?>">Week</a>
+ <a href="<?= base_url('logs?filter=month') ?>" class="btn <?= ($f == 'month') ? 'active' : 'btn-outline-primary' ?>">Month</a>
+ <a href="<?= base_url('logs') ?>" class="btn <?= ($f == '' || $f == 'all') ? 'active' : 'btn-outline-primary' ?>">All</a>
+ </div>
+ </div>
 
-                        <!-- Action Filters -->
-                        <div class="filter-item">
-                            <label class="filter-label">⚡ Action</label>
-                            <div class="btn-group btn-group-sm" style="flex-wrap: wrap; gap: 4px;">
-                                <a href="<?= base_url('logs?filter=release') ?>" class="btn <?= ($f == 'release') ? 'active' : 'btn-outline-success' ?>">✅ Releases</a>
-                                <a href="<?= base_url('logs?filter=decline') ?>" class="btn <?= ($f == 'decline') ? 'active' : 'btn-outline-danger' ?>">❌ Declined</a>
-                                <a href="<?= base_url('logs?filter=create') ?>" class="btn <?= ($f == 'create') ? 'active' : 'btn-outline-warning' ?>">➕ Created</a>
-                                <a href="<?= base_url('logs?filter=delete') ?>" class="btn <?= ($f == 'delete') ? 'active' : 'btn-outline-dark' ?>">🗑️ Deleted</a>
-                            </div>
-                        </div>
-                    </div>
+ <!-- Action Filters -->
+ <div class="filter-item">
+ <label class="filter-label"> Action</label>
+ <div class="btn-group btn-group-sm" style="flex-wrap: wrap; gap: 4px;">
+ <a href="<?= base_url('logs?filter=release') ?>" class="btn <?= ($f == 'release') ? 'active' : 'btn-outline-success' ?>"> Releases</a>
+ <a href="<?= base_url('logs?filter=decline') ?>" class="btn <?= ($f == 'decline') ? 'active' : 'btn-outline-danger' ?>"> Declined</a>
+ <a href="<?= base_url('logs?filter=create') ?>" class="btn <?= ($f == 'create') ? 'active' : 'btn-outline-warning' ?>"> Created</a>
+ <a href="<?= base_url('logs?filter=delete') ?>" class="btn <?= ($f == 'delete') ? 'active' : 'btn-outline-dark' ?>"> Deleted</a>
+ </div>
+ </div>
+ </div>
 
-                    <div class="filter-row" style="margin-top: 10px;">
-                        <!-- Module -->
-                        <div class="filter-item">
-                            <label class="filter-label">📦 Module</label>
-                            <select name="module" class="form-control form-control-sm" onchange="this.form.submit()">
-                                <option value="">All Modules</option>
-                                <option value="auth" <?= ($m == 'auth') ? 'selected' : '' ?>>Auth</option>
-                                <option value="student" <?= ($m == 'student') ? 'selected' : '' ?>>Students</option>
-                                <option value="parent" <?= ($m == 'parent') ? 'selected' : '' ?>>Parents</option>
-                                <option value="sub_fetcher" <?= ($m == 'sub_fetcher') ? 'selected' : '' ?>>Sub-Fetchers</option>
-                                <option value="staff" <?= ($m == 'staff') ? 'selected' : '' ?>>Staffs</option>
-                                <option value="authorization" <?= ($m == 'authorization') ? 'selected' : '' ?>>Authorization</option>
-                                <option value="scan" <?= ($m == 'scan') ? 'selected' : '' ?>>QR Scan</option>
-                            </select>
-                        </div>
+ <div class="filter-row" style="margin-top: 10px;">
+ <!-- Module -->
+ <div class="filter-item">
+ <label class="filter-label"> Module</label>
+ <select name="module" class="form-control form-control-sm" onchange="this.form.submit()">
+ <option value="">All Modules</option>
+ <option value="auth" <?= ($m == 'auth') ? 'selected' : '' ?>>Auth</option>
+ <option value="student" <?= ($m == 'student') ? 'selected' : '' ?>>Students</option>
+ <option value="parent" <?= ($m == 'parent') ? 'selected' : '' ?>>Parents</option>
+ <option value="sub_fetcher" <?= ($m == 'sub_fetcher') ? 'selected' : '' ?>>Sub-Fetchers</option>
+ <option value="staff" <?= ($m == 'staff') ? 'selected' : '' ?>>Staffs</option>
+ <option value="authorization" <?= ($m == 'authorization') ? 'selected' : '' ?>>Authorization</option>
+ <option value="scan" <?= ($m == 'scan') ? 'selected' : '' ?>>QR Scan</option>
+ </select>
+ </div>
 
-                        <!-- Date Picker -->
-                        <div class="filter-item">
-                            <label class="filter-label">📅 Specific Date</label>
-                            <input type="date" name="date" class="form-control form-control-sm" value="<?= $d ?>" onchange="this.form.submit()">
-                        </div>
+ <!-- Date Picker -->
+ <div class="filter-item">
+ <label class="filter-label"> Specific Date</label>
+ <input type="date" name="date" class="form-control form-control-sm" value="<?= $d ?>" onchange="this.form.submit()">
+ </div>
 
-                        <!-- Reset & Refresh -->
-                        <div class="filter-item-sm">
-                            <label class="filter-label">&nbsp;</label>
-                            <div style="display: flex; gap: 6px;">
-                                <a href="<?= base_url('logs') ?>" class="btn btn-outline-secondary btn-sm" style="flex:1;">
-                                    <i class="fas fa-times"></i> Reset
-                                </a>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="location.reload()" title="Refresh">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
+ <!-- Reset & Refresh -->
+ <div class="filter-item-sm">
+ <label class="filter-label">&nbsp;</label>
+ <div style="display: flex; gap: 6px;">
+ <a href="<?= base_url('logs') ?>" class="btn btn-outline-secondary btn-sm" style="flex:1;">
+ <i class="fas fa-times"></i> Reset
+ </a>
+ <button type="button" class="btn btn-outline-secondary btn-sm" onclick="location.reload()" title="Refresh">
+ <i class="fas fa-sync-alt"></i>
+ </button>
+ </div>
+ </div>
+ </div>
+ </form>
+ </div>
 
-            <!-- ===== TABLE ===== -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header pt-3 pb-2">
-                            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-list mr-2" style="color: var(--soft-blue);"></i>
-                                    System Activity 📋
-                                    <span class="badge" style="background: rgba(160,160,180,0.1); color: #7a7a9a; margin-left: 8px; font-weight: 600; font-size: 12px; padding: 6px 14px;">
-                                        <?= count($logs ?? 0) ?>
-                                    </span>
-                                </h5>
-                                <small style="color: #b0b0c8; font-size: 12px;">
-                                    <?php if ($f == 'today'): ?>📅 Showing today's logs
-                                    <?php elseif ($f == 'yesterday'): ?>📆 Showing yesterday's logs
-                                    <?php elseif ($f == 'week'): ?>📊 Showing this week's logs
-                                    <?php elseif ($f == 'month'): ?>📈 Showing this month's logs
-                                    <?php elseif ($f != '' && $f != 'all'): ?>🔍 Filtered by: <?= ucfirst($f) ?>
-                                    <?php else: ?>📋 Showing all logs
-                                    <?php endif; ?>
-                                    <?= $m ? ' | Module: ' . ucfirst(str_replace('_', ' ', $m)) : '' ?>
-                                    <?= $d ? ' | Date: ' . date('M d, Y', strtotime($d)) : '' ?>
-                                </small>
-                            </div>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th style="width:45px;">#</th>
-                                            <th style="width:150px;">📅 Date/Time</th>
-                                            <th style="width:120px;">👤 User</th>
-                                            <th style="width:80px;">🎭 Role</th>
-                                            <th style="width:100px;">⚡ Action</th>
-                                            <th style="width:100px;">📦 Module</th>
-                                            <th>📝 Description</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php if (!empty($logs)): $i = 1; foreach ($logs as $log): ?>
-                                        <?php
+ <!-- ===== TABLE ===== -->
+ <div class="row">
+ <div class="col-12">
+ <div class="card">
+ <div class="card-header pt-3 pb-2">
+ <div class="d-flex justify-content-between align-items-center flex-wrap">
+ <h5 class="mb-0">
+ <i class="fas fa-list mr-2" style="color: var(--soft-blue);"></i>
+                                    System Activity
+ <span class="badge" style="background: rgba(160,160,180,0.1); color: #7a7a9a; margin-left: 8px; font-weight: 600; font-size: 12px; padding: 6px 14px;">
+ <?= count($logs ?? 0) ?>
+ </span>
+ </h5>
+ <small style="color: #b0b0c8; font-size: 12px;">
+ <?php if ($f == 'today'): ?> Showing today's logs
+ <?php elseif ($f == 'yesterday'): ?> Showing yesterday's logs
+ <?php elseif ($f == 'week'): ?> Showing this week's logs
+ <?php elseif ($f == 'month'): ?> Showing this month's logs
+ <?php elseif ($f != '' && $f != 'all'): ?> Filtered by: <?= ucfirst($f) ?>
+ <?php else: ?> Showing all logs
+ <?php endif; ?>
+ <?= $m ? ' | Module: ' . ucfirst(str_replace('_', ' ', $m)) : '' ?>
+ <?= $d ? ' | Date: ' . date('M d, Y', strtotime($d)) : '' ?>
+ </small>
+ </div>
+ </div>
+ <div class="card-body p-0">
+ <div class="table-responsive">
+ <table class="table table-hover mb-0">
+ <thead>
+ <tr>
+ <th style="width:45px;">#</th>
+ <th style="width:150px;"> Date/Time</th>
+ <th style="width:120px;"> User</th>
+ <th style="width:80px;"> Role</th>
+ <th style="width:100px;"> Action</th>
+ <th style="width:100px;"> Module</th>
+ <th> Description</th>
+ </tr>
+ </thead>
+ <tbody>
+ <?php if (!empty($logs)): $i = 1; foreach ($logs as $log): ?>
+ <?php
                                             $role = $log['role'] ?? '';
                                             if ($role == 'admin') $rb = 'danger';
                                             elseif ($role == 'staff') $rb = 'warning';
@@ -713,51 +667,51 @@ select.form-control option {
                                             else $rb = 'secondary';
 
                                             $action = $log['action'] ?? '';
-                                            if ($action == 'login') { $ab = 'success'; $ai = '🔑'; }
-                                            elseif ($action == 'logout') { $ab = 'dark'; $ai = '🚪'; }
-                                            elseif (in_array($action, ['create', 'register'])) { $ab = 'primary'; $ai = '➕'; }
-                                            elseif ($action == 'update') { $ab = 'warning'; $ai = '✏️'; }
-                                            elseif ($action == 'delete') { $ab = 'danger'; $ai = '🗑️'; }
-                                            elseif ($action == 'release') { $ab = 'success'; $ai = '✅'; }
-                                            elseif ($action == 'decline') { $ab = 'danger'; $ai = '❌'; }
-                                            elseif ($action == 'approve') { $ab = 'info'; $ai = '👍'; }
+                                            if ($action == 'login') { $ab = 'success'; $ai = ''; }
+                                            elseif ($action == 'logout') { $ab = 'dark'; $ai = ''; }
+                                            elseif (in_array($action, ['create', 'register'])) { $ab = 'primary'; $ai = ''; }
+                                            elseif ($action == 'update') { $ab = 'warning'; $ai = ''; }
+                                            elseif ($action == 'delete') { $ab = 'danger'; $ai = ''; }
+                                            elseif ($action == 'release') { $ab = 'success'; $ai = ''; }
+                                            elseif ($action == 'decline') { $ab = 'danger'; $ai = ''; }
+                                            elseif ($action == 'approve') { $ab = 'info'; $ai = ''; }
                                             else { $ab = 'secondary'; $ai = '•'; }
                                         ?>
-                                        <tr>
-                                            <td style="color: #b0b0c8; font-size: 12px; font-weight: 700;"><?= $i++ ?></td>
-                                            <td style="color: #7a7a9a; font-size: 12px;"><?= date('M d, Y h:i A', strtotime($log['created_at'])) ?></td>
-                                            <td style="color: #2d2d4a; font-weight: 600;"><?= esc($log['user_name'] ?? 'System') ?></td>
-                                            <td><span class="badge badge-<?= $rb ?>"><?= ucfirst($role ?: '—') ?></span></td>
-                                            <td><span class="badge badge-<?= $ab ?>"><?= $ai ?> <?= ucfirst($action) ?></span></td>
-                                            <td><span class="badge badge-light"><?= ucfirst(str_replace('_', ' ', $log['module'] ?? '')) ?></span></td>
-                                            <td class="desc-cell" style="color: #2d2d4a; font-size: 13px;">
-                                                <?= esc($log['description'] ?? '') ?>
-                                            </td>
-                                        </tr>
-                                        <?php endforeach; else: ?>
-                                        <tr>
-                                            <td colspan="7" class="text-center py-5">
-                                                <i class="fas fa-clipboard-list fa-3x mb-3 d-block" style="color: rgba(160,160,180,0.15);"></i>
-                                                <h5 style="color: #7a7a9a;">No activity logs found</h5>
-                                                <p style="color: #b0b0c8; font-size: 14px;">Perform actions in the system to see logs here. ✨</p>
-                                            </td>
-                                        </tr>
-                                        <?php endif; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <?php if (!empty($logs) && count($logs) >= 200): ?>
-                        <div class="card-footer text-center py-2">
-                            <small style="color: #b0b0c8;">Showing latest 200 records. Use filters for more specific results.</small>
-                        </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
+ <tr>
+ <td style="color: #b0b0c8; font-size: 12px; font-weight: 700;"><?= $i++ ?></td>
+ <td style="color: #7a7a9a; font-size: 12px;"><?= date('M d, Y h:i A', strtotime($log['created_at'])) ?></td>
+ <td style="color: #2d2d4a; font-weight: 600;"><?= esc($log['user_name'] ?? 'System') ?></td>
+ <td><span class="badge badge-<?= $rb ?>"><?= ucfirst($role ?: '—') ?></span></td>
+ <td><span class="badge badge-<?= $ab ?>"><?= $ai ?> <?= ucfirst($action) ?></span></td>
+ <td><span class="badge badge-light"><?= ucfirst(str_replace('_', ' ', $log['module'] ?? '')) ?></span></td>
+ <td class="desc-cell" style="color: #2d2d4a; font-size: 13px;">
+ <?= esc($log['description'] ?? '') ?>
+ </td>
+ </tr>
+ <?php endforeach; else: ?>
+ <tr>
+ <td colspan="7" class="text-center py-5">
+ <i class="fas fa-clipboard-list fa-3x mb-3 d-block" style="color: rgba(160,160,180,0.15);"></i>
+ <h5 style="color: #7a7a9a;">No activity logs found</h5>
+ <p style="color: #b0b0c8; font-size: 14px;">Perform actions in the system to see logs here.</p>
+ </td>
+ </tr>
+ <?php endif; ?>
+ </tbody>
+ </table>
+ </div>
+ </div>
+ <?php if (!empty($logs) && count($logs) >= 200): ?>
+ <div class="card-footer text-center py-2">
+ <small style="color: #b0b0c8;">Showing latest 200 records. Use filters for more specific results.</small>
+ </div>
+ <?php endif; ?>
+ </div>
+ </div>
+ </div>
 
-        </div>
-    </section>
+ </div>
+ </section>
 </div>
 
 <?= $this->endSection() ?>

@@ -9,6 +9,6 @@ class StaffsModel extends Model
     protected $table = 'staffs';
     protected $primaryKey = 'id';
     protected $allowedFields = [
-        'fname', 'mname', 'lname', 'phone', 'password', 'created_at'
+        'fname', 'mname', 'lname', 'phone', 'password', 'picture', 'created_at'
     ];
 }

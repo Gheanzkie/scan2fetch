@@ -4,8 +4,8 @@ namespace App\Controllers;
 
 use App\Models\StudentModel;
 use App\Models\ParentsModel;
-use App\Models\SubFetcherModel;
 use App\Models\ActivityLogModel;
+use App\Models\SubFetcherModel;
 
 class Students extends BaseController
 {
@@ -89,6 +89,7 @@ class Students extends BaseController
 
             $firstParentId = null;
             $registeredParents = [];
+            $passwordSmsFailed = false;
 
             // Save parents (max 3)
             $parentFnames = $this->request->getPost('parent_fname');
@@ -97,19 +98,19 @@ class Students extends BaseController
                 $parentLnames    = $this->request->getPost('parent_lname');
                 $parentPhones    = $this->request->getPost('parent_phone');
                 $parentRelations = $this->request->getPost('parent_relation');
-                $parentPasswords = $this->request->getPost('parent_password');
                 $parentPictures  = $this->uploadParentPictures();
 
                 foreach ($parentFnames as $i => $fname) {
                     if (empty($fname) || $i >= 3) continue;
 
+                    $password = $this->generatePassword();
                     $qrValue = $this->generateQR();
                     $parentId = $this->parentsModel->insert([
                         'fname'      => $fname,
                         'mname'      => $parentMnames[$i] ?? null,
                         'lname'      => $parentLnames[$i],
                         'phone'      => $parentPhones[$i],
-                        'password'   => password_hash($parentPasswords[$i] ?? 'parent123', PASSWORD_DEFAULT),
+                        'password'   => password_hash($password, PASSWORD_DEFAULT),
                         'qr_code'    => $qrValue,
                         'picture'    => $parentPictures[$i] ?? null,
                         'created_by' => session('user_id'),
@@ -130,7 +131,7 @@ class Students extends BaseController
                         'relation' => $parentRelations[$i] ?? 'Parent',
                     ];
 
-                    $linked = $this->parentsModel->db->table('student_parents')->insert([
+                    $linked = $db->table('student_parents')->insert([
                         'student_id' => $studentId,
                         'parent_id'  => $parentId,
                         'relation'   => $parentRelations[$i] ?? 'Parent',
@@ -139,6 +140,12 @@ class Students extends BaseController
                     if (!$linked) {
                         throw new \Exception('Failed to link parent to student');
                     }
+
+                    // Record the generated password SMS locally (no gateway)
+                    $this->sendLocalSms(
+                        $parentPhones[$i],
+                        'Your Scan2Fetch account password is: ' . $password . ' (recorded in SMS logs).'
+                    );
                 }
             }
 
@@ -200,6 +207,7 @@ class Students extends BaseController
             session()->setFlashdata('registered_fetchers', $registeredFetchers);
             session()->setFlashdata('student_id', $studentId);
             session()->setFlashdata('showResult', true);
+            session()->setFlashdata('password_sms_failed', $passwordSmsFailed);
 
             return redirect()->to('/register')->with('showResult', true);
 
@@ -350,13 +358,14 @@ class Students extends BaseController
 
         $pictureName = $this->uploadParentPicture();
         $qrValue = $this->generateQR();
+        $password = $this->generatePassword();
 
         $parentId = $this->parentsModel->insert([
             'fname'      => $this->request->getPost('fname'),
             'mname'      => $this->request->getPost('mname'),
             'lname'      => $this->request->getPost('lname'),
             'phone'      => $this->request->getPost('phone'),
-            'password'   => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+            'password'   => password_hash($password, PASSWORD_DEFAULT),
             'picture'    => $pictureName,
             'qr_code'    => $qrValue,
             'created_by' => session('user_id'),
@@ -376,7 +385,14 @@ class Students extends BaseController
             'parent', 
             'Added: '.$this->request->getPost('fname').' '.$this->request->getPost('lname')
         );
-        return redirect()->to('/students-view/' . $studentId)->with('msg', 'Parent added');
+
+        $this->sendLocalSms(
+            $this->request->getPost('phone'),
+            'Your Scan2Fetch account password is: ' . $password . ' (recorded in SMS logs).'
+        );
+
+        $msg = 'Parent added';
+        return redirect()->to('/students-view/' . $studentId)->with('msg', $msg);
     }
 
     // ========== HELPERS ==========
@@ -458,7 +474,7 @@ class Students extends BaseController
 
     private function generateQR()
     {
-        $qrValue = 'QR-' . strtoupper(bin2hex(random_bytes(6)));
+        $qrValue = $this->generateQrValue();
         include_once('phpqrcode/qrlib.php');
         
         $qrImagePath = 'uploads/qr/' . $qrValue . '_tmp.png';

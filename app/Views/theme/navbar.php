@@ -1,274 +1,293 @@
-<nav class="main-header navbar navbar-expand navbar-dark shadow-sm"
-     style="background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); 
-            border-bottom: 3px solid rgba(255,255,255,0.2);
-            box-shadow: 0 4px 20px rgba(102,126,234,0.3);"
+<nav class="main-header navbar navbar-expand navbar-dark"
+     style="background: #111827 !important;
+            border-bottom: 1px solid #1f2937;"
      id="mainNavbar">
 
-    <ul class="navbar-nav align-items-center">
-        <li class="nav-item">
-            <a class="nav-link text-white px-3" data-widget="pushmenu" href="#" role="button" 
-               style="transition: all 0.3s ease; border-radius: 12px;">
-                <i class="fas fa-bars fa-lg"></i>
-            </a>
-        </li>
-        <li class="nav-item d-none d-sm-inline-block">
-            <a href="<?= base_url('dashboard') ?>" class="nav-link text-white px-3 font-weight-bold"
-               style="transition: all 0.3s ease; border-radius: 12px; font-size: 15px;">
-                <i class="fas fa-tachometer-alt mr-1"></i> 🏠 Dashboard
-            </a>
-        </li>
-        <li class="nav-item d-none d-sm-inline-block">
-            <span class="nav-link text-white px-3" style="opacity: 0.5; font-size: 12px;">
-                <i class="fas fa-child mr-1"></i> 🎒
-            </span>
-        </li>
-    </ul>
+ <ul class="navbar-nav align-items-center">
+ <li class="nav-item">
+ <a class="nav-link text-white px-2" data-widget="pushmenu" href="#" role="button">
+ <i class="fas fa-bars fa-lg"></i>
+ </a>
+ </li>
+ <li class="nav-item d-none d-sm-inline-block">
+ <a href="<?= base_url('dashboard') ?>" class="nav-link text-white px-2 font-weight-semibold"
+               style="font-size: 15px;">
+ <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
+ </a>
+ </li>
+ </ul>
 
-    <ul class="navbar-nav ml-auto align-items-center">
-        <!-- ===== LIVE TIMER (Admin & Staff Only) ===== -->
-        <?php 
+ <ul class="navbar-nav ml-auto align-items-center">
+ <!-- ===== THEME SWITCHER (Light / Dark) ===== -->
+ <li class="nav-item mr-2">
+ <div class="theme-switcher" id="themeSwitcher" role="group" aria-label="Theme selector">
+ <button type="button" class="theme-opt" data-theme="light" title="Light Mode">
+ <i class="fas fa-sun"></i>
+ </button>
+ <button type="button" class="theme-opt" data-theme="dark" title="Dark Mode">
+ <i class="fas fa-moon"></i>
+ </button>
+ </div>
+ </li>
+ <!-- ===== LIVE TIMER (Admin & Staff Only) ===== -->
+ <?php
         $role = session('role');
-        if ($role == 'admin' || $role == 'staff'): 
+        if ($role == 'admin' || $role == 'staff'):
         ?>
-        <li class="nav-item d-none d-md-block mr-2">
-            <div class="live-timer-container">
-                <div class="live-dot"></div>
-                <span class="live-label">LIVE</span>
-                <span class="live-time" id="liveTimeDisplay">
-                    <?= date('h:i:s A') ?>
-                </span>
-                <span class="live-date" id="liveDateDisplay">
-                    <?= date('M d, Y') ?>
-                </span>
-            </div>
-        </li>
-        <?php endif; ?>
-        
-        <!-- Sparkle Decor -->
-        <li class="nav-item d-none d-md-block">
-            <span style="font-size: 20px; animation: sparkle 2s ease-in-out infinite; display: inline-block;">
-                ✨
-            </span>
-        </li>
-        
-        <li class="nav-item dropdown">
-            <a class="nav-link text-white px-3" data-toggle="dropdown" href="#" role="button"
-               style="transition: all 0.3s ease; border-radius: 12px; background: rgba(255,255,255,0.1);">
-                <i class="far fa-user-circle fa-lg mr-1"></i>
-                <span class="d-none d-md-inline font-weight-bold"><?= session('fname') ?> <?= session('lname') ?></span>
-                <span class="badge px-3 py-1 ml-1" 
-                     style="background: rgba(255,255,255,0.2); color: #fff; border-radius: 50px; font-size: 11px;">
-                    <?php 
-                        if ($role == 'admin') echo '👨‍🏫 Admin';
-                        elseif ($role == 'staff') echo '🧑‍🏫 Staff';
-                        elseif ($role == 'parent') echo '👨‍👩 Parent';
-                    ?>
-                </span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-right" 
-                 style="border: none; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.12); padding: 8px;">
-                <div class="dropdown-header" style="padding: 12px 20px; border-bottom: 1px solid #f0f0f0;">
-                    <strong style="color: #2d2d4a;"><?= session('fname') ?> <?= session('lname') ?></strong>
-                    <br>
-                    <small style="color: #8888aa;">
-                        <?php 
-                            if ($role == 'admin') echo '👨‍🏫 Administrator';
-                            elseif ($role == 'staff') echo '🧑‍🏫 Staff';
-                            elseif ($role == 'parent') echo '👨‍👩 Parent / Guardian';
+ <li class="nav-item d-none d-md-block mr-2">
+ <div class="live-timer-container">
+ <div class="live-dot"></div>
+ <span class="live-time" id="liveTimeDisplay">
+ <?= date('h:i:s A') ?>
+ </span>
+ <span class="live-date" id="liveDateDisplay">
+ <?= date('M d, Y') ?>
+ </span>
+ </div>
+ </li>
+ <?php endif; ?>
+
+ <li class="nav-item dropdown">
+ <a class="nav-link text-white px-2" data-toggle="dropdown" href="#" role="button">
+ <i class="far fa-user-circle fa-lg mr-1"></i>
+ <span class="d-none d-md-inline font-weight-semibold"><?= session('fname') ?> <?= session('lname') ?></span>
+ </a>
+ <div class="dropdown-menu dropdown-menu-right">
+ <div class="dropdown-header">
+ <strong><?= session('fname') ?> <?= session('lname') ?></strong>
+ <br>
+ <small>
+ <?php
+                            if ($role == 'admin') echo 'Administrator';
+                            elseif ($role == 'staff') echo 'Staff';
+                            elseif ($role == 'teacher') echo 'Teacher';
+                            elseif ($role == 'parent') echo 'Parent / Guardian';
                         ?>
-                    </small>
-                </div>
-                <div class="dropdown-divider" style="margin: 4px 0;"></div>
-                <a href="<?= base_url('dashboard') ?>" class="dropdown-item" style="border-radius: 12px; padding: 10px 20px;">
-                    <i class="fas fa-tachometer-alt mr-2" style="color: #667eea;"></i> 🏠 Dashboard
-                </a>
-                <div class="dropdown-divider" style="margin: 4px 0;"></div>
-                <a href="<?= base_url('logout') ?>" class="dropdown-item text-danger" 
-                   style="border-radius: 12px; padding: 10px 20px; transition: all 0.3s ease;">
-                    <i class="fas fa-sign-out-alt mr-2"></i> 🚪 Logout
-                </a>
-            </div>
-        </li>
-        
-        <!-- Sparkle Decor -->
-        <li class="nav-item d-none d-md-block">
-            <span style="font-size: 20px; animation: sparkle 2s ease-in-out infinite 0.5s; display: inline-block;">
-                🌟
-            </span>
-        </li>
-    </ul>
+ </small>
+ </div>
+ <div class="dropdown-divider"></div>
+ <a href="<?= base_url('dashboard') ?>" class="dropdown-item">
+ <i class="fas fa-tachometer-alt mr-2" style="color: #64748b;"></i> Dashboard
+ </a>
+ <a href="<?= base_url('messages') ?>" class="dropdown-item <?= $role == 'teacher' ? 'd-none' : '' ?>">
+ <i class="fas fa-comments mr-2" style="color: #64748b;"></i> Messages
+ <span class="badge badge-danger msg-badge" style="display:none;">0</span>
+ </a>
+ <div class="dropdown-divider"></div>
+ <a href="#" class="dropdown-item" data-toggle="modal" data-target="#changePasswordModal">
+ <i class="fas fa-key mr-2" style="color: #64748b;"></i> Change Password
+ </a>
+ <div class="dropdown-divider"></div>
+ <a href="<?= base_url('logout') ?>" class="dropdown-item text-danger">
+ <i class="fas fa-sign-out-alt mr-2"></i> Logout
+ </a>
+ </div>
+ </li>
+ </ul>
 </nav>
 
 <style>
-    /* ===== NAVBAR CHILD-FRIENDLY ===== */
     #mainNavbar .nav-link {
-        transition: all 0.3s ease;
-        border-radius: 12px;
+        border-radius: 6px;
         margin: 0 2px;
-        padding: 8px 16px !important;
-    }
-    
-    #mainNavbar .nav-link:hover {
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateY(-2px);
-    }
-    
-    .dropdown-menu {
-        border: none;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-        border-radius: 20px;
-        animation: slideDown 0.3s ease;
-    }
-    
-    @keyframes slideDown {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .dropdown-header {
-        padding: 12px 20px;
-        border-bottom: 1px solid #f0f0f0;
-    }
-    
-    .dropdown-item {
-        padding: 10px 20px;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-        font-weight: 500;
-    }
-    
-    .dropdown-item:hover {
-        background: #f5f0ff;
-        padding-left: 25px;
-    }
-    
-    .dropdown-item.text-danger:hover {
-        background: #fff0f0;
-    }
-    
-    @keyframes sparkle {
-        0%, 100% { transform: scale(1) rotate(0deg); }
-        50% { transform: scale(1.2) rotate(10deg); }
+        padding: 8px 12px !important;
     }
 
-    /* ===== LIVE TIMER STYLES ===== */
+    #mainNavbar .nav-link:hover {
+        background: rgba(148, 163, 184, .14);
+    }
+
+    .nav-item.dropdown .nav-link:hover { background: rgba(148, 163, 184, .14) !important; }
+
+    /* ===== THEME SWITCHER ===== */
+    .theme-switcher {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: #1f2937;
+        padding: 3px;
+        border-radius: 6px;
+        border: 1px solid #374151;
+    }
+
+    .theme-opt {
+        width: 30px;
+        height: 30px;
+        border-radius: 4px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        background: transparent;
+        cursor: pointer;
+        font-size: 13px;
+        transition: background .2s ease, color .2s ease;
+    }
+
+    .theme-opt:hover { background: rgba(148, 163, 184, .14); color: #e2e8f0; }
+
+    .theme-opt.active { background: #4361ee; color: #ffffff; }
+
+    @media (max-width: 480px) {
+        .theme-opt { width: 28px; height: 28px; font-size: 12px; }
+    }
+
+    /* ===== LIVE TIMER ===== */
     .live-timer-container {
         display: flex;
         align-items: center;
         gap: 8px;
-        background: rgba(255, 255, 255, 0.15);
-        padding: 4px 16px 4px 12px;
-        border-radius: 50px;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        background: #1f2937;
+        padding: 4px 14px 4px 10px;
+        border-radius: 6px;
+        border: 1px solid #374151;
     }
 
     .live-dot {
-        width: 10px;
-        height: 10px;
-        background: #00ff88;
+        width: 8px;
+        height: 8px;
+        background: #34d399;
         border-radius: 50%;
-        animation: livePulse 1.5s ease-in-out infinite;
-        box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        animation: livePulse 1.4s ease-in-out infinite;
     }
 
     @keyframes livePulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.4; transform: scale(0.8); }
-    }
-
-    .live-label {
-        color: #00ff88;
-        font-weight: 700;
-        font-size: 11px;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        0%, 100% { opacity: 1; }
+        50% { opacity: .35; }
     }
 
     .live-time {
-        color: #ffffff;
-        font-weight: 700;
-        font-size: 14px;
+        color: #e2e8f0;
+        font-weight: 600;
+        font-size: 13px;
         font-family: 'Courier New', monospace;
-        letter-spacing: 1px;
-        min-width: 70px;
+        letter-spacing: .5px;
+        min-width: 66px;
         text-align: center;
-        text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
     }
 
     .live-date {
-        color: rgba(255, 255, 255, 0.7);
+        color: #94a3b8;
         font-weight: 500;
-        font-size: 11px;
-        border-left: 1px solid rgba(255, 255, 255, 0.15);
+        font-size: 12px;
+        border-left: 1px solid #374151;
         padding-left: 10px;
     }
 
-    @media (max-width: 1200px) {
-        .live-date {
-            display: none;
-        }
-        .live-timer-container {
-            padding: 4px 12px 4px 10px;
-        }
-    }
+    @media (max-width: 1200px) { .live-date { display: none; } }
+    @media (max-width: 768px) { .live-timer-container { display: none; } }
 
-    @media (max-width: 992px) {
-        .live-timer-container {
-            padding: 3px 10px 3px 8px;
-        }
-        .live-label {
-            font-size: 9px;
-        }
-        .live-time {
-            font-size: 12px;
-            min-width: 60px;
-        }
-        .live-dot {
-            width: 8px;
-            height: 8px;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .live-timer-container {
-            display: none;
-        }
+    .dropdown-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e2e8f0;
     }
 </style>
 
-<!-- ===== LIVE TIMER JAVASCRIPT ===== -->
+<!-- ===== LIVE TIMER JAVASCRIPT (no jQuery dependency - ticks on every page) ===== -->
 <script>
-<?php 
-$role = session('role');
-if ($role == 'admin' || $role == 'staff'): 
-?>
-$(document).ready(function() {
-    function updateLiveTimer() {
+(function() {
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+    function updateTimer() {
         var now = new Date();
-        var timeString = now.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit', 
-            second: '2-digit',
-            hour12: true 
-        });
-        var dateString = now.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric', 
-            year: 'numeric' 
-        });
-        
-        $('#liveTimeDisplay').text(timeString);
-        $('#liveDateDisplay').text(dateString);
+        var h = now.getHours();
+        var ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12; if (h === 0) { h = 12; }
+        var time = pad(h) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds()) + ' ' + ampm;
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var date = months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+
+        var tEl = document.getElementById('liveTimeDisplay');
+        var dEl = document.getElementById('liveDateDisplay');
+        if (tEl) { tEl.textContent = time; }
+        if (dEl) { dEl.textContent = date; }
     }
 
-    // Update immediately
-    updateLiveTimer();
-    
-    // Update every second
-    setInterval(updateLiveTimer, 1000);
-});
-<?php endif; ?>
+    updateTimer();
+    setInterval(updateTimer, 1000);
+})();
+</script>
+
+<!-- ===== CHANGE PASSWORD MODAL (shared by admin / staff / parent) ===== -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+ <div class="modal-dialog modal-dialog-centered">
+ <div class="modal-content">
+ <div class="modal-header">
+ <h5 class="modal-title">
+ <i class="fas fa-key mr-2" style="color: #4361ee;"></i> Change Password
+ </h5>
+ <button type="button" class="close" data-dismiss="modal">&times;</button>
+ </div>
+ <form id="changePasswordForm">
+ <div class="modal-body">
+ <div class="form-group">
+ <label>Current Password</label>
+ <input type="password" class="form-control" id="cpCurrent" required>
+ </div>
+ <div class="form-group">
+ <label>New Password</label>
+ <input type="password" class="form-control" id="cpNew" minlength="6" required>
+ <small class="text-muted">Minimum 6 characters.</small>
+ </div>
+ <div class="form-group mb-0">
+ <label>Confirm New Password</label>
+ <input type="password" class="form-control" id="cpConfirm" minlength="6" required>
+ </div>
+ <div id="cpStatus" class="small mt-2" style="color: #64748b;"></div>
+ </div>
+ <div class="modal-footer">
+ <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">Cancel</button>
+ <button type="submit" class="btn btn-primary btn-sm px-4">
+ <i class="fas fa-check mr-1"></i> Update Password
+ </button>
+ </div>
+ </form>
+ </div>
+ </div>
+</div>
+
+<script>
+(function() {
+    var form = document.getElementById('changePasswordForm');
+    if (!form) return;
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var status = document.getElementById('cpStatus');
+        var current = document.getElementById('cpCurrent').value;
+        var np = document.getElementById('cpNew').value;
+        var conf = document.getElementById('cpConfirm').value;
+
+        status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+        var body = new URLSearchParams();
+        body.append('current_password', current);
+        body.append('new_password', np);
+        body.append('confirm_password', conf);
+
+        fetch('/change-password', {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            body: body
+        }).then(function(r) { return r.json(); }).then(function(d) {
+            if (d.success) {
+                status.innerHTML = '<span style="color:#15803d;">' + d.message + '</span>';
+                document.getElementById('cpCurrent').value = '';
+                document.getElementById('cpNew').value = '';
+                document.getElementById('cpConfirm').value = '';
+                if (window.toastr) {
+                    toastr.success(d.message);
+                    $('#changePasswordModal').modal('hide');
+                } else {
+                    setTimeout(function() { $('#changePasswordModal').modal('hide'); }, 1200);
+                }
+            } else {
+                status.innerHTML = '<span style="color:#dc2626;">' + d.message + '</span>';
+            }
+        }).catch(function() {
+            status.innerHTML = '<span style="color:#dc2626;">Could not reach the server.</span>';
+        });
+    });
+})();
 </script>
