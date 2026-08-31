@@ -191,7 +191,6 @@ body {
  <div class="card mb-3">
  <div class="card-header d-flex justify-content-between align-items-center">
  <h6 class="mb-0"><i class="fas fa-user-check mr-2" style="color: var(--soft-blue);"></i>Main Parent / Guardian</h6>
- <a href="<?= base_url('parents') ?>" class="btn btn-outline-secondary btn-xs"><i class="fas fa-external-link-alt"></i> Manage Parents</a>
  </div>
  <div class="card-body">
  <?php if(!empty($parents)): ?>
@@ -211,6 +210,9 @@ body {
  <?php if(!empty($p['qr_code'])): ?>
  <img src="<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>" style="width:50px;height:50px;border:2px solid var(--soft-blue);border-radius:8px;cursor:pointer;margin-right:5px;" onclick="openQrModal('<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>')">
  <?php endif; ?>
+ <a href="<?= base_url('parents-view/'.$p['parent_id']) ?>" class="btn btn-outline-secondary btn-xs ml-1" title="Go to Parent">
+ <i class="fas fa-user-check"></i> Go to Parent
+ </a>
  </div>
  <?php endforeach; ?>
  <?php else: ?>
@@ -223,7 +225,6 @@ body {
  <div class="card">
  <div class="card-header d-flex justify-content-between align-items-center">
  <h6 class="mb-0"><i class="fas fa-user-friends mr-2" style="color: var(--soft-green);"></i>Sub-Fetchers (<?= count($subFetchers ?? []) ?>)</h6>
- <a href="<?= base_url('parents') ?>" class="btn btn-outline-secondary btn-xs"><i class="fas fa-external-link-alt"></i> Manage Fetchers</a>
  </div>
  <div class="card-body">
  <?php if(!empty($subFetchers)): ?>
@@ -243,6 +244,9 @@ body {
  <?php if(!empty($f['qr_code'])): ?>
  <img src="<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>" style="width:45px;height:45px;border:2px solid var(--soft-green);border-radius:8px;cursor:pointer;margin-right:5px;" onclick="openQrModal('<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>')">
  <?php endif; ?>
+ <a href="<?= base_url('parents-view/'.$f['parent_id']) ?>" class="btn btn-outline-secondary btn-xs ml-1" title="Go to Fetcher">
+ <i class="fas fa-user-friends"></i> Go to Fetcher
+ </a>
  </div>
  <?php endforeach; ?>
  <?php else: ?>

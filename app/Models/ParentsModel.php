@@ -9,6 +9,6 @@ class ParentsModel extends Model
     protected $table = 'parents';
     protected $primaryKey = 'id';
     protected $allowedFields = [
-        'fname', 'mname', 'lname', 'phone', 'password', 'qr_code', 'picture', 'created_by', 'created_at'
+        'fname', 'mname', 'lname', 'phone', 'password', 'password_sent', 'qr_code', 'picture', 'created_by', 'created_at'
     ];
 }

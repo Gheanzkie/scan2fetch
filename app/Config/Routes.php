@@ -22,6 +22,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('students-view/(:num)', 'Students::view/$1');
     $routes->get('students-edit/(:num)', 'Students::edit/$1');
     $routes->post('students-save', 'Students::save');
+    $routes->post('students-import', 'Students::importExcel');
     $routes->post('students-update', 'Students::update');
     $routes->get('students-delete/(:num)', 'Students::delete/$1');
     $routes->get('students-remove-parent/(:num)/(:num)', 'Students::removeParent/$1/$2');
@@ -35,6 +36,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('parents-update', 'Parents::update');
     $routes->get('parents-delete/(:num)', 'Parents::delete/$1');
     $routes->get('parents-send-password/(:num)', 'Parents::sendPassword/$1');
+    $routes->get('parents-send-all', 'Parents::sendAllPasswords');
     $routes->post('parents-update-picture', 'Parents::updatePicture');
     $routes->post('parents-update-from-student', 'Parents::updateFromStudent');
     $routes->get('parents-releases', 'Parents::releases');
@@ -51,15 +53,19 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('staffs-save', 'Staffs::save');
     $routes->post('staffs-update', 'Staffs::update');
     $routes->get('staffs-delete/(:num)', 'Staffs::delete/$1');
+    $routes->get('staffs-send-password/(:num)', 'Staffs::sendPassword/$1');
+    $routes->get('staffs-send-all', 'Staffs::sendAllPasswords');
 
     // ===== TEACHERS =====
     $routes->get('teachers', 'Teachers::index');
     $routes->get('teachers-view/(:num)', 'Teachers::view/$1');
+    $routes->get('teachers-student-view/(:num)', 'Teachers::studentView/$1');
     $routes->get('teachers-notifications', 'Teachers::notifications');
     $routes->post('teachers-save', 'Teachers::save');
     $routes->post('teachers-update', 'Teachers::update');
     $routes->get('teachers-delete/(:num)', 'Teachers::delete/$1');
     $routes->get('teachers-send-password/(:num)', 'Teachers::sendPassword/$1');
+    $routes->get('teachers-send-all', 'Teachers::sendAllPasswords');
 
     // ===== QR SCAN =====
     $routes->get('scan', 'Scan::index');

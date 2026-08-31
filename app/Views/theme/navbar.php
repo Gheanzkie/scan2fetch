@@ -1,6 +1,6 @@
 <nav class="main-header navbar navbar-expand navbar-dark"
-     style="background: #111827 !important;
-            border-bottom: 1px solid #1f2937;"
+     style="background: #221c4a !important;
+            border-bottom: 1px solid #32298a;"
      id="mainNavbar">
 
  <ul class="navbar-nav align-items-center">
@@ -104,30 +104,30 @@
         display: flex;
         align-items: center;
         gap: 4px;
-        background: #1f2937;
+        background: #2d2757;
         padding: 3px;
-        border-radius: 6px;
-        border: 1px solid #374151;
+        border-radius: 8px;
+        border: 1px solid #3b3480;
     }
 
     .theme-opt {
         width: 30px;
         height: 30px;
-        border-radius: 4px;
+        border-radius: 6px;
         border: none;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #94a3b8;
+        color: #9a90d9;
         background: transparent;
         cursor: pointer;
         font-size: 13px;
         transition: background .2s ease, color .2s ease;
     }
 
-    .theme-opt:hover { background: rgba(148, 163, 184, .14); color: #e2e8f0; }
+    .theme-opt:hover { background: rgba(165, 180, 252, .15); color: #f5f3ff; }
 
-    .theme-opt.active { background: #4361ee; color: #ffffff; }
+    .theme-opt.active { background: #4c4090; color: #ffffff; }
 
     @media (max-width: 480px) {
         .theme-opt { width: 28px; height: 28px; font-size: 12px; }
@@ -138,16 +138,16 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        background: #1f2937;
+        background: #2d2757;
         padding: 4px 14px 4px 10px;
-        border-radius: 6px;
-        border: 1px solid #374151;
+        border-radius: 8px;
+        border: 1px solid #3b3480;
     }
 
     .live-dot {
         width: 8px;
         height: 8px;
-        background: #34d399;
+        background: #7cf2b4;
         border-radius: 50%;
         animation: livePulse 1.4s ease-in-out infinite;
     }
@@ -158,7 +158,7 @@
     }
 
     .live-time {
-        color: #e2e8f0;
+        color: #f5f3ff;
         font-weight: 600;
         font-size: 13px;
         font-family: 'Courier New', monospace;
@@ -168,10 +168,10 @@
     }
 
     .live-date {
-        color: #94a3b8;
+        color: #b3a9e6;
         font-weight: 500;
         font-size: 12px;
-        border-left: 1px solid #374151;
+        border-left: 1px solid #3b3480;
         padding-left: 10px;
     }
 

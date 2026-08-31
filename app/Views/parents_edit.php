@@ -174,7 +174,7 @@ label {
  </div>
  <div class="alert alert-info mt-3 mb-0">
  <i class="fas fa-sms mr-1"></i>
- <small>Passwords are auto-generated and sent to this number via SMS.</small>
+ <small>Passwords are not sent automatically. Use "Send Password" / "Send All Passwords" on the Parents page to deliver them.</small>
  </div>
  </div>
  </div>

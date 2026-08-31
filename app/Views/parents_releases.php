@@ -42,6 +42,11 @@ body {
 
 .card-body { padding: 0 !important; }
 
+.input-group-text { border: none !important; background: transparent !important; }
+.form-control:focus { box-shadow: none !important; outline: none !important; }
+input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; }
+input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+
 .table {
     color: #2d2d4a !important;
 }

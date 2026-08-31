@@ -90,63 +90,6 @@
  </div>
  </div>
  </div>
- <div class="col-lg-4 col-6 mb-3">
- <div class="fun-box bg-kid-orange">
- <div class="text-center">
- <div class="icon-circle"><i class="fas fa-history"></i></div>
- <span class="number"><?= count($recentReleases ?? []) ?></span>
- <span class="label">Recent Releases</span>
- </div>
- </div>
- </div>
- </div>
- <!-- Table -->
- <div class="row">
- <div class="col-12">
- <div class="kid-card">
- <div class="card-header">
- <h5 class="mb-0">
- <i class="fas fa-history mr-2" style="color: #4361ee;"></i> Recent Releases
- <span style="font-size:0.8rem;color:#94a3b8;font-weight:400;margin-left:10px;">Latest 10 entries</span>
- </h5>
- </div>
- <div class="card-body p-0">
- <div class="table-responsive">
- <table class="table table-fun table-hover table-sm mb-0">
- <thead><tr><th>Student</th><th>Fetcher</th><th>Method</th><th>Time</th></tr></thead>
- <tbody>
- <?php if(!empty($recentReleases)): foreach($recentReleases as $r): ?>
- <tr>
- <td>
- <strong><?= esc($r['student_fname']) ?> <?= esc($r['student_lname']) ?></strong>
- <br><small class="text-muted">#<?= esc($r['student_id']) ?> · <?= esc($r['grade_section']) ?></small>
- </td>
- <td>
- <?php $fetcherName = trim((string)($r['fetcher_fname'] ?? '') . ' ' . (string)($r['fetcher_lname'] ?? '')); ?>
- <?php if (!empty($fetcherName)): ?>
- <?= esc($fetcherName) ?>
- <?php if (!empty($r['fetcher_relation'])): ?>
- <br><small class="text-muted"><?= esc($r['fetcher_relation']) ?></small>
- <?php endif; ?>
- <?php elseif (!empty($r['parent_fname'])): ?>
- <?= esc($r['parent_fname']) ?> <?= esc($r['parent_lname']) ?>
- <br><small class="text-muted">Parent</small>
- <?php else: ?>
- <span class="text-muted">—</span>
- <?php endif; ?>
- </td>
- <td><span class="badge badge-primary" style="<?= ($r['method']??'')=='QR' ? '' : 'background-color:#eef2ff;color:#4338ca;' ?>"><?= $r['method']??'—' ?></span></td>
- <td class="small text-muted"><?= date('h:i A', strtotime($r['time_released'])) ?></td>
- </tr>
- <?php endforeach; else: ?>
- <tr><td colspan="4" class="text-center text-muted py-4">No releases yet</td></tr>
- <?php endif; ?>
- </tbody>
- </table>
- </div>
- </div>
- </div>
- </div>
  </div>
  <?php endif; ?>
 
@@ -191,28 +134,6 @@
  </div>
  </div>
 
- <!-- Quick Action Buttons -->
- <div class="row mb-4">
- <div class="col-12">
- <div class="kid-card">
- <div class="card-body">
- <h5 class="mb-3" style="color:#0f172a;font-weight:700;font-size:1rem;">Quick Actions</h5>
- <div class="d-flex flex-wrap gap-2">
- <a href="<?= base_url('scan') ?>" class="btn btn-primary">
- <i class="fas fa-qrcode mr-1"></i> Scan QR
- </a>
- <a href="<?= base_url('students') ?>" class="btn btn-success">
- <i class="fas fa-user-graduate mr-1"></i> Students
- </a>
- <a href="<?= base_url('parents') ?>" class="btn btn-kid-purple">
- <i class="fas fa-users mr-1"></i> Parents
- </a>
- </div>
- </div>
- </div>
- </div>
- </div>
-
  <!-- Today's Releases Table -->
  <div class="row">
  <div class="col-12">
@@ -249,7 +170,7 @@
  <?php endif; ?>
  </td>
  <td><span class="badge badge-primary" style="<?= ($r['method']??'')=='QR' ? '' : 'background-color:#eef2ff;color:#4338ca;' ?>"><?= $r['method']??'—' ?></span></td>
- <td class="small text-muted"><?= date('h:i A', strtotime($r['time_released'])) ?></td>
+ <td class="small text-muted"><i class="fas fa-calendar-alt mr-1"></i><?= date('M d, Y', strtotime($r['time_released'])) ?><br><small><?= date('h:i A', strtotime($r['time_released'])) ?></small></td>
  </tr>
  <?php endforeach; else: ?>
  <tr><td colspan="4" class="text-center text-muted py-4">No releases today</td></tr>
@@ -280,7 +201,7 @@
  <div class="text-center">
  <div class="icon-circle"><i class="fas fa-check-circle"></i></div>
  <span class="number"><?= $releasedToday ?? 0 ?></span>
- <span class="label">Released Today</span>
+ <span class="label">Released on <?= date('M d', strtotime($selectedDate ?? date('Y-m-d'))) ?></span>
  </div>
  </div>
  </div>
@@ -289,7 +210,7 @@
  <div class="text-center">
  <div class="icon-circle"><i class="fas fa-hourglass-half"></i></div>
  <span class="number"><?= $pendingToday ?? 0 ?></span>
- <span class="label">Still at School</span>
+ <span class="label">Still Waiting</span>
  </div>
  </div>
  </div>
@@ -329,7 +250,7 @@
  <i class="fas fa-phone mr-1"></i> <?= esc($teacherProfile['phone'] ?? session('phone')) ?>
  </div>
  <a href="<?= base_url('teachers-view/' . session('user_id')) ?>" class="btn btn-primary btn-sm mt-3 px-3">
- <i class="fas fa-eye mr-1"></i> View My Students
+ <i class="fas fa-list mr-1"></i> Full Roster
  </a>
  </div>
  </div>
@@ -338,47 +259,77 @@
  <!-- My Students -->
  <div class="col-md-8">
  <div class="kid-card">
- <div class="card-header d-flex justify-content-between align-items-center">
+ <div class="card-header">
+ <div class="d-flex justify-content-between align-items-center mb-3">
  <h5 class="mb-0">
  <i class="fas fa-child mr-2" style="color: #4361ee;"></i>
-                                My Students (<?= count($myStudents ?? []) ?>)
+                                    My Students (<?= count($myStudents ?? []) ?>)
  </h5>
+ </div>
+ <form method="GET" action="<?= base_url('dashboard') ?>" id="teacherFilterForm">
+ <div class="row no-gutters align-items-center">
+ <div class="col-auto pr-2">
+ <div class="input-group input-group-sm" style="border-radius:50px;overflow:hidden;border:2px solid rgba(108,140,255,0.12);background:rgba(255,255,255,0.7);">
+ <div class="input-group-prepend">
+ <span class="input-group-text" style="background:transparent;border:none;padding:6px 12px;"><i class="fas fa-calendar-alt" style="color:#7C6CFF;font-size:13px;"></i></span>
+ </div>
+ <input type="date" id="teacherDate" name="date" value="<?= esc($selectedDate ?? date('Y-m-d')) ?>" class="form-control border-0" style="background:transparent;font-size:13px;font-weight:600;color:#2d2d4a;padding:6px 8px;max-width:170px;" onchange="document.getElementById('teacherFilterForm').submit()">
+ </div>
+ </div>
+ <div class="col pr-2">
+ <div class="input-group input-group-sm" style="border-radius:50px;overflow:hidden;border:2px solid rgba(108,140,255,0.12);background:rgba(255,255,255,0.7);">
+ <div class="input-group-prepend">
+ <span class="input-group-text" style="background:transparent;border:none;padding:6px 12px;"><i class="fas fa-search" style="color:#6C8CFF;font-size:13px;"></i></span>
+ </div>
+ <input type="text" name="q" value="<?= esc($search ?? '') ?>" class="form-control border-0" placeholder="Search student..." style="background:transparent;font-size:13px;padding:6px 12px;">
+ <div class="input-group-append">
+ <button type="submit" class="btn btn-sm" style="background:linear-gradient(135deg,#6C8CFF,#7C6CFF);color:#fff;border:none;border-radius:0 50px 50px 0;padding:6px 14px;font-size:12px;font-weight:700;">Search</button>
+ </div>
+ </div>
+ </div>
+ <div class="col-auto">
+ <a href="<?= base_url('dashboard') ?>" class="btn btn-sm" style="border:2px solid rgba(108,140,255,0.15);background:rgba(255,255,255,0.3);border-radius:50px;font-size:12px;padding:6px 14px;font-weight:700;color:#6a6a8a;">
+ <i class="fas fa-sync-alt mr-1"></i>Today
+ </a>
+ </div>
+ </div>
+ </form>
  </div>
  <div class="card-body">
  <?php if (!empty($myStudents)): ?>
- <div class="row">
  <?php foreach ($myStudents as $st): ?>
- <div class="col-md-6 mb-3">
- <div class="child-item d-flex align-items-center p-3">
+ <div class="d-flex align-items-center p-3 mb-2" style="border:1px solid rgba(108,140,255,0.06);border-radius:14px;transition:background 0.2s;">
  <div class="mr-3" style="cursor:pointer;" onclick="openImageViewer('<?= !empty($st['picture']) ? base_url('uploads/students/' . $st['picture']) : '' ?>', '<?= esc($st['fname'] . ' ' . $st['lname']) ?>')">
  <?php if (!empty($st['picture'])): ?>
- <img src="<?= base_url('uploads/students/' . $st['picture']) ?>" class="img-circle" style="width:50px;height:50px;object-fit:cover;">
+ <img src="<?= base_url('uploads/students/' . $st['picture']) ?>" class="img-circle" style="width:45px;height:45px;object-fit:cover;">
  <?php else: ?>
- <div class="img-circle d-flex align-items-center justify-content-center" style="width:50px;height:50px;background:#f1f5f9;">
- <i class="fas fa-child" style="color: #94a3b8; font-size: 1.3rem;"></i>
+ <div class="img-circle d-flex align-items-center justify-content-center" style="width:45px;height:45px;background:#f1f5f9;">
+ <i class="fas fa-child" style="color: #94a3b8; font-size: 1.1rem;"></i>
  </div>
  <?php endif; ?>
  </div>
  <div class="flex-grow-1">
- <strong style="color: #0f172a;"><?= esc($st['fname']) ?> <?= esc($st['lname']) ?></strong>
+ <strong style="color: #0f172a; font-size:14px;"><?= esc($st['fname']) ?> <?= esc($st['lname']) ?></strong>
  <br><small class="text-muted"><?= esc($st['grade_section']) ?></small>
- <?php if (!empty($todayReleasedMap[$st['id']])): ?>
- <br><span class="badge badge-success mt-1">Picked up <?= date('h:i A', strtotime($todayReleasedMap[$st['id']])) ?></span>
+ <?php if (!empty($dateReleasedMap[$st['id']])): ?>
+ <br><span class="badge badge-success mt-1" style="font-size:11px;">Picked up <?= date('h:i A', strtotime($dateReleasedMap[$st['id']])) ?></span>
  <?php else: ?>
- <br><span class="badge badge-warning mt-1">Still in school</span>
+ <br><span class="badge badge-warning mt-1" style="font-size:11px;">Still in school</span>
  <?php endif; ?>
  </div>
- <a href="<?= base_url('students-view/' . $st['id']) ?>" class="btn btn-sm btn-outline-secondary ml-1">
+ <a href="<?= base_url('teachers-student-view/' . $st['id']) ?>" class="btn btn-sm btn-outline-secondary ml-1" title="View Details">
  <i class="fas fa-eye"></i>
  </a>
  </div>
- </div>
  <?php endforeach; ?>
- </div>
  <?php else: ?>
  <div class="text-center text-muted py-5">
  <i class="fas fa-user-graduate" style="font-size: 3rem; color: #cbd5e1;"></i>
+ <?php if (!empty($search ?? '')): ?>
+ <p class="mt-3">No students match "<strong><?= esc($search) ?></strong>"</p>
+ <?php else: ?>
  <p class="mt-3">No students under your class yet</p>
+ <?php endif; ?>
  </div>
  <?php endif; ?>
  </div>
@@ -521,14 +472,6 @@
  <div class="flex-grow-1">
  <strong style="color: #0f172a;"><?= esc($child['fname']) ?> <?= esc($child['lname']) ?></strong>
  <br><small class="text-muted"><?= esc($child['grade_section']) ?></small>
- <?php if (!empty($child['teacher'])): ?>
- <br><small class="text-muted" style="color: #7c3aed !important;"><i class="fas fa-chalkboard-teacher"></i> <?= esc($child['teacher']) ?></small>
- <?php endif; ?>
- <?php if (!empty($child['relation'])): ?>
- <br><span class="badge badge-light">
- <?= esc($child['relation']) ?>
- </span>
- <?php endif; ?>
  </div>
  </div>
  </div>
@@ -540,6 +483,86 @@
  <p class="mt-3">No children registered yet</p>
  </div>
  <?php endif; ?>
+ </div>
+ </div>
+
+ <!-- Recent Pickup History -->
+ <div class="kid-card mt-3">
+ <div class="card-header">
+ <div class="d-flex justify-content-between align-items-center mb-3">
+ <h5 class="mb-0">
+ <i class="fas fa-history mr-2" style="color: #4361ee;"></i>
+                                Pickup History
+ <span class="badge" style="background:rgba(67,97,238,0.1);color:#4361ee;margin-left:8px;font-size:12px;padding:5px 12px;"><?= count($parentReleaseHistory ?? []) ?> records</span>
+ </h5>
+ <a href="<?= base_url('parents-releases') ?>" class="btn btn-sm btn-primary" style="font-size:12px;border-radius:50px;">
+ <i class="fas fa-list mr-1"></i> View All
+ </a>
+ </div>
+ <form method="GET" action="<?= base_url('dashboard') ?>" id="parentFilterForm">
+ <div class="row no-gutters align-items-center">
+ <div class="col-auto pr-2">
+ <div class="input-group input-group-sm" style="border-radius:50px;overflow:hidden;border:2px solid rgba(108,140,255,0.12);background:rgba(255,255,255,0.7);">
+ <div class="input-group-prepend">
+ <span class="input-group-text" style="background:transparent;border:none;padding:6px 12px;"><i class="fas fa-calendar-alt" style="color:#7C6CFF;font-size:13px;"></i></span>
+ </div>
+ <input type="date" id="parentDate" name="date" value="<?= esc($selectedDate ?? '') ?>" class="form-control border-0" style="background:transparent;font-size:13px;font-weight:600;color:#2d2d4a;padding:6px 8px;max-width:170px;" onchange="document.getElementById('parentFilterForm').submit()">
+ </div>
+ </div>
+ <div class="col pr-2">
+ <div class="input-group input-group-sm" style="border-radius:50px;overflow:hidden;border:2px solid rgba(108,140,255,0.12);background:rgba(255,255,255,0.7);">
+ <div class="input-group-prepend">
+ <span class="input-group-text" style="background:transparent;border:none;padding:6px 12px;"><i class="fas fa-search" style="color:#6C8CFF;font-size:13px;"></i></span>
+ </div>
+ <input type="text" name="q" value="<?= esc($search ?? '') ?>" class="form-control border-0" placeholder="Search by child or fetcher name..." style="background:transparent;font-size:13px;padding:6px 12px;">
+ <div class="input-group-append">
+ <button type="submit" class="btn btn-sm" style="background:linear-gradient(135deg,#6C8CFF,#7C6CFF);color:#fff;border:none;border-radius:0 50px 50px 0;padding:6px 14px;font-size:12px;font-weight:700;">Search</button>
+ </div>
+ </div>
+ </div>
+ <div class="col-auto">
+ <a href="<?= base_url('dashboard') ?>" class="btn btn-sm" style="border:2px solid rgba(108,140,255,0.15);background:rgba(255,255,255,0.3);border-radius:50px;font-size:12px;padding:6px 14px;font-weight:700;color:#6a6a8a;">
+ <i class="fas fa-sync-alt mr-1"></i>All
+ </a>
+ </div>
+ </div>
+ </form>
+ </div>
+ <div class="card-body p-0">
+ <div class="table-responsive">
+ <table class="table table-fun table-hover table-sm mb-0">
+ <thead style="background:linear-gradient(135deg,#6C8CFF,#7C6CFF);"><tr style="color:#fff;"><th>Date & Time</th><th>Child</th><th>Picked up by</th><th>Method</th></tr></thead>
+ <tbody>
+ <?php if(!empty($parentReleaseHistory)): foreach($parentReleaseHistory as $rh): ?>
+ <tr>
+ <td class="small" style="color: #64748b; white-space: nowrap;">
+ <i class="fas fa-calendar-alt mr-1" style="color: #94a3b8;"></i><?= date('M d, Y', strtotime($rh['time_released'])) ?>
+ <br><small style="color: #94a3b8;"><?= date('h:i A', strtotime($rh['time_released'])) ?></small>
+ </td>
+ <td>
+ <strong style="color: #0f172a;"><?= esc($rh['student_fname'] ?? '') ?> <?= esc($rh['student_lname'] ?? '') ?></strong>
+ </td>
+ <td>
+ <?= esc(trim(($rh['fetcher_fname'] ?? '') . ' ' . ($rh['fetcher_lname'] ?? ''))) ?>
+ <?php if (!empty($rh['fetcher_relation'])): ?>
+ <br><small class="text-muted"><?= esc($rh['fetcher_relation']) ?></small>
+ <?php endif; ?>
+ </td>
+ <td><span class="badge badge-primary" style="<?= ($rh['method'] ?? '') == 'QR' ? '' : 'background-color:#eef2ff;color:#4338ca;' ?>"><?= $rh['method'] ?? '—' ?></span></td>
+ </tr>
+ <?php endforeach; else: ?>
+ <tr><td colspan="4" class="text-center text-muted py-4">
+ <?php if (!empty($selectedDate) || !empty($search ?? '')): ?>
+ <i class="fas fa-search fa-2x mb-2 d-block" style="color:rgba(108,140,255,0.2);"></i>
+ <p>No records found for this filter</p>
+ <?php else: ?>
+ <i class="fas fa-history fa-2x mb-2 d-block" style="color:rgba(108,140,255,0.2);"></i>
+ <p>No releases yet</p>
+ <?php endif; ?>
+ </td></tr>
+ <?php endif; ?>
+ </tbody>
+ </table>
  </div>
  </div>
  </div>

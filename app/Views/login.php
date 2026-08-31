@@ -3,8 +3,9 @@
 <head>
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
- <title>Scan2Fetch | Sign In</title>
+ <title>SCAN2FETCH | Sign In</title>
  <link rel="icon" href="<?= base_url('image/qr-code-76.png') ?>">
+ <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,600,700&display=fallback">
  <link rel="stylesheet" href="<?= base_url('public/assets/plugins/fontawesome-free/css/all.min.css') ?>">
 
  <style>
@@ -12,6 +13,7 @@
 
         :root {
             --primary: #4361ee;
+            --primary-2: #7c3aed;
             --primary-dark: #3b4fd8;
             --heading: #0f172a;
             --text: #334155;
@@ -21,7 +23,7 @@
 
         body {
             min-height: 100vh;
-            font-family: 'Source Sans Pro', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Quicksand', 'Source Sans Pro', 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: #f1f5f9;
             color: var(--text);
             display: flex;
@@ -66,19 +68,24 @@
         .nav-icon {
             width: 40px;
             height: 40px;
-            border-radius: 8px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
             color: white;
             font-size: 17px;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, .25);
         }
 
         .brand-text {
             font-size: 18px;
             font-weight: 700;
             letter-spacing: .6px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             color: var(--heading);
         }
 
@@ -90,7 +97,7 @@
             background: #fff;
             border: 1px solid #cbd5e1;
             color: var(--muted);
-            border-radius: 6px;
+            border-radius: 50px;
             font-size: 14px;
             font-weight: 600;
             text-decoration: none;
@@ -119,13 +126,14 @@
             width: 64px;
             height: 64px;
             margin: 0 auto 12px;
-            border-radius: 12px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #eef2ff;
-            color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            color: #fff;
             font-size: 26px;
+            box-shadow: 0 8px 24px rgba(67,97,238,.3);
         }
 
         .brand-name {
@@ -175,7 +183,7 @@
             display: flex;
             align-items: center;
             border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            border-radius: 50px;
             background: #fff;
             transition: border-color .2s ease, box-shadow .2s ease;
         }
@@ -215,9 +223,9 @@
         .btn-signin {
             width: 100%;
             padding: 12px;
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
             border: none;
-            border-radius: 6px;
+            border-radius: 50px;
             color: white;
             font-size: 15px;
             font-weight: 600;
@@ -228,11 +236,11 @@
             justify-content: center;
             gap: 10px;
             margin-top: 6px;
-            transition: background .2s ease, box-shadow .2s ease;
+            transition: box-shadow .2s ease, transform .2s ease;
         }
 
-        .btn-signin:hover { background: var(--primary-dark); box-shadow: 0 4px 12px rgba(67, 97, 238, .3); }
-        .btn-signin:active { background: #3651e0; }
+        .btn-signin:hover { background: linear-gradient(135deg, var(--primary-dark), #6d28d9); box-shadow: 0 8px 20px rgba(67, 97, 238, .35); }
+        .btn-signin:active { background: linear-gradient(135deg, #3651e0, #6d28d9); transform: translateY(1px); }
 
         /* ===== DIVIDER & FEATURES ===== */
         .divider {

@@ -80,14 +80,14 @@ class Parents extends BaseController
     {
         $picture = $this->uploadPicture('picture');
         $qrValue = $this->generateQR();
-        $password = $this->generatePassword();
 
         $this->parentsModel->save([
             'fname' => $this->request->getPost('fname'),
             'mname' => $this->request->getPost('mname'),
             'lname' => $this->request->getPost('lname'),
             'phone' => $this->request->getPost('phone'),
-            'password' => password_hash($password, PASSWORD_DEFAULT),
+            'password' => null,
+            'password_sent' => 0,
             'picture' => $picture,
             'qr_code' => $qrValue,
             'created_by' => session('user_id'),
@@ -101,11 +101,6 @@ class Parents extends BaseController
             'Created parent: ' . $this->request->getPost('fname') . ' ' . $this->request->getPost('lname')
         );
 
-        $this->sendLocalSms(
-            $this->request->getPost('phone'),
-            'Your Scan2Fetch account password is: ' . $password . ' (recorded in SMS logs).'
-        );
-
         $msg = 'Parent added';
         return redirect()->to('/parents')->with('msg', $msg);
     }
@@ -113,18 +108,13 @@ class Parents extends BaseController
     // ===== SEND / RESET PASSWORD VIA SMS =====
     public function sendPassword($id)
     {
+        if (! $this->requireAdminStaff()) return;
         $parent = $this->parentsModel->find($id);
         if (!$parent) {
             return redirect()->to('/parents')->with('error', 'Parent not found');
         }
 
-        $password = $this->generatePassword();
-        $this->parentsModel->update($id, ['password' => password_hash($password, PASSWORD_DEFAULT)]);
-
-        $this->sendLocalSms(
-            $parent['phone'],
-            'Your new Scan2Fetch account password is: ' . $password . ' (recorded in SMS logs).'
-        );
+        $this->deliverPassword($this->parentsModel, $parent, 'parent');
 
         $this->logModel->addLog(
             session('user_id'),
@@ -137,6 +127,29 @@ class Parents extends BaseController
 
         $msg = 'New password recorded in SMS logs.';
         return redirect()->to('/parents-view/' . $id)->with('msg', $msg);
+    }
+
+    // ===== SEND PASSWORD TO ALL PARENTS NOT YET SENT =====
+    public function sendAllPasswords()
+    {
+        if (! $this->requireAdminStaff()) return;
+        $pending = $this->parentsModel->where('password_sent', 0)->findAll();
+        $sent = 0;
+        foreach ($pending as $parent) {
+            $this->deliverPassword($this->parentsModel, $parent, 'parent');
+            $sent++;
+        }
+
+        $this->logModel->addLog(
+            session('user_id'),
+            session('fname') . ' ' . session('lname'),
+            session('role'),
+            'update',
+            'parent',
+            "Sent passwords to $sent parent(s) who had not received one yet."
+        );
+
+        return redirect()->to('/parents')->with('msg', "Passwords sent to $sent parent(s).");
     }
 
     public function update()
@@ -292,6 +305,15 @@ class Parents extends BaseController
         $userId = session('user_id');
         $studentModel = new \App\Models\StudentModel();
         $db = \Config\Database::connect();
+
+        // Date filter: defaults to all
+        $selectedDate = $this->request->getGet('date') ?? '';
+        if ($selectedDate && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDate)) {
+            $selectedDate = '';
+        }
+
+        // Search filter
+        $search = trim($this->request->getGet('q') ?? '');
         
         $studentParents = $db->table('student_parents')
             ->where('parent_id', $userId)
@@ -313,10 +335,16 @@ class Parents extends BaseController
         $data['releases'] = [];
         if (!empty($studentIds)) {
             $fetchLogModel = new \App\Models\FetchLogModel();
-            $releases = $fetchLogModel
-                ->whereIn('student_id', $studentIds)
+            $query = $fetchLogModel
+                ->whereIn('student_id', $studentIds);
+
+            if ($selectedDate) {
+                $query->where('DATE(time_released)', $selectedDate);
+            }
+
+            $releases = $query
                 ->orderBy('time_released', 'DESC')
-                ->limit(50)
+                ->limit(100)
                 ->findAll();
             
             foreach ($releases as &$release) {
@@ -334,12 +362,18 @@ class Parents extends BaseController
 
         $data['declined'] = [];
         if (!empty($studentIds)) {
-            $declined = $db->table('activity_logs')
+            $declinedQuery = $db->table('activity_logs')
                 ->select('activity_logs.*')
                 ->where('action', 'decline')
-                ->where('module', 'scan')
+                ->where('module', 'scan');
+
+            if ($selectedDate) {
+                $declinedQuery->where('DATE(created_at)', $selectedDate);
+            }
+
+            $declined = $declinedQuery
                 ->orderBy('created_at', 'DESC')
-                ->limit(50)
+                ->limit(100)
                 ->get()
                 ->getResultArray();
             
@@ -373,7 +407,24 @@ class Parents extends BaseController
         usort($allLogs, function($a, $b) {
             return strtotime($b['time_released']) - strtotime($a['time_released']);
         });
+
+        // Search filter
+        if ($search !== '') {
+            $allLogs = array_filter($allLogs, function($r) use ($search) {
+                $haystack = strtolower(
+                    ($r['sfname'] ?? '') . ' ' .
+                    ($r['slname'] ?? '') . ' ' .
+                    ($r['fetcher_fname'] ?? '') . ' ' .
+                    ($r['fetcher_lname'] ?? '')
+                );
+                return strpos($haystack, strtolower($search)) !== false;
+            });
+            $allLogs = array_values($allLogs);
+        }
+
         $data['logs'] = $allLogs;
+        $data['selectedDate'] = $selectedDate;
+        $data['search'] = $search;
         
         return view('parents_releases', $data);
     }

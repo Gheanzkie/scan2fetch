@@ -347,6 +347,11 @@ body {
                                     Teacher List
  <span class="badge badge-soft ml-2"><?= count($teachers ?? []) ?></span>
  </h5>
+ <a href="<?= base_url('teachers-send-all') ?>" class="btn btn-kid-primary btn-sm mr-2"
+                                                title="Send passwords to teachers who haven't received one yet"
+                                                onclick="return confirm('Send passwords to all teachers who have not received one yet?')">
+ <i class="fas fa-sms mr-1"></i> Send All Passwords
+ </a>
  <button type="button" class="btn btn-kid-primary btn-sm" data-toggle="modal" data-target="#addTeacherModal">
  <i class="fas fa-plus mr-1"></i> Add Teacher
  </button>
@@ -379,8 +384,9 @@ body {
  <th>Phone</th>
  <th>Grade / Section</th>
  <th class="text-center">Students</th>
+ <th class="text-center">Password</th>
  <th>Created</th>
- <th class="text-center" style="width:140px;">Actions</th>
+ <th class="text-center" style="width:160px;">Actions</th>
  </tr>
  </thead>
  <tbody>
@@ -413,6 +419,13 @@ body {
  <td class="text-center">
  <span class="badge badge-soft"><?= $studentCounts[$teacher['grade_section']] ?? 0 ?></span>
  </td>
+ <td class="text-center">
+ <?php if (!empty($teacher['password_sent'])): ?>
+ <span class="badge badge-soft" title="Password already sent" style="color:#2e7d32;"><i class="fas fa-check"></i></span>
+ <?php else: ?>
+ <span class="badge badge-soft" title="Password not yet sent" style="color:#c2185b;"><i class="fas fa-times"></i></span>
+ <?php endif; ?>
+ </td>
  <td class="muted"><?= date('M d, Y', strtotime($teacher['created_at'])) ?></td>
  <td class="text-center">
  <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
@@ -441,10 +454,17 @@ data-phone="<?= esc($teacher['phone']) ?>"
  <i class="fas fa-edit mr-2" style="color:#b8750a;"></i> Edit
  </a>
  <div class="dropdown-divider"></div>
+ <?php if (empty($teacher['password_sent'])): ?>
  <a class="dropdown-item" href="<?= base_url('teachers-send-password/' . $teacher['id']) ?>"
-                                                                   onclick="return confirm('Send a new password to this teacher via SMS?\n\n<?= esc($teacher['fname']) ?> <?= esc($teacher['lname']) ?>')">
+ onclick="return confirm('Generate and send a password to this teacher via SMS?\n\n<?= esc($teacher['fname']) ?> <?= esc($teacher['lname']) ?>')">
+ <i class="fas fa-sms mr-2" style="color:#2e7d32;"></i> Send Password
+ </a>
+ <?php else: ?>
+ <a class="dropdown-item" href="<?= base_url('teachers-send-password/' . $teacher['id']) ?>"
+ onclick="return confirm('Send a new password to this teacher via SMS?\n\n<?= esc($teacher['fname']) ?> <?= esc($teacher['lname']) ?>')">
  <i class="fas fa-key mr-2" style="color:#2e7d32;"></i> Reset Password
  </a>
+ <?php endif; ?>
  <div class="dropdown-divider"></div>
  <a class="dropdown-item text-danger" href="<?= base_url('teachers-delete/' . $teacher['id']) ?>"
                                                                    onclick="return confirm('Delete this teacher?\n\n<?= esc($teacher['fname']) ?> <?= esc($teacher['lname']) ?>')">
@@ -458,7 +478,7 @@ data-phone="<?= esc($teacher['phone']) ?>"
  <?php endforeach; ?>
  <?php else: ?>
  <tr>
- <td colspan="7" class="text-center py-5 empty-state">
+ <td colspan="8" class="text-center py-5 empty-state">
  <i class="fas fa-chalkboard-teacher fa-3x mb-3 d-block"></i>
  <h5>No teachers yet</h5>
  <p>Click "Add Teacher" to register a new teacher.</p>
@@ -562,7 +582,7 @@ data-phone="<?= esc($teacher['phone']) ?>"
  <div class="alert" style="background: rgba(168,192,255,0.12); border: 1.5px dashed rgba(63,43,150,0.18); border-radius: 12px; margin-bottom: 0; padding: 12px 14px; font-size: 13px; color: var(--ink);">
  <i class="fas fa-info-circle mr-1" style="color: var(--soft-blue);"></i>
                         The teacher is linked to the grade/section above, so their students and parents connect automatically.
-                        A temporary password will be generated and recorded in the SMS Logs (SMS is not live yet).
+                        Passwords are not sent automatically — use "Send Password" / "Send All Passwords" to deliver them.
  </div>
 
  <div class="text-center mt-3">

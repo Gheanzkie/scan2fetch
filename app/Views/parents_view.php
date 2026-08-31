@@ -400,18 +400,7 @@ body {
  </div>
  <?php endif; ?>
 
- <!-- Action Buttons -->
- <div class="mt-2">
- <a href="<?= base_url('parents-edit/'.$parent['id']) ?>" class="btn btn-outline-secondary btn-sm">
- <i class="fas fa-edit"></i> Edit
- </a>
- <a href="<?= base_url('parents-send-password/'.$parent['id']) ?>" class="btn btn-warning btn-sm ml-1">
- <i class="fas fa-sms"></i> Reset Password
- </a>
- <a href="<?= base_url('parents-delete/'.$parent['id']) ?>" class="btn btn-outline-danger btn-sm ml-1" onclick="return confirm('Delete this parent?')">
- <i class="fas fa-trash"></i> Delete
- </a>
- </div>
+ <!-- Action Buttons (Edit / Reset Password / Delete now live in the Parents list) -->
  </div>
  </div>
 
@@ -479,18 +468,24 @@ body {
  <div class="card mb-3">
  <div class="card-header d-flex justify-content-between align-items-center">
  <h5 class="mb-0">
+ <a href="<?= base_url('students-view/'.$s['student_id']) ?>" style="color: #2d2d4a; text-decoration:none;">
  <i class="fas fa-user-graduate mr-2" style="color: var(--soft-blue);"></i>
  <?= esc($s['fname']) ?> <?= esc($s['lname']) ?>
  <small style="color: #b0b0c8; font-size: 13px;">(<?= esc($s['grade_section']) ?>)</small>
+ </a>
  </h5>
  <a href="<?= base_url('students-view/'.$s['student_id']) ?>" class="btn btn-outline-info btn-xs">
- <i class="fas fa-eye"></i> View Student
+ <i class="fas fa-eye"></i> Go to Student
  </a>
  </div>
  <div class="card-body">
  <div class="row">
  <div class="col-md-6">
- <p class="mb-1"><strong style="color: #2d2d4a;">Student:</strong> <?= esc($s['fname']) ?> <?= esc($s['lname']) ?></p>
+ <p class="mb-1"><strong style="color: #2d2d4a;">Student:</strong>
+ <a href="<?= base_url('students-view/'.$s['student_id']) ?>" style="color: var(--soft-purple); font-weight:700; text-decoration:none;">
+ <?= esc($s['fname']) ?> <?= esc($s['lname']) ?>
+ </a>
+ </p>
  <p class="mb-1"><strong style="color: #2d2d4a;">Grade:</strong> <?= esc($s['grade_section']) ?></p>
  <?php if (!empty($teacherMap[$s['grade_section']] ?? '')): ?>
  <p class="mb-1"><strong style="color: #2d2d4a;">Teacher:</strong> <i class="fas fa-chalkboard-teacher" style="color: #7a5ad0;"></i> <?= esc($teacherMap[$s['grade_section']]) ?></p>
@@ -498,17 +493,19 @@ body {
  <p class="mb-0"><strong style="color: #2d2d4a;">Relation:</strong> <span class="badge badge-primary"><?= esc($s['relation'] ?? 'Parent') ?></span></p>
  </div>
  <div class="col-md-6 text-right">
+ <a href="<?= base_url('students-view/'.$s['student_id']) ?>">
  <?php if(!empty($s['picture'])): ?>
  <img src="<?= base_url('uploads/students/'.$s['picture']) ?>" 
-                                             class="img-circle" 
-                                             style="width:70px;height:70px;object-fit:cover;border:3px solid var(--soft-blue);cursor:pointer;" 
-                                             onclick="openImageViewer('<?= base_url('uploads/students/'.$s['picture']) ?>','<?= esc($s['fname'].' '.$s['lname']) ?>')">
+                                              class="img-circle" 
+                                              style="width:70px;height:70px;object-fit:cover;border:3px solid var(--soft-blue);cursor:pointer;" 
+                                              title="View <?= esc($s['fname'].' '.$s['lname']) ?>">
  <?php else: ?>
  <div class="img-circle d-inline-flex align-items-center justify-content-center" 
-                                             style="width:70px;height:70px;border:3px solid var(--soft-blue);background:rgba(255,255,255,0.3);">
+                                              style="width:70px;height:70px;border:3px solid var(--soft-blue);background:rgba(255,255,255,0.3);cursor:pointer;">
  <i class="fas fa-child fa-2x" style="color: #b0b0c8;"></i>
  </div>
  <?php endif; ?>
+ </a>
  </div>
  </div>
  </div>

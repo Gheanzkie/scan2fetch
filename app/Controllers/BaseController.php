@@ -119,4 +119,44 @@ abstract class BaseController extends Controller
             'phone'   => $phone,
         ];
     }
+
+    /**
+     * Allow only admin and staff roles (used by protected management actions).
+     * Returns true when access is granted, otherwise redirects and returns false.
+     */
+    protected function requireAdminStaff(): bool
+    {
+        if (session('role') !== 'admin' && session('role') !== 'staff') {
+            redirect()->to('/dashboard')->send();
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Generate a fresh password for a record, store its hash, mark it as sent,
+     * and record the SMS locally. Shared by single "Send Password" and bulk
+     * "Send All Passwords" flows across parents / teachers / staff.
+     *
+     * @return array{password: string, name: string} the delivered plaintext + display name
+     */
+    protected function deliverPassword(\CodeIgniter\Model $model, array $record, string $roleLabel): array
+    {
+        $password = $this->generatePassword();
+
+        $model->update($record['id'], [
+            'password'      => password_hash($password, PASSWORD_DEFAULT),
+            'password_sent' => 1,
+        ]);
+
+        $this->sendLocalSms(
+            $record['phone'],
+            "Your new $roleLabel account password is: $password (recorded in SMS logs)."
+        );
+
+        return [
+            'password' => $password,
+            'name'     => trim(($record['fname'] ?? '') . ' ' . ($record['lname'] ?? '')),
+        ];
+    }
 }

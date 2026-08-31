@@ -35,6 +35,14 @@ class Students extends BaseController
     // ========== VIEW ==========
     public function view($id)
     {
+        // Only admin and staff can access the full student view with edit/delete
+        if (session('role') != 'admin' && session('role') != 'staff') {
+            if (session('role') == 'teacher') {
+                return redirect()->to('/teachers-student-view/' . $id);
+            }
+            return redirect()->to('/dashboard');
+        }
+
         $data['student'] = $this->studentModel->find($id);
         if (!$data['student']) return redirect()->to('/students')->with('error', 'Student not found');
 
@@ -103,17 +111,17 @@ class Students extends BaseController
                 foreach ($parentFnames as $i => $fname) {
                     if (empty($fname) || $i >= 3) continue;
 
-                    $password = $this->generatePassword();
                     $qrValue = $this->generateQR();
                     $parentId = $this->parentsModel->insert([
-                        'fname'      => $fname,
-                        'mname'      => $parentMnames[$i] ?? null,
-                        'lname'      => $parentLnames[$i],
-                        'phone'      => $parentPhones[$i],
-                        'password'   => password_hash($password, PASSWORD_DEFAULT),
-                        'qr_code'    => $qrValue,
-                        'picture'    => $parentPictures[$i] ?? null,
-                        'created_by' => session('user_id'),
+                        'fname'        => $fname,
+                        'mname'        => $parentMnames[$i] ?? null,
+                        'lname'        => $parentLnames[$i],
+                        'phone'        => $parentPhones[$i],
+                        'password'     => null,
+                        'password_sent'=> 0,
+                        'qr_code'      => $qrValue,
+                        'picture'      => $parentPictures[$i] ?? null,
+                        'created_by'   => session('user_id'),
                     ]);
 
                     if (!$parentId) {
@@ -140,12 +148,6 @@ class Students extends BaseController
                     if (!$linked) {
                         throw new \Exception('Failed to link parent to student');
                     }
-
-                    // Record the generated password SMS locally (no gateway)
-                    $this->sendLocalSms(
-                        $parentPhones[$i],
-                        'Your Scan2Fetch account password is: ' . $password . ' (recorded in SMS logs).'
-                    );
                 }
             }
 
@@ -216,6 +218,136 @@ class Students extends BaseController
             log_message('error', 'Registration failed: ' . $e->getMessage());
             return redirect()->to('/register')->with('error', 'Registration failed: ' . $e->getMessage());
         }
+    }
+
+    // ========== IMPORT STUDENTS + PARENTS FROM XLSX ==========
+    public function importExcel()
+    {
+        $db = \Config\Database::connect();
+        $file = $this->request->getFile('excel_file');
+
+        if (!$file || !$file->isValid()) {
+            return redirect()->to('/register')->with('error', 'Please choose an Excel (.xlsx) file to import.');
+        }
+        if (strtolower($file->getClientExtension()) !== 'xlsx') {
+            return redirect()->to('/register')->with('error', 'Only .xlsx files are supported.');
+        }
+
+        $tmp = WRITEPATH . 'uploads/' . $file->getRandomName();
+        $file->move(dirname($tmp), basename($tmp));
+
+        try {
+            require_once ROOTPATH . 'vendor/autoload.php';
+            $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($tmp);
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray(null, true, true, true);
+        } catch (\Throwable $e) {
+            @unlink($tmp);
+            return redirect()->to('/register')->with('error', 'Could not read the Excel file: ' . $e->getMessage());
+        }
+        @unlink($tmp);
+
+        if (empty($rows) || count($rows) < 2) {
+            return redirect()->to('/register')->with('error', 'The Excel file has no data rows.');
+        }
+
+        // Remove the header row (first row).
+        $rows = array_values(array_slice($rows, 1));
+
+        $imported = 0;
+        $skipped = 0;
+        $errors = [];
+        $limit = 500;
+
+        $db->transStart();
+        try {
+            foreach ($rows as $r) {
+                if ($imported + $skipped >= $limit) break;
+
+                $vals = array_values($r);
+
+                $sfname = trim((string)($vals[0] ?? ''));
+                $smname = trim((string)($vals[1] ?? ''));
+                $slname = trim((string)($vals[2] ?? ''));
+                $grade  = trim((string)($vals[3] ?? ''));
+                $pfname = trim((string)($vals[4] ?? ''));
+                $pmname = trim((string)($vals[5] ?? ''));
+                $plname = trim((string)($vals[6] ?? ''));
+                $pphone = trim((string)($vals[7] ?? ''));
+                $rel    = trim((string)($vals[8] ?? '')) ?: 'Parent';
+
+                if ($sfname === '' || $slname === '' || $pfname === '' || $plname === '' || $pphone === '') {
+                    $skipped++;
+                    continue;
+                }
+
+                $studentId = $this->studentModel->insert([
+                    'fname'         => $sfname,
+                    'mname'         => $smname ?: null,
+                    'lname'         => $slname,
+                    'grade_section' => $grade,
+                    'picture'       => null,
+                    'created_by'    => session('user_id'),
+                ]);
+                if (!$studentId) {
+                    $skipped++;
+                    continue;
+                }
+
+                $qrValue  = $this->generateQR();
+                $parentId = $this->parentsModel->insert([
+                    'fname'        => $pfname,
+                    'mname'        => $pmname ?: null,
+                    'lname'        => $plname,
+                    'phone'        => $pphone,
+                    'password'     => null,
+                    'password_sent'=> 0,
+                    'qr_code'      => $qrValue,
+                    'picture'      => null,
+                    'created_by'   => session('user_id'),
+                ]);
+                if (!$parentId) {
+                    $skipped++;
+                    continue;
+                }
+
+                $db->table('student_parents')->insert([
+                    'student_id' => $studentId,
+                    'parent_id'  => $parentId,
+                    'relation'   => $rel,
+                ]);
+
+                $imported++;
+            }
+
+            $db->transComplete();
+        } catch (\Throwable $e) {
+            $db->transRollback();
+            return redirect()->to('/register')->with('error', 'Import failed: ' . $e->getMessage());
+        }
+
+        if ($db->transStatus() === false) {
+            return redirect()->to('/register')->with('error', 'Import transaction failed.');
+        }
+
+        if ($imported > 0) {
+            $this->logModel->addLog(
+                session('user_id'),
+                session('fname') . ' ' . session('lname'),
+                session('role'),
+                'create',
+                'import',
+                "Imported $imported students + parents from Excel"
+            );
+        }
+
+        $msg = "Import complete! <strong>$imported</strong> student(s) registered.";
+        if ($skipped > 0) {
+            $msg .= " <strong>$skipped</strong> row(s) skipped (missing required fields).";
+        }
+        return redirect()->to('/register')->with('msg', $msg);
     }
 
     // ========== UPDATE STUDENT ==========
@@ -358,17 +490,17 @@ class Students extends BaseController
 
         $pictureName = $this->uploadParentPicture();
         $qrValue = $this->generateQR();
-        $password = $this->generatePassword();
 
         $parentId = $this->parentsModel->insert([
-            'fname'      => $this->request->getPost('fname'),
-            'mname'      => $this->request->getPost('mname'),
-            'lname'      => $this->request->getPost('lname'),
-            'phone'      => $this->request->getPost('phone'),
-            'password'   => password_hash($password, PASSWORD_DEFAULT),
-            'picture'    => $pictureName,
-            'qr_code'    => $qrValue,
-            'created_by' => session('user_id'),
+            'fname'        => $this->request->getPost('fname'),
+            'mname'        => $this->request->getPost('mname'),
+            'lname'        => $this->request->getPost('lname'),
+            'phone'        => $this->request->getPost('phone'),
+            'password'     => null,
+            'password_sent'=> 0,
+            'picture'      => $pictureName,
+            'qr_code'      => $qrValue,
+            'created_by'   => session('user_id'),
         ]);
 
         $db->table('student_parents')->insert([
@@ -384,11 +516,6 @@ class Students extends BaseController
             'create', 
             'parent', 
             'Added: '.$this->request->getPost('fname').' '.$this->request->getPost('lname')
-        );
-
-        $this->sendLocalSms(
-            $this->request->getPost('phone'),
-            'Your Scan2Fetch account password is: ' . $password . ' (recorded in SMS logs).'
         );
 
         $msg = 'Parent added';

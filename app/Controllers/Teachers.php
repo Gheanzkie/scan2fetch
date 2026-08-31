@@ -54,25 +54,57 @@ class Teachers extends BaseController
         }
 
         $db = \Config\Database::connect();
-        $students = $db->table('students')
+
+        // Date filter: defaults to today
+        $selectedDate = $this->request->getGet('date') ?: date('Y-m-d');
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDate)) {
+            $selectedDate = date('Y-m-d');
+        }
+
+        // Search filter
+        $search = trim($this->request->getGet('q') ?? '');
+
+        $query = $db->table('students')
             ->select('students.*')
-            ->where('students.grade_section', $teacher['grade_section'])
-            ->orderBy('students.lname', 'ASC')
+            ->where('students.grade_section', $teacher['grade_section']);
+        if ($search !== '') {
+            $query->groupStart()
+                ->like('students.fname', $search)
+                ->orLike('students.lname', $search)
+                ->orLike('students.mname', $search)
+                ->groupEnd();
+        }
+        $students = $query->orderBy('students.lname', 'ASC')
             ->get()
             ->getResultArray();
 
-        // Today's release status per student -> "who went home / who is still at school".
+        $studentIds = array_column($students, 'id');
+
+        // Selected date's release status per student
         $releasedIds = [];
-        if (!empty($students)) {
-            $todayLogs = $db->table('fetch_logs')
+        $recentHistory = [];
+        if (!empty($studentIds)) {
+            $dateLogs = $db->table('fetch_logs')
                 ->select('student_id, time_released')
-                ->where('DATE(time_released)', date('Y-m-d'))
-                ->whereIn('student_id', array_column($students, 'id'))
+                ->where('DATE(time_released)', $selectedDate)
+                ->whereIn('student_id', $studentIds)
                 ->orderBy('time_released', 'ASC')
                 ->get()
                 ->getResultArray();
-            foreach ($todayLogs as $l) {
+            foreach ($dateLogs as $l) {
                 $releasedIds[$l['student_id']] = $l;
+            }
+
+            // Recent pickup history per student (last 30 days)
+            $historyLogs = $db->table('fetch_logs')
+                ->select('student_id, time_released, fetcher_fname, fetcher_lname, method')
+                ->where('DATE(time_released) >=', date('Y-m-d', strtotime('-30 days')))
+                ->whereIn('student_id', $studentIds)
+                ->orderBy('time_released', 'DESC')
+                ->get()
+                ->getResultArray();
+            foreach ($historyLogs as $hl) {
+                $recentHistory[$hl['student_id']][] = $hl;
             }
         }
 
@@ -87,6 +119,7 @@ class Teachers extends BaseController
 
             $s['released'] = isset($releasedIds[$s['id']]);
             $s['released_time'] = $releasedIds[$s['id']]['time_released'] ?? null;
+            $s['recent_history'] = $recentHistory[$s['id']] ?? [];
 
             $rows[] = [
                 'student' => $s,
@@ -97,8 +130,61 @@ class Teachers extends BaseController
         $data['teacher'] = $teacher;
         $data['rows'] = $rows;
         $data['releasedToday'] = count($releasedIds);
-        $data['pendingToday'] = count($students) - count($releasedIds);
+        $data['pendingToday'] = count($studentIds) - count($releasedIds);
+        $data['selectedDate'] = $selectedDate;
+        $data['search'] = $search;
         return view('teachers_view', $data);
+    }
+
+    // ===== TEACHER SELF-SERVICE: View student details (read-only) =====
+    public function studentView($id)
+    {
+        if (session('role') != 'teacher') {
+            return redirect()->to('/dashboard');
+        }
+
+        $db = \Config\Database::connect();
+        $gradeSection = session('grade_section');
+
+        $student = $db->table('students')->where('id', $id)->get()->getRowArray();
+        if (!$student) {
+            return redirect()->to('/teachers-view/' . session('user_id'))->with('error', 'Student not found');
+        }
+
+        // Teachers can only view students in their grade section
+        if ($student['grade_section'] !== $gradeSection) {
+            return redirect()->to('/teachers-view/' . session('user_id'))->with('error', 'You can only view students in your class.');
+        }
+
+        $parents = $db->table('student_parents')
+            ->select('parents.*, student_parents.relation')
+            ->join('parents', 'parents.id = student_parents.parent_id')
+            ->where('student_parents.student_id', $id)
+            ->get()
+            ->getResultArray();
+
+        $subFetchers = $db->table('sub_fetchers')
+            ->where('student_id', $id)
+            ->get()
+            ->getResultArray();
+
+        // Recent pickup history
+        $pickupHistory = $db->table('fetch_logs')
+            ->select('fetch_logs.*, parents.fname AS parent_fname, parents.lname AS parent_lname')
+            ->join('parents', 'parents.id = fetch_logs.parent_id', 'left')
+            ->where('fetch_logs.student_id', $id)
+            ->orderBy('fetch_logs.time_released', 'DESC')
+            ->limit(20)
+            ->get()
+            ->getResultArray();
+
+        $data['student'] = $student;
+        $data['parents'] = $parents;
+        $data['subFetchers'] = $subFetchers;
+        $data['pickupHistory'] = $pickupHistory;
+        $data['teacherId'] = session('user_id');
+
+        return view('teachers_student_view', $data);
     }
 
     // ===== TEACHER SELF-SERVICE: SMS they received (like the parent module) =====
@@ -154,7 +240,6 @@ class Teachers extends BaseController
             return redirect()->to('/dashboard');
         }
         $model = new TeachersModel();
-        $password = $this->generatePassword();
 
         $phone = trim($this->request->getPost('phone'));
         $existing = $model->where('phone', $phone)->first();
@@ -168,14 +253,11 @@ class Teachers extends BaseController
             'lname' => $this->request->getPost('lname'),
             'phone' => $phone,
             'grade_section' => $this->request->getPost('grade_section'),
-            'password' => password_hash($password, PASSWORD_DEFAULT),
+            'password' => null,
+            'password_sent' => 0,
             'picture' => $this->saveUploadedPicture('teachers'),
             'created_by' => session('user_id'),
         ]);
-        $this->sendLocalSms(
-            $phone,
-            'Your Scan2Fetch teacher account password is: ' . $password . ' (recorded in SMS logs).'
-        );
         $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'create', 'teacher', 'Created teacher: '.$this->request->getPost('fname').' '.$this->request->getPost('lname').' ('.trim($this->request->getPost('grade_section')).')');
         return redirect()->to('/teachers')->with('msg', 'Teacher added');
     }
@@ -218,22 +300,30 @@ class Teachers extends BaseController
 
     public function sendPassword($id)
     {
-        if (session('role') != 'admin' && session('role') != 'staff') {
-            return redirect()->to('/dashboard');
-        }
+        if (! $this->requireAdminStaff()) return;
         $model = new TeachersModel();
         $teacher = $model->find($id);
-        if (!$teacher) {
+        if (! $teacher) {
             return redirect()->to('/teachers')->with('error', 'Teacher not found');
         }
-        $password = $this->generatePassword();
-        $model->update($id, ['password' => password_hash($password, PASSWORD_DEFAULT)]);
-        $this->sendLocalSms(
-            $teacher['phone'],
-            'Your new Scan2Fetch teacher account password is: ' . $password . ' (recorded in SMS logs).'
-        );
+        $this->deliverPassword($model, $teacher, 'teacher');
         $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'update', 'teacher', 'Reset password for teacher: '.$teacher['fname'].' '.$teacher['lname'].' (ID: '.$id.')');
         return redirect()->to('/teachers')->with('msg', 'New password sent via SMS (recorded in SMS logs)');
+    }
+
+    // ===== SEND PASSWORD TO ALL TEACHERS NOT YET SENT =====
+    public function sendAllPasswords()
+    {
+        if (! $this->requireAdminStaff()) return;
+        $model = new TeachersModel();
+        $pending = $model->where('password_sent', 0)->findAll();
+        $sent = 0;
+        foreach ($pending as $t) {
+            $this->deliverPassword($model, $t, 'teacher');
+            $sent++;
+        }
+        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'update', 'teacher', "Sent passwords to $sent teacher(s) who had not received one yet.");
+        return redirect()->to('/teachers')->with('msg', "Passwords sent to $sent teacher(s).");
     }
 
     private function gradeSections()

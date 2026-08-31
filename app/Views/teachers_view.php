@@ -199,10 +199,16 @@ body {
     box-shadow: 0 4px 14px rgba(63,43,150,0.06);
 }
 
-@media (max-width: 768px) {
-    .content-header h1 { font-size: 1.35rem !important; }
-    .btn { font-size: 12px !important; padding: 6px 14px !important; }
-}
+ /* ===== DATE PICKER & SEARCH ===== */
+ .input-group-text { border: none !important; background: transparent !important; }
+ .form-control:focus { box-shadow: none !important; outline: none !important; }
+ input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; }
+ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+
+ @media (max-width: 768px) {
+     .content-header h1 { font-size: 1.35rem !important; }
+     .btn { font-size: 12px !important; padding: 6px 14px !important; }
+ }
 </style>
 
 <div class="content-wrapper" style="background: transparent;">
@@ -290,11 +296,11 @@ body {
  </div>
  <div class="card-body py-3" style="color: var(--muted); font-size: 13px;">
  <div class="d-flex align-items-center justify-content-between mb-2 p-3" style="border-radius: 16px; background: rgba(129,199,132,0.08);">
- <span><i class="fas fa-home mr-2" style="color: #43a047;"></i> Went home today</span>
+ <span><i class="fas fa-home mr-2" style="color: #43a047;"></i> Picked up on <?= date('M d, Y', strtotime($selectedDate)) ?></span>
  <span class="badge badge-released"><?= isset($releasedToday) ? (int)$releasedToday : 0 ?></span>
  </div>
  <div class="d-flex align-items-center justify-content-between p-3" style="border-radius: 16px; background: rgba(255,183,77,0.10);">
- <span><i class="fas fa-school mr-2" style="color: #f57c00;"></i> Still at school</span>
+ <span><i class="fas fa-school mr-2" style="color: #f57c00;"></i> Still waiting</span>
  <span class="badge badge-pending"><?= isset($pendingToday) ? (int)$pendingToday : 0 ?></span>
  </div>
  <div class="mt-3" style="color: var(--faint); font-size: 12px; text-align: center;">
@@ -309,16 +315,50 @@ body {
  <div class="col-md-8">
  <div class="card">
  <div class="card-header">
+ <div class="d-flex justify-content-between align-items-center flex-wrap">
  <h6 class="mb-0">
  <i class="fas fa-users mr-2" style="color: var(--soft-blue);"></i>
-                                Class Roster (<?= count($rows) ?>)
+                                    Class Roster (<?= count($rows) ?>)
  <small style="color: var(--faint); font-size: 12px;">&nbsp;<?= esc($teacher['grade_section']) ?></small>
  </h6>
+ </div>
+ <div class="mt-3">
+ <form method="GET" action="<?= base_url('teachers-view/' . $teacher['id']) ?>" id="filterForm">
+ <div class="row no-gutters align-items-center">
+ <div class="col-auto pr-2">
+ <div class="input-group input-group-sm" style="border-radius:50px;overflow:hidden;border:2px solid rgba(108,140,255,0.12);background:rgba(255,255,255,0.7);">
+ <div class="input-group-prepend">
+ <span class="input-group-text" style="background:transparent;border:none;padding:6px 12px;"><i class="fas fa-calendar-alt" style="color:var(--soft-purple);font-size:13px;"></i></span>
+ </div>
+ <input type="date" name="date" value="<?= esc($selectedDate) ?>" class="form-control border-0" style="background:transparent;font-size:13px;font-weight:600;color:var(--ink);padding:6px 8px;max-width:170px;" onchange="document.getElementById('filterForm').submit()">
+ </div>
+ </div>
+ <div class="col pr-2">
+ <div class="input-group input-group-sm" style="border-radius:50px;overflow:hidden;border:2px solid rgba(108,140,255,0.12);background:rgba(255,255,255,0.7);">
+ <div class="input-group-prepend">
+ <span class="input-group-text" style="background:transparent;border:none;padding:6px 12px;"><i class="fas fa-search" style="color:var(--soft-blue);font-size:13px;"></i></span>
+ </div>
+ <input type="text" name="q" value="<?= esc($search) ?>" class="form-control border-0" placeholder="Search student..." style="background:transparent;font-size:13px;padding:6px 12px;">
+ <input type="hidden" name="date" value="<?= esc($selectedDate) ?>">
+ <div class="input-group-append">
+ <button type="submit" class="btn btn-sm" style="background:linear-gradient(135deg,var(--soft-blue),var(--soft-purple));color:#fff;border:none;border-radius:0 50px 50px 0;padding:6px 14px;font-size:12px;font-weight:700;">Search</button>
+ </div>
+ </div>
+ </div>
+ <div class="col-auto">
+ <a href="<?= base_url('teachers-view/' . $teacher['id']) ?>" class="btn btn-sm btn-outline-secondary" style="border-radius:50px;font-size:12px;padding:6px 14px;font-weight:700;">
+ <i class="fas fa-sync-alt mr-1"></i>Today
+ </a>
+ </div>
+ </div>
+ </form>
+ </div>
  </div>
  <div class="card-body pt-2">
  <?php if(!empty($rows)): foreach($rows as $r): ?>
  <?php $s = $r['student']; ?>
- <div class="d-flex align-items-center justify-content-between py-2 px-2 mb-2 student-row">
+ <div class="student-row mb-3 p-3">
+ <div class="d-flex align-items-center justify-content-between mb-2">
  <div class="d-flex align-items-center">
  <i class="fas fa-child mr-3" style="color: #b0b0c8; font-size: 16px;"></i>
  <div>
@@ -329,17 +369,39 @@ body {
  <div class="d-flex align-items-center">
  <?php if (!empty($s['released'])): ?>
  <span class="badge badge-released">
- <i class="fas fa-check-circle mr-1"></i> Picked up <?= date('h:i A', strtotime($s['released_time'])) ?>
+ <i class="fas fa-check-circle mr-1"></i> Picked up <?= date('M d, Y h:i A', strtotime($s['released_time'])) ?>
  </span>
  <?php else: ?>
  <span class="badge badge-pending">
  <i class="fas fa-spinner mr-1"></i> Still in school
  </span>
  <?php endif; ?>
- <a href="<?= base_url('students-view/'.$s['id']) ?>" class="btn btn-outline-info btn-xs ml-2" title="View student">
+ <a href="<?= base_url('teachers-student-view/'.$s['id']) ?>" class="btn btn-outline-info btn-xs ml-2" title="View student">
  <i class="fas fa-eye"></i>
  </a>
  </div>
+ </div>
+ <?php if (!empty($s['recent_history'])): ?>
+ <div class="mt-2" style="padding-left: 39px;">
+ <small style="color: var(--faint); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-history mr-1"></i>Pickup History</small>
+ <div class="mt-1">
+ <?php foreach (array_slice($s['recent_history'], 0, 5) as $hl): ?>
+ <div class="d-flex align-items-center mb-1" style="font-size: 12px; color: var(--muted);">
+ <i class="fas fa-check-circle mr-1" style="color: var(--soft-green); font-size: 10px;"></i>
+ <span style="color: var(--ink); font-weight: 600;"><?= date('M d', strtotime($hl['time_released'])) ?></span>
+ <span class="mx-1" style="color: var(--faint);">-</span>
+ <span><?= date('h:i A', strtotime($hl['time_released'])) ?></span>
+ <span class="mx-1" style="color: var(--faint);">-</span>
+ <span><?= esc($hl['fetcher_fname']) ?> <?= esc($hl['fetcher_lname']) ?></span>
+ <span class="badge badge-count ml-1" style="font-size: 10px; padding: 2px 8px;"><?= esc($hl['method']) ?></span>
+ </div>
+ <?php endforeach; ?>
+ <?php if (count($s['recent_history']) > 5): ?>
+ <div style="font-size: 11px; color: var(--faint);"><i class="fas fa-ellipsis-h mr-1"></i><?= count($s['recent_history']) - 5 ?> more pickup(s)</div>
+ <?php endif; ?>
+ </div>
+ </div>
+ <?php endif; ?>
  </div>
  <?php endforeach; else: ?>
  <div class="text-center py-5" style="color: var(--faint);">

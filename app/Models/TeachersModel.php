@@ -9,7 +9,7 @@ class TeachersModel extends Model
     protected $table = 'teachers';
     protected $primaryKey = 'id';
     protected $allowedFields = [
-        'fname', 'mname', 'lname', 'phone', 'password', 'grade_section', 'picture', 'created_by', 'created_at'
+        'fname', 'mname', 'lname', 'phone', 'password', 'password_sent', 'grade_section', 'picture', 'created_by', 'created_at'
     ];
 
     public function studentCounts(): array

@@ -177,6 +177,37 @@ body {
     color: #fff !important;
 }
 
+.btn-action-send {
+    background: linear-gradient(135deg, var(--soft-green), #43a047) !important;
+    border: none !important;
+    color: #fff !important;
+    box-shadow: 0 3px 10px rgba(76,175,80,0.18) !important;
+    transition: box-shadow 0.25s ease !important;
+}
+
+.btn-action-send:hover {
+    box-shadow: 0 6px 18px rgba(76,175,80,0.30) !important;
+    color: #fff !important;
+}
+
+.btn-action-more {
+    background: rgba(63,43,150,0.08) !important;
+    border: none !important;
+    color: #5a5280 !important;
+}
+
+.btn-action-more:hover { background: rgba(63,43,150,0.16) !important; color: #3f2b96 !important; }
+
+.dropdown-menu {
+    border-radius: 14px !important;
+    border: 1px solid rgba(255,255,255,0.8) !important;
+    box-shadow: 0 12px 32px rgba(63,43,150,0.12) !important;
+}
+
+.dropdown-item { font-size: 13px !important; font-weight: 600 !important; color: var(--ink) !important; border-radius: 8px !important; }
+.dropdown-item:hover { background: rgba(168,192,255,0.12) !important; color: var(--soft-purple) !important; }
+.dropdown-item.text-danger:hover { background: rgba(245,87,108,0.08) !important; color: #c2185b !important; }
+
 .btn-sm { padding: 7px 16px !important; font-size: 12.5px !important; }
 
 /* ===== FILTER SECTION ===== */
@@ -423,8 +454,13 @@ select.form-control option {
  <span class="badge badge-soft ml-2"><?= count($parents ?? []) ?></span>
  </h5>
  <span style="color: var(--faint); font-size: 12.5px;">
- <i class="fas fa-info-circle mr-1"></i>Passwords are auto-generated and sent via SMS on registration
+ <i class="fas fa-info-circle mr-1"></i>Passwords are sent manually via "Send Password" or "Send All Passwords" below
  </span>
+ <a href="<?= base_url('parents-send-all') ?>" class="btn btn-kid-primary btn-sm mr-2"
+                                                title="Send passwords to parents who haven't received one yet"
+                                                onclick="return confirm('Send passwords to all parents who have not received one yet?')">
+ <i class="fas fa-sms mr-1"></i> Send All Passwords
+ </a>
  </div>
  </div>
  <div class="card-body pt-0">
@@ -456,8 +492,9 @@ select.form-control option {
  <th>Student / Grade</th>
  <th>Relation</th>
  <th style="width:70px;">QR</th>
+ <th class="text-center">Password</th>
  <th>Created</th>
- <th class="text-center" style="width:120px;">Action</th>
+ <th class="text-center" style="width:210px;">Actions</th>
  </tr>
  </thead>
  <tbody>
@@ -506,20 +543,56 @@ select.form-control option {
  <span class="muted" style="font-size:12px;">No QR</span>
  <?php endif; ?>
  </td>
+ <td class="text-center">
+ <?php if (!empty($p['password_sent'])): ?>
+ <span class="badge badge-soft" title="Password already sent" style="color:#2e7d32;"><i class="fas fa-check"></i></span>
+ <?php else: ?>
+ <span class="badge badge-soft" title="Password not yet sent" style="color:#c2185b;"><i class="fas fa-times"></i></span>
+ <?php endif; ?>
+ </td>
  <td class="muted"><?= date('M d, Y', strtotime($p['created_at'])) ?></td>
  <td class="text-center">
+ <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
  <a href="<?= base_url('parents-view/'.$p['id']) ?>" class="btn-action btn-action-view" title="View Parent Details">
  <i class="fas fa-eye"></i> View
  </a>
+ <div class="dropdown">
+ <button class="btn-action btn-action-more dropdown-toggle" data-toggle="dropdown" title="More actions" style="border:none; cursor:pointer;">
+ <i class="fas fa-ellipsis-h"></i>
+ </button>
+ <div class="dropdown-menu dropdown-menu-right">
+ <a class="dropdown-item" href="<?= base_url('parents-edit/'.$p['id']) ?>">
+ <i class="fas fa-edit mr-2" style="color:#b8750a;"></i> Edit
+ </a>
+ <div class="dropdown-divider"></div>
+ <?php if (empty($p['password_sent'])): ?>
+ <a class="dropdown-item" href="<?= base_url('parents-send-password/'.$p['id']) ?>"
+ onclick="return confirm('Generate and send a password to this parent via SMS?\n\n<?= esc($p['fname']) ?> <?= esc($p['lname']) ?>')">
+ <i class="fas fa-sms mr-2" style="color:#2e7d32;"></i> Send Password
+ </a>
+ <?php else: ?>
+ <a class="dropdown-item" href="<?= base_url('parents-send-password/'.$p['id']) ?>"
+ onclick="return confirm('Reset and send a new password to this parent via SMS?\n\n<?= esc($p['fname']) ?> <?= esc($p['lname']) ?>')">
+ <i class="fas fa-key mr-2" style="color:#2e7d32;"></i> Reset Password
+ </a>
+ <?php endif; ?>
+ <div class="dropdown-divider"></div>
+ <a class="dropdown-item text-danger" href="<?= base_url('parents-delete/'.$p['id']) ?>"
+ onclick="return confirm('Delete this parent?\n\n<?= esc($p['fname']) ?> <?= esc($p['lname']) ?>')">
+ <i class="fas fa-trash mr-2"></i> Delete
+ </a>
+ </div>
+ </div>
+ </div>
  </td>
  </tr>
  <?php endforeach; ?>
  <?php else: ?>
  <tr>
- <td colspan="9" class="text-center py-5 empty-state">
+ <td colspan="10" class="text-center py-5 empty-state">
  <i class="fas fa-user-friends fa-3x mb-3 d-block"></i>
  <h5>No parents registered yet</h5>
- <p>Parents are automatically registered when adding a student. Their password is sent via SMS.</p>
+ <p>Parents are automatically registered when adding a student. Their password is sent manually via "Send Password" / "Send All Passwords".</p>
  </td>
  </tr>
  <?php endif; ?>

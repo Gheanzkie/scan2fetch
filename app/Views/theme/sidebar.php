@@ -1,17 +1,17 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4"
        id="mainSidebar"
-       style="background: #111827 !important;
-              border-right: 1px solid #1f2937;">
+       style="background: #221c4a !important;
+              border-right: 1px solid #32298a;">
 
  <!-- ===== BRAND ===== -->
  <a href="<?= base_url('dashboard') ?>" class="brand-link d-flex align-items-center"
-       style="border-bottom: 1px solid #1f2937; padding: 14px 18px;">
+       style="border-bottom: 1px solid #32298a; padding: 14px 18px;">
  <div style="width:36px;height:36px;
                     display:flex;align-items:center;justify-content:center;
-                    background:#1f2937;border-radius:8px;">
- <i class="fas fa-qrcode" style="color:#60a5fa;font-size:18px;"></i>
+                    background:linear-gradient(135deg,#4361ee,#7c3aed);border-radius:10px;">
+ <i class="fas fa-qrcode" style="color:#fff;font-size:18px;"></i>
  </div>
- <span class="brand-text font-weight-bold ml-3" style="font-size:17px;color:#f8fafc;letter-spacing:.5px;">
+ <span class="brand-text font-weight-bold ml-3" style="font-size:17px;color:#f5f3ff;letter-spacing:.5px;">
             SCAN2FETCH
  </span>
  </a>
@@ -19,18 +19,18 @@
  <div class="sidebar" style="padding: 10px 12px;">
  <!-- ===== USER GREETING ===== -->
  <div class="user-panel mt-2 pb-3 mb-3 d-flex align-items-center"
-             style="border-bottom: 1px solid #1f2937; padding-bottom: 14px;">
+             style="border-bottom: 1px solid #32298a; padding-bottom: 14px;">
  <div class="image">
- <div style="width:38px;height:38px;border-radius:8px;background:#1f2937;
+ <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#4361ee,#7c3aed);
                             display:flex;align-items:center;justify-content:center;">
- <i class="fas fa-user" style="color:#94a3b8;font-size:15px;"></i>
+ <i class="fas fa-user" style="color:#fff;font-size:15px;"></i>
  </div>
  </div>
  <div class="info ml-3" style="line-height:1.3;">
- <a href="#" class="d-block text-white font-weight-semibold" style="font-size:14px;color:#f8fafc !important;">
+ <a href="#" class="d-block text-white font-weight-semibold" style="font-size:14px;color:#f5f3ff !important;">
  <?= session('fname') ?> <?= session('lname') ?>
  </a>
- <small style="color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: .5px;">
+ <small style="color: #8b7fd0; font-size: 11px; text-transform: uppercase; letter-spacing: .5px;">
  <?php
                         $role = session('role');
                         if ($role == 'admin') echo 'Administrator';
@@ -262,27 +262,28 @@
 <style>
     /* ===== SIDEBAR ===== */
     .nav-sidebar .nav-link {
-        border-radius: 6px !important;
+        border-radius: 8px !important;
         margin: 2px 2px !important;
         padding: 9px 14px !important;
         font-size: 14px !important;
-        color: #cbd5e1 !important;
+        color: #c9c2ec !important;
         transition: all .15s ease !important;
     }
 
     .nav-sidebar .nav-link:hover {
-        background: rgba(148, 163, 184, .1) !important;
-        color: #f8fafc !important;
+        background: rgba(165, 180, 252, .12) !important;
+        color: #f5f3ff !important;
     }
 
     .nav-sidebar .nav-link.active {
-        background: #1f2937 !important;
-        border-left: 3px solid #60a5fa !important;
-        color: #f8fafc !important;
+        background: linear-gradient(135deg, #4361ee, #7c3aed) !important;
+        border-left: 3px solid #a5b4fc !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(67,97,238,.35) !important;
     }
 
     .nav-sidebar .nav-link.active i {
-        color: #60a5fa !important;
+        color: #c4d0ff !important;
     }
 
     .nav-sidebar .nav-header {
@@ -290,7 +291,7 @@
         font-weight: 700 !important;
         letter-spacing: 1px !important;
         text-transform: uppercase !important;
-        color: #64748b !important;
+        color: #8b7fd0 !important;
         padding: 14px 14px 6px !important;
     }
 

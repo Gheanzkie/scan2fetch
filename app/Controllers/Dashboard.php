@@ -85,6 +85,14 @@ class Dashboard extends BaseController
         if ($role == 'parent') {
             $data['parentProfile'] = $this->parentsModel->find($userId);
 
+            // Date filter: empty = show all
+            $selectedDate = $this->request->getGet('date') ?? '';
+            if ($selectedDate && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDate)) {
+                $selectedDate = '';
+            }
+            // Search filter
+            $search = trim($this->request->getGet('q') ?? '');
+
             $db = \Config\Database::connect();
             $studentParents = $db->table('student_parents')
                 ->where('parent_id', $userId)
@@ -123,15 +131,69 @@ class Dashboard extends BaseController
             }
             foreach ($data['myChildren'] as &$child) {
                 $child['teacher'] = $teacherMap[$child['grade_section']] ?? '';
+                $child['release_today'] = null;
             }
             unset($child);
 
             $data['releasedToday'] = 0;
+            $data['parentReleaseHistory'] = [];
+            $data['selectedDate'] = $selectedDate;
+            $data['search'] = $search;
             if (!empty($studentIds)) {
                 $data['releasedToday'] = $this->fetchLogModel
                     ->whereIn('student_id', $studentIds)
                     ->where('DATE(time_released)', $today)
                     ->countAllResults();
+
+                // Per-child today status
+                $todayReleases = $this->fetchLogModel
+                    ->select('student_id, time_released')
+                    ->whereIn('student_id', $studentIds)
+                    ->where('DATE(time_released)', $today)
+                    ->orderBy('time_released', 'ASC')
+                    ->findAll();
+                $todayMap = [];
+                foreach ($todayReleases as $tr) {
+                    if (!isset($todayMap[$tr['student_id']])) {
+                        $todayMap[$tr['student_id']] = $tr['time_released'];
+                    }
+                }
+                foreach ($data['myChildren'] as &$child) {
+                    $child['release_today'] = $todayMap[$child['id']] ?? null;
+                }
+                unset($child);
+
+                // Release history with date filter
+                $histQuery = $db->table('fetch_logs')
+                    ->select('fetch_logs.*, students.fname AS student_fname, students.lname AS student_lname')
+                    ->join('students', 'students.id = fetch_logs.student_id', 'left')
+                    ->whereIn('fetch_logs.student_id', $studentIds);
+
+                if ($selectedDate) {
+                    $histQuery->where('DATE(fetch_logs.time_released)', $selectedDate);
+                }
+
+                $history = $histQuery
+                    ->orderBy('fetch_logs.time_released', 'DESC')
+                    ->limit(50)
+                    ->get()
+                    ->getResultArray();
+
+                // Search filter
+                if ($search !== '') {
+                    $history = array_filter($history, function($r) use ($search) {
+                        $haystack = strtolower(
+                            ($r['student_fname'] ?? '') . ' ' .
+                            ($r['student_lname'] ?? '') . ' ' .
+                            ($r['fetcher_fname'] ?? '') . ' ' .
+                            ($r['fetcher_lname'] ?? '')
+                        );
+                        return strpos($haystack, strtolower($search)) !== false;
+                    });
+                    $history = array_values($history);
+                }
+
+                $data['parentReleaseHistory'] = $history;
             }
         }
 
@@ -140,14 +202,30 @@ class Dashboard extends BaseController
             $db = \Config\Database::connect();
             $gradeSection = session('grade_section');
 
+            // Date filter: defaults to today
+            $selectedDate = $this->request->getGet('date') ?: date('Y-m-d');
+            if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDate)) {
+                $selectedDate = date('Y-m-d');
+            }
+
+            // Search filter
+            $search = trim($this->request->getGet('q') ?? '');
+
             $data['teacherProfile'] = $db->table('teachers')->where('id', $userId)->get()->getRowArray();
 
             $myStudents = [];
             $studentIds = [];
             if (!empty($gradeSection)) {
-                $students = $db->table('students')
-                    ->where('grade_section', $gradeSection)
-                    ->orderBy('lname', 'ASC')
+                $query = $db->table('students')
+                    ->where('grade_section', $gradeSection);
+                if ($search !== '') {
+                    $query->groupStart()
+                        ->like('fname', $search)
+                        ->orLike('lname', $search)
+                        ->orLike('mname', $search)
+                        ->groupEnd();
+                }
+                $students = $query->orderBy('lname', 'ASC')
                     ->get()
                     ->getResultArray();
 
@@ -166,35 +244,40 @@ class Dashboard extends BaseController
 
             $data['releasedToday'] = 0;
             $data['pendingToday'] = 0;
-            $data['todayReleasedMap'] = [];
+            $data['dateReleasedMap'] = [];
+            $data['selectedDate'] = $selectedDate;
+            $data['search'] = $search;
             if (!empty($studentIds)) {
                 $data['releasedToday'] = $this->fetchLogModel
                     ->whereIn('student_id', $studentIds)
-                    ->where('DATE(time_released)', $today)
+                    ->where('DATE(time_released)', $selectedDate)
                     ->countAllResults();
 
-                $data['recentReleases'] = $this->fetchLogModel
-                    ->whereIn('student_id', $studentIds)
-                    ->orderBy('time_released', 'DESC')
+                $data['recentReleases'] = $db->table('fetch_logs')
+                    ->select('fetch_logs.*, students.fname AS student_fname, students.lname AS student_lname')
+                    ->join('students', 'students.id = fetch_logs.student_id', 'left')
+                    ->whereIn('fetch_logs.student_id', $studentIds)
+                    ->orderBy('fetch_logs.time_released', 'DESC')
                     ->limit(10)
-                    ->findAll();
+                    ->get()
+                    ->getResultArray();
 
                 $releasedIds = array_column(
                     $this->fetchLogModel
                         ->whereIn('student_id', $studentIds)
-                        ->where('DATE(time_released)', $today)
+                        ->where('DATE(time_released)', $selectedDate)
                         ->findAll(),
                     'student_id'
                 );
 
                 $releaseLogs = $this->fetchLogModel
                     ->whereIn('student_id', $studentIds)
-                    ->where('DATE(time_released)', $today)
+                    ->where('DATE(time_released)', $selectedDate)
                     ->orderBy('time_released', 'ASC')
                     ->findAll();
                 foreach ($releaseLogs as $rl) {
-                    if (!isset($data['todayReleasedMap'][$rl['student_id']])) {
-                        $data['todayReleasedMap'][$rl['student_id']] = $rl['time_released'];
+                    if (!isset($data['dateReleasedMap'][$rl['student_id']])) {
+                        $data['dateReleasedMap'][$rl['student_id']] = $rl['time_released'];
                     }
                 }
                 $data['pendingToday'] = count(array_diff($studentIds, $releasedIds));

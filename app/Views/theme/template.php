@@ -7,7 +7,7 @@
  <meta name="csrf-token" content="<?= csrf_hash() ?>">
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
- <title><?= siteTitle($pageName ?? '') ?></title>
+ <title><?= siteTitle(!empty($pageName) ? $pageName : routeTitle()) ?></title>
 
  <!-- ===== THEME PRELOAD (prevents dark-mode flash) ===== -->
  <script>
@@ -18,6 +18,7 @@
     } catch (e) {}
  </script>
 
+ <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,600,700&display=fallback">
  <link rel="stylesheet" href="<?= base_url('public/assets/plugins/fontawesome-free/css/all.min.css') ?>">
  <link rel="stylesheet" href="<?= base_url('public/assets/dist/css/adminlte.min.css') ?>">
  <link rel="stylesheet" href="<?= base_url('public/assets/plugins/toastr/toastr.min.css') ?>">
@@ -35,12 +36,19 @@
            per-page pastel styles that previously loaded later.
         ============================================================ */
         :root {
+            --blue: #4361ee;
+            --purple: #3b4fd8;
             --primary: #4361ee;
-            --primary-dark: #3b4fd8;
+            --primary-2: #3b4fd8;
+            --primary-grad: linear-gradient(135deg, #4361ee, #7c3aed);
             --success: #16a34a;
             --warning: #d97706;
             --danger: #dc2626;
             --info: #0284c7;
+            --pink: #e11d48;
+            --teal: #0284c7;
+            --green: #16a34a;
+            --orange: #d97706;
             --bg: #f1f5f9;
             --card: #ffffff;
             --border: #e2e8f0;
@@ -60,7 +68,7 @@
         }
 
         html body {
-            font-family: 'Source Sans Pro', 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+            font-family: 'Quicksand', 'Source Sans Pro', 'Segoe UI', system-ui, -apple-system, sans-serif !important;
             background: var(--bg) !important;
             color: var(--text) !important;
             min-height: 100vh;
@@ -118,30 +126,37 @@
         html body .welcome-banner h2 { color: var(--heading) !important; font-weight: 800 !important; font-size: 1.5rem !important; }
         html body .welcome-banner p { color: var(--muted) !important; font-size: .95rem !important; margin-bottom: 0 !important; }
 
-        /* ===== STAT BOXES ===== */
-        html body .fun-box { padding: 1.1rem .5rem !important; cursor: default !important; box-shadow: 0 1px 3px rgba(15,23,42,.05) !important; }
+        /* ===== STAT BOXES (semi-kid friendly, clean — no animations) ===== */
+        html body .fun-box {
+            padding: 1.1rem .5rem !important;
+            cursor: default !important;
+            box-shadow: 0 1px 3px rgba(15,23,42,.05) !important;
+            text-align: center !important;
+        }
+        html body .fun-box:hover { box-shadow: 0 4px 12px rgba(15,23,42,.09) !important; border-color: #cbd5e1 !important; }
         html body .fun-box .icon-circle {
-            width: 46px !important; height: 46px !important;
-            border-radius: 10px !important;
-            font-size: 1.15rem !important;
+            width: 50px !important; height: 50px !important;
+            border-radius: 14px !important;
+            font-size: 1.2rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 auto 10px !important;
             background: #eef2ff !important;
             color: var(--primary) !important;
-            margin: 0 auto 10px !important;
+            border: 1px solid #e0e7ff !important;
         }
-        html body .fun-box .number { color: var(--heading) !important; font-size: 1.55rem !important; font-weight: 800 !important; display: block !important; }
+        html body .fun-box .number { color: var(--heading) !important; font-size: 1.6rem !important; font-weight: 800 !important; display: block !important; line-height: 1.1 !important; }
         html body .fun-box .label { color: var(--muted) !important; font-size: .72rem !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: .4px !important; }
 
-        /* neutralize kid gradient backgrounds */
-        html body .bg-kid-blue,
-        html body .bg-kid-green,
-        html body .bg-kid-orange,
-        html body .bg-kid-pink,
-        html body .bg-kid-purple,
-        html body .bg-kid-yellow,
-        html body .bg-kid-teal {
-            background: var(--card) !important;
-            color: var(--text) !important;
-        }
+        /* semi-kid tinted (soft pastel) backgrounds — playful but professional */
+        html body .bg-kid-blue   { background: #eef4ff !important; color: var(--text) !important; }
+        html body .bg-kid-green  { background: #ecfdf3 !important; color: var(--text) !important; }
+        html body .bg-kid-orange { background: #fff6ed !important; color: var(--text) !important; }
+        html body .bg-kid-pink   { background: #fdf0f3 !important; color: var(--text) !important; }
+        html body .bg-kid-purple { background: #f4efff !important; color: var(--text) !important; }
+        html body .bg-kid-yellow { background: #fffbeb !important; color: var(--text) !important; }
+        html body .bg-kid-teal   { background: #eefcfc !important; color: var(--text) !important; }
         html body .bg-kid-blue   { border-top: 3px solid var(--primary) !important; }
         html body .bg-kid-green  { border-top: 3px solid var(--success) !important; }
         html body .bg-kid-orange { border-top: 3px solid var(--warning) !important; }
@@ -149,6 +164,14 @@
         html body .bg-kid-purple { border-top: 3px solid #7c3aed !important; }
         html body .bg-kid-yellow { border-top: 3px solid #f59e0b !important; }
         html body .bg-kid-teal   { border-top: 3px solid var(--info) !important; }
+        /* colored icon bubble to match each stat color */
+        html body .bg-kid-blue .icon-circle   { background: #fff8 !important; color: var(--primary) !important; border-color: #d6e4ff !important; }
+        html body .bg-kid-green .icon-circle  { background: #fff8 !important; color: var(--success) !important; border-color: #ccf5df !important; }
+        html body .bg-kid-orange .icon-circle { background: #fff8 !important; color: var(--warning) !important; border-color: #ffdcc2 !important; }
+        html body .bg-kid-pink .icon-circle   { background: #fff8 !important; color: #e11d48 !important; border-color: #ffccd6 !important; }
+        html body .bg-kid-purple .icon-circle { background: #fff8 !important; color: #7c3aed !important; border-color: #e2d5ff !important; }
+        html body .bg-kid-yellow .icon-circle { background: #fff8 !important; color: #f59e0b !important; border-color: #ffe9b3 !important; }
+        html body .bg-kid-teal .icon-circle   { background: #fff8 !important; color: var(--info) !important; border-color: #ccf0f0 !important; }
 
         /* ===== CHILD / LIST ITEMS ===== */
         html body .child-item,
@@ -249,7 +272,7 @@
         /* ===== BUTTONS (uniform) ===== */
         html body .btn,
         html body .btn-kid {
-            border-radius: 6px !important;
+            border-radius: 50px !important;
             font-weight: 600 !important;
             font-size: 14px !important;
             font-family: inherit !important;
@@ -260,24 +283,25 @@
             text-transform: none !important;
             transition: all .15s ease !important;
         }
-        html body .btn:hover { box-shadow: 0 2px 6px rgba(15,23,42,.14) !important; }
+        html body .btn:hover { box-shadow: 0 4px 12px rgba(63,43,150,.2) !important; }
         html body .btn-primary,
-        html body .btn-kid-primary { background: var(--primary) !important; border-color: var(--primary) !important; color: #fff !important; }
-        html body .btn-primary:hover, html body .btn-primary:focus { background: var(--primary-dark) !important; border-color: var(--primary-dark) !important; }
+        html body .btn-kid-primary { background: linear-gradient(135deg, #4361ee, #7c3aed) !important; border-color: #4361ee !important; color: #fff !important; box-shadow: 0 4px 14px rgba(67,97,238,.28) !important; }
+        html body .btn-primary:hover, html body .btn-primary:focus,
+        html body .btn-kid-primary:hover, html body .btn-kid-primary:focus { background: linear-gradient(135deg, #3b4fd8, #6d28d9) !important; border-color: #3b4fd8 !important; color: #fff !important; box-shadow: 0 6px 18px rgba(67,97,238,.35) !important; }
         html body .btn-success,
-        html body .btn-kid-success { background: var(--success) !important; border-color: var(--success) !important; color: #fff !important; }
-        html body .btn-success:hover { background: #128a3d !important; border-color: #128a3d !important; }
+        html body .btn-kid-success { background: linear-gradient(135deg, #16a34a, #34d399) !important; border-color: #16a34a !important; color: #fff !important; box-shadow: 0 4px 14px rgba(22,163,74,.25) !important; }
+        html body .btn-success:hover, html body .btn-kid-success:hover { background: linear-gradient(135deg, #15803d, #2bbd7e) !important; border-color: #15803d !important; color: #fff !important; }
         html body .btn-warning,
-        html body .btn-kid-warning { background: var(--warning) !important; border-color: var(--warning) !important; color: #fff !important; }
-        html body .btn-warning:hover { background: #b85f04 !important; border-color: #b85f04 !important; color: #fff !important; }
-        html body .btn-danger { background: var(--danger) !important; border-color: var(--danger) !important; color: #fff !important; }
-        html body .btn-danger:hover { background: #b91c1c !important; border-color: #b91c1c !important; }
-        html body .btn-info { background: var(--info) !important; border-color: var(--info) !important; color: #fff !important; }
-        html body .btn-info:hover { background: #0369a1 !important; border-color: #0369a1 !important; }
-        html body .btn-kid-purple { background: #7c3aed !important; border-color: #7c3aed !important; color: #fff !important; }
-        html body .btn-kid-purple:hover { background: #6d28d9 !important; border-color: #6d28d9 !important; }
-        html body .btn-kid-pink { background: #e11d48 !important; border-color: #e11d48 !important; color: #fff !important; }
-        html body .btn-kid-pink:hover { background: #be123c !important; border-color: #be123c !important; }
+        html body .btn-kid-warning { background: linear-gradient(135deg, #d97706, #f59e0b) !important; border-color: #d97706 !important; color: #fff !important; box-shadow: 0 4px 14px rgba(217,119,6,.25) !important; }
+        html body .btn-warning:hover, html body .btn-kid-warning:hover { background: linear-gradient(135deg, #b85f04, #f59e0b) !important; border-color: #b85f04 !important; color: #fff !important; }
+        html body .btn-danger { background: linear-gradient(135deg, #dc2626, #f87171) !important; border-color: #dc2626 !important; color: #fff !important; }
+        html body .btn-danger:hover { background: linear-gradient(135deg, #b91c1c, #f87171) !important; border-color: #b91c1c !important; }
+        html body .btn-info { background: linear-gradient(135deg, #0284c7, #38bdf8) !important; border-color: #0284c7 !important; color: #fff !important; }
+        html body .btn-info:hover { background: linear-gradient(135deg, #0369a1, #38bdf8) !important; border-color: #0369a1 !important; }
+        html body .btn-kid-purple { background: linear-gradient(135deg, #7c3aed, #a78bfa) !important; border-color: #7c3aed !important; color: #fff !important; }
+        html body .btn-kid-purple:hover { background: linear-gradient(135deg, #6d28d9, #a78bfa) !important; border-color: #6d28d9 !important; }
+        html body .btn-kid-pink { background: linear-gradient(135deg, #e11d48, #f472b6) !important; border-color: #e11d48 !important; color: #fff !important; }
+        html body .btn-kid-pink:hover { background: linear-gradient(135deg, #be123c, #f472b6) !important; border-color: #be123c !important; }
 
         html body .btn-outline-secondary,
         html body .btn-outline-primary,
@@ -311,11 +335,11 @@
         html body .btn-outline-kid:hover {
             background: #eef2ff !important;
             border-color: #4361ee !important;
-            color: #4361ee !important;
+            color: #7c3aed !important;
         }
 
         html body .btn-sm { padding: 5px 12px !important; font-size: 13px !important; }
-        html body .btn-xs { padding: 3px 10px !important; font-size: 12px !important; border-radius: 6px !important; }
+        html body .btn-xs { padding: 3px 10px !important; font-size: 12px !important; border-radius: 50px !important; }
 
         /* ===== BADGES ===== */
         html body .badge {
@@ -341,10 +365,29 @@
         /* ===== CUSTOM MODULE ACTIONS ===== */
         html body .btn-action, html body .btn-action-view, html body .btn-action-edit,
         html body .btn-action-delete, html body .btn-action-more, html body .btn-action-password {
-            border-radius: 5px !important;
-            padding: 4px 9px !important;
+            border-radius: 50px !important;
+            padding: 4px 10px !important;
             font-size: 12px !important;
+            font-weight: 600 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            border: 1px solid transparent !important;
+            white-space: nowrap !important;
         }
+        /* uniform action-button colors: view=blue, edit=amber, send=green, delete=red, more=neutral */
+        html body .btn-action-view    { background: #eef4ff !important; color: #2f5fd0 !important; border-color: #d6e4ff !important; }
+        html body .btn-action-view:hover { background: #dbe8ff !important; color: #1e3a8a !important; }
+        html body .btn-action-edit    { background: #fff6e5 !important; color: #b8750a !important; border-color: #ffe9bf !important; }
+        html body .btn-action-edit:hover { background: #ffedcc !important; color: #92400e !important; }
+        html body .btn-action-send,
+        html body .btn-action-password{ background: #e9f9ef !important; color: #15803d !important; border-color: #ccf2db !important; }
+        html body .btn-action-send:hover,
+        html body .btn-action-password:hover { background: #d3f3e2 !important; color: #166534 !important; }
+        html body .btn-action-delete  { background: #feecec !important; color: #c2185b !important; border-color: #ffd5dc !important; }
+        html body .btn-action-delete:hover { background: #ffd9de !important; color: #9f1239 !important; }
+        html body .btn-action-more    { background: #f1f5f9 !important; color: #475569 !important; border-color: #e2e8f0 !important; }
+        html body .btn-action-more:hover { background: #e2e8f0 !important; color: #1e293b !important; }
         html body .student-item { background: #fff !important; border-color: #e2e8f0 !important; }
         html body .student-item:hover { background: #f8fafc !important; border-color: #cbd5e1 !important; }
         html body .qr-card, html body .qr-thumb { background: #fff !important; border-color: #e2e8f0 !important; }
@@ -406,7 +449,12 @@
             font-size: 1.4rem !important;
             margin: .2rem 0 .4rem !important;
         }
-        html body .content-header h1 i { color: var(--heading) !important; -webkit-text-fill-color: currentColor !important; }
+        html body .content-header h1 i {
+            background: linear-gradient(135deg, #4361ee, #7c3aed) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+        }
 
         /* ===== INFO BOX (stats on logs/sms pages) ===== */
         html body .info-box {
@@ -584,7 +632,7 @@
  </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed"
-      style="font-family: 'Source Sans Pro', 'Segoe UI', system-ui, -apple-system, sans-serif;">
+      style="font-family: 'Quicksand', 'Source Sans Pro', 'Segoe UI', system-ui, -apple-system, sans-serif;">
 
 <div class="wrapper">
 
@@ -594,11 +642,11 @@
 
  <!-- ===== FOOTER ===== -->
  <footer class="main-footer no-print"
-            style="background: #111827 !important;
-                   border-top: 1px solid #1f2937;
+            style="background: #221c4a !important;
+                   border-top: 1px solid #32298a;
                    color: rgba(226,232,240,0.6) !important;
                    padding: 14px 20px !important;
-                   font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif !important;
+                   font-family: 'Quicksand', 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif !important;
                    position: relative;
                    z-index: 1;">
  <div class="container-fluid">

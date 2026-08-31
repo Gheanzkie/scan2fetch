@@ -27,17 +27,13 @@ class Staffs extends BaseController
     public function save()
     {
         $model = new StaffsModel();
-        $password = $this->generatePassword();
         $model->save([
             'fname' => $this->request->getPost('fname'), 'mname' => $this->request->getPost('mname'),
             'lname' => $this->request->getPost('lname'), 'phone' => $this->request->getPost('phone'),
-            'password' => password_hash($password, PASSWORD_DEFAULT),
+            'password' => null,
+            'password_sent' => 0,
             'picture' => $this->saveUploadedPicture('staffs'),
         ]);
-        $this->sendLocalSms(
-            $this->request->getPost('phone'),
-            'Your Scan2Fetch staff account password is: ' . $password . ' (recorded in SMS logs).'
-        );
         $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'create', 'staff', 'Created staff: '.$this->request->getPost('fname').' '.$this->request->getPost('lname'));
         return redirect()->to('/staffs')->with('msg', 'Staff added');
     }
@@ -52,16 +48,40 @@ class Staffs extends BaseController
             $data['picture'] = $picture;
         }
         if ($this->request->getPost('password')) {
-            $password = $this->request->getPost('password');
-            $data['password'] = password_hash($password, PASSWORD_DEFAULT);
-            $this->sendLocalSms(
-                $data['phone'],
-                'Your new Scan2Fetch staff account password is: ' . $password . ' (recorded in SMS logs).'
-            );
+            $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
         }
         $model->update($id, $data);
         $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'update', 'staff', 'Updated staff: '.$data['fname'].' '.$data['lname'].' (ID: '.$id.')');
         return redirect()->to('/staffs')->with('msg', 'Staff updated');
+    }
+
+    // ===== SEND / RESET PASSWORD VIA SMS =====
+    public function sendPassword($id)
+    {
+        if (! $this->requireAdminStaff()) return;
+        $model = new StaffsModel();
+        $staff = $model->find($id);
+        if (!$staff) {
+            return redirect()->to('/staffs')->with('error', 'Staff not found');
+        }
+        $this->deliverPassword($model, $staff, 'staff');
+        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'update', 'staff', 'Sent password for staff: '.$staff['fname'].' '.$staff['lname'].' (ID: '.$id.')');
+        return redirect()->to('/staffs')->with('msg', 'Password sent via SMS (recorded in SMS logs)');
+    }
+
+    // ===== SEND PASSWORD TO ALL STAFF NOT YET SENT =====
+    public function sendAllPasswords()
+    {
+        if (! $this->requireAdminStaff()) return;
+        $model = new StaffsModel();
+        $pending = $model->where('password_sent', 0)->findAll();
+        $sent = 0;
+        foreach ($pending as $s) {
+            $this->deliverPassword($model, $s, 'staff');
+            $sent++;
+        }
+        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'update', 'staff', "Sent passwords to $sent staff member(s) who had not received one yet.");
+        return redirect()->to('/staffs')->with('msg', "Passwords sent to $sent staff member(s).");
     }
 
     public function delete($id)

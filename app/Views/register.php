@@ -486,6 +486,66 @@ label .text-danger { color: #dc2626 !important; }
  <section class="content">
  <div class="container-fluid">
 
+ <!-- FLASH MESSAGES -->
+ <?php if(session()->getFlashdata('msg')): ?>
+ <div class="alert alert-success alert-dismissible fade show">
+ <i class="fas fa-check-circle mr-2"></i> <?= session()->getFlashdata('msg') ?>
+ <button type="button" class="close" data-dismiss="alert" style="color: var(--ink);">&times;</button>
+ </div>
+ <?php endif; ?>
+ <?php if(session()->getFlashdata('error')): ?>
+ <div class="alert alert-danger alert-dismissible fade show">
+ <i class="fas fa-exclamation-circle mr-2"></i> <?= session()->getFlashdata('error') ?>
+ <button type="button" class="close" data-dismiss="alert" style="color: var(--ink);">&times;</button>
+ </div>
+ <?php endif; ?>
+
+ <!-- ===== EXCEL IMPORT ===== -->
+ <div class="card mb-4">
+ <div class="card-header">
+ <h5 class="mb-0">
+ <i class="fas fa-file-excel mr-2" style="color: #1d9e4b;"></i>
+                                Bulk Import from Excel
+ </h5>
+ </div>
+ <div class="card-body">
+ <div class="row align-items-center">
+ <div class="col-md-7">
+ <p class="mb-1" style="color: var(--muted); font-size: 13.5px;">
+ <i class="fas fa-info-circle mr-1" style="color: var(--soft-blue);"></i>
+                                        Import many students + parents at once using an Excel (.xlsx) file.
+ </p>
+ <ul class="small mb-1" style="color: var(--muted);">
+ <li>Required columns: Student First Name, Student Last Name, Parent First Name, Parent Last Name, Parent Phone</li>
+ <li>Optional: Student Middle Name, Grade & Section, Parent Middle Name, Parent Relation</li>
+ <li>Column order matters. See the bundled sample file below.</li>
+ </ul>
+ </div>
+ <div class="col-md-5">
+ <form action="<?= base_url('students-import') ?>" method="post" enctype="multipart/form-data" id="importForm">
+ <?= csrf_field() ?>
+ <div class="input-group">
+ <div class="custom-file">
+ <input type="file" class="custom-file-input" name="excel_file" id="excelFileInput" accept=".xlsx" required>
+ <label class="custom-file-label" for="excelFileInput">Choose .xlsx file</label>
+ </div>
+ <div class="input-group-append">
+  <button type="submit" class="btn btn-kid-primary btn-sm" id="importBtn">
+  <i class="fas fa-upload mr-1"></i> Import
+  </button>
+ </div>
+ </div>
+ <small class="d-block mt-2">
+ <a href="<?= base_url('uploads/sample/sample_students.xlsx') ?>" download style="color: var(--soft-purple); font-weight:600;">
+ <i class="fas fa-file-download mr-1"></i> Download sample file (50 students)
+ </a>
+ </small>
+ </form>
+ </div>
+ </div>
+ </div>
+ </div>
+
  <!-- ===== REGISTRATION FORM ===== -->
  <div id="registrationFormContainer">
  <form action="<?= base_url('students-save') ?>" method="post" enctype="multipart/form-data" id="registrationForm">
@@ -513,10 +573,10 @@ label .text-danger { color: #dc2626 !important; }
  <i class="fas fa-child"></i>
  </div>
  <div class="btn-group btn-group-sm" role="group" style="gap: 8px;">
- <button type="button" class="btn btn-kid-primary open-camera-btn" data-target="student">
+ <button type="button" class="btn btn-kid-primary btn-sm open-camera-btn" data-target="student">
  <i class="fas fa-camera mr-1"></i> Take Photo
  </button>
- <label class="btn btn-kid-pink mb-0" style="cursor:pointer;">
+ <label class="btn btn-kid-pink btn-sm mb-0" style="cursor:pointer;">
  <i class="fas fa-upload mr-1"></i> Upload
  <input type="file" name="picture" id="pictureInput" class="d-none" accept="image/*">
  </label>
@@ -721,7 +781,7 @@ label .text-danger { color: #dc2626 !important; }
 
  <div class="alert alert-warning mt-3 mb-0">
  <i class="fas fa-lightbulb"></i>
- <small>QR codes and passwords will be automatically generated for all registered parents! The password will be sent via SMS to the parent's phone number.</small>
+ <small>QR codes will be automatically generated for all registered parents. Passwords are NOT sent automatically — send them manually later using "Send Password" or "Send All Passwords" on the Parents page.</small>
  </div>
  </div>
  </div>
@@ -731,10 +791,10 @@ label .text-danger { color: #dc2626 !important; }
  <!-- ===== STICKY ACTION BAR ===== -->
  <div class="action-bar mt-3">
  <div class="d-flex justify-content-between align-items-center flex-wrap" style="gap: 10px;">
- <a href="<?= base_url('students') ?>" class="btn btn-outline-kid">
+ <a href="<?= base_url('students') ?>" class="btn btn-outline-kid btn-sm">
  <i class="fas fa-arrow-left mr-1"></i> Cancel
  </a>
- <button type="submit" class="btn btn-kid-success px-4" id="submitBtn">
+ <button type="submit" class="btn btn-kid-primary btn-sm px-4" id="submitBtn">
  <i class="fas fa-save mr-1"></i> Save & Generate QR
  </button>
  </div>
@@ -839,14 +899,14 @@ label .text-danger { color: #dc2626 !important; }
  <?php else: ?>
  <div class="alert alert-info mt-2 mb-0">
  <i class="fas fa-sms mr-1"></i>
- <small>A password has been generated and sent via SMS to each registered parent's number.</small>
+ <small>Passwords were not sent automatically. Send them when ready using "Send Password" / "Send All Passwords" on the Parents page.</small>
  </div>
  <?php endif; ?>
  </div>
  <div class="modal-footer" style="border-top: 2px solid rgba(129,199,132,0.12);">
- <a href="<?= base_url('students') ?>" class="btn btn-kid-success px-4" id="closeResultBtn">
- <i class="fas fa-check mr-1"></i> Done
- </a>
+  <a href="<?= base_url('students') ?>" class="btn btn-kid-primary btn-sm px-4" id="closeResultBtn">
+  <i class="fas fa-check mr-1"></i> Done
+  </a>
  </div>
  </div>
  </div>
@@ -1055,6 +1115,16 @@ $(function(){
         }
 
         $('#submitBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Saving... Please wait ');
+    });
+
+    // ===== IMPORT FORM FILE LABEL =====
+    $('#excelFileInput').on('change', function(){
+        var name = this.files && this.files[0] ? this.files[0].name : 'Choose .xlsx file';
+        $('.custom-file-label').text(name);
+    });
+
+    $('#importForm').on('submit', function(){
+        $('#importBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Importing...');
     });
 
     // ===== SHOW SUCCESS MODAL =====

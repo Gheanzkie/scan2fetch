@@ -626,9 +626,26 @@ select.form-control option {
  <td><span class="badge badge-soft"><?= esc($s['grade_section']) ?></span></td>
  <td class="muted"><?= date('M d, Y', strtotime($s['created_at'])) ?></td>
  <td class="text-center">
+ <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
  <a href="<?= base_url('students-view/'.$s['id']) ?>" class="btn-action btn-action-view">
  <i class="fas fa-eye"></i> View
  </a>
+ <div class="dropdown">
+ <button class="btn-action btn-action-more dropdown-toggle" data-toggle="dropdown" title="More actions" style="border:none; cursor:pointer;">
+ <i class="fas fa-ellipsis-h"></i>
+ </button>
+ <div class="dropdown-menu dropdown-menu-right">
+ <a class="dropdown-item" href="<?= base_url('students-edit/'.$s['id']) ?>">
+ <i class="fas fa-edit mr-2" style="color:#b8750a;"></i> Edit
+ </a>
+ <div class="dropdown-divider"></div>
+ <a class="dropdown-item text-danger" href="<?= base_url('students-delete/'.$s['id']) ?>"
+ onclick="return confirm('Delete this student?\n\n<?= esc($s['fname']) ?> <?= esc($s['lname']) ?>')">
+ <i class="fas fa-trash mr-2"></i> Delete
+ </a>
+ </div>
+ </div>
+ </div>
  </td>
  </tr>
  <?php endforeach; else: ?>

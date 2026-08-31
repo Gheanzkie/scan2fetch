@@ -186,6 +186,26 @@ body {
 
 .btn-action-delete:hover { box-shadow: 0 6px 18px rgba(245,87,108,0.30) !important; color: #fff !important; }
 
+.btn-action-view {
+    background: linear-gradient(135deg, var(--soft-blue), var(--soft-purple)) !important;
+    box-shadow: 0 3px 10px rgba(63,43,150,0.15) !important;
+}
+
+.btn-action-view:hover { box-shadow: 0 6px 18px rgba(63,43,150,0.28) !important; color: #fff !important; }
+
+.btn-action-more { background: rgba(63,43,150,0.08) !important; color: #5a5280 !important; }
+.btn-action-more:hover { background: rgba(63,43,150,0.16) !important; color: #3f2b96 !important; }
+
+.dropdown-menu {
+    border-radius: 14px !important;
+    border: 1px solid rgba(255,255,255,0.8) !important;
+    box-shadow: 0 12px 32px rgba(63,43,150,0.12) !important;
+}
+
+.dropdown-item { font-size: 13px !important; font-weight: 600 !important; color: var(--ink) !important; border-radius: 8px !important; }
+.dropdown-item:hover { background: rgba(168,192,255,0.12) !important; color: var(--soft-purple) !important; }
+.dropdown-item.text-danger:hover { background: rgba(245,87,108,0.08) !important; color: #c2185b !important; }
+
 .btn-sm { padding: 7px 16px !important; font-size: 12.5px !important; }
 
 /* ===== FILTER SECTION ===== */
@@ -448,6 +468,11 @@ label .text-danger { color: var(--soft-rose) !important; }
                                     Staff List
  <span class="badge badge-soft ml-2"><?= count($staffs ?? []) ?></span>
  </h5>
+ <a href="<?= base_url('staffs-send-all') ?>" class="btn btn-kid-primary btn-sm mr-2"
+                                                title="Send passwords to staff who haven't received one yet"
+                                                onclick="return confirm('Send passwords to all staff who have not received one yet?')">
+ <i class="fas fa-sms mr-1"></i> Send All Passwords
+ </a>
  <button type="button" class="btn btn-kid-primary btn-sm" data-toggle="modal" data-target="#addStaffModal">
  <i class="fas fa-plus mr-1"></i> Add Staff
  </button>
@@ -478,8 +503,9 @@ label .text-danger { color: var(--soft-rose) !important; }
  <th style="width:50px;">#</th>
  <th>Full Name</th>
  <th>Phone</th>
+ <th class="text-center">Password</th>
  <th>Created</th>
- <th class="text-center" style="width:220px;">Actions</th>
+ <th class="text-center" style="width:150px;">Actions</th>
  </tr>
  </thead>
  <tbody>
@@ -506,33 +532,57 @@ label .text-danger { color: var(--soft-rose) !important; }
  </div>
  </td>
  <td><code><?= esc($staff['phone']) ?></code></td>
+ <td class="text-center">
+ <?php if (!empty($staff['password_sent'])): ?>
+ <span class="badge badge-soft" title="Password already sent" style="color:#2e7d32;"><i class="fas fa-check"></i></span>
+ <?php else: ?>
+ <span class="badge badge-soft" title="Password not yet sent" style="color:#c2185b;"><i class="fas fa-times"></i></span>
+ <?php endif; ?>
+ </td>
  <td class="muted"><?= date('M d, Y', strtotime($staff['created_at'])) ?></td>
  <td class="text-center">
- <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
- <button class="btn-action btn-action-edit"
-                                                                data-toggle="modal" data-target="#editStaffModal"
-                                                                data-id="<?= $staff['id'] ?>"
-                                                                data-fname="<?= esc($staff['fname']) ?>"
-                                                                data-mname="<?= esc($staff['mname'] ?? '') ?>"
-                                                                data-lname="<?= esc($staff['lname']) ?>"
-                                                                data-phone="<?= esc($staff['phone']) ?>"
-                                                                data-picture="<?= esc($staff['picture'] ?? '') ?>"
-                                                                title="Edit">
- <i class="fas fa-edit"></i> Edit
+ <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+ <div class="dropdown">
+ <button class="btn-action btn-action-more dropdown-toggle" data-toggle="dropdown" title="More actions" style="border:none; cursor:pointer;">
+ <i class="fas fa-ellipsis-h"></i>
  </button>
- <a href="<?= base_url('staffs-delete/' . $staff['id']) ?>"
-                                                           class="btn-action btn-action-delete"
-                                                           onclick="return confirm('Delete this staff member?\n\n<?= esc($staff['fname']) ?> <?= esc($staff['lname']) ?>')"
-                                                           title="Delete">
- <i class="fas fa-trash"></i> Delete
+ <div class="dropdown-menu dropdown-menu-right">
+ <a class="dropdown-item" href="#"
+ data-toggle="modal" data-target="#editStaffModal"
+ data-id="<?= $staff['id'] ?>"
+ data-fname="<?= esc($staff['fname']) ?>"
+ data-mname="<?= esc($staff['mname'] ?? '') ?>"
+ data-lname="<?= esc($staff['lname']) ?>"
+ data-phone="<?= esc($staff['phone']) ?>"
+ data-picture="<?= esc($staff['picture'] ?? '') ?>">
+ <i class="fas fa-edit mr-2" style="color:#b8750a;"></i> Edit
  </a>
+ <div class="dropdown-divider"></div>
+ <?php if (empty($staff['password_sent'])): ?>
+ <a class="dropdown-item" href="<?= base_url('staffs-send-password/' . $staff['id']) ?>"
+ onclick="return confirm('Generate and send a password to this staff via SMS?\n\n<?= esc($staff['fname']) ?> <?= esc($staff['lname']) ?>')">
+ <i class="fas fa-sms mr-2" style="color:#2e7d32;"></i> Send Password
+ </a>
+ <?php else: ?>
+ <a class="dropdown-item" href="<?= base_url('staffs-send-password/' . $staff['id']) ?>"
+ onclick="return confirm('Reset and send a new password to this staff via SMS?\n\n<?= esc($staff['fname']) ?> <?= esc($staff['lname']) ?>')">
+ <i class="fas fa-key mr-2" style="color:#2e7d32;"></i> Reset Password
+ </a>
+ <?php endif; ?>
+ <div class="dropdown-divider"></div>
+ <a class="dropdown-item text-danger" href="<?= base_url('staffs-delete/' . $staff['id']) ?>"
+ onclick="return confirm('Delete this staff member?\n\n<?= esc($staff['fname']) ?> <?= esc($staff['lname']) ?>')">
+ <i class="fas fa-trash mr-2"></i> Delete
+ </a>
+ </div>
+ </div>
  </div>
  </td>
  </tr>
  <?php endforeach; ?>
  <?php else: ?>
  <tr>
- <td colspan="5" class="text-center py-5 empty-state">
+ <td colspan="6" class="text-center py-5 empty-state">
  <i class="fas fa-user-tie fa-3x mb-3 d-block"></i>
  <h5>No staff accounts yet</h5>
  <p>Click "Add Staff" to register a new staff member.</p>
@@ -595,7 +645,7 @@ label .text-danger { color: var(--soft-rose) !important; }
  </div>
  <div class="alert" style="background: rgba(168,192,255,0.12); border: 1.5px dashed rgba(63,43,150,0.18); border-radius: 12px; margin-bottom: 0; padding: 12px 14px; font-size: 13px; color: var(--ink);">
  <i class="fas fa-info-circle mr-1" style="color: var(--soft-blue);"></i>
-                        A temporary password will be generated and recorded in the SMS Logs (SMS is not live yet).
+                        Passwords are not sent automatically — use "Send Password" / "Send All Passwords" to deliver them.
  </div>
 
  <div class="text-center mt-3">

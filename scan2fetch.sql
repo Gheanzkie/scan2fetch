@@ -170,7 +170,8 @@ CREATE TABLE `parents` (
   `mname` varchar(50) DEFAULT NULL,
   `lname` varchar(50) NOT NULL,
   `phone` varchar(15) NOT NULL,
-  `password` varchar(255) NOT NULL,
+  `password` varchar(255) NULL DEFAULT NULL,
+  `password_sent` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 = password delivered via SMS',
   `qr_code` varchar(100) DEFAULT NULL COMMENT 'Unique QR code for parent',
   `picture` varchar(255) DEFAULT NULL COMMENT 'Parent profile photo',
   `created_by` int(11) DEFAULT NULL COMMENT 'staff or admin id',
@@ -269,7 +270,8 @@ CREATE TABLE `staffs` (
   `lname` varchar(50) NOT NULL,
   `picture` varchar(255) DEFAULT NULL,
   `phone` varchar(15) NOT NULL,
-  `password` varchar(255) NOT NULL,
+  `password` varchar(255) NULL DEFAULT NULL,
+  `password_sent` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 = password delivered via SMS',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -352,7 +354,8 @@ CREATE TABLE `teachers` (
   `lname` varchar(50) NOT NULL,
   `picture` varchar(255) DEFAULT NULL,
   `phone` varchar(20) NOT NULL,
-  `password` varchar(255) NOT NULL,
+  `password` varchar(255) NULL DEFAULT NULL,
+  `password_sent` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 = password delivered via SMS',
   `grade_section` varchar(50) NOT NULL,
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
