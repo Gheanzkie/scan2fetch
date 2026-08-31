@@ -518,7 +518,6 @@ label .text-danger { color: #dc2626 !important; }
  <ul class="small mb-1" style="color: var(--muted);">
  <li>Required columns: Student First Name, Student Last Name, Parent First Name, Parent Last Name, Parent Phone</li>
  <li>Optional: Student Middle Name, Grade & Section, Parent Middle Name, Parent Relation</li>
- <li>Column order matters. See the bundled sample file below.</li>
  </ul>
  </div>
  <div class="col-md-5">
@@ -535,11 +534,6 @@ label .text-danger { color: #dc2626 !important; }
   </button>
  </div>
  </div>
- <small class="d-block mt-2">
- <a href="<?= base_url('uploads/sample/sample_students.xlsx') ?>" download style="color: var(--soft-purple); font-weight:600;">
- <i class="fas fa-file-download mr-1"></i> Download sample file (50 students)
- </a>
- </small>
  </form>
  </div>
  </div>
