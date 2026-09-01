@@ -170,6 +170,21 @@ body {
 .badge-info { background: var(--soft-teal) !important; color: #fff !important; }
 .badge-light { background: rgba(168,192,255,0.15) !important; color: #5a5280 !important; }
 
+.released-badge {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    padding: 8px 20px !important;
+    border-radius: 50px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: linear-gradient(135deg, var(--soft-green), #43a047) !important;
+    box-shadow: 0 4px 14px rgba(76,175,80,0.30) !important;
+    white-space: nowrap !important;
+}
+
+.released-badge i { font-size: 18px !important; }
+
 /* ===== PARENT / STUDENT CARDS ===== */
 #parentPhotoContainer {
     width: 150px;
@@ -312,9 +327,9 @@ body {
  <!-- ===== ALERT AREA ===== -->
  <div id="alertArea" style="display:none;"></div>
 
- <div class="row">
- <!-- ===== LEFT: Scanner + Manual Input ===== -->
- <div class="col-lg-5 col-md-6 col-12">
+ <div class="row justify-content-center">
+ <!-- ===== SCANNER + MANUAL INPUT ===== -->
+ <div class="col-lg-8 col-md-10 col-12" id="scannerCol">
 
  <!-- Camera Scanner -->
  <div class="card mb-3">
@@ -340,14 +355,14 @@ body {
  </div>
  </div>
  <div class="card-body text-center">
- <div id="cameraControl" style="display:none;" class="mb-3 text-left" >
+ <div id="cameraControl" style="display:none;" class="mb-3 text-left">
  <select id="cameraSelect" class="form-control">
  <option value="back">Back Camera</option>
  <option value="front">Front Camera</option>
  </select>
  </div>
- <div id="reader" style="width:100%;max-width:400px;margin:0 auto;display:none;"></div>
- <div id="photoReader" style="width:100%;max-width:400px;margin:0 auto;display:none;"></div>
+ <div id="reader" style="width:100%;max-width:560px;margin:0 auto;display:none;"></div>
+ <div id="photoReader" style="width:100%;max-width:560px;margin:0 auto;display:none;"></div>
  <div id="scanResult" class="mt-3"></div>
  <small class="text-muted mt-2 d-block" style="font-size:12.5px;">
  <i class="fas fa-info-circle mr-1"></i> Point the camera at the QR code
@@ -356,7 +371,7 @@ body {
  </div>
 
  <!-- Manual Input -->
- <div class="card">
+ <div class="card mb-4">
  <div class="card-header">
  <h5 class="mb-0">
  <i class="fas fa-keyboard mr-2" style="color: var(--soft-teal);"></i>
@@ -369,10 +384,10 @@ body {
  <span class="input-group-text"><i class="fas fa-qrcode"></i></span>
  </div>
  <input type="text" id="qrInput" class="form-control text-center font-weight-bold"
-                                       placeholder="Enter QR Code (e.g. QR-4A2B8C3D1E5F)"
-                                       style="text-transform:uppercase;">
+                                        placeholder="Enter QR Code (e.g. QR-4A2B8C3D1E5F)"
+                                        style="text-transform:uppercase;">
  </div>
- <button class="btn btn-kid-primary px-4" id="verifyQrBtn">
+  <button class="btn btn-kid-primary px-4" id="verifyQrBtn">
  <i class="fas fa-search mr-1"></i> Verify QR Code
  </button>
  <div class="mt-3" id="qrResult"></div>
@@ -380,8 +395,8 @@ body {
  </div>
  </div>
 
- <!-- ===== RIGHT: Results ===== -->
- <div class="col-lg-7 col-md-6 col-12">
+ <!-- ===== BELOW: Results (Full Width) ===== -->
+ <div class="col-12">
 
  <!-- Empty State -->
  <div class="card" id="emptyState">
@@ -433,32 +448,6 @@ body {
  </div>
  </div>
  </section>
-</div>
-
-<!-- ===== CONFIRM ACTION MODAL ===== -->
-<div class="modal fade" id="confirmActionModal" tabindex="-1">
- <div class="modal-dialog modal-dialog-centered">
- <div class="modal-content">
- <div class="modal-header">
- <h5><i class="fas fa-question-circle mr-2" style="color: var(--soft-orange);"></i>Confirm Action</h5>
- <button type="button" class="close" data-dismiss="modal" style="color: var(--ink);">&times;</button>
- </div>
- <div class="modal-body text-center py-4">
- <i class="fas fa-user-graduate fa-3x mb-3" style="color: var(--soft-blue);"></i>
- <h5 class="mb-2" style="color: var(--ink); font-weight: 700;">Release Student?</h5>
- <p class="mb-0" style="color: var(--muted);"><strong id="confirmStudentName" style="color: var(--ink);"></strong></p>
- <small style="color: var(--faint);">An SMS notification will be sent to the parent.</small>
- </div>
- <div class="modal-footer justify-content-center border-0 pb-4">
- <button type="button" class="btn btn-danger px-4 mx-2" id="confirmDecline">
- <i class="fas fa-times-circle mr-1"></i> Decline
- </button>
- <button type="button" class="btn btn-kid-success px-4 mx-2" id="confirmRelease">
- <i class="fas fa-check-circle mr-1"></i> Release
- </button>
- </div>
- </div>
- </div>
 </div>
 
 <!-- ===== IMAGE VIEWER MODAL ===== -->
@@ -581,7 +570,7 @@ $(function() {
         html5QrCode = new Html5Qrcode("reader");
         html5QrCode.start(
             getCameraConfig(),
-            { fps: 10, qrbox: { width: 250, height: 250 } },
+            { fps: 10, qrbox: { width: 320, height: 320 } },
             function(decodedText) {
                 $('#scanResult').html('<span style="color: var(--soft-green); font-weight: bold;"><i class="fas fa-check-circle mr-1"></i> QR Code Scanned!</span>');
                 stopCamera(false, true);
@@ -868,11 +857,15 @@ $(function() {
         .then(response => response.json())
         .then(res => {
             if (res.success) {
-                $('#qrResult').html('<span style="color: var(--soft-green); font-weight: bold;"><i class="fas fa-check-circle mr-1"></i> Verified!</span>');
+                $('#qrResult').html('<span style="color: var(--soft-green); font-weight: bold;"><i class="fas fa-check-circle mr-1"></i> Auto-releasing...</span>');
 
                 var p = res.parent, f = res.fetcher;
+                var fetcherName = p.fname + ' ' + p.lname;
+                if (f && f.type === 'Sub-Fetcher') {
+                    fetcherName = f.fname + ' ' + f.lname;
+                }
 
-                // Update fetcher info
+                // Update fetcher / parent profile
                 if (f && f.type === 'Sub-Fetcher') {
                     $('#parentName').text(f.fname + ' ' + f.lname);
                     $('#parentPhone').html('<i class="fas fa-phone mr-1"></i> ' + f.phone);
@@ -897,22 +890,22 @@ $(function() {
                     }
                 }
 
-                // Build students list
+                // Build student profiles to release
                 var html = '';
                 if (res.students && res.students.length > 0) {
                     res.students.forEach(function(s) {
                         var sid = s.student_id || s.id;
                         var studentPic = s.picture ? BASE_URL + 'uploads/students/' + s.picture : '';
                         html += '<div class="d-flex align-items-center border rounded p-3 mb-2 student-item">';
-                        html += '<div class="mr-3" style="cursor:pointer;" onclick="openImageViewer(\'' + studentPic + '\', \'' + s.fname + ' ' + s.lname + '\')">';
+                        html += '<div class="mr-3">';
                         if (s.picture) {
-                            html += '<img src="' + studentPic + '" class="img-circle" style="width:56px;height:56px;border:3px solid rgba(168,192,255,0.5);">';
+                            html += '<img src="' + studentPic + '" class="img-circle" style="width:56px;height:56px;border:3px solid rgba(129,199,132,0.5);">';
                         } else {
-                            html += '<div class="img-circle d-flex align-items-center justify-content-center" style="width:56px;height:56px;border:3px solid rgba(168,192,255,0.35);background:rgba(168,192,255,0.10);"><i class="fas fa-child" style="color: var(--faint); font-size:22px;"></i></div>';
+                            html += '<div class="img-circle d-flex align-items-center justify-content-center" style="width:56px;height:56px;border:3px solid rgba(129,199,132,0.35);background:rgba(129,199,132,0.10);"><i class="fas fa-child" style="color: var(--soft-green); font-size:22px;"></i></div>';
                         }
                         html += '</div>';
-                        html += '<div class="flex-grow-1"><strong style="font-size:1rem; color: var(--ink);">' + s.fname + ' ' + s.lname + '</strong><br><span class="badge badge-light">' + (s.grade_section || 'N/A') + '</span></div>';
-                        html += '<button class="btn btn-outline-kid btn-sm action-btn" data-student-id="' + sid + '" data-parent-id="' + res.parent.id + '" data-name="' + s.fname + ' ' + s.lname + '"><i class="fas fa-exchange-alt mr-1"></i> Action</button>';
+                        html += '<div class="flex-grow-1"><strong style="font-size:1.05rem; color: var(--ink);">' + s.fname + ' ' + s.lname + '</strong><br><span class="badge badge-light" style="font-size:12px; padding:5px 12px;">' + (s.grade_section || 'N/A') + '</span></div>';
+                        html += '<span class="badge badge-success released-badge" data-student-id="' + sid + '" data-name="' + s.fname + ' ' + s.lname + '"><i class="fas fa-check-circle mr-1"></i>Released</span>';
                         html += '</div>';
                     });
                     $('#studentCount').text(res.students.length);
@@ -923,6 +916,10 @@ $(function() {
                 $('#studentsList').html(html);
                 $('#parentCard').show();
                 $('#emptyState').hide();
+                $('#scannerCol').hide();
+
+                // Auto-release every linked student
+                autoReleaseAll(res.students, res.parent.id, qrCode, fetcherName);
 
                 // Scroll to parent card on mobile
                 if ($(window).width() < 768) {
@@ -942,73 +939,75 @@ $(function() {
         });
     }
 
-    // Action button click
-    $(document).on('click', '.action-btn', function() {
-        pendingStudentId = $(this).data('student-id');
-        pendingParentId = $(this).data('parent-id');
-        $('#confirmStudentName').text($(this).data('name'));
-        $('#confirmActionModal').modal('show');
-    });
+    // Automatically release every linked student, then reset & scan the next fetcher
+    function autoReleaseAll(students, parentId, qrCode, fetcherName) {
+        var list = students || [];
+        if (list.length === 0) {
+            resetAndRestart();
+            return;
+        }
 
-    // Release
-    $('#confirmRelease').click(function() {
-        $('#confirmActionModal').modal('hide');
-        if (!pendingStudentId || !pendingParentId) return;
+        var index = 0;
+        var releasedCount = 0;
+        var alreadyCount = 0;
 
-        var formData = new FormData();
-        formData.append('student_id', pendingStudentId);
-        formData.append('parent_id', pendingParentId);
-        formData.append('qr_code', $('#qrInput').val().trim().toUpperCase());
-        formData.append(CSRF_NAME, CSRF_HASH);
-
-        fetch(BASE_URL + 'scan/release', { method: 'POST', body: formData })
-        .then(response => response.json())
-        .then(res => {
-            if (res.success) {
-                showAlert('Student released! SMS sent to parent.', 'success');
-            } else {
-                showAlert(res.message || 'Failed to release', 'danger');
+        function releaseNext() {
+            if (index >= list.length) {
+                var msg;
+                if (alreadyCount > 0 && releasedCount === 0) {
+                    msg = 'All students already released today.';
+                    showAlert(msg, 'success');
+                } else if (alreadyCount > 0) {
+                    msg = 'Released ' + releasedCount + ', already released ' + alreadyCount + '.';
+                    showAlert(msg, 'success');
+                } else {
+                    msg = 'Released ' + releasedCount + ' student(s). Ready for next scan.';
+                    showAlert(msg, 'success');
+                }
+                setTimeout(resetAndRestart, 3000);
+                return;
             }
-            resetAndRestart();
-        })
-        .catch(err => {
-            console.error('Release error:', err);
-            showAlert('Connection error', 'danger');
-            resetAndRestart();
-        });
-    });
 
-    // Decline
-    $('#confirmDecline').click(function() {
-        $('#confirmActionModal').modal('hide');
-        if (!pendingStudentId || !pendingParentId) return;
+            var s = list[index];
+            var sid = s.student_id || s.id;
+            index++;
 
-        var formData = new FormData();
-        formData.append('student_id', pendingStudentId);
-        formData.append('parent_id', pendingParentId);
-        formData.append('qr_code', $('#qrInput').val().trim().toUpperCase());
-        formData.append(CSRF_NAME, CSRF_HASH);
+            var formData = new FormData();
+            formData.append('student_id', sid);
+            formData.append('parent_id', parentId);
+            formData.append('qr_code', qrCode);
+            formData.append(CSRF_NAME, CSRF_HASH);
 
-        fetch(BASE_URL + 'scan/decline', { method: 'POST', body: formData })
-        .then(response => response.json())
-        .then(res => {
-            if (res.success) {
-                showAlert('Pickup declined. SMS sent.', 'warning');
-            } else {
-                showAlert('Error: ' + (res.message || 'Failed'), 'danger');
-            }
-            resetAndRestart();
-        })
-        .catch(err => {
-            console.error('Decline error:', err);
-            showAlert('Connection error', 'danger');
-            resetAndRestart();
-        });
-    });
+            fetch(BASE_URL + 'scan/release', { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(res => {
+                if (res.already_released) {
+                    alreadyCount++;
+                    var $badge = $('.released-badge[data-student-id="' + sid + '"]');
+                    if ($badge.length) {
+                        $badge.removeClass('badge-success').addClass('badge-warning')
+                               .html('<i class="fas fa-check-double mr-1"></i>Already Released');
+                    }
+                } else if (res.success) {
+                    releasedCount++;
+                } else {
+                    console.error('Release failed:', res.message);
+                }
+                releaseNext();
+            })
+            .catch(err => {
+                console.error('Release error:', err, 'Fetcher:', fetcherName);
+                releaseNext();
+            });
+        }
+
+        releaseNext();
+    }
 
     function resetAndRestart() {
         $('#parentCard').hide();
         $('#emptyState').show();
+        $('#scannerCol').show();
         $('#qrInput').val('');
         $('#qrResult').html('');
         $('#scanResult').html('');
@@ -1016,7 +1015,7 @@ $(function() {
         $('#fetcherType').hide();
         pendingStudentId = null;
         pendingParentId = null;
-        setTimeout(startCamera, 1500);
+        setTimeout(startCamera, 800);
     }
 });
 

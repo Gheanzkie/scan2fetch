@@ -19,19 +19,59 @@
             --teal: #0284c7;
             --green: #16a34a;
             --orange: #d97706;
+
             --ink: #0f172a;
             --muted: #64748b;
             --faint: #94a3b8;
+            --bg: #f1f5f9;
+            --card: rgba(255,255,255,0.78);
+            --card-border: rgba(255,255,255,0.9);
+            --navbar-bg: rgba(255,255,255,0.85);
+            --nav-text: var(--ink);
+            --soft-badge-bg: #eef2ff;
+            --soft-badge-border: #c7d2fe;
+            --soft-badge-text: #3730a3;
+            --pill-bg: rgba(255,255,255,0.6);
+            --pill-border: rgba(160,160,180,0.15);
+            --pill-text: #5a5a8a;
+            --qr-bg: #fff;
+            --step-bg: rgba(255,255,255,0.75);
+            --shadow-color: rgba(0,0,0,0.06);
+            --shadow-hover: rgba(0,0,0,0.12);
+            --border: rgba(160,160,180,0.15);
+        }
+
+        body.dark {
+            --ink: #e2e8f0;
+            --muted: #94a3b8;
+            --faint: #64748b;
+            --bg: #0f172a;
+            --card: rgba(30,41,59,0.75);
+            --card-border: rgba(51,65,85,0.8);
+            --navbar-bg: rgba(15,23,42,0.85);
+            --nav-text: #e2e8f0;
+            --soft-badge-bg: rgba(67,97,238,0.15);
+            --soft-badge-border: rgba(99,102,241,0.4);
+            --soft-badge-text: #a5b4fc;
+            --pill-bg: rgba(51,65,85,0.6);
+            --pill-border: rgba(100,116,139,0.25);
+            --pill-text: #cbd5e1;
+            --qr-bg: #fff;
+            --step-bg: rgba(30,41,59,0.75);
+            --shadow-color: rgba(0,0,0,0.35);
+            --shadow-hover: rgba(0,0,0,0.5);
+            --border: rgba(100,116,139,0.25);
         }
 
         body {
             min-height: 100vh;
             font-family: 'Quicksand', 'Source Sans Pro', sans-serif;
-            background: #f1f5f9;
+            background: var(--bg);
             background-attachment: fixed;
             color: var(--ink);
             overflow-x: hidden;
             line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .container {
@@ -43,7 +83,7 @@
 
         /* ===== NAVBAR ===== */
         .navbar {
-            background: rgba(255,255,255,0.85);
+            background: var(--navbar-bg);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             box-shadow: 0 2px 20px rgba(0,0,0,0.04);
@@ -66,7 +106,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            color: var(--ink);
+            color: var(--nav-text);
             text-decoration: none;
         }
 
@@ -109,6 +149,27 @@
 
         .btn-login:hover { box-shadow: 0 8px 25px rgba(63,43,150,0.35); }
 
+        .btn-theme {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(160,160,180,0.12);
+            border: 1px solid rgba(160,160,180,0.2);
+            color: var(--nav-text);
+            font-size: 17px;
+            cursor: pointer;
+            transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn-theme:hover {
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(63,43,150,0.25);
+        }
+
         /* ===== HERO ===== */
         .main-content {
             padding: 130px 0 60px;
@@ -127,9 +188,9 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: #eef2ff;
-            border: 1px solid #c7d2fe;
-            color: #3730a3;
+            background: var(--soft-badge-bg);
+            border: 1px solid var(--soft-badge-border);
+            color: var(--soft-badge-text);
             padding: 8px 20px;
             border-radius: 50px;
             font-size: 12px;
@@ -191,8 +252,8 @@
             align-items: center;
             gap: 8px;
             padding: 14px 28px;
-            background: rgba(255,255,255,0.6);
-            border: 2px solid rgba(160,160,180,0.15);
+            background: var(--pill-bg);
+            border: 2px solid var(--pill-border);
             color: var(--muted);
             border-radius: 50px;
             font-size: 14px;
@@ -217,9 +278,9 @@
             border-radius: 50px;
             font-size: 13px;
             font-weight: 600;
-            color: #5a5a8a;
-            background: rgba(255,255,255,0.6);
-            border: 1px solid rgba(160,160,180,0.15);
+            color: var(--pill-text);
+            background: var(--pill-bg);
+            border: 1px solid var(--pill-border);
         }
 
         .feature-pill .fa-shield-alt { color: var(--teal); }
@@ -233,12 +294,12 @@
         }
 
         .visual-card {
-            background: rgba(255,255,255,0.8);
+            background: var(--card);
             backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.9);
+            border: 1px solid var(--card-border);
             border-radius: 28px;
             padding: 34px 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.06);
+            box-shadow: 0 20px 60px var(--shadow-color);
             text-align: center;
         }
 
@@ -261,7 +322,7 @@
             margin: 0 auto 22px;
             border-radius: 18px;
             border: 2px solid rgba(63,43,150,0.1);
-            background: #fff;
+            background: var(--qr-bg);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -287,11 +348,11 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(255,255,255,0.95);
-            border: 1px solid rgba(255,255,255,0.9);
+            background: var(--card);
+            border: 1px solid var(--card-border);
             border-radius: 16px;
             padding: 10px 16px;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
             font-size: 12px;
             font-weight: 600;
             color: var(--ink);
@@ -339,17 +400,17 @@
         }
 
         .step-card {
-            background: rgba(255,255,255,0.75);
+            background: var(--step-bg);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.9);
+            border: 1px solid var(--card-border);
             border-radius: 22px;
             padding: 28px 22px;
             text-align: center;
-            box-shadow: 0 10px 35px rgba(0,0,0,0.04);
-            transition: box-shadow 0.3s ease;
+            box-shadow: 0 10px 35px var(--shadow-color);
+            transition: box-shadow 0.3s ease, background 0.3s ease;
         }
 
-        .step-card:hover { box-shadow: 0 16px 45px rgba(0,0,0,0.08); }
+        .step-card:hover { box-shadow: 0 16px 45px var(--shadow-hover); }
 
         .step-icon {
             width: 60px;
@@ -419,6 +480,14 @@
 </head>
 <body>
 
+    <script>
+        try {
+            if (localStorage.getItem('scan2fetch-theme') === 'dark') {
+                document.body.classList.add('dark');
+            }
+        } catch (e) {}
+    </script>
+
     <!-- ===== NAVIGATION ===== -->
     <nav class="navbar">
         <div class="container navbar-inner">
@@ -426,9 +495,14 @@
                 <div class="nav-icon"><i class="fas fa-child"></i></div>
                 <div class="brand-text">SCAN2FETCH</div>
             </a>
-            <a href="<?= base_url('login') ?>" class="btn-login">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </a>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <button id="themeToggle" class="btn-theme" title="Toggle dark / light mode">
+                    <i id="themeIcon" class="fas fa-moon"></i>
+                </button>
+                <a href="<?= base_url('login') ?>" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            </div>
         </div>
     </nav>
 
@@ -516,6 +590,28 @@
             <p class="footer-text">&copy; <?= date('Y') ?> BCC Scan2Fetch • All rights reserved</p>
         </div>
     </div>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+
+        function applyTheme(theme) {
+            const isDark = theme === 'dark';
+            document.body.classList.toggle('dark', isDark);
+            themeIcon.classList.remove(isDark ? 'fa-moon' : 'fa-sun');
+            themeIcon.classList.add(isDark ? 'fa-sun' : 'fa-moon');
+        }
+
+        const saved = localStorage.getItem('scan2fetch-theme') || 'light';
+        applyTheme(saved);
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.body.classList.contains('dark');
+            const next = isDark ? 'light' : 'dark';
+            localStorage.setItem('scan2fetch-theme', next);
+            applyTheme(next);
+        });
+    </script>
 
 </body>
 </html>

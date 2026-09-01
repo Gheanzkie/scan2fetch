@@ -678,19 +678,28 @@
 <!-- ===== THEME SWITCHER LOGIC ===== -->
 <script>
 $(function(){
+    var isDark = document.documentElement.classList.contains('theme-dark');
+
+    function setToggleIcon() {
+        var icon = document.getElementById('themeIcon');
+        if (icon) { icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon'; }
+    }
+
     function applyTheme(theme) {
-        document.documentElement.classList.toggle('theme-dark', theme === 'dark');
-        $('.theme-opt').removeClass('active');
-        $('.theme-opt[data-theme="' + theme + '"]').addClass('active');
+        isDark = theme === 'dark';
+        document.documentElement.classList.toggle('theme-dark', isDark);
         try { localStorage.setItem('scan2fetch-theme', theme); } catch (e) {}
+        setToggleIcon();
     }
 
     var saved = 'light';
     try { saved = localStorage.getItem('scan2fetch-theme') || 'light'; } catch (e) {}
     applyTheme(saved);
 
-    $('.theme-opt').on('click', function(){
-        applyTheme($(this).data('theme'));
+    $(document).on('click', '#themeToggle', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        applyTheme(isDark ? 'light' : 'dark');
     });
 });
 

@@ -18,16 +18,11 @@
  </ul>
 
  <ul class="navbar-nav ml-auto align-items-center">
- <!-- ===== THEME SWITCHER (Light / Dark) ===== -->
+ <!-- ===== THEME SWITCHER (Dark / Light) ===== -->
  <li class="nav-item mr-2">
- <div class="theme-switcher" id="themeSwitcher" role="group" aria-label="Theme selector">
- <button type="button" class="theme-opt" data-theme="light" title="Light Mode">
- <i class="fas fa-sun"></i>
+ <button type="button" id="themeToggle" class="btn-theme" title="Toggle dark / light mode">
+ <i id="themeIcon" class="fas fa-moon"></i>
  </button>
- <button type="button" class="theme-opt" data-theme="dark" title="Dark Mode">
- <i class="fas fa-moon"></i>
- </button>
- </div>
  </li>
  <!-- ===== LIVE TIMER (Admin & Staff Only) ===== -->
  <?php
@@ -99,38 +94,33 @@
 
     .nav-item.dropdown .nav-link:hover { background: rgba(148, 163, 184, .14) !important; }
 
-    /* ===== THEME SWITCHER ===== */
-    .theme-switcher {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        background: #2d2757;
-        padding: 3px;
-        border-radius: 8px;
-        border: 1px solid #3b3480;
-    }
-
-    .theme-opt {
-        width: 30px;
-        height: 30px;
-        border-radius: 6px;
-        border: none;
+    /* ===== THEME SWITCHER (circular toggle) ===== */
+    .btn-theme {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #9a90d9;
-        background: transparent;
+        background: rgba(165, 180, 252, .12);
+        border: 1px solid rgba(165, 180, 252, .25);
+        color: #e2e8f0;
+        font-size: 17px;
         cursor: pointer;
-        font-size: 13px;
-        transition: background .2s ease, color .2s ease;
+        transition: background .25s ease, color .25s ease, box-shadow .25s ease, transform .25s ease;
     }
 
-    .theme-opt:hover { background: rgba(165, 180, 252, .15); color: #f5f3ff; }
+    .btn-theme:hover {
+        background: linear-gradient(135deg, #4361ee, #7c3aed);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(67, 97, 238, .35);
+        transform: scale(1.05);
+    }
 
-    .theme-opt.active { background: #4c4090; color: #ffffff; }
+    .btn-theme:active { transform: scale(.95); }
 
     @media (max-width: 480px) {
-        .theme-opt { width: 28px; height: 28px; font-size: 12px; }
+        .btn-theme { width: 36px; height: 36px; font-size: 15px; }
     }
 
     /* ===== LIVE TIMER ===== */

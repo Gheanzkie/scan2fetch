@@ -4,9 +4,9 @@
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
  <title>SCAN2FETCH | Sign In</title>
- <link rel="icon" href="<?= base_url('image/qr-code-76.png') ?>">
- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,600,700&display=fallback">
- <link rel="stylesheet" href="<?= base_url('public/assets/plugins/fontawesome-free/css/all.min.css') ?>">
+  <link rel="icon" href="<?= base_url('image/qr-code-76.png') ?>">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,600,700&display=fallback">
+  <link rel="stylesheet" href="<?= base_url('public/assets/plugins/fontawesome-free/css/all.min.css') ?>">
 
  <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -19,23 +19,47 @@
             --text: #334155;
             --muted: #64748b;
             --border: #e2e8f0;
+            --bg: #f1f5f9;
+            --navbar-bg: #ffffff;
+            --card-bg: #ffffff;
+            --input-bg: #ffffff;
+            --input-placeholder: #94a3b8;
+            --icon-bg: #fff;
+            --feature-bg: #f8fafc;
+            --toggle-sun: #0f172a;
+        }
+
+        body.dark {
+            --heading: #f1f5f9;
+            --text: #cbd5e1;
+            --muted: #94a3b8;
+            --border: #334155;
+            --bg: #0f172a;
+            --navbar-bg: #1e293b;
+            --card-bg: #1e293b;
+            --input-bg: #0f172a;
+            --input-placeholder: #64748b;
+            --icon-bg: #1e293b;
+            --feature-bg: #243247;
+            --toggle-sun: #f1f5f9;
         }
 
         body {
             min-height: 100vh;
             font-family: 'Quicksand', 'Source Sans Pro', 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: #f1f5f9;
+            background: var(--bg);
             color: var(--text);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 100px 20px 40px;
+            transition: background .3s ease, color .3s ease;
         }
 
         /* ===== NAVBAR ===== */
         .navbar {
-            background: #ffffff;
+            background: var(--navbar-bg);
             box-shadow: 0 1px 3px rgba(15, 23, 42, .07);
             padding: 10px 0;
             position: fixed;
@@ -44,6 +68,7 @@
             width: 100%;
             z-index: 1000;
             border-bottom: 1px solid var(--border);
+            transition: background .3s ease;
         }
 
         .navbar-inner {
@@ -94,7 +119,7 @@
             align-items: center;
             gap: 8px;
             padding: 8px 18px;
-            background: #fff;
+            background: var(--icon-bg);
             border: 1px solid #cbd5e1;
             color: var(--muted);
             border-radius: 50px;
@@ -106,15 +131,41 @@
 
         .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
 
+        /* ===== THEME TOGGLE ===== */
+        .btn-theme {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(100, 116, 139, .12);
+            border: 1px solid rgba(100, 116, 139, .2);
+            color: var(--toggle-sun);
+            font-size: 17px;
+            cursor: pointer;
+            transition: background .25s ease, color .25s ease, box-shadow .25s ease, transform .25s ease;
+        }
+
+        .btn-theme:hover {
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, .35);
+            transform: scale(1.05);
+        }
+
+        .btn-theme:active { transform: scale(.95); }
+
         /* ===== LOGIN CARD ===== */
         .login-card {
             width: 100%;
             max-width: 420px;
-            background: #fff;
+            background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 10px;
             padding: 34px 34px;
             box-shadow: 0 8px 24px rgba(15, 23, 42, .08);
+            transition: background .3s ease;
         }
 
         .brand-section {
@@ -184,7 +235,7 @@
             align-items: center;
             border: 1px solid #cbd5e1;
             border-radius: 50px;
-            background: #fff;
+            background: var(--input-bg);
             transition: border-color .2s ease, box-shadow .2s ease;
         }
 
@@ -210,7 +261,7 @@
             font-family: inherit;
         }
 
-        .input-field::placeholder { color: #94a3b8; opacity: 1; }
+        .input-field::placeholder { color: var(--input-placeholder); opacity: 1; }
 
         .toggle-password {
             padding: 0 12px;
@@ -280,7 +331,7 @@
             font-weight: 600;
             color: var(--muted);
             padding: 6px 14px;
-            background: #f8fafc;
+            background: var(--feature-bg);
             border-radius: 6px;
             border: 1px solid var(--border);
         }
@@ -315,6 +366,14 @@
 </head>
 <body>
 
+ <script>
+    try {
+        if (localStorage.getItem('scan2fetch-theme') === 'dark') {
+            document.body.classList.add('dark');
+        }
+    } catch (e) {}
+ </script>
+
  <!-- ===== NAVBAR ===== -->
  <nav class="navbar">
  <div class="navbar-inner">
@@ -322,9 +381,14 @@
  <div class="nav-icon"><i class="fas fa-qrcode"></i></div>
  <div class="brand-text">SCAN2FETCH</div>
  </a>
+ <div style="display:flex; align-items:center; gap:10px;">
+ <button type="button" id="themeToggle" class="btn-theme" title="Toggle dark / light mode">
+ <i id="themeIcon" class="fas fa-moon"></i>
+ </button>
  <a href="<?= base_url() ?>" class="btn-outline">
  <i class="fas fa-arrow-left"></i> Home
  </a>
+ </div>
  </div>
  </nav>
 
@@ -381,6 +445,24 @@
         if (p.type === 'password') { p.type = 'text'; i.classList.remove('fa-eye'); i.classList.add('fa-eye-slash'); }
         else { p.type = 'password'; i.classList.remove('fa-eye-slash'); i.classList.add('fa-eye'); }
     }
+
+    (function() {
+        var saved = 'light';
+        try { saved = localStorage.getItem('scan2fetch-theme') || 'light'; } catch (e) {}
+        var isDark = saved === 'dark';
+        var icon = document.getElementById('themeIcon');
+        function apply() {
+            document.body.classList.toggle('dark', isDark);
+            if (icon) { icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon'; }
+        }
+        apply();
+        var btn = document.getElementById('themeToggle');
+        if (btn) btn.addEventListener('click', function() {
+            isDark = !isDark;
+            try { localStorage.setItem('scan2fetch-theme', isDark ? 'dark' : 'light'); } catch (e) {}
+            apply();
+        });
+    })();
  </script>
 </body>
 </html>

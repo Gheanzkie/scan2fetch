@@ -112,6 +112,19 @@ class Scan extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Parent not found']);
         }
 
+        // Prevent duplicate release: if this student was already released today, skip.
+        $alreadyReleased = $db->table('fetch_logs')
+            ->where('student_id', $studentId)
+            ->where('DATE(time_released)', date('Y-m-d'))
+            ->countAllResults();
+        if ($alreadyReleased > 0) {
+            return $this->response->setJSON([
+                'success' => false,
+                'already_released' => true,
+                'message' => $student['fname'] . ' ' . $student['lname'] . ' is already released today.'
+            ]);
+        }
+
         // Check if fetcher is sub-fetcher or parent
         $fetcherFname = $parent['fname'];
         $fetcherLname = $parent['lname'];
