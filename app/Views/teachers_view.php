@@ -335,20 +335,15 @@ body {
  </div>
  <div class="col pr-2">
  <div class="input-group input-group-sm" style="border-radius:50px;overflow:hidden;border:2px solid rgba(108,140,255,0.12);background:rgba(255,255,255,0.7);">
- <div class="input-group-prepend">
- <span class="input-group-text" style="background:transparent;border:none;padding:6px 12px;"><i class="fas fa-search" style="color:var(--soft-blue);font-size:13px;"></i></span>
- </div>
- <input type="text" name="q" value="<?= esc($search) ?>" class="form-control border-0" placeholder="Search student..." style="background:transparent;font-size:13px;padding:6px 12px;">
- <input type="hidden" name="date" value="<?= esc($selectedDate) ?>">
+
+  <input type="text" name="q" value="<?= esc($search) ?>" class="form-control border-0" placeholder="Search student..." style="background:transparent;font-size:13px;padding:6px 12px;">
  <div class="input-group-append">
  <button type="submit" class="btn btn-sm" style="background:linear-gradient(135deg,var(--soft-blue),var(--soft-purple));color:#fff;border:none;border-radius:0 50px 50px 0;padding:6px 14px;font-size:12px;font-weight:700;">Search</button>
  </div>
  </div>
  </div>
  <div class="col-auto">
- <a href="<?= base_url('teachers-view/' . $teacher['id']) ?>" class="btn btn-sm btn-outline-secondary" style="border-radius:50px;font-size:12px;padding:6px 14px;font-weight:700;">
- <i class="fas fa-sync-alt mr-1"></i>Today
- </a>
+
  </div>
  </div>
  </form>
@@ -373,35 +368,11 @@ body {
  </span>
  <?php else: ?>
  <span class="badge badge-pending">
- <i class="fas fa-spinner mr-1"></i> Still in school
+ <i class="fas fa-times-circle mr-1"></i> Not Fetched
  </span>
  <?php endif; ?>
- <a href="<?= base_url('teachers-student-view/'.$s['id']) ?>" class="btn btn-outline-info btn-xs ml-2" title="View student">
- <i class="fas fa-eye"></i>
- </a>
  </div>
  </div>
- <?php if (!empty($s['recent_history'])): ?>
- <div class="mt-2" style="padding-left: 39px;">
- <small style="color: var(--faint); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-history mr-1"></i>Pickup History</small>
- <div class="mt-1">
- <?php foreach (array_slice($s['recent_history'], 0, 5) as $hl): ?>
- <div class="d-flex align-items-center mb-1" style="font-size: 12px; color: var(--muted);">
- <i class="fas fa-check-circle mr-1" style="color: var(--soft-green); font-size: 10px;"></i>
- <span style="color: var(--ink); font-weight: 600;"><?= date('M d', strtotime($hl['time_released'])) ?></span>
- <span class="mx-1" style="color: var(--faint);">-</span>
- <span><?= date('h:i A', strtotime($hl['time_released'])) ?></span>
- <span class="mx-1" style="color: var(--faint);">-</span>
- <span><?= esc($hl['fetcher_fname']) ?> <?= esc($hl['fetcher_lname']) ?></span>
- <span class="badge badge-count ml-1" style="font-size: 10px; padding: 2px 8px;"><?= esc($hl['method']) ?></span>
- </div>
- <?php endforeach; ?>
- <?php if (count($s['recent_history']) > 5): ?>
- <div style="font-size: 11px; color: var(--faint);"><i class="fas fa-ellipsis-h mr-1"></i><?= count($s['recent_history']) - 5 ?> more pickup(s)</div>
- <?php endif; ?>
- </div>
- </div>
- <?php endif; ?>
  </div>
  <?php endforeach; else: ?>
  <div class="text-center py-5" style="color: var(--faint);">
