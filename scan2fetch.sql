@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 31, 2026 at 06:59 PM
+-- Generation Time: Sep 12, 2026 at 03:00 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -123,7 +123,132 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `user_name`, `role`, `action`, `mo
 (98, 1, 'Ghean Cruz', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-08-31 16:55:20'),
 (99, 47, 'Jasmine Velasco', 'parent', 'login', 'auth', 'Parent logged in | Phone: 09171000045', '::1', '2026-08-31 16:55:31'),
 (100, 47, 'Jasmine Velasco', 'parent', 'logout', 'auth', 'User logged out', '::1', '2026-08-31 16:55:54'),
-(101, 1, 'Ghean Cruz', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-08-31 16:55:58');
+(101, 1, 'Ghean Cruz', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-08-31 16:55:58'),
+(102, 1, 'Ghean Cruz', 'admin', 'update', 'teacher', 'Sent passwords to 2 teacher(s) who had not received one yet.', '::1', '2026-08-31 17:05:41'),
+(103, 1, 'Ghean Cruz', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-08-31 17:12:33'),
+(104, 1, 'Ghean Cruz', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-09-01 12:28:17'),
+(105, 1, 'Ghean Cruz', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-09-01 12:29:28'),
+(106, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-09-01 12:29:34'),
+(107, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-09-01 12:41:00'),
+(108, 46, 'Paolo Rosario', 'parent', 'login', 'auth', 'Parent logged in | Phone: 09171000044', '::1', '2026-09-01 12:41:16'),
+(109, 46, 'Paolo Rosario', 'parent', 'logout', 'auth', 'User logged out', '::1', '2026-09-01 12:42:36'),
+(110, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-09-01 12:42:41'),
+(111, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-09-01 12:43:27'),
+(112, 4, 'Ghean rfd', 'teacher', 'login', 'auth', 'Teacher logged in | Phone: 123', '::1', '2026-09-01 12:43:32'),
+(113, 4, 'Ghean rfd', 'teacher', 'logout', 'auth', 'User logged out', '::1', '2026-09-01 12:54:56'),
+(114, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-09-01 12:55:08'),
+(115, 1, 'Admin ', 'admin', 'release', 'scan', 'QR Release | Student: Angela Fajardo (ID: 49) | Parent: Joy Saldana | SMS sent', '::1', '2026-09-01 13:57:30'),
+(116, 1, 'Admin ', 'admin', 'update', 'teacher', 'Sent passwords to 0 teacher(s) who had not received one yet.', '::1', '2026-09-01 14:27:46'),
+(117, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-09-01 14:29:14'),
+(118, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-09-01 14:42:18'),
+(119, 1, 'Admin ', 'admin', 'release', 'scan', 'QR Release | Student: Angela Fajardo (ID: 49) | Parent: Joy Saldana | SMS sent', '::1', '2026-09-01 14:49:03'),
+(120, 1, 'Admin ', 'admin', 'release', 'scan', 'QR Release | Student: Angela Fajardo (ID: 49) | Parent: Joy Saldana | SMS sent', '::1', '2026-09-01 14:53:09'),
+(121, 1, 'Admin ', 'admin', 'release', 'scan', 'QR Release | Student: Angela Fajardo (ID: 49) | Parent: Joy Saldana | SMS sent', '::1', '2026-09-01 14:54:54'),
+(122, 1, 'Admin ', 'admin', 'create', 'scan', 'Started gate scanning session.', '::1', '2026-09-01 15:10:09'),
+(123, 1, 'Admin ', 'admin', 'update', 'scan', 'Stopped gate scanning session.', '::1', '2026-09-01 15:10:40'),
+(124, 1, 'Admin ', 'admin', 'create', 'scan', 'Started gate scanning session.', '::1', '2026-09-01 15:10:43'),
+(125, 1, 'Admin ', 'admin', 'update', 'scan', 'Stopped gate scanning session.', '::1', '2026-09-01 15:11:28'),
+(126, 1, 'Admin ', 'admin', 'create', 'scan', 'Started gate scanning session.', '::1', '2026-09-01 15:11:28'),
+(127, 1, 'Admin ', 'admin', 'update', 'scan', 'Stopped gate scanning session.', '::1', '2026-09-01 15:13:27'),
+(128, 1, 'Admin ', 'admin', 'create', 'scan', 'Started gate scanning session.', '::1', '2026-09-01 15:13:28'),
+(129, 1, 'Admin ', 'admin', 'update', 'scan', 'Stopped gate scanning session.', '::1', '2026-09-01 15:18:00'),
+(130, 1, 'Admin ', 'admin', 'create', 'scan', 'Started gate scanning session.', '::1', '2026-09-01 15:18:01'),
+(131, 1, 'Admin ', 'admin', 'update', 'scan', 'Stopped gate scanning session.', '::1', '2026-09-01 15:18:20'),
+(132, 1, 'Admin ', 'admin', 'create', 'scan', 'Started gate scanning session.', '::1', '2026-09-01 15:18:21'),
+(133, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-09-01 15:26:54'),
+(134, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-09-01 15:27:00'),
+(135, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-09-01 15:27:22'),
+(136, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-09-12 06:50:50'),
+(137, 1, 'Admin ', 'admin', 'create', 'import', 'Imported 50 students + parents from Excel', '::1', '2026-09-12 06:55:12'),
+(138, 1, 'Admin ', 'admin', 'update', 'parent', 'Sent passwords to 50 parent(s) who had not received one yet.', '::1', '2026-09-12 06:56:10'),
+(139, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-09-12 06:57:54'),
+(140, 96, 'Paolo Rosario', 'parent', 'login', 'auth', 'Parent logged in | Phone: 09171000044', '::1', '2026-09-12 06:58:05'),
+(141, 96, 'Paolo Rosario', 'parent', 'update', 'password', 'Parent changed their password', '::1', '2026-09-12 06:59:10'),
+(142, 96, 'Paolo Rosario', 'parent', 'logout', 'auth', 'User logged out', '::1', '2026-09-12 06:59:16'),
+(143, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-09-12 06:59:22'),
+(144, 1, 'Admin ', 'admin', 'settings', 'settings', 'SMS mode changed to Automatic (scheduled 2026-09-12 15:03:00)', '::1', '2026-09-12 07:02:27'),
+(145, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Juan Dela Cruz for student Maria Santos', '::1', '2026-09-12 07:03:02'),
+(146, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Elena Ramos for student Ana Garcia', '::1', '2026-09-12 07:03:02'),
+(147, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Nico Castillo for student Luz Flores', '::1', '2026-09-12 07:03:02'),
+(148, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to teacher SHANA MATILLANO for student Luz Flores', '::1', '2026-09-12 07:03:02'),
+(149, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Grace Guzman for student Rosa Villanueva', '::1', '2026-09-12 07:03:02'),
+(150, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Rico Rosario for student Elena Castillo', '::1', '2026-09-12 07:03:03'),
+(151, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Daisy Velasco for student Sofia Lopez', '::1', '2026-09-12 07:03:03'),
+(152, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to teacher Ghean rfd for student Sofia Lopez', '::1', '2026-09-12 07:03:03'),
+(153, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Joey Smith for student Andrea Rivera', '::1', '2026-09-12 07:03:03'),
+(154, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Maria Saldana for student Bianca Padilla', '::1', '2026-09-12 07:03:03'),
+(155, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Carlo Gonzales for student Jasmine Ocampo', '::1', '2026-09-12 07:03:03'),
+(156, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Bianca Lim for student Camille Velasco', '::1', '2026-09-12 07:03:03'),
+(157, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Dennis Dela Cruz for student Isabel Go', '::1', '2026-09-12 07:03:03'),
+(158, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Teresa Ramos for student Grace Duran', '::1', '2026-09-12 07:03:03'),
+(159, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Bryan Castillo for student Nina Pineda', '::1', '2026-09-12 07:03:03'),
+(160, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Princess Guzman for student Clara Cabrera', '::1', '2026-09-12 07:03:03'),
+(161, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Nestor Rosario for student Teresa Gonzales', '::1', '2026-09-12 07:03:03'),
+(162, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Rosa Velasco for student Joy Jimenez', '::1', '2026-09-12 07:03:03'),
+(163, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Ramon Smith for student Liza Morales', '::1', '2026-09-12 07:03:03'),
+(164, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to teacher SHANA MATILLANO for student Liza Morales', '::1', '2026-09-12 07:03:03'),
+(165, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Isabel Saldana for student Kath Reyes', '::1', '2026-09-12 07:03:03'),
+(166, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Emilio Gonzales for student Daisy Mendoza', '::1', '2026-09-12 07:03:03'),
+(167, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Kath Lim for student Mara Ramos', '::1', '2026-09-12 07:03:03'),
+(168, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to teacher Ghean rfd for student Mara Ramos', '::1', '2026-09-12 07:03:03'),
+(169, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Dan Dela Cruz for student Shiela Aquino', '::1', '2026-09-12 07:03:03'),
+(170, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Veronica Ramos for student Princess Domingo', '::1', '2026-09-12 07:03:03'),
+(171, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Miguel Castillo for student Angela Marquez', '::1', '2026-09-12 07:03:03'),
+(172, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Andrea Guzman for student Melanie Delgado', '::1', '2026-09-12 07:03:03'),
+(173, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Adrian Rosario for student Veronica Rosario', '::1', '2026-09-12 07:03:03'),
+(174, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Clara Velasco for student Maria Dizon', '::1', '2026-09-12 07:03:03'),
+(175, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Renato Smith for student Ana Cruz', '::1', '2026-09-12 07:03:03'),
+(176, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Shiela Saldana for student Luz Parker', '::1', '2026-09-12 07:03:03'),
+(177, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Romeo Gonzales for student Rosa Lara', '::1', '2026-09-12 07:03:03'),
+(178, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Luz Lim for student Elena Saldana', '::1', '2026-09-12 07:03:03'),
+(179, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Marco Dela Cruz for student Sofia Espinoza', '::1', '2026-09-12 07:03:03'),
+(180, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to teacher SHANA MATILLANO for student Sofia Espinoza', '::1', '2026-09-12 07:03:03'),
+(181, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Camille Ramos for student Andrea Hernandez', '::1', '2026-09-12 07:03:03'),
+(182, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Victor Castillo for student Bianca King', '::1', '2026-09-12 07:03:03'),
+(183, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Liza Guzman for student Jasmine Nuñez', '::1', '2026-09-12 07:03:03'),
+(184, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to teacher Ghean rfd for student Jasmine Nuñez', '::1', '2026-09-12 07:03:03'),
+(185, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Gilbert Rosario for student Camille Dela Cruz', '::1', '2026-09-12 07:03:03'),
+(186, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Melanie Velasco for student Isabel Torres', '::1', '2026-09-12 07:03:03'),
+(187, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Pedro Smith for student Grace Bautista', '::1', '2026-09-12 07:03:03'),
+(188, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Sofia Saldana for student Nina Navarro', '::1', '2026-09-12 07:03:03'),
+(189, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Leo Gonzales for student Clara Salazar', '::1', '2026-09-12 07:03:03'),
+(190, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Nina Lim for student Teresa Guzman', '::1', '2026-09-12 07:03:03'),
+(191, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Francis Dela Cruz for student Joy Cortez', '::1', '2026-09-12 07:03:03'),
+(192, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Mara Ramos for student Liza Santiago', '::1', '2026-09-12 07:03:03'),
+(193, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Paul Castillo for student Kath Manalo', '::1', '2026-09-12 07:03:03'),
+(194, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Ana Guzman for student Daisy Fernandez', '::1', '2026-09-12 07:03:03'),
+(195, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Paolo Rosario for student Mara Smith', '::1', '2026-09-12 07:03:03'),
+(196, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to teacher SHANA MATILLANO for student Mara Smith', '::1', '2026-09-12 07:03:03'),
+(197, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Jasmine Velasco for student Shiela Mercado', '::1', '2026-09-12 07:03:03'),
+(198, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Alvin Smith for student Princess Beltran', '::1', '2026-09-12 07:03:03'),
+(199, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Joy Saldana for student Angela Fajardo', '::1', '2026-09-12 07:03:03'),
+(200, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to teacher Ghean rfd for student Angela Fajardo', '::1', '2026-09-12 07:03:03'),
+(201, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Erwin Gonzales for student Melanie Ibarra', '::1', '2026-09-12 07:03:03'),
+(202, 1, 'Admin ', 'admin', 'notify', 'scan', 'SMS notification sent to Angela Lim for student Veronica Lim', '::1', '2026-09-12 07:03:03'),
+(203, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-09-12 07:03:25'),
+(204, 96, 'Paolo Rosario', 'parent', 'login', 'auth', 'Parent logged in | Phone: 09171000044', '::1', '2026-09-12 07:03:29'),
+(205, 96, 'Paolo Rosario', 'parent', 'logout', 'auth', 'User logged out', '::1', '2026-09-12 07:03:56'),
+(206, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-09-12 07:04:01'),
+(207, 1, 'Admin ', 'admin', 'update', 'teacher', 'Reset password for teacher: SHANA MATILLANO (ID: 3)', '::1', '2026-09-12 07:04:41'),
+(208, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-09-12 07:04:55'),
+(209, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-09-12 07:05:41'),
+(210, 1, 'Admin ', 'admin', 'release', 'scan', 'QR Release | Student: Mara Smith (ID: 96) | Parent: Paolo Rosario | SMS sent', '::1', '2026-09-12 07:07:33'),
+(211, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-09-12 07:09:33'),
+(212, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-09-12 07:09:45'),
+(213, 1, 'Admin ', 'admin', 'update', 'teacher', 'Reset password for teacher: SHANA MATILLANO (ID: 3)', '::1', '2026-09-12 07:10:35'),
+(214, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-09-12 07:10:52'),
+(215, 3, 'SHANA MATILLANO', 'teacher', 'login', 'auth', 'Teacher logged in | Phone: 09995011147', '::1', '2026-09-12 07:10:59'),
+(216, 3, 'SHANA MATILLANO', 'teacher', 'delete', 'sms_notification', 'Deleted SMS notification (ID: 233)', '::1', '2026-09-12 07:39:38'),
+(217, 3, 'SHANA MATILLANO', 'teacher', 'logout', 'auth', 'User logged out', '::1', '2026-09-12 07:41:08'),
+(218, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-09-12 07:41:12'),
+(219, 1, 'Admin ', 'admin', 'delete', 'sms_log', 'Cleared all SMS logs (229 records removed)', '::1', '2026-09-12 07:52:14'),
+(220, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-09-12 07:54:55'),
+(221, 3, 'SHANA MATILLANO', 'teacher', 'login', 'auth', 'Teacher logged in | Phone: 09995011147', '::1', '2026-09-12 07:55:03'),
+(222, 3, 'SHANA MATILLANO', 'teacher', 'logout', 'auth', 'User logged out', '::1', '2026-09-12 07:55:56'),
+(223, 96, 'Paolo Rosario', 'parent', 'login', 'auth', 'Parent logged in | Phone: 09171000044', '::1', '2026-09-12 07:56:20'),
+(224, 96, 'Paolo Rosario', 'parent', 'logout', 'auth', 'User logged out', '::1', '2026-09-12 08:07:33'),
+(225, 1, 'Admin ', 'admin', 'login', 'auth', 'Admin logged in | Phone: admin', '::1', '2026-09-12 08:07:39'),
+(226, 1, 'Admin ', 'admin', 'logout', 'auth', 'User logged out', '::1', '2026-09-12 08:08:07');
 
 -- --------------------------------------------------------
 
@@ -147,7 +272,7 @@ CREATE TABLE `admin` (
 --
 
 INSERT INTO `admin` (`id`, `fname`, `mname`, `lname`, `picture`, `phone`, `password`, `created_at`) VALUES
-(1, 'Ghean', 'De La', 'Cruz', '', 'admin', '$2y$10$i9.Cv8kZ2QBwgWcXhCiqxOz9E2c9CQn0fDFOCIWouhhZlPUnFb9rO', '2026-05-28 16:23:06');
+(1, 'Admin', '', '', '', 'admin', '$2y$10$i9.Cv8kZ2QBwgWcXhCiqxOz9E2c9CQn0fDFOCIWouhhZlPUnFb9rO', '2026-05-28 16:23:06');
 
 -- --------------------------------------------------------
 
@@ -189,8 +314,7 @@ CREATE TABLE `fetch_logs` (
 --
 
 INSERT INTO `fetch_logs` (`id`, `student_id`, `parent_id`, `auth_letter_id`, `fetcher_fname`, `fetcher_mname`, `fetcher_lname`, `fetcher_relation`, `method`, `staff_id`, `time_released`) VALUES
-(1, 1, 1, NULL, 'jea', '', 'da', 'Parent', 'QR', NULL, '2026-08-29 14:14:50'),
-(2, 1, 1, NULL, 'jea', '', 'da', 'Parent', 'QR', NULL, '2026-08-31 14:05:24');
+(7, 96, 96, NULL, 'Paolo', '', 'Rosario', 'Parent', 'QR', NULL, '2026-09-12 07:07:33');
 
 -- --------------------------------------------------------
 
@@ -215,7 +339,9 @@ CREATE TABLE `messages` (
 INSERT INTO `messages` (`id`, `sender_id`, `sender_role`, `receiver_id`, `message`, `is_read`, `created_at`) VALUES
 (1, 1, 'parent', NULL, '4DLg6IKpAhUv9LG1a69sIk7H3iXWHJR+j77AatSGimTBpOHNCWXY1/huBqthHa9zpFVEgVHvuIZ1b9H6OPsNceYnHIfZ6uB2x07vbULxrXwCPt4G1fM9u+Q8vLe7iduUuQv0q+D4LPkbv5Ag/gyx4Ic=', 1, '2026-08-29 22:12:07'),
 (2, 1, 'admin', 1, 'S5dnUYYoh9BZ0ZuCYPfI4SJkzj59eH9gvh4sR6gSP7mz7mKE8VcX1GsnCYxp2MKIjgSxXIdb9vazQM2FxakNxmUjBHQqmAVWbn3FEEVLMX1FgE2oCKlWf/zvoD0kssMmTygnRQ==', 1, '2026-08-29 22:12:31'),
-(3, 47, 'parent', NULL, '/xHD1+JpEwphLrrpY1aI6w7llwwc+0p1Ny1IuJxIiFEeQMsQjtQ/hQCS8GcOLI2tTK5BFY1BoXnNRM0OOSQQ/ze+sFoUErtOD94AmUnc1tbkpccWFA==', 1, '2026-09-01 00:55:50');
+(3, 47, 'parent', NULL, '/xHD1+JpEwphLrrpY1aI6w7llwwc+0p1Ny1IuJxIiFEeQMsQjtQ/hQCS8GcOLI2tTK5BFY1BoXnNRM0OOSQQ/ze+sFoUErtOD94AmUnc1tbkpccWFA==', 1, '2026-09-01 00:55:50'),
+(4, 46, 'parent', NULL, 'HdW+2suINlYajBo7iJXvyMcDxsjTCoX52CHzuZyc6d9Xo4WqF/tvrpnZzcqvE47Lr/u3bgVCLijdsHGwBSv1PzAnvqxNW7htOS0vP7RpIjdl/c41gTc2MtOEcueDFQI=', 1, '2026-09-01 20:42:23'),
+(5, 96, 'parent', NULL, '8qlyN101wnadlleIPx8iBrfjDpjsWqhk3OiB8fWx0HUlMEeBkBchbALCEBVVpVBaBux0zFqum1IJWxPFGT82He4/rbU52XAPBo8JWN+2fFF4eROpUu4=', 1, '2026-09-12 14:58:52');
 
 -- --------------------------------------------------------
 
@@ -242,57 +368,56 @@ CREATE TABLE `parents` (
 --
 
 INSERT INTO `parents` (`id`, `fname`, `mname`, `lname`, `phone`, `password`, `password_sent`, `qr_code`, `picture`, `created_by`, `created_at`) VALUES
-(1, 'jea', 'DE ', 'da', '110417', '$2y$10$BpYiUZry9Tz809E8c3XfruZjFcGreYRckE9dqLMfE0VgjMJDfUlb6', 1, 'QR-8W25Z', '1788012653_928c175ca7a18a59d1c5.jpg', 1, '2026-08-29 14:10:19'),
-(2, 'Juan', NULL, 'Dela Cruz', '09171000000', '$2y$10$/72MgT3sCEv4.OurqwNsRehOMl1e38EDGmvy80TmZrazrOtteFGuS', 1, 'QR-S9AS5', NULL, 1, '2026-08-31 15:25:24'),
-(3, 'Elena', NULL, 'Ramos', '09171000001', '$2y$10$BbyGUOQEjdpvLxQ/nadfJOQaitANHMkJDoyT7YHkPO182Px7do2G.', 1, 'QR-8WZMK', NULL, 1, '2026-08-31 15:25:25'),
-(4, 'Nico', NULL, 'Castillo', '09171000002', '$2y$10$MdLTv0tzFu1t9yXH3wpUIukhwlhPVuG.ZT9mbXgk1d6wkttiahIF2', 1, 'QR-G5Z88', NULL, 1, '2026-08-31 15:25:25'),
-(5, 'Grace', NULL, 'Guzman', '09171000003', '$2y$10$W0lmw4hiG8M4Lr0vnkOMj.FHASym0yUlW/ddx4b6OULJs9i9HuKVa', 1, 'QR-WPZ3Q', NULL, 1, '2026-08-31 15:25:25'),
-(6, 'Rico', NULL, 'Rosario', '09171000004', '$2y$10$GgFT.SpwDooCyuFE.2UQ7O7QS2HJeqvG18.YHq4boLCUp0c0C7pZK', 1, 'QR-FTQHV', NULL, 1, '2026-08-31 15:25:25'),
-(7, 'Daisy', NULL, 'Velasco', '09171000005', '$2y$10$Rjq/NtOXyP/JuN73SWXzu.6Dwmws5CMW9l8TXZwtQy7YzoQ4NKb4i', 1, 'QR-XP77B', NULL, 1, '2026-08-31 15:25:26'),
-(8, 'Joey', NULL, 'Smith', '09171000006', '$2y$10$T3YPhw14KGBzH/Lq6vUnCu345RgY/IVZvwHc4HNREjhOFhb4HUB/C', 1, 'QR-Y3G6U', NULL, 1, '2026-08-31 15:25:26'),
-(9, 'Maria', NULL, 'Saldana', '09171000007', '$2y$10$3/v8mpfIZH/CA9Nnf2l8COHe7hxE297p6VKHvnHuxMNoEAnkqYFSi', 1, 'QR-8XC2W', NULL, 1, '2026-08-31 15:25:26'),
-(10, 'Carlo', NULL, 'Gonzales', '09171000008', '$2y$10$gSfeQcg7Wt96Ta/PxjP.4unNQMOHBqT42A01zynwua1MmQJ5HjYjO', 1, 'QR-CBMT6', NULL, 1, '2026-08-31 15:25:26'),
-(11, 'Bianca', NULL, 'Lim', '09171000009', '$2y$10$aHP7/l49/YmECglHq0BV7eNIB8Du8s0QXaZCx9vcaacPQh6NtfOCO', 1, 'QR-TB2KF', NULL, 1, '2026-08-31 15:25:26'),
-(12, 'Dennis', NULL, 'Dela Cruz', '09171000010', '$2y$10$Tazy.Ce.zg1LadrXH6Zam.Vp5lygIDHyR7V3RRoSc2IqJJdFcYG5q', 1, 'QR-4PBJA', NULL, 1, '2026-08-31 15:25:26'),
-(13, 'Teresa', NULL, 'Ramos', '09171000011', '$2y$10$ptUKQ2J/4u68RDXM/WL5y.RPuAJLBUXuYjmqOvhRXhv506400woRi', 1, 'QR-9MPDY', NULL, 1, '2026-08-31 15:25:27'),
-(14, 'Bryan', NULL, 'Castillo', '09171000012', '$2y$10$.bfQYSINFf92hJyK8pVXaOQNYcIHUUxCYQiwBP9QMf4r.ZOmtHWm6', 1, 'QR-B3FF9', NULL, 1, '2026-08-31 15:25:27'),
-(15, 'Princess', NULL, 'Guzman', '09171000013', '$2y$10$zTYFelejWxXdbT7svy1t5e75/EyP9t50wC.TtDQFZvlraDyKUSf..', 1, 'QR-6N2Y7', NULL, 1, '2026-08-31 15:25:27'),
-(16, 'Nestor', NULL, 'Rosario', '09171000014', '$2y$10$REYBOTXv0JIHjQb2mXrLTeZsCnVwACV3zv7B0AESmGogUCX3dWWna', 1, 'QR-5A2AS', NULL, 1, '2026-08-31 15:25:27'),
-(17, 'Rosa', NULL, 'Velasco', '09171000015', '$2y$10$v6exOfaKUSLez8.tVFfCe.hiM2pNozWNaHlza8mV4frkUUVy06792', 1, 'QR-NG9UA', NULL, 1, '2026-08-31 15:25:27'),
-(18, 'Ramon', NULL, 'Smith', '09171000016', '$2y$10$PKoGaNlvNR53ZqxDNeECXOtyAHwh07bGFIclM5MJ9tMoe/MPjEAu.', 1, 'QR-PZ34M', NULL, 1, '2026-08-31 15:25:27'),
-(19, 'Isabel', NULL, 'Saldana', '09171000017', '$2y$10$GQ1aMd16Tt7CqgKgzDsw9.TesrtmbylXWjYK10wJQ8/PyhSxH8/Am', 1, 'QR-TBESS', NULL, 1, '2026-08-31 15:25:28'),
-(20, 'Emilio', NULL, 'Gonzales', '09171000018', '$2y$10$vZzHoZf1f70/rO/AF44qv.17j9osdEE7WJwvXUf/XAcziL3GkDL.a', 1, 'QR-ZGABT', NULL, 1, '2026-08-31 15:25:28'),
-(21, 'Kath', NULL, 'Lim', '09171000019', '$2y$10$U8bdHRF5pGLxI2ZisWDHkOZKCi7k.F2KIq580A2QFb6ArMheKt80a', 1, 'QR-E3WFN', NULL, 1, '2026-08-31 15:25:28'),
-(22, 'Dan', NULL, 'Dela Cruz', '09171000020', '$2y$10$Gymke7GjJN7CU2JP/96ABOdvU5pnm9/MkKZW6Zf6T5ajT3vSO0zMm', 1, 'QR-DASVB', NULL, 1, '2026-08-31 15:25:28'),
-(23, 'Veronica', NULL, 'Ramos', '09171000021', '$2y$10$wzgdIAMXLWq6bMSRAy8fLeDAebdAL2dS6B.jXEtEKEsPkpzQxy7ua', 1, 'QR-3VEYR', NULL, 1, '2026-08-31 15:25:28'),
-(24, 'Miguel', NULL, 'Castillo', '09171000022', '$2y$10$sHRdcCwcWT.kXzYkzZmzLu.a4VPwxEUPx9n8XZgY2eBGb8zhEE3KS', 1, 'QR-SWZ5U', NULL, 1, '2026-08-31 15:25:29'),
-(25, 'Andrea', NULL, 'Guzman', '09171000023', '$2y$10$SjQvjz6IRYQhwthvXn7Gg.6KOTlKQEL0LbF86ZLEwELCWvoRJsEk2', 1, 'QR-65VKW', NULL, 1, '2026-08-31 15:25:29'),
-(26, 'Adrian', NULL, 'Rosario', '09171000024', '$2y$10$CUJk0pDCXYM5W1n.kOAGF.GWCrCyo09319Ii.TBys2AivI.aeMexy', 1, 'QR-AK35V', NULL, 1, '2026-08-31 15:25:29'),
-(27, 'Clara', NULL, 'Velasco', '09171000025', '$2y$10$zVVIrftjqGnlVrHE.bisfOFTNySBIV4PDj/KHKa0Xr0MHTx2sKGJe', 1, 'QR-W2QQE', NULL, 1, '2026-08-31 15:25:29'),
-(28, 'Renato', NULL, 'Smith', '09171000026', '$2y$10$Ai6Z0ZJj18Hq9ksNmO3ykuwfpxEqAT5WqihDvZfkbi3yq/9nC6NvO', 1, 'QR-KNQ2W', NULL, 1, '2026-08-31 15:25:29'),
-(29, 'Shiela', NULL, 'Saldana', '09171000027', '$2y$10$/veU4/8sq3omwzEy6h8IZuVp27ZWlMAwICgCtEbksrWAuZiq40wwW', 1, 'QR-5HUHE', NULL, 1, '2026-08-31 15:25:30'),
-(30, 'Romeo', NULL, 'Gonzales', '09171000028', '$2y$10$ZZso0CcbaPG5PDj.7UO3m.Yc2fbobeOXvjGVIjFoiII9FE.RVqaDO', 1, 'QR-3KEUF', NULL, 1, '2026-08-31 15:25:30'),
-(31, 'Luz', NULL, 'Lim', '09171000029', '$2y$10$RwoU9.IYbNJGJshqlIXcmuiUjd2m4RdCw.l7bHvoEQRd9stj.zeiq', 1, 'QR-QB4CR', NULL, 1, '2026-08-31 15:25:30'),
-(32, 'Marco', NULL, 'Dela Cruz', '09171000030', '$2y$10$HxybzocpyOv2F7Hbhx2yOOBVDrFQmUltk.jBYsLsUT5Q25FvGZ1e6', 1, 'QR-WNAJ7', NULL, 1, '2026-08-31 15:25:30'),
-(33, 'Camille', NULL, 'Ramos', '09171000031', '$2y$10$smkmN7bz0s319fCM7yoAe.8RO42n.zoYvVziWp/G2xLBhR7qfF1tW', 1, 'QR-H9JTG', NULL, 1, '2026-08-31 15:25:30'),
-(34, 'Victor', NULL, 'Castillo', '09171000032', '$2y$10$3ykaQItjG.TNyD9D0m5wU.6dw1xLicFtx/exvo..aWM4Pj6HqCIhy', 1, 'QR-J3H6X', NULL, 1, '2026-08-31 15:25:31'),
-(35, 'Liza', NULL, 'Guzman', '09171000033', '$2y$10$M7NIEiyesiKIAodp9bt9LeIZzk/q/Ae23.RedqdjitqQFQd2iRCgm', 1, 'QR-HMK4W', NULL, 1, '2026-08-31 15:25:31'),
-(36, 'Gilbert', NULL, 'Rosario', '09171000034', '$2y$10$R8dGGqlbUR7Aaa/ukw/9pO6zFBSWRnBV3Wt/j0pwYWcflaKjzFWGy', 1, 'QR-YTB5G', NULL, 1, '2026-08-31 15:25:31'),
-(37, 'Melanie', NULL, 'Velasco', '09171000035', '$2y$10$ZlbRuRmIXSqXYJG/N1aJMOTnF4HNH14FTwTat0Y3SW0c3/P8a/bOW', 1, 'QR-74WBG', NULL, 1, '2026-08-31 15:25:31'),
-(38, 'Pedro', NULL, 'Smith', '09171000036', '$2y$10$XuP5BcHbc.bMUVqcgwIEkulpd0IaYZQDEsSPgaPVg1zrkJkgICGXy', 1, 'QR-Z8NG7', NULL, 1, '2026-08-31 15:25:31'),
-(39, 'Sofia', NULL, 'Saldana', '09171000037', '$2y$10$eRWXb1kSGC3a9myF.UcK9u3rUSsq5LqYTApSluVomdejQvwGo3Ho.', 1, 'QR-F75FK', NULL, 1, '2026-08-31 15:25:31'),
-(40, 'Leo', NULL, 'Gonzales', '09171000038', '$2y$10$pvPpepC6SRKvpo9DzcuQk.n8aqYmJJNXq7y/Bo08qqB88vwVKecKS', 1, 'QR-9FVHS', NULL, 1, '2026-08-31 15:25:32'),
-(41, 'Nina', NULL, 'Lim', '09171000039', '$2y$10$iqIzZDRt9sbi.YEb8bljuugA4qWX3DEv/tCtJhivAzUyaSnMA4O5y', 1, 'QR-EPEWT', NULL, 1, '2026-08-31 15:25:32'),
-(42, 'Francis', NULL, 'Dela Cruz', '09171000040', '$2y$10$zN.OGu12OTX3rmiV9UFwV.AoMlD.91ztBWBEOTzvVhEN1iG1rhlMu', 1, 'QR-KRNUG', NULL, 1, '2026-08-31 15:25:32'),
-(43, 'Mara', NULL, 'Ramos', '09171000041', '$2y$10$AfoIK8Iu973fGJmO7q8rJuMTBwpK4oPQ8kbz.Vr.rQazbtv.YXT/W', 1, 'QR-GVPTH', NULL, 1, '2026-08-31 15:25:32'),
-(44, 'Paul', NULL, 'Castillo', '09171000042', '$2y$10$Q2nhbVShRzBYGAwSYlK.eOBwNaEE2Bej.sla6p1HScggLnXNpYJoq', 1, 'QR-UQJE7', NULL, 1, '2026-08-31 15:25:32'),
-(45, 'Ana', NULL, 'Guzman', '09171000043', '$2y$10$5CAlnx9IpYCgBwu.IhQMdeiOrbU4rVQAQGEldjDTGKSi7Asisy.hy', 1, 'QR-X8C38', NULL, 1, '2026-08-31 15:25:32'),
-(46, 'Paolo', NULL, 'Rosario', '09171000044', '$2y$10$ikLrrjtJo9gIbWFX9N79kOhFGJDFJ3.e0E/5VLGGwCs0ygrPp7dRG', 1, 'QR-HCU48', NULL, 1, '2026-08-31 15:25:33'),
-(47, 'Jasmine', NULL, 'Velasco', '09171000045', '$2y$10$21jKBJHEdGQc2FehrckqVeSrVJpwXbwYLAZgkonIdWTITWwUZ/sbO', 1, 'QR-M4QXP', NULL, 1, '2026-08-31 15:25:33'),
-(48, 'Alvin', NULL, 'Smith', '09171000046', '$2y$10$9ZRTit7texQpnw3KPQqkUe2FjLFZrpfVzRSGv78RVFQKQJMwnqXC2', 1, 'QR-4AHM7', NULL, 1, '2026-08-31 15:25:33'),
-(49, 'Joy', NULL, 'Saldana', '09171000047', '$2y$10$CQF3XG6/5ifuo4aXESwJf.banRby23O5y3/UP4HTSvIrgTDHBclw.', 1, 'QR-YDHDP', NULL, 1, '2026-08-31 15:25:33'),
-(50, 'Erwin', NULL, 'Gonzales', '09171000048', '$2y$10$LiSXv2j50PMY6sQm/rsJXea3FKDmS5Wo6pBykCEtKYaAnD8e8y63i', 1, 'QR-VRXPD', NULL, 1, '2026-08-31 15:25:33'),
-(51, 'Angela', NULL, 'Lim', '09171000049', '$2y$10$MebVmpk6uMx.B.r.u9olJ.w5xDECire4nWDJcCxAlSNux8sHgKNfS', 1, 'QR-7EECC', NULL, 1, '2026-08-31 15:25:33');
+(52, 'Juan', NULL, 'Dela Cruz', '09171000000', '$2y$10$qwySBbPswkYAB4/DLQzfdOJ1vDGVwiEHrVBM/59cX5TUiVx5Tkc4i', 1, 'QR-62GX4', NULL, 1, '2026-09-12 06:55:10'),
+(53, 'Elena', NULL, 'Ramos', '09171000001', '$2y$10$3Q5MchPjKp0EFZ3dDpi0TeF.sYuHgoDnm/l.23mEz.PQpropYlmRu', 1, 'QR-7YW4N', NULL, 1, '2026-09-12 06:55:10'),
+(54, 'Nico', NULL, 'Castillo', '09171000002', '$2y$10$tRHm2FG/D1eUrqKSNS73BufqypngZeCtFaQ7xkAsYy/Vv.hjat3wS', 1, 'QR-B99NW', NULL, 1, '2026-09-12 06:55:10'),
+(55, 'Grace', NULL, 'Guzman', '09171000003', '$2y$10$EDZKSfqOvuHvpio5vax9vOyHqYzIm17bslJpknk98Kwklrsj7RI4O', 1, 'QR-5G3CC', NULL, 1, '2026-09-12 06:55:10'),
+(56, 'Rico', NULL, 'Rosario', '09171000004', '$2y$10$kKwftv.hsU31jO1fnU/2zO9V9VOae5WF.YuGe4Gj92Y50eKGDH.xS', 1, 'QR-7M774', NULL, 1, '2026-09-12 06:55:10'),
+(57, 'Daisy', NULL, 'Velasco', '09171000005', '$2y$10$uHqV3DLQI21dAmqH9DpaYe8s2sP5TEMX9hBaswt1R9R9ji8lhGygy', 1, 'QR-F9XTM', NULL, 1, '2026-09-12 06:55:11'),
+(58, 'Joey', NULL, 'Smith', '09171000006', '$2y$10$tbqH.VbocE3M8mSYAV.gkuXtxJdyc7QFfUeM0GLADJZBXnAWB6Fci', 1, 'QR-TXAC7', NULL, 1, '2026-09-12 06:55:11'),
+(59, 'Maria', NULL, 'Saldana', '09171000007', '$2y$10$K9Ja4dPM8CCfBP/6jnQvHO6tbD6ewe7vA/v.XrjXFuR6Na4ezfNKm', 1, 'QR-4SCBN', NULL, 1, '2026-09-12 06:55:11'),
+(60, 'Carlo', NULL, 'Gonzales', '09171000008', '$2y$10$8XHGSVvH6jx1UHiKPmD87e2zJmzcO2nyTHUROitNxUonJEZWnlN4O', 1, 'QR-BGXKD', NULL, 1, '2026-09-12 06:55:11'),
+(61, 'Bianca', NULL, 'Lim', '09171000009', '$2y$10$zogmfQsbOWmgxevjr0g8Ve55SbrCATWQwfSQohpYGFLVXynDr.gfi', 1, 'QR-5NRYK', NULL, 1, '2026-09-12 06:55:11'),
+(62, 'Dennis', NULL, 'Dela Cruz', '09171000010', '$2y$10$RLkLy5riqIg0CpwQOOzWVOIevxZei8I/4Bbfa..zfd.cufY/dOahK', 1, 'QR-CUBYB', NULL, 1, '2026-09-12 06:55:11'),
+(63, 'Teresa', NULL, 'Ramos', '09171000011', '$2y$10$2NhI04QJqSPLlNv.4TIWVOxjMd1Jp17jhP6Nsk4kDrlrMIgleyU02', 1, 'QR-U9BQT', NULL, 1, '2026-09-12 06:55:11'),
+(64, 'Bryan', NULL, 'Castillo', '09171000012', '$2y$10$ToUao6t0kuuveFju4POB8.q.zx2zJmypQzacfh0f7w4TGVDjkJBvG', 1, 'QR-GSASS', NULL, 1, '2026-09-12 06:55:11'),
+(65, 'Princess', NULL, 'Guzman', '09171000013', '$2y$10$Mo6gPExFYd8zNlW27NpTPeHwrA2SAmGiyo9uRWEAswAPfqHBStZWS', 1, 'QR-TDH8C', NULL, 1, '2026-09-12 06:55:11'),
+(66, 'Nestor', NULL, 'Rosario', '09171000014', '$2y$10$aPiblsVbBksMP0iFzK/tcOmT18p0GVwwzwb5bZhIRhgHT1iuTFR4e', 1, 'QR-UXVB4', NULL, 1, '2026-09-12 06:55:11'),
+(67, 'Rosa', NULL, 'Velasco', '09171000015', '$2y$10$ODpZUmu3paGghc2D4t.wHuNBPsOBrilNWikHM1Swn/Z8jWMa.vj8O', 1, 'QR-YV3YK', NULL, 1, '2026-09-12 06:55:11'),
+(68, 'Ramon', NULL, 'Smith', '09171000016', '$2y$10$Fo.j/HY8tyVU9e3J97EbqOEHxLWpWbKNdb6mD8AiYPW.l79xZjPFC', 1, 'QR-G4TV2', NULL, 1, '2026-09-12 06:55:11'),
+(69, 'Isabel', NULL, 'Saldana', '09171000017', '$2y$10$HyEjNpMSzYjXCV4qIfJVj.GgkzLAeoFCcSIVYarbNatFODx0pZjj.', 1, 'QR-D6GEF', NULL, 1, '2026-09-12 06:55:11'),
+(70, 'Emilio', NULL, 'Gonzales', '09171000018', '$2y$10$ahjzc0Y3xyr7UuR8Pb9IDelKcZUYLGdtYZu4lLixF85kFwNNx1zR.', 1, 'QR-KXK3M', NULL, 1, '2026-09-12 06:55:11'),
+(71, 'Kath', NULL, 'Lim', '09171000019', '$2y$10$JsVirKmSHvXSh.IxwTLtM.zFnjLmW0FTH8Kj05qWBHXuf5haoVZCq', 1, 'QR-UDS6A', NULL, 1, '2026-09-12 06:55:11'),
+(72, 'Dan', NULL, 'Dela Cruz', '09171000020', '$2y$10$eKrVGcXckErgZyEnWVUAL.Z.tNyjJ3NgzJfkifuAUVpg4oQjABaNa', 1, 'QR-BBH5R', NULL, 1, '2026-09-12 06:55:11'),
+(73, 'Veronica', NULL, 'Ramos', '09171000021', '$2y$10$lixZD570u/TYBO2g2a4TwebIdushQ9XKQ4F0Gy0M/jWYnNBZZi.ca', 1, 'QR-UN7WY', NULL, 1, '2026-09-12 06:55:11'),
+(74, 'Miguel', NULL, 'Castillo', '09171000022', '$2y$10$qnbyju.OFzSfzL0fHaNPEO/g0xWrCXDFNZGycdz4kVfdgdtWIOSoi', 1, 'QR-VPFG9', NULL, 1, '2026-09-12 06:55:11'),
+(75, 'Andrea', NULL, 'Guzman', '09171000023', '$2y$10$o6BN80z16vAxW96ZGrgkoeXL1PWsGpxidp1IIYuK5newoHdjjhxNK', 1, 'QR-UXBH3', NULL, 1, '2026-09-12 06:55:11'),
+(76, 'Adrian', NULL, 'Rosario', '09171000024', '$2y$10$Yn2QrKBeEwnv6/CPEF6esuBGMLjS0.4pfLoM7sFP.PVvxnQcsXoW6', 1, 'QR-2W9FQ', NULL, 1, '2026-09-12 06:55:11'),
+(77, 'Clara', NULL, 'Velasco', '09171000025', '$2y$10$cDWrlSDiFcHWQuGeefoLm./sayImsTsHe6QzW1L2uCTJPcG2rGoRy', 1, 'QR-S72DJ', NULL, 1, '2026-09-12 06:55:11'),
+(78, 'Renato', NULL, 'Smith', '09171000026', '$2y$10$OWtqYyfz2HsgyrE2hRl8NODMRMnaT3fvuByERv0CdQVH3w8wc5daO', 1, 'QR-MBWU7', NULL, 1, '2026-09-12 06:55:11'),
+(79, 'Shiela', NULL, 'Saldana', '09171000027', '$2y$10$7gEU76joSvJjjp8WUfLUmuSx9p2VTfqSaTAShSm7PbrOcPylLqiVO', 1, 'QR-R232Q', NULL, 1, '2026-09-12 06:55:11'),
+(80, 'Romeo', NULL, 'Gonzales', '09171000028', '$2y$10$6HiYqJIKeFLBZE7Hd7uRTO44jUbfSsPzpSn8elai2VjGr97x.0Uke', 1, 'QR-RF4G3', NULL, 1, '2026-09-12 06:55:11'),
+(81, 'Luz', NULL, 'Lim', '09171000029', '$2y$10$0/eUoulzSuIqAypPF3mnxeHkrZqkJKuRvJkrfeygP24h8GUkIW3ue', 1, 'QR-WPCQR', NULL, 1, '2026-09-12 06:55:11'),
+(82, 'Marco', NULL, 'Dela Cruz', '09171000030', '$2y$10$gYBqwtyllSrz.34IYvYLVOra2MbGKySzXAmWtXFszNiuNzc5kaIbO', 1, 'QR-U7JVJ', NULL, 1, '2026-09-12 06:55:11'),
+(83, 'Camille', NULL, 'Ramos', '09171000031', '$2y$10$j6HKEbmfFMQdwd5u6y2/tu86U3J3KvbwaWeNL2JDvPIGQehxI35e2', 1, 'QR-QTVJ5', NULL, 1, '2026-09-12 06:55:11'),
+(84, 'Victor', NULL, 'Castillo', '09171000032', '$2y$10$9czICwihEgJFHo2mL757XeyBjJKIrMAMNedCJWlCCn7iAvlBaOLIm', 1, 'QR-XCVR9', NULL, 1, '2026-09-12 06:55:12'),
+(85, 'Liza', NULL, 'Guzman', '09171000033', '$2y$10$vjE7E6CoJpzCBMrx.xinVel4wFqUvJZgdYRpDsqLomU2yJG4hGlt.', 1, 'QR-AKFRF', NULL, 1, '2026-09-12 06:55:12'),
+(86, 'Gilbert', NULL, 'Rosario', '09171000034', '$2y$10$2vmfzrlg2aeRC3oRTMf/h.K8vI8b7GwcMUolfqIA8dnytKnDtJNRS', 1, 'QR-T5MMD', NULL, 1, '2026-09-12 06:55:12'),
+(87, 'Melanie', NULL, 'Velasco', '09171000035', '$2y$10$iL13IR4q5ysmsgpTRU70GOs.WJWYSKLJQlC8l2rRvvqgTj/HuQwba', 1, 'QR-9WA7W', NULL, 1, '2026-09-12 06:55:12'),
+(88, 'Pedro', NULL, 'Smith', '09171000036', '$2y$10$rTBnybu4tELAE2ZjZjtwjeFZVHU.AEq/W74oXo2YtgFRxTELwln9G', 1, 'QR-QHWXP', NULL, 1, '2026-09-12 06:55:12'),
+(89, 'Sofia', NULL, 'Saldana', '09171000037', '$2y$10$AP8kch5H2vBkgKzlXxfrde/wS8Pud7e49JrC/QbEfEh2cVQ2VHD5q', 1, 'QR-M58A6', NULL, 1, '2026-09-12 06:55:12'),
+(90, 'Leo', NULL, 'Gonzales', '09171000038', '$2y$10$IZOJxh35kzWF8uWLcBfoS.yK7iTeTJOL2kQzV/Ea/GX5evPPhTFUa', 1, 'QR-SEM8A', NULL, 1, '2026-09-12 06:55:12'),
+(91, 'Nina', NULL, 'Lim', '09171000039', '$2y$10$dTgBpvNGsEfYeSRgUY2b0uZxBpQX0aU9xdT1y9Dd1nZHaWmBVpwNS', 1, 'QR-B5R2Z', NULL, 1, '2026-09-12 06:55:12'),
+(92, 'Francis', NULL, 'Dela Cruz', '09171000040', '$2y$10$1lpTCSh4msDcIX/Z/FMMaO3iBOAzQ5kEfsPv6trrKCN9RhK77nxFW', 1, 'QR-M99K4', NULL, 1, '2026-09-12 06:55:12'),
+(93, 'Mara', NULL, 'Ramos', '09171000041', '$2y$10$lp6HLExv6Hfs8fVKnea4iORi7aHlTEWTw46CX92HmXdvVkrueF0oS', 1, 'QR-C9EC4', NULL, 1, '2026-09-12 06:55:12'),
+(94, 'Paul', NULL, 'Castillo', '09171000042', '$2y$10$bZEGTvYaPn9fKWERqAcBIOt7O9rEwXVb/s4Y8kV/QChbpEjypUHfm', 1, 'QR-6G5WZ', NULL, 1, '2026-09-12 06:55:12'),
+(95, 'Ana', NULL, 'Guzman', '09171000043', '$2y$10$CWnc0l59.n0sW68WUW2d9u0OPQ.Fo6yDP6TXJ0eZMpUg8Mp3IwF5G', 1, 'QR-S6FTD', NULL, 1, '2026-09-12 06:55:12'),
+(96, 'Paolo', NULL, 'Rosario', '09171000044', '$2y$10$3cd2iW9HP65Tlx8y7ltQkeu9cPpl9uNpBL3yfXMD8m2qXlRzeybbW', 1, 'QR-MPFKX', NULL, 1, '2026-09-12 06:55:12'),
+(97, 'Jasmine', NULL, 'Velasco', '09171000045', '$2y$10$r3Ivs3ju3cDFNRpgb5S2KenWjFbPn8NbAhLZmKSvEsWE5mimBtXNK', 1, 'QR-GYDUR', NULL, 1, '2026-09-12 06:55:12'),
+(98, 'Alvin', NULL, 'Smith', '09171000046', '$2y$10$68ofqXnrlF.HyOv/5qaQmuWJWDOzQM19UwZy5gWyAswv9k03Zesfi', 1, 'QR-JVPC9', NULL, 1, '2026-09-12 06:55:12'),
+(99, 'Joy', NULL, 'Saldana', '09171000047', '$2y$10$tDhHGsw9gSbWurXukaCn2Oda0h3k1qTZKnrYTgJ27AXwTvECd2V9.', 1, 'QR-TPD2V', NULL, 1, '2026-09-12 06:55:12'),
+(100, 'Erwin', NULL, 'Gonzales', '09171000048', '$2y$10$uYBQkXYxra9n/FPN9YZ2fexBjiEYFkByFeOOP1iJjqk6ZRZikdpUK', 1, 'QR-Z59P3', NULL, 1, '2026-09-12 06:55:12'),
+(101, 'Angela', NULL, 'Lim', '09171000049', '$2y$10$SqcH2awJyKfVbJo.LAK.FOJcsoEjddeWAWug446TDRGZrWvySGaTa', 1, 'QR-QU63Q', NULL, 1, '2026-09-12 06:55:12');
 
 -- --------------------------------------------------------
 
@@ -312,10 +437,14 @@ CREATE TABLE `settings` (
 --
 
 INSERT INTO `settings` (`id`, `setting_key`, `setting_value`, `updated_at`) VALUES
-(1, 'sms_mode', 'auto', '2026-08-31 22:01:52'),
+(1, 'sms_mode', 'auto', '2026-09-12 15:02:27'),
 (2, 'auto_sms_interval', '60', '2026-08-29 15:04:30'),
-(3, 'auto_sms_datetime', '2026-08-31 22:02:00', '2026-08-31 22:01:52'),
-(4, 'auto_sms_last_run', '2026-08-31 22:02:00', '2026-08-31 22:02:03');
+(3, 'auto_sms_datetime', '2026-09-12 15:03:00', '2026-09-12 15:02:27'),
+(4, 'auto_sms_last_run', '2026-09-12 15:03:00', '2026-09-12 15:03:03'),
+(5, 'gate_camera_config', 'default', '2026-09-01 23:09:43'),
+(6, 'gate_scan_active', '1', '2026-09-01 23:18:21'),
+(7, 'gate_scan_token', '4556d7b9339d4769706eea80175fc6ad1724178e1a68ca31', '2026-09-01 23:18:21'),
+(8, 'gate_scan_started_by', '1|Admin ', '2026-09-01 23:18:21');
 
 -- --------------------------------------------------------
 
@@ -330,125 +459,6 @@ CREATE TABLE `sms_logs` (
   `status` varchar(20) DEFAULT 'sent',
   `sent_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `sms_logs`
---
-
-INSERT INTO `sms_logs` (`id`, `parent_phone`, `message`, `status`, `sent_at`) VALUES
-(4, '09995011147', 'Your Scan2Fetch teacher account password is: tVdccU5u (recorded in SMS logs).', 'sent', '2026-08-29 12:51:02'),
-(5, '110417', 'Your Scan2Fetch account password is: VpEwZTxE (recorded in SMS logs).', 'sent', '2026-08-29 14:10:19'),
-(6, '110417', 'Reminder: Your child juan cruz has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-29 14:13:05'),
-(7, '09995011147', 'Reminder: juan cruz (Grade 1 - A) has not been picked up yet and is still at school. - BCC Scan2Fetch', 'sent', '2026-08-29 14:13:05'),
-(8, '110417', 'Your child juan cruz has been released at 10:14 PM. - BCC Scan2Fetch', 'sent', '2026-08-29 14:14:50'),
-(9, '09995011147', 'Your new Scan2Fetch teacher account password is: Z7VeXXxs (recorded in SMS logs).', 'sent', '2026-08-31 13:57:57'),
-(10, '110417', 'Your new Scan2Fetch account password is: 2h3Cs2Ux (recorded in SMS logs).', 'sent', '2026-08-31 13:59:57'),
-(11, '110417', 'Reminder: Your child juan cruz has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', '2026-08-31 14:02:03'),
-(12, '09995011147', 'Reminder: juan cruz (Grade 1 - A) has not been picked up yet and is still at school. - BCC Scan2Fetch', 'sent', '2026-08-31 14:02:03'),
-(13, '110417', 'Your child juan cruz has been released at 10:05 PM. - BCC Scan2Fetch', 'sent', '2026-08-31 14:05:24'),
-(14, '09171000000', 'Your Scan2Fetch account password is: De9mBmcK (recorded in SMS logs).', 'sent', '2026-08-31 15:25:24'),
-(15, '09171000001', 'Your Scan2Fetch account password is: kMEXcZFj (recorded in SMS logs).', 'sent', '2026-08-31 15:25:25'),
-(16, '09171000002', 'Your Scan2Fetch account password is: AvgsyeL3 (recorded in SMS logs).', 'sent', '2026-08-31 15:25:25'),
-(17, '09171000003', 'Your Scan2Fetch account password is: 3ktBdU2c (recorded in SMS logs).', 'sent', '2026-08-31 15:25:25'),
-(18, '09171000004', 'Your Scan2Fetch account password is: AwKwsT43 (recorded in SMS logs).', 'sent', '2026-08-31 15:25:25'),
-(19, '09171000005', 'Your Scan2Fetch account password is: e4ZTmWpt (recorded in SMS logs).', 'sent', '2026-08-31 15:25:26'),
-(20, '09171000006', 'Your Scan2Fetch account password is: NZg3Vnvm (recorded in SMS logs).', 'sent', '2026-08-31 15:25:26'),
-(21, '09171000007', 'Your Scan2Fetch account password is: 9cWGw5sW (recorded in SMS logs).', 'sent', '2026-08-31 15:25:26'),
-(22, '09171000008', 'Your Scan2Fetch account password is: EKmjcxHf (recorded in SMS logs).', 'sent', '2026-08-31 15:25:26'),
-(23, '09171000009', 'Your Scan2Fetch account password is: upYhgTha (recorded in SMS logs).', 'sent', '2026-08-31 15:25:26'),
-(24, '09171000010', 'Your Scan2Fetch account password is: Hx4RhpqU (recorded in SMS logs).', 'sent', '2026-08-31 15:25:26'),
-(25, '09171000011', 'Your Scan2Fetch account password is: gqQGAfmD (recorded in SMS logs).', 'sent', '2026-08-31 15:25:27'),
-(26, '09171000012', 'Your Scan2Fetch account password is: eAnjy6UK (recorded in SMS logs).', 'sent', '2026-08-31 15:25:27'),
-(27, '09171000013', 'Your Scan2Fetch account password is: rC5AvCGR (recorded in SMS logs).', 'sent', '2026-08-31 15:25:27'),
-(28, '09171000014', 'Your Scan2Fetch account password is: GDcSAdps (recorded in SMS logs).', 'sent', '2026-08-31 15:25:27'),
-(29, '09171000015', 'Your Scan2Fetch account password is: hqzAE98K (recorded in SMS logs).', 'sent', '2026-08-31 15:25:27'),
-(30, '09171000016', 'Your Scan2Fetch account password is: Y8bAfHp3 (recorded in SMS logs).', 'sent', '2026-08-31 15:25:27'),
-(31, '09171000017', 'Your Scan2Fetch account password is: ya7GANND (recorded in SMS logs).', 'sent', '2026-08-31 15:25:28'),
-(32, '09171000018', 'Your Scan2Fetch account password is: evjkj9kS (recorded in SMS logs).', 'sent', '2026-08-31 15:25:28'),
-(33, '09171000019', 'Your Scan2Fetch account password is: wV2ezVxN (recorded in SMS logs).', 'sent', '2026-08-31 15:25:28'),
-(34, '09171000020', 'Your Scan2Fetch account password is: Lf98uWRB (recorded in SMS logs).', 'sent', '2026-08-31 15:25:28'),
-(35, '09171000021', 'Your Scan2Fetch account password is: ccYmHBfk (recorded in SMS logs).', 'sent', '2026-08-31 15:25:28'),
-(36, '09171000022', 'Your Scan2Fetch account password is: 5nna8VUk (recorded in SMS logs).', 'sent', '2026-08-31 15:25:29'),
-(37, '09171000023', 'Your Scan2Fetch account password is: skDyewEa (recorded in SMS logs).', 'sent', '2026-08-31 15:25:29'),
-(38, '09171000024', 'Your Scan2Fetch account password is: U6sRBgfH (recorded in SMS logs).', 'sent', '2026-08-31 15:25:29'),
-(39, '09171000025', 'Your Scan2Fetch account password is: 2ZxvNawT (recorded in SMS logs).', 'sent', '2026-08-31 15:25:29'),
-(40, '09171000026', 'Your Scan2Fetch account password is: LgzRBCsz (recorded in SMS logs).', 'sent', '2026-08-31 15:25:29'),
-(41, '09171000027', 'Your Scan2Fetch account password is: nsSckRjG (recorded in SMS logs).', 'sent', '2026-08-31 15:25:30'),
-(42, '09171000028', 'Your Scan2Fetch account password is: 4ytBcG2Q (recorded in SMS logs).', 'sent', '2026-08-31 15:25:30'),
-(43, '09171000029', 'Your Scan2Fetch account password is: fJXLgy2N (recorded in SMS logs).', 'sent', '2026-08-31 15:25:30'),
-(44, '09171000030', 'Your Scan2Fetch account password is: Ud8TT2fc (recorded in SMS logs).', 'sent', '2026-08-31 15:25:30'),
-(45, '09171000031', 'Your Scan2Fetch account password is: xtGUgmhU (recorded in SMS logs).', 'sent', '2026-08-31 15:25:30'),
-(46, '09171000032', 'Your Scan2Fetch account password is: 4Q757hsW (recorded in SMS logs).', 'sent', '2026-08-31 15:25:31'),
-(47, '09171000033', 'Your Scan2Fetch account password is: rzhjFAmj (recorded in SMS logs).', 'sent', '2026-08-31 15:25:31'),
-(48, '09171000034', 'Your Scan2Fetch account password is: CJ8eWq3X (recorded in SMS logs).', 'sent', '2026-08-31 15:25:31'),
-(49, '09171000035', 'Your Scan2Fetch account password is: Ds6dHNTY (recorded in SMS logs).', 'sent', '2026-08-31 15:25:31'),
-(50, '09171000036', 'Your Scan2Fetch account password is: x7j2LaTc (recorded in SMS logs).', 'sent', '2026-08-31 15:25:31'),
-(51, '09171000037', 'Your Scan2Fetch account password is: uUTDCr6p (recorded in SMS logs).', 'sent', '2026-08-31 15:25:31'),
-(52, '09171000038', 'Your Scan2Fetch account password is: ffzVpFsg (recorded in SMS logs).', 'sent', '2026-08-31 15:25:32'),
-(53, '09171000039', 'Your Scan2Fetch account password is: na3duFQs (recorded in SMS logs).', 'sent', '2026-08-31 15:25:32'),
-(54, '09171000040', 'Your Scan2Fetch account password is: ZPZ3XAxV (recorded in SMS logs).', 'sent', '2026-08-31 15:25:32'),
-(55, '09171000041', 'Your Scan2Fetch account password is: 5Wk3VD78 (recorded in SMS logs).', 'sent', '2026-08-31 15:25:32'),
-(56, '09171000042', 'Your Scan2Fetch account password is: CeyZN88Y (recorded in SMS logs).', 'sent', '2026-08-31 15:25:32'),
-(57, '09171000043', 'Your Scan2Fetch account password is: VpX8uaMq (recorded in SMS logs).', 'sent', '2026-08-31 15:25:32'),
-(58, '09171000044', 'Your Scan2Fetch account password is: dJaZjJL8 (recorded in SMS logs).', 'sent', '2026-08-31 15:25:33'),
-(59, '09171000045', 'Your Scan2Fetch account password is: msFjpKGr (recorded in SMS logs).', 'sent', '2026-08-31 15:25:33'),
-(60, '09171000046', 'Your Scan2Fetch account password is: F7r3v3L8 (recorded in SMS logs).', 'sent', '2026-08-31 15:25:33'),
-(61, '09171000047', 'Your Scan2Fetch account password is: WpmswvgT (recorded in SMS logs).', 'sent', '2026-08-31 15:25:33'),
-(62, '09171000048', 'Your Scan2Fetch account password is: XEX9JQ4Z (recorded in SMS logs).', 'sent', '2026-08-31 15:25:33'),
-(63, '09171000049', 'Your Scan2Fetch account password is: jeUFkYfK (recorded in SMS logs).', 'sent', '2026-08-31 15:25:33'),
-(64, '123', 'Your Scan2Fetch teacher account password is: WqEnCfBp (recorded in SMS logs).', 'sent', '2026-08-31 15:26:30'),
-(65, '123', 'Your Scan2Fetch staff account password is: h7zzkraJ (recorded in SMS logs).', 'sent', '2026-08-31 15:56:41'),
-(66, '110417', 'Your new parent account password is: ZyNQtRBV (recorded in SMS logs).', 'sent', '2026-08-31 16:39:18'),
-(67, '09171000000', 'Your new parent account password is: PPdx5AR5 (recorded in SMS logs).', 'sent', '2026-08-31 16:39:18'),
-(68, '09171000001', 'Your new parent account password is: FagWRsDU (recorded in SMS logs).', 'sent', '2026-08-31 16:39:18'),
-(69, '09171000002', 'Your new parent account password is: ax8bvsTv (recorded in SMS logs).', 'sent', '2026-08-31 16:39:18'),
-(70, '09171000003', 'Your new parent account password is: QFDF3abX (recorded in SMS logs).', 'sent', '2026-08-31 16:39:18'),
-(71, '09171000004', 'Your new parent account password is: vEP7zJvM (recorded in SMS logs).', 'sent', '2026-08-31 16:39:18'),
-(72, '09171000005', 'Your new parent account password is: LrU7MypP (recorded in SMS logs).', 'sent', '2026-08-31 16:39:18'),
-(73, '09171000006', 'Your new parent account password is: EqE8yJnt (recorded in SMS logs).', 'sent', '2026-08-31 16:39:18'),
-(74, '09171000007', 'Your new parent account password is: wErdEka4 (recorded in SMS logs).', 'sent', '2026-08-31 16:39:19'),
-(75, '09171000008', 'Your new parent account password is: EMTgc9xM (recorded in SMS logs).', 'sent', '2026-08-31 16:39:19'),
-(76, '09171000009', 'Your new parent account password is: hV5V4H6c (recorded in SMS logs).', 'sent', '2026-08-31 16:39:19'),
-(77, '09171000010', 'Your new parent account password is: Wmk2TqNR (recorded in SMS logs).', 'sent', '2026-08-31 16:39:19'),
-(78, '09171000011', 'Your new parent account password is: N3r7GbPP (recorded in SMS logs).', 'sent', '2026-08-31 16:39:19'),
-(79, '09171000012', 'Your new parent account password is: auG34DAD (recorded in SMS logs).', 'sent', '2026-08-31 16:39:19'),
-(80, '09171000013', 'Your new parent account password is: Qrd3Mmm4 (recorded in SMS logs).', 'sent', '2026-08-31 16:39:19'),
-(81, '09171000014', 'Your new parent account password is: T7UVfD4H (recorded in SMS logs).', 'sent', '2026-08-31 16:39:19'),
-(82, '09171000015', 'Your new parent account password is: yAvF9hQs (recorded in SMS logs).', 'sent', '2026-08-31 16:39:20'),
-(83, '09171000016', 'Your new parent account password is: TepVBVn4 (recorded in SMS logs).', 'sent', '2026-08-31 16:39:20'),
-(84, '09171000017', 'Your new parent account password is: UZqsEAnX (recorded in SMS logs).', 'sent', '2026-08-31 16:39:20'),
-(85, '09171000018', 'Your new parent account password is: csx8E6xK (recorded in SMS logs).', 'sent', '2026-08-31 16:39:20'),
-(86, '09171000019', 'Your new parent account password is: hJ8xKcPY (recorded in SMS logs).', 'sent', '2026-08-31 16:39:20'),
-(87, '09171000020', 'Your new parent account password is: 2rW3P9RG (recorded in SMS logs).', 'sent', '2026-08-31 16:39:20'),
-(88, '09171000021', 'Your new parent account password is: 8sKdUanw (recorded in SMS logs).', 'sent', '2026-08-31 16:39:20'),
-(89, '09171000022', 'Your new parent account password is: sPQJgm8e (recorded in SMS logs).', 'sent', '2026-08-31 16:39:21'),
-(90, '09171000023', 'Your new parent account password is: CbEUNCT9 (recorded in SMS logs).', 'sent', '2026-08-31 16:39:21'),
-(91, '09171000024', 'Your new parent account password is: XtU7x54Z (recorded in SMS logs).', 'sent', '2026-08-31 16:39:21'),
-(92, '09171000025', 'Your new parent account password is: G6BTAj2D (recorded in SMS logs).', 'sent', '2026-08-31 16:39:21'),
-(93, '09171000026', 'Your new parent account password is: dWHHHKMj (recorded in SMS logs).', 'sent', '2026-08-31 16:39:21'),
-(94, '09171000027', 'Your new parent account password is: xkzpJcuK (recorded in SMS logs).', 'sent', '2026-08-31 16:39:21'),
-(95, '09171000028', 'Your new parent account password is: HdAX3mDb (recorded in SMS logs).', 'sent', '2026-08-31 16:39:21'),
-(96, '09171000029', 'Your new parent account password is: VANVC8Bs (recorded in SMS logs).', 'sent', '2026-08-31 16:39:22'),
-(97, '09171000030', 'Your new parent account password is: fEt66Mz4 (recorded in SMS logs).', 'sent', '2026-08-31 16:39:22'),
-(98, '09171000031', 'Your new parent account password is: CtNHaZDF (recorded in SMS logs).', 'sent', '2026-08-31 16:39:22'),
-(99, '09171000032', 'Your new parent account password is: Wy5bEGQh (recorded in SMS logs).', 'sent', '2026-08-31 16:39:22'),
-(100, '09171000033', 'Your new parent account password is: MzL5fDCh (recorded in SMS logs).', 'sent', '2026-08-31 16:39:22'),
-(101, '09171000034', 'Your new parent account password is: sU3FwQGz (recorded in SMS logs).', 'sent', '2026-08-31 16:39:22'),
-(102, '09171000035', 'Your new parent account password is: dYujVEQX (recorded in SMS logs).', 'sent', '2026-08-31 16:39:22'),
-(103, '09171000036', 'Your new parent account password is: CSdtA4YG (recorded in SMS logs).', 'sent', '2026-08-31 16:39:22'),
-(104, '09171000037', 'Your new parent account password is: 9YMe5AuM (recorded in SMS logs).', 'sent', '2026-08-31 16:39:23'),
-(105, '09171000038', 'Your new parent account password is: uWfhAdrc (recorded in SMS logs).', 'sent', '2026-08-31 16:39:23'),
-(106, '09171000039', 'Your new parent account password is: vguKhakz (recorded in SMS logs).', 'sent', '2026-08-31 16:39:23'),
-(107, '09171000040', 'Your new parent account password is: s2qcsyqV (recorded in SMS logs).', 'sent', '2026-08-31 16:39:23'),
-(108, '09171000041', 'Your new parent account password is: EzJDvst2 (recorded in SMS logs).', 'sent', '2026-08-31 16:39:23'),
-(109, '09171000042', 'Your new parent account password is: xYZfBrzW (recorded in SMS logs).', 'sent', '2026-08-31 16:39:23'),
-(110, '09171000043', 'Your new parent account password is: ZRAKVU28 (recorded in SMS logs).', 'sent', '2026-08-31 16:39:23'),
-(111, '09171000044', 'Your new parent account password is: 8pzC6XQu (recorded in SMS logs).', 'sent', '2026-08-31 16:39:23'),
-(112, '09171000045', 'Your new parent account password is: P9y5RR2S (recorded in SMS logs).', 'sent', '2026-08-31 16:39:24'),
-(113, '09171000046', 'Your new parent account password is: a3XqypeX (recorded in SMS logs).', 'sent', '2026-08-31 16:39:24'),
-(114, '09171000047', 'Your new parent account password is: vBPf9wnA (recorded in SMS logs).', 'sent', '2026-08-31 16:39:24'),
-(115, '09171000048', 'Your new parent account password is: mLUw76Z8 (recorded in SMS logs).', 'sent', '2026-08-31 16:39:24'),
-(116, '09171000049', 'Your new parent account password is: QCTkeQAW (recorded in SMS logs).', 'sent', '2026-08-31 16:39:24');
 
 -- --------------------------------------------------------
 
@@ -474,7 +484,65 @@ INSERT INTO `sms_notification_logs` (`id`, `student_id`, `parent_id`, `message`,
 (1, 1, 1, 'Reminder: Your child juan cruz has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-29 22:13:05'),
 (2, 1, 3, 'Reminder: juan cruz (Grade 1 - A) has not been picked up yet and is still at school. - BCC Scan2Fetch', 'sent', 1, '2026-08-29 22:13:05'),
 (3, 1, 1, 'Reminder: Your child juan cruz has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-08-31 22:02:03'),
-(4, 1, 3, 'Reminder: juan cruz (Grade 1 - A) has not been picked up yet and is still at school. - BCC Scan2Fetch', 'sent', 1, '2026-08-31 22:02:03');
+(4, 1, 3, 'Reminder: juan cruz (Grade 1 - A) has not been picked up yet and is still at school. - BCC Scan2Fetch', 'sent', 1, '2026-08-31 22:02:03'),
+(5, 52, 52, 'Reminder: Your child Maria Santos has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:02'),
+(6, 53, 53, 'Reminder: Your child Ana Garcia has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:02'),
+(7, 54, 54, 'Reminder: Your child Luz Flores has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:02'),
+(8, 54, 3, 'Reminder: Luz Flores (Grade 1 - A) has not been picked up yet and is still at school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:02'),
+(9, 55, 55, 'Reminder: Your child Rosa Villanueva has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:02'),
+(10, 56, 56, 'Reminder: Your child Elena Castillo has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(11, 57, 57, 'Reminder: Your child Sofia Lopez has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(12, 57, 4, 'Reminder: Sofia Lopez (Grade 2 - B) has not been picked up yet and is still at school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(13, 58, 58, 'Reminder: Your child Andrea Rivera has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(14, 59, 59, 'Reminder: Your child Bianca Padilla has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(15, 60, 60, 'Reminder: Your child Jasmine Ocampo has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(16, 61, 61, 'Reminder: Your child Camille Velasco has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(17, 62, 62, 'Reminder: Your child Isabel Go has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(18, 63, 63, 'Reminder: Your child Grace Duran has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(19, 64, 64, 'Reminder: Your child Nina Pineda has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(20, 65, 65, 'Reminder: Your child Clara Cabrera has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(21, 66, 66, 'Reminder: Your child Teresa Gonzales has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(22, 67, 67, 'Reminder: Your child Joy Jimenez has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(23, 68, 68, 'Reminder: Your child Liza Morales has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(24, 68, 3, 'Reminder: Liza Morales (Grade 1 - A) has not been picked up yet and is still at school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(25, 69, 69, 'Reminder: Your child Kath Reyes has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(26, 70, 70, 'Reminder: Your child Daisy Mendoza has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(27, 71, 71, 'Reminder: Your child Mara Ramos has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(28, 71, 4, 'Reminder: Mara Ramos (Grade 2 - B) has not been picked up yet and is still at school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(29, 72, 72, 'Reminder: Your child Shiela Aquino has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(30, 73, 73, 'Reminder: Your child Princess Domingo has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(31, 74, 74, 'Reminder: Your child Angela Marquez has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(32, 75, 75, 'Reminder: Your child Melanie Delgado has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(33, 76, 76, 'Reminder: Your child Veronica Rosario has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(34, 77, 77, 'Reminder: Your child Maria Dizon has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(35, 78, 78, 'Reminder: Your child Ana Cruz has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(36, 79, 79, 'Reminder: Your child Luz Parker has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(37, 80, 80, 'Reminder: Your child Rosa Lara has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(38, 81, 81, 'Reminder: Your child Elena Saldana has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(39, 82, 82, 'Reminder: Your child Sofia Espinoza has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(40, 82, 3, 'Reminder: Sofia Espinoza (Grade 1 - A) has not been picked up yet and is still at school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(41, 83, 83, 'Reminder: Your child Andrea Hernandez has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(42, 84, 84, 'Reminder: Your child Bianca King has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(43, 85, 85, 'Reminder: Your child Jasmine Nuñez has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(44, 85, 4, 'Reminder: Jasmine Nuñez (Grade 2 - B) has not been picked up yet and is still at school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(45, 86, 86, 'Reminder: Your child Camille Dela Cruz has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(46, 87, 87, 'Reminder: Your child Isabel Torres has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(47, 88, 88, 'Reminder: Your child Grace Bautista has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(48, 89, 89, 'Reminder: Your child Nina Navarro has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(49, 90, 90, 'Reminder: Your child Clara Salazar has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(50, 91, 91, 'Reminder: Your child Teresa Guzman has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(51, 92, 92, 'Reminder: Your child Joy Cortez has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(52, 93, 93, 'Reminder: Your child Liza Santiago has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(53, 94, 94, 'Reminder: Your child Kath Manalo has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(54, 95, 95, 'Reminder: Your child Daisy Fernandez has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(55, 96, 96, 'Reminder: Your child Mara Smith has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(56, 96, 3, 'Reminder: Mara Smith (Grade 1 - A) has not been picked up yet and is still at school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(57, 97, 97, 'Reminder: Your child Shiela Mercado has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(58, 98, 98, 'Reminder: Your child Princess Beltran has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(59, 99, 99, 'Reminder: Your child Angela Fajardo has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(60, 99, 4, 'Reminder: Angela Fajardo (Grade 2 - B) has not been picked up yet and is still at school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(61, 100, 100, 'Reminder: Your child Melanie Ibarra has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03'),
+(62, 101, 101, 'Reminder: Your child Veronica Lim has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch', 'sent', 1, '2026-09-12 15:03:03');
 
 -- --------------------------------------------------------
 
@@ -524,57 +592,56 @@ CREATE TABLE `students` (
 --
 
 INSERT INTO `students` (`id`, `fname`, `mname`, `lname`, `grade_section`, `picture`, `created_by`, `created_at`, `last_sms_notification`) VALUES
-(1, 'juan', 'dela ', 'cruz', 'Grade 1 - A', '1788012619_e6116c9aef1ded91938f.jpg', 1, '2026-08-29 14:10:19', '2026-08-31 22:02:03'),
-(2, 'Maria', NULL, 'Santos', 'Kindergarten - A', NULL, 1, '2026-08-31 15:25:23', NULL),
-(3, 'Ana', NULL, 'Garcia', 'Kindergarten - B', NULL, 1, '2026-08-31 15:25:24', NULL),
-(4, 'Luz', NULL, 'Flores', 'Grade 1 - A', NULL, 1, '2026-08-31 15:25:25', NULL),
-(5, 'Rosa', NULL, 'Villanueva', 'Grade 1 - B', NULL, 1, '2026-08-31 15:25:25', NULL),
-(6, 'Elena', NULL, 'Castillo', 'Grade 2 - A', NULL, 1, '2026-08-31 15:25:25', NULL),
-(7, 'Sofia', NULL, 'Lopez', 'Grade 2 - B', NULL, 1, '2026-08-31 15:25:25', NULL),
-(8, 'Andrea', NULL, 'Rivera', 'Grade 3 - A', NULL, 1, '2026-08-31 15:25:26', NULL),
-(9, 'Bianca', NULL, 'Padilla', 'Grade 3 - B', NULL, 1, '2026-08-31 15:25:26', NULL),
-(10, 'Jasmine', NULL, 'Ocampo', 'Grade 4 - A', NULL, 1, '2026-08-31 15:25:26', NULL),
-(11, 'Camille', NULL, 'Velasco', 'Grade 4 - B', NULL, 1, '2026-08-31 15:25:26', NULL),
-(12, 'Isabel', NULL, 'Go', 'Grade 5 - A', NULL, 1, '2026-08-31 15:25:26', NULL),
-(13, 'Grace', NULL, 'Duran', 'Grade 5 - B', NULL, 1, '2026-08-31 15:25:26', NULL),
-(14, 'Nina', NULL, 'Pineda', 'Grade 6 - A', NULL, 1, '2026-08-31 15:25:27', NULL),
-(15, 'Clara', NULL, 'Cabrera', 'Grade 6 - B', NULL, 1, '2026-08-31 15:25:27', NULL),
-(16, 'Teresa', NULL, 'Gonzales', 'Kindergarten - A', NULL, 1, '2026-08-31 15:25:27', NULL),
-(17, 'Joy', NULL, 'Jimenez', 'Kindergarten - B', NULL, 1, '2026-08-31 15:25:27', NULL),
-(18, 'Liza', NULL, 'Morales', 'Grade 1 - A', NULL, 1, '2026-08-31 15:25:27', NULL),
-(19, 'Kath', NULL, 'Reyes', 'Grade 1 - B', NULL, 1, '2026-08-31 15:25:27', NULL),
-(20, 'Daisy', NULL, 'Mendoza', 'Grade 2 - A', NULL, 1, '2026-08-31 15:25:28', NULL),
-(21, 'Mara', NULL, 'Ramos', 'Grade 2 - B', NULL, 1, '2026-08-31 15:25:28', NULL),
-(22, 'Shiela', NULL, 'Aquino', 'Grade 3 - A', NULL, 1, '2026-08-31 15:25:28', NULL),
-(23, 'Princess', NULL, 'Domingo', 'Grade 3 - B', NULL, 1, '2026-08-31 15:25:28', NULL),
-(24, 'Angela', NULL, 'Marquez', 'Grade 4 - A', NULL, 1, '2026-08-31 15:25:28', NULL),
-(25, 'Melanie', NULL, 'Delgado', 'Grade 4 - B', NULL, 1, '2026-08-31 15:25:29', NULL),
-(26, 'Veronica', NULL, 'Rosario', 'Grade 5 - A', NULL, 1, '2026-08-31 15:25:29', NULL),
-(27, 'Maria', NULL, 'Dizon', 'Grade 5 - B', NULL, 1, '2026-08-31 15:25:29', NULL),
-(28, 'Ana', NULL, 'Cruz', 'Grade 6 - A', NULL, 1, '2026-08-31 15:25:29', NULL),
-(29, 'Luz', NULL, 'Parker', 'Grade 6 - B', NULL, 1, '2026-08-31 15:25:29', NULL),
-(30, 'Rosa', NULL, 'Lara', 'Kindergarten - A', NULL, 1, '2026-08-31 15:25:30', NULL),
-(31, 'Elena', NULL, 'Saldana', 'Kindergarten - B', NULL, 1, '2026-08-31 15:25:30', NULL),
-(32, 'Sofia', NULL, 'Espinoza', 'Grade 1 - A', NULL, 1, '2026-08-31 15:25:30', NULL),
-(33, 'Andrea', NULL, 'Hernandez', 'Grade 1 - B', NULL, 1, '2026-08-31 15:25:30', NULL),
-(34, 'Bianca', NULL, 'King', 'Grade 2 - A', NULL, 1, '2026-08-31 15:25:30', NULL),
-(35, 'Jasmine', NULL, 'Nuñez', 'Grade 2 - B', NULL, 1, '2026-08-31 15:25:31', NULL),
-(36, 'Camille', NULL, 'Dela Cruz', 'Grade 3 - A', NULL, 1, '2026-08-31 15:25:31', NULL),
-(37, 'Isabel', NULL, 'Torres', 'Grade 3 - B', NULL, 1, '2026-08-31 15:25:31', NULL),
-(38, 'Grace', NULL, 'Bautista', 'Grade 4 - A', NULL, 1, '2026-08-31 15:25:31', NULL),
-(39, 'Nina', NULL, 'Navarro', 'Grade 4 - B', NULL, 1, '2026-08-31 15:25:31', NULL),
-(40, 'Clara', NULL, 'Salazar', 'Grade 5 - A', NULL, 1, '2026-08-31 15:25:31', NULL),
-(41, 'Teresa', NULL, 'Guzman', 'Grade 5 - B', NULL, 1, '2026-08-31 15:25:32', NULL),
-(42, 'Joy', NULL, 'Cortez', 'Grade 6 - A', NULL, 1, '2026-08-31 15:25:32', NULL),
-(43, 'Liza', NULL, 'Santiago', 'Grade 6 - B', NULL, 1, '2026-08-31 15:25:32', NULL),
-(44, 'Kath', NULL, 'Manalo', 'Kindergarten - A', NULL, 1, '2026-08-31 15:25:32', NULL),
-(45, 'Daisy', NULL, 'Fernandez', 'Kindergarten - B', NULL, 1, '2026-08-31 15:25:32', NULL),
-(46, 'Mara', NULL, 'Smith', 'Grade 1 - A', NULL, 1, '2026-08-31 15:25:32', NULL),
-(47, 'Shiela', NULL, 'Mercado', 'Grade 1 - B', NULL, 1, '2026-08-31 15:25:33', NULL),
-(48, 'Princess', NULL, 'Beltran', 'Grade 2 - A', NULL, 1, '2026-08-31 15:25:33', NULL),
-(49, 'Angela', NULL, 'Fajardo', 'Grade 2 - B', NULL, 1, '2026-08-31 15:25:33', NULL),
-(50, 'Melanie', NULL, 'Ibarra', 'Grade 3 - A', NULL, 1, '2026-08-31 15:25:33', NULL),
-(51, 'Veronica', NULL, 'Lim', 'Grade 3 - B', NULL, 1, '2026-08-31 15:25:33', NULL);
+(52, 'Maria', NULL, 'Santos', 'Kindergarten - A', NULL, 1, '2026-09-12 06:55:10', '2026-09-12 15:03:02'),
+(53, 'Ana', NULL, 'Garcia', 'Kindergarten - B', NULL, 1, '2026-09-12 06:55:10', '2026-09-12 15:03:02'),
+(54, 'Luz', NULL, 'Flores', 'Grade 1 - A', NULL, 1, '2026-09-12 06:55:10', '2026-09-12 15:03:02'),
+(55, 'Rosa', NULL, 'Villanueva', 'Grade 1 - B', NULL, 1, '2026-09-12 06:55:10', '2026-09-12 15:03:02'),
+(56, 'Elena', NULL, 'Castillo', 'Grade 2 - A', NULL, 1, '2026-09-12 06:55:10', '2026-09-12 15:03:03'),
+(57, 'Sofia', NULL, 'Lopez', 'Grade 2 - B', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(58, 'Andrea', NULL, 'Rivera', 'Grade 3 - A', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(59, 'Bianca', NULL, 'Padilla', 'Grade 3 - B', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(60, 'Jasmine', NULL, 'Ocampo', 'Grade 4 - A', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(61, 'Camille', NULL, 'Velasco', 'Grade 4 - B', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(62, 'Isabel', NULL, 'Go', 'Grade 5 - A', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(63, 'Grace', NULL, 'Duran', 'Grade 5 - B', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(64, 'Nina', NULL, 'Pineda', 'Grade 6 - A', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(65, 'Clara', NULL, 'Cabrera', 'Grade 6 - B', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(66, 'Teresa', NULL, 'Gonzales', 'Kindergarten - A', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(67, 'Joy', NULL, 'Jimenez', 'Kindergarten - B', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(68, 'Liza', NULL, 'Morales', 'Grade 1 - A', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(69, 'Kath', NULL, 'Reyes', 'Grade 1 - B', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(70, 'Daisy', NULL, 'Mendoza', 'Grade 2 - A', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(71, 'Mara', NULL, 'Ramos', 'Grade 2 - B', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(72, 'Shiela', NULL, 'Aquino', 'Grade 3 - A', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(73, 'Princess', NULL, 'Domingo', 'Grade 3 - B', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(74, 'Angela', NULL, 'Marquez', 'Grade 4 - A', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(75, 'Melanie', NULL, 'Delgado', 'Grade 4 - B', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(76, 'Veronica', NULL, 'Rosario', 'Grade 5 - A', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(77, 'Maria', NULL, 'Dizon', 'Grade 5 - B', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(78, 'Ana', NULL, 'Cruz', 'Grade 6 - A', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(79, 'Luz', NULL, 'Parker', 'Grade 6 - B', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(80, 'Rosa', NULL, 'Lara', 'Kindergarten - A', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(81, 'Elena', NULL, 'Saldana', 'Kindergarten - B', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(82, 'Sofia', NULL, 'Espinoza', 'Grade 1 - A', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(83, 'Andrea', NULL, 'Hernandez', 'Grade 1 - B', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(84, 'Bianca', NULL, 'King', 'Grade 2 - A', NULL, 1, '2026-09-12 06:55:11', '2026-09-12 15:03:03'),
+(85, 'Jasmine', NULL, 'Nuñez', 'Grade 2 - B', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(86, 'Camille', NULL, 'Dela Cruz', 'Grade 3 - A', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(87, 'Isabel', NULL, 'Torres', 'Grade 3 - B', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(88, 'Grace', NULL, 'Bautista', 'Grade 4 - A', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(89, 'Nina', NULL, 'Navarro', 'Grade 4 - B', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(90, 'Clara', NULL, 'Salazar', 'Grade 5 - A', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(91, 'Teresa', NULL, 'Guzman', 'Grade 5 - B', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(92, 'Joy', NULL, 'Cortez', 'Grade 6 - A', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(93, 'Liza', NULL, 'Santiago', 'Grade 6 - B', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(94, 'Kath', NULL, 'Manalo', 'Kindergarten - A', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(95, 'Daisy', NULL, 'Fernandez', 'Kindergarten - B', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(96, 'Mara', NULL, 'Smith', 'Grade 1 - A', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(97, 'Shiela', NULL, 'Mercado', 'Grade 1 - B', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(98, 'Princess', NULL, 'Beltran', 'Grade 2 - A', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(99, 'Angela', NULL, 'Fajardo', 'Grade 2 - B', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(100, 'Melanie', NULL, 'Ibarra', 'Grade 3 - A', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03'),
+(101, 'Veronica', NULL, 'Lim', 'Grade 3 - B', NULL, 1, '2026-09-12 06:55:12', '2026-09-12 15:03:03');
 
 -- --------------------------------------------------------
 
@@ -595,57 +662,56 @@ CREATE TABLE `student_parents` (
 --
 
 INSERT INTO `student_parents` (`id`, `student_id`, `parent_id`, `relation`, `created_at`) VALUES
-(1, 1, 1, 'Parent', '2026-08-29 14:10:19'),
-(2, 2, 2, 'Father', '2026-08-31 15:25:24'),
-(3, 3, 3, 'Mother', '2026-08-31 15:25:25'),
-(4, 4, 4, 'Guardian', '2026-08-31 15:25:25'),
-(5, 5, 5, 'Father', '2026-08-31 15:25:25'),
-(6, 6, 6, 'Mother', '2026-08-31 15:25:25'),
-(7, 7, 7, 'Guardian', '2026-08-31 15:25:26'),
-(8, 8, 8, 'Father', '2026-08-31 15:25:26'),
-(9, 9, 9, 'Mother', '2026-08-31 15:25:26'),
-(10, 10, 10, 'Guardian', '2026-08-31 15:25:26'),
-(11, 11, 11, 'Father', '2026-08-31 15:25:26'),
-(12, 12, 12, 'Mother', '2026-08-31 15:25:26'),
-(13, 13, 13, 'Guardian', '2026-08-31 15:25:27'),
-(14, 14, 14, 'Father', '2026-08-31 15:25:27'),
-(15, 15, 15, 'Mother', '2026-08-31 15:25:27'),
-(16, 16, 16, 'Guardian', '2026-08-31 15:25:27'),
-(17, 17, 17, 'Father', '2026-08-31 15:25:27'),
-(18, 18, 18, 'Mother', '2026-08-31 15:25:27'),
-(19, 19, 19, 'Guardian', '2026-08-31 15:25:28'),
-(20, 20, 20, 'Father', '2026-08-31 15:25:28'),
-(21, 21, 21, 'Mother', '2026-08-31 15:25:28'),
-(22, 22, 22, 'Guardian', '2026-08-31 15:25:28'),
-(23, 23, 23, 'Father', '2026-08-31 15:25:28'),
-(24, 24, 24, 'Mother', '2026-08-31 15:25:29'),
-(25, 25, 25, 'Guardian', '2026-08-31 15:25:29'),
-(26, 26, 26, 'Father', '2026-08-31 15:25:29'),
-(27, 27, 27, 'Mother', '2026-08-31 15:25:29'),
-(28, 28, 28, 'Guardian', '2026-08-31 15:25:29'),
-(29, 29, 29, 'Father', '2026-08-31 15:25:30'),
-(30, 30, 30, 'Mother', '2026-08-31 15:25:30'),
-(31, 31, 31, 'Guardian', '2026-08-31 15:25:30'),
-(32, 32, 32, 'Father', '2026-08-31 15:25:30'),
-(33, 33, 33, 'Mother', '2026-08-31 15:25:30'),
-(34, 34, 34, 'Guardian', '2026-08-31 15:25:31'),
-(35, 35, 35, 'Father', '2026-08-31 15:25:31'),
-(36, 36, 36, 'Mother', '2026-08-31 15:25:31'),
-(37, 37, 37, 'Guardian', '2026-08-31 15:25:31'),
-(38, 38, 38, 'Father', '2026-08-31 15:25:31'),
-(39, 39, 39, 'Mother', '2026-08-31 15:25:31'),
-(40, 40, 40, 'Guardian', '2026-08-31 15:25:32'),
-(41, 41, 41, 'Father', '2026-08-31 15:25:32'),
-(42, 42, 42, 'Mother', '2026-08-31 15:25:32'),
-(43, 43, 43, 'Guardian', '2026-08-31 15:25:32'),
-(44, 44, 44, 'Father', '2026-08-31 15:25:32'),
-(45, 45, 45, 'Mother', '2026-08-31 15:25:32'),
-(46, 46, 46, 'Guardian', '2026-08-31 15:25:33'),
-(47, 47, 47, 'Father', '2026-08-31 15:25:33'),
-(48, 48, 48, 'Mother', '2026-08-31 15:25:33'),
-(49, 49, 49, 'Guardian', '2026-08-31 15:25:33'),
-(50, 50, 50, 'Father', '2026-08-31 15:25:33'),
-(51, 51, 51, 'Mother', '2026-08-31 15:25:33');
+(52, 52, 52, 'Father', '2026-09-12 06:55:10'),
+(53, 53, 53, 'Mother', '2026-09-12 06:55:10'),
+(54, 54, 54, 'Guardian', '2026-09-12 06:55:10'),
+(55, 55, 55, 'Father', '2026-09-12 06:55:10'),
+(56, 56, 56, 'Mother', '2026-09-12 06:55:11'),
+(57, 57, 57, 'Guardian', '2026-09-12 06:55:11'),
+(58, 58, 58, 'Father', '2026-09-12 06:55:11'),
+(59, 59, 59, 'Mother', '2026-09-12 06:55:11'),
+(60, 60, 60, 'Guardian', '2026-09-12 06:55:11'),
+(61, 61, 61, 'Father', '2026-09-12 06:55:11'),
+(62, 62, 62, 'Mother', '2026-09-12 06:55:11'),
+(63, 63, 63, 'Guardian', '2026-09-12 06:55:11'),
+(64, 64, 64, 'Father', '2026-09-12 06:55:11'),
+(65, 65, 65, 'Mother', '2026-09-12 06:55:11'),
+(66, 66, 66, 'Guardian', '2026-09-12 06:55:11'),
+(67, 67, 67, 'Father', '2026-09-12 06:55:11'),
+(68, 68, 68, 'Mother', '2026-09-12 06:55:11'),
+(69, 69, 69, 'Guardian', '2026-09-12 06:55:11'),
+(70, 70, 70, 'Father', '2026-09-12 06:55:11'),
+(71, 71, 71, 'Mother', '2026-09-12 06:55:11'),
+(72, 72, 72, 'Guardian', '2026-09-12 06:55:11'),
+(73, 73, 73, 'Father', '2026-09-12 06:55:11'),
+(74, 74, 74, 'Mother', '2026-09-12 06:55:11'),
+(75, 75, 75, 'Guardian', '2026-09-12 06:55:11'),
+(76, 76, 76, 'Father', '2026-09-12 06:55:11'),
+(77, 77, 77, 'Mother', '2026-09-12 06:55:11'),
+(78, 78, 78, 'Guardian', '2026-09-12 06:55:11'),
+(79, 79, 79, 'Father', '2026-09-12 06:55:11'),
+(80, 80, 80, 'Mother', '2026-09-12 06:55:11'),
+(81, 81, 81, 'Guardian', '2026-09-12 06:55:11'),
+(82, 82, 82, 'Father', '2026-09-12 06:55:11'),
+(83, 83, 83, 'Mother', '2026-09-12 06:55:11'),
+(84, 84, 84, 'Guardian', '2026-09-12 06:55:12'),
+(85, 85, 85, 'Father', '2026-09-12 06:55:12'),
+(86, 86, 86, 'Mother', '2026-09-12 06:55:12'),
+(87, 87, 87, 'Guardian', '2026-09-12 06:55:12'),
+(88, 88, 88, 'Father', '2026-09-12 06:55:12'),
+(89, 89, 89, 'Mother', '2026-09-12 06:55:12'),
+(90, 90, 90, 'Guardian', '2026-09-12 06:55:12'),
+(91, 91, 91, 'Father', '2026-09-12 06:55:12'),
+(92, 92, 92, 'Mother', '2026-09-12 06:55:12'),
+(93, 93, 93, 'Guardian', '2026-09-12 06:55:12'),
+(94, 94, 94, 'Father', '2026-09-12 06:55:12'),
+(95, 95, 95, 'Mother', '2026-09-12 06:55:12'),
+(96, 96, 96, 'Guardian', '2026-09-12 06:55:12'),
+(97, 97, 97, 'Father', '2026-09-12 06:55:12'),
+(98, 98, 98, 'Mother', '2026-09-12 06:55:12'),
+(99, 99, 99, 'Guardian', '2026-09-12 06:55:12'),
+(100, 100, 100, 'Father', '2026-09-12 06:55:12'),
+(101, 101, 101, 'Mother', '2026-09-12 06:55:12');
 
 -- --------------------------------------------------------
 
@@ -692,8 +758,8 @@ CREATE TABLE `teachers` (
 --
 
 INSERT INTO `teachers` (`id`, `fname`, `mname`, `lname`, `picture`, `phone`, `password`, `password_sent`, `grade_section`, `created_by`, `created_at`) VALUES
-(3, 'SHANA', 'JOY', 'MATILLANO', '1788007862_cec08cf549e13d5b9e37.png', '09995011147', '$2y$10$vfBGvuo7GeDfItoipabvH.tBGf3JNpWFC3z10pXpjlM/N2JcUdcCG', 0, 'Grade 1 - A', 1, '2026-08-29 12:51:02'),
-(4, 'Ghean', 'Dela', 'rfd', '1788190004_0d58fcd03898973d0c74.jpg', '123', '$2y$10$EooKnsfRRmfmvCeumqI/hOyWBsqTK7SnUbrZ5EJR99I7t6WZyp/M2', 0, 'Grade 2 - B', 1, '2026-08-31 15:26:30');
+(3, 'SHANA', 'JOY', 'MATILLANO', '1788007862_cec08cf549e13d5b9e37.png', '09995011147', '$2y$10$UFuCAeZCCd/5qC6RmqSnMuYxOovUyg1IupTat2/Qx0DaftPh5IKSW', 1, 'Grade 1 - A', 1, '2026-08-29 12:51:02'),
+(4, 'Ghean', 'Dela', 'rfd', '1788190004_0d58fcd03898973d0c74.jpg', '123', '$2y$10$83izkiBe6SXpoVJx7BSM9.lDy84oRQ.hfkhGzZEMw/DH.6qbFUM0O', 1, 'Grade 2 - B', 1, '2026-08-31 15:26:30');
 
 --
 -- Indexes for dumped tables
@@ -806,7 +872,7 @@ ALTER TABLE `teachers`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=227;
 
 --
 -- AUTO_INCREMENT for table `admin`
@@ -824,37 +890,37 @@ ALTER TABLE `daily_reset_log`
 -- AUTO_INCREMENT for table `fetch_logs`
 --
 ALTER TABLE `fetch_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `parents`
 --
 ALTER TABLE `parents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
 
 --
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `sms_logs`
 --
 ALTER TABLE `sms_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=234;
 
 --
 -- AUTO_INCREMENT for table `sms_notification_logs`
 --
 ALTER TABLE `sms_notification_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT for table `staffs`
@@ -866,13 +932,13 @@ ALTER TABLE `staffs`
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
 
 --
 -- AUTO_INCREMENT for table `student_parents`
 --
 ALTER TABLE `student_parents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
 
 --
 -- AUTO_INCREMENT for table `sub_fetchers`
