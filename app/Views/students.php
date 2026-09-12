@@ -559,38 +559,17 @@ select.form-control option {
  <!-- FILTER SECTION -->
  <div class="filter-section">
  <div class="filter-row">
- <div class="filter-item">
- <label class="filter-label">Search Student</label>
- <div class="input-group input-group-sm">
- <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-search"></i></span>
- </div>
- <input type="text" id="searchStudent" class="form-control form-control-sm" placeholder="Search name or grade...">
- </div>
- </div>
- <div class="filter-item">
- <label class="filter-label">Grade</label>
- <select id="filterGrade" class="form-control form-control-sm">
- <option value="">All Grades</option>
- <option value="kindergarten">Kindergarten</option>
- <option value="grade 1">Grade 1</option>
- <option value="grade 2">Grade 2</option>
- <option value="grade 3">Grade 3</option>
- <option value="grade 4">Grade 4</option>
- <option value="grade 5">Grade 5</option>
- <option value="grade 6">Grade 6</option>
- </select>
- </div>
- <div class="filter-item">
- <label class="filter-label">Section</label>
- <select id="filterSection" class="form-control form-control-sm">
- <option value="">All Sections</option>
- <option value="a">Section A</option>
- <option value="b">Section B</option>
- </select>
- </div>
- </div>
- </div>
+<div class="filter-item">
+  <label class="filter-label">Search Student</label>
+  <div class="input-group input-group-sm">
+  <div class="input-group-prepend">
+  <span class="input-group-text"><i class="fas fa-search"></i></span>
+  </div>
+  <input type="text" id="searchStudent" class="form-control form-control-sm" placeholder="Search name or grade...">
+  </div>
+  </div>
+  </div>
+  </div>
 
  <!-- TABLE -->
  <div class="table-responsive">
@@ -716,21 +695,16 @@ select.form-control option {
 <script>
 $(function(){
     function filterTable(){
-        var s = $('#searchStudent').val().toLowerCase(),
-            g = $('#filterGrade').val().toLowerCase(),
-            sec = $('#filterSection').val().toLowerCase();
+        var s = $('#searchStudent').val().toLowerCase();
         $('.student-row').each(function(){
             var n = $(this).data('name'),
                 gr = $(this).data('grade');
             $(this).toggle(
-                (s=='' || n.indexOf(s)>-1 || gr.indexOf(s)>-1) &&
-                (g=='' || gr.indexOf(g)>-1) &&
-                (sec=='' || gr.indexOf('- '+sec)>-1 || gr.endsWith(' '+sec))
+                (s=='' || n.indexOf(s)>-1 || gr.indexOf(s)>-1)
             );
         });
     }
     $('#searchStudent').on('keyup', filterTable);
-    $('#filterGrade,#filterSection').on('change', filterTable);
 });
 
 function openImageViewer(u,t){

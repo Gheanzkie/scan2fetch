@@ -471,6 +471,43 @@ class Parents extends BaseController
         return view('parents_notifications', $data);
     }
 
+    // ===== DELETE OWN SMS NOTIFICATION =====
+    public function deleteNotification($id)
+    {
+        $db = \Config\Database::connect();
+        $parentPhone = session('phone');
+
+        if (empty($parentPhone)) {
+            return redirect()->to('/parents-notifications')->with('error', 'No phone number linked to your account.');
+        }
+
+        $deleted = $db->table('sms_logs')
+            ->where('id', $id)
+            ->where('parent_phone', $parentPhone)
+            ->delete();
+
+        if ($deleted) {
+            $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'delete', 'sms_notification', 'Deleted SMS notification (ID: '.$id.')');
+            return redirect()->to('/parents-notifications')->with('msg', 'SMS notification deleted.');
+        }
+        return redirect()->to('/parents-notifications')->with('error', 'Notification not found. You can only delete your own notifications.');
+    }
+
+    // ===== CLEAR ALL OWN SMS NOTIFICATIONS =====
+    public function clearAllNotifications()
+    {
+        $db = \Config\Database::connect();
+        $parentPhone = session('phone');
+
+        if (empty($parentPhone)) {
+            return redirect()->to('/parents-notifications')->with('error', 'No phone number linked to your account.');
+        }
+
+        $deleted = $db->table('sms_logs')->where('parent_phone', $parentPhone)->delete();
+        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'delete', 'sms_notification', 'Cleared all SMS notifications for phone '.$parentPhone);
+        return redirect()->to('/parents-notifications')->with('msg', 'All SMS notifications cleared.');
+    }
+
     // ===== LEGACY: Combined logs =====
     public function logs()
     {

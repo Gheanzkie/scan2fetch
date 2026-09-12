@@ -24,7 +24,7 @@ class ActivityLogModel extends Model
         ]);
     }
 
-    public function getLogs($filter = 'today', $module = '', $date = '', $limit = 200)
+    public function getLogs($filter = 'all', $module = '', $date = '', $limit = 200, $search = '')
     {
         $builder = $this->orderBy('created_at', 'DESC');
 
@@ -50,6 +50,16 @@ class ActivityLogModel extends Model
         // Date filter (overrides time-based if set)
         if (!empty($date)) {
             $builder->where('DATE(created_at)', $date);
+        }
+
+        // Search filter
+        if (!empty($search)) {
+            $builder->groupStart()
+                ->like('user_name', $search)
+                ->orLike('description', $search)
+                ->orLike('action', $search)
+                ->orLike('module', $search)
+                ->groupEnd();
         }
 
         return $builder->limit($limit)->findAll();

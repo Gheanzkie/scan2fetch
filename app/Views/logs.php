@@ -498,124 +498,45 @@ select.form-control option {
  <div class="container-fluid">
 
  <?php 
-            $f = $_GET['filter'] ?? 'today'; 
-            $m = $_GET['module'] ?? ''; 
-            $d = $_GET['date'] ?? date('Y-m-d'); 
+            $f = $filter ?? 'all'; 
+            $mod = $module ?? ''; 
+            $d = $date ?? ''; 
+            $q = $search ?? ''; 
             ?>
-
- <!-- ===== QUICK STATS ===== -->
- <div class="row">
- <div class="col-lg-3 col-6 mb-3">
- <div class="info-box">
- <span class="info-box-icon" style="background: #4361ee; color: #fff;">
- <i class="fas fa-list"></i>
- </span>
- <div class="info-box-content">
- <span class="info-box-text"> Total Logs</span>
- <span class="info-box-number" id="totalCount"><?= count($logs ?? []) ?></span>
- </div>
- </div>
- </div>
- <div class="col-lg-3 col-6 mb-3">
- <div class="info-box">
- <span class="info-box-icon" style="background: #16a34a; color: #fff;">
- <i class="fas fa-check-circle"></i>
- </span>
- <div class="info-box-content">
- <span class="info-box-text"> Releases</span>
- <span class="info-box-number" id="releaseCount"><?= count(array_filter($logs ?? [], function($l){ return ($l['action']??'') == 'release'; })) ?></span>
- </div>
- </div>
- </div>
- <div class="col-lg-3 col-6 mb-3">
- <div class="info-box">
- <span class="info-box-icon" style="background: #dc2626; color: #fff;">
- <i class="fas fa-times-circle"></i>
- </span>
- <div class="info-box-content">
- <span class="info-box-text"> Declined</span>
- <span class="info-box-number" id="declineCount"><?= count(array_filter($logs ?? [], function($l){ return ($l['action']??'') == 'decline'; })) ?></span>
- </div>
- </div>
- </div>
- <div class="col-lg-3 col-6 mb-3">
- <div class="info-box">
- <span class="info-box-icon" style="background: #0284c7; color: #fff;">
- <i class="fas fa-calendar-day"></i>
- </span>
- <div class="info-box-content">
- <span class="info-box-text"> Today</span>
- <span class="info-box-number"><?= count(array_filter($logs ?? [], function($l){ return date('Y-m-d', strtotime($l['created_at']??'')) == date('Y-m-d'); })) ?></span>
- </div>
- </div>
- </div>
- </div>
 
  <!-- ===== FILTERS ===== -->
  <div class="filter-section">
  <form method="get" action="<?= base_url('logs') ?>" id="filterForm">
  <div class="filter-row">
- <!-- Date Filters -->
+ <!-- Search -->
  <div class="filter-item">
- <label class="filter-label"> Date Filter</label>
- <div class="btn-group btn-group-sm" style="flex-wrap: wrap; gap: 4px;">
- <a href="<?= base_url('logs?filter=today') ?>" class="btn <?= ($f == 'today') ? 'active' : 'btn-outline-primary' ?>">Today</a>
- <a href="<?= base_url('logs?filter=yesterday') ?>" class="btn <?= ($f == 'yesterday') ? 'active' : 'btn-outline-primary' ?>">Yesterday</a>
- <a href="<?= base_url('logs?filter=week') ?>" class="btn <?= ($f == 'week') ? 'active' : 'btn-outline-primary' ?>">Week</a>
- <a href="<?= base_url('logs?filter=month') ?>" class="btn <?= ($f == 'month') ? 'active' : 'btn-outline-primary' ?>">Month</a>
- <a href="<?= base_url('logs') ?>" class="btn <?= ($f == '' || $f == 'all') ? 'active' : 'btn-outline-primary' ?>">All</a>
+ <label class="filter-label"> Search</label>
+ <div class="input-group input-group-sm">
+ <div class="input-group-prepend">
+ <span class="input-group-text"><i class="fas fa-search"></i></span>
  </div>
- </div>
+<input type="text" name="q" class="form-control form-control-sm" placeholder="Search user, action, module or description..." value="<?= esc($q) ?>" oninput="autoSubmitForm(this.form)">
+  </div>
+  </div>
 
- <!-- Action Filters -->
- <div class="filter-item">
- <label class="filter-label"> Action</label>
- <div class="btn-group btn-group-sm" style="flex-wrap: wrap; gap: 4px;">
- <a href="<?= base_url('logs?filter=release') ?>" class="btn <?= ($f == 'release') ? 'active' : 'btn-outline-success' ?>"> Releases</a>
- <a href="<?= base_url('logs?filter=decline') ?>" class="btn <?= ($f == 'decline') ? 'active' : 'btn-outline-danger' ?>"> Declined</a>
- <a href="<?= base_url('logs?filter=create') ?>" class="btn <?= ($f == 'create') ? 'active' : 'btn-outline-warning' ?>"> Created</a>
- <a href="<?= base_url('logs?filter=delete') ?>" class="btn <?= ($f == 'delete') ? 'active' : 'btn-outline-dark' ?>"> Deleted</a>
- </div>
- </div>
- </div>
+  <!-- Date Picker -->
+  <div class="filter-item">
+  <label class="filter-label"> Date</label>
+  <input type="date" name="date" class="form-control form-control-sm" value="<?= $d ?>" onchange="this.form.submit()">
+  </div>
 
- <div class="filter-row" style="margin-top: 10px;">
- <!-- Module -->
- <div class="filter-item">
- <label class="filter-label"> Module</label>
- <select name="module" class="form-control form-control-sm" onchange="this.form.submit()">
- <option value="">All Modules</option>
- <option value="auth" <?= ($m == 'auth') ? 'selected' : '' ?>>Auth</option>
- <option value="student" <?= ($m == 'student') ? 'selected' : '' ?>>Students</option>
- <option value="parent" <?= ($m == 'parent') ? 'selected' : '' ?>>Parents</option>
- <option value="sub_fetcher" <?= ($m == 'sub_fetcher') ? 'selected' : '' ?>>Sub-Fetchers</option>
- <option value="staff" <?= ($m == 'staff') ? 'selected' : '' ?>>Staffs</option>
- <option value="authorization" <?= ($m == 'authorization') ? 'selected' : '' ?>>Authorization</option>
- <option value="scan" <?= ($m == 'scan') ? 'selected' : '' ?>>QR Scan</option>
- </select>
- </div>
-
- <!-- Date Picker -->
- <div class="filter-item">
- <label class="filter-label"> Specific Date</label>
- <input type="date" name="date" class="form-control form-control-sm" value="<?= $d ?>" onchange="this.form.submit()">
- </div>
-
- <!-- Reset & Refresh -->
- <div class="filter-item-sm">
- <label class="filter-label">&nbsp;</label>
- <div style="display: flex; gap: 6px;">
- <a href="<?= base_url('logs') ?>" class="btn btn-outline-secondary btn-sm" style="flex:1;">
- <i class="fas fa-times"></i> Reset
- </a>
- <button type="button" class="btn btn-outline-secondary btn-sm" onclick="location.reload()" title="Refresh">
- <i class="fas fa-sync-alt"></i>
- </button>
- </div>
- </div>
- </div>
- </form>
- </div>
+  <!-- Reset -->
+  <div class="filter-item-sm">
+  <label class="filter-label">&nbsp;</label>
+  <div style="display: flex; gap: 6px;">
+  <a href="<?= base_url('logs') ?>" class="btn btn-outline-secondary btn-sm" style="flex:1;">
+<i class="fas fa-times"></i> Reset
+  </a>
+  </div>
+  </div>
+</div>
+  </form>
+  </div>
 
  <!-- ===== TABLE ===== -->
  <div class="row">
@@ -630,17 +551,14 @@ select.form-control option {
  <?= count($logs ?? 0) ?>
  </span>
  </h5>
- <small style="color: #b0b0c8; font-size: 12px;">
- <?php if ($f == 'today'): ?> Showing today's logs
- <?php elseif ($f == 'yesterday'): ?> Showing yesterday's logs
- <?php elseif ($f == 'week'): ?> Showing this week's logs
- <?php elseif ($f == 'month'): ?> Showing this month's logs
- <?php elseif ($f != '' && $f != 'all'): ?> Filtered by: <?= ucfirst($f) ?>
- <?php else: ?> Showing all logs
- <?php endif; ?>
- <?= $m ? ' | Module: ' . ucfirst(str_replace('_', ' ', $m)) : '' ?>
- <?= $d ? ' | Date: ' . date('M d, Y', strtotime($d)) : '' ?>
- </small>
+<small style="color: #b0b0c8; font-size: 12px;">
+  <?php if ($f == 'all' || $f == ''): ?> Showing all logs
+  <?php else: ?> Filtered by: <?= ucfirst($f) ?>
+  <?php endif; ?>
+  <?= $mod ? ' | Module: ' . ucfirst(str_replace('_', ' ', $mod)) : '' ?>
+  <?= $d ? ' | Date: ' . date('M d, Y', strtotime($d)) : '' ?>
+  <?= $q ? ' | Search: "' . esc($q) . '"' : '' ?>
+  </small>
  </div>
  </div>
  <div class="card-body p-0">
@@ -714,26 +632,4 @@ select.form-control option {
  </section>
 </div>
 
-<?= $this->endSection() ?>
-
-<?= $this->section('scripts') ?>
-<script>
-// Auto-refresh every 60 seconds for today's logs only
-var idleTime = 0;
-var refreshInterval = 60000;
-
-setInterval(function() {
-    idleTime += 1000;
-    if (idleTime >= refreshInterval && !document.querySelector(':focus')) {
-        var url = new URL(window.location.href);
-        if (url.searchParams.get('filter') === 'today' || !url.searchParams.get('filter')) {
-            location.reload();
-        }
-    }
-}, 1000);
-
-$(document).on('mousemove keypress click scroll', function() {
-    idleTime = 0;
-});
-</script>
 <?= $this->endSection() ?>

@@ -336,17 +336,14 @@ body {
  <div class="col pr-2">
  <div class="input-group input-group-sm" style="border-radius:50px;overflow:hidden;border:2px solid rgba(108,140,255,0.12);background:rgba(255,255,255,0.7);">
 
-  <input type="text" name="q" value="<?= esc($search) ?>" class="form-control border-0" placeholder="Search student..." style="background:transparent;font-size:13px;padding:6px 12px;">
- <div class="input-group-append">
- <button type="submit" class="btn btn-sm" style="background:linear-gradient(135deg,var(--soft-blue),var(--soft-purple));color:#fff;border:none;border-radius:0 50px 50px 0;padding:6px 14px;font-size:12px;font-weight:700;">Search</button>
- </div>
- </div>
- </div>
- <div class="col-auto">
-
- </div>
- </div>
- </form>
+<input type="text" name="q" value="<?= esc($search) ?>" class="form-control border-0" placeholder="Search student..." style="background:transparent;font-size:13px;padding:6px 12px;" oninput="autoSubmitForm(this.form)">
+  </div>
+  </div>
+  </div>
+  <div class="col-auto">
+  </div>
+  </div>
+  </form>
  </div>
  </div>
  <div class="card-body pt-2">

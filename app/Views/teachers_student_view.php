@@ -97,17 +97,6 @@ body {
 .info-label { color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
 .info-value { color: var(--ink); font-size: 14px; font-weight: 700; }
 
-.history-row {
-    background: rgba(255,255,255,0.55);
-    border: 1px solid rgba(63,43,150,0.05);
-    border-radius: 14px;
-    transition: background 0.25s ease;
-}
-
-.history-row:hover {
-    background: rgba(168,192,255,0.08);
-}
-
 @media (max-width: 768px) {
     .content-header h1 { font-size: 1.35rem !important; }
     .btn { font-size: 12px !important; padding: 6px 14px !important; }
@@ -126,9 +115,8 @@ body {
  </div>
  <div class="col-sm-6">
  <ol class="breadcrumb float-sm-right">
- <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">Home</a></li>
- <li class="breadcrumb-item"><a href="<?= base_url('teachers-view/' . $teacherId) ?>">My Students</a></li>
- <li class="breadcrumb-item active">Details</li>
+<li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">Home</a></li>
+  <li class="breadcrumb-item active">Student Details</li>
  </ol>
  </div>
  </div>
@@ -174,11 +162,11 @@ body {
  </div>
  </div>
 
- <div class="mt-3">
- <a href="<?= base_url('teachers-view/' . $teacherId) ?>" class="btn btn-primary btn-sm px-4">
- <i class="fas fa-arrow-left mr-1"></i> Back to My Students
- </a>
- </div>
+<div class="mt-3">
+  <a href="<?= base_url('dashboard') ?>" class="btn btn-primary btn-sm px-4">
+  <i class="fas fa-arrow-left mr-1"></i> Back to Dashboard
+  </a>
+  </div>
  </div>
  </div>
  </div>
@@ -209,13 +197,9 @@ body {
  <div class="flex-grow-1">
  <strong style="color: #2d2d4a;"><?= esc($p['fname']) ?> <?= esc($p['lname']) ?></strong>
  <br><small style="color: #b0b0c8;"><?= esc($p['relation'] ?? 'Parent') ?></small>
- <br><small style="color: #b0b0c8;"><i class="fas fa-phone mr-1"></i><?= esc($p['phone']) ?></small>
- </div>
- <?php if(!empty($p['qr_code'])): ?>
- <img src="<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>" style="width:45px;height:45px;border:2px solid #e2e8f0;border-radius:8px;cursor:pointer;"
-              onclick="openQrModal('<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>', '<?= esc($p['fname']) ?>')">
- <?php endif; ?>
- </div>
+<br><small style="color: #b0b0c8;"><i class="fas fa-phone mr-1"></i><?= esc($p['phone']) ?></small>
+  </div>
+  </div>
  <?php endforeach; ?>
  <?php else: ?>
  <p class="text-center py-3 mb-0" style="color: var(--faint);">No parent linked yet</p>
@@ -246,13 +230,9 @@ body {
  </div>
  <div class="flex-grow-1">
  <strong style="color: #2d2d4a;"><?= esc($f['fname']) ?> <?= esc($f['lname']) ?></strong>
- <br><small style="color: #b0b0c8;"><i class="fas fa-phone mr-1"></i><?= esc($f['phone']) ?></small>
- </div>
- <?php if(!empty($f['qr_code'])): ?>
- <img src="<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>" style="width:40px;height:40px;border:2px solid var(--soft-green);border-radius:8px;cursor:pointer;"
-              onclick="openQrModal('<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>', '<?= esc($f['fname']) ?>')">
- <?php endif; ?>
- </div>
+<br><small style="color: #b0b0c8;"><i class="fas fa-phone mr-1"></i><?= esc($f['phone']) ?></small>
+  </div>
+  </div>
  <?php endforeach; ?>
  <?php else: ?>
  <p class="text-center py-3 mb-0" style="color: var(--faint);">No sub-fetchers assigned</p>
@@ -260,76 +240,10 @@ body {
  </div>
  </div>
 
- <!-- Pickup History -->
- <div class="card">
- <div class="card-header">
- <h6 class="mb-0">
- <i class="fas fa-history mr-2" style="color: var(--soft-purple);"></i>Pickup History
- <small style="color: var(--faint); font-size: 12px;">&nbsp;Last 20 entries</small>
- </h6>
- </div>
- <div class="card-body">
- <?php if(!empty($pickupHistory)): ?>
- <?php foreach($pickupHistory as $ph): ?>
- <div class="d-flex align-items-center justify-content-between py-2 px-3 mb-2 history-row">
- <div class="d-flex align-items-center">
- <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-right:12px;<?= ($ph['method'] ?? '') == 'QR' ? 'background:rgba(129,199,132,0.12);' : 'background:rgba(255,183,77,0.12);' ?>">
- <i class="fas fa-<?= ($ph['method'] ?? '') == 'QR' ? 'check-circle' : 'file-alt' ?>" style="color: <?= ($ph['method'] ?? '') == 'QR' ? '#43a047' : '#f57c00' ?>;font-size:14px;"></i>
- </div>
- <div>
- <div style="font-size:13px; font-weight:700; color: var(--ink);">
- <?= esc(trim(($ph['fetcher_fname'] ?? '') . ' ' . ($ph['fetcher_lname'] ?? ''))) ?>
- </div>
- <div style="font-size:11px; color: var(--muted);">
- <?= esc($ph['fetcher_relation'] ?? 'Parent') ?>
- <?php if (!empty($ph['parent_fname'])): ?>
- <span style="color: var(--faint);"> | </span> <?= esc($ph['parent_fname']) ?> <?= esc($ph['parent_lname']) ?>
- <?php endif; ?>
- </div>
- </div>
- </div>
- <div class="text-right">
- <div style="font-size:12px; font-weight:700; color: var(--ink);">
- <?= date('M d, Y', strtotime($ph['time_released'])) ?>
- </div>
- <div style="font-size:11px; color: var(--muted);">
- <?= date('h:i A', strtotime($ph['time_released'])) ?>
- </div>
- <span class="badge badge-grade mt-1" style="font-size:10px; padding:3px 10px;"><?= esc($ph['method'] ?? '—') ?></span>
- </div>
- </div>
- <?php endforeach; ?>
- <?php else: ?>
- <div class="text-center py-4" style="color: var(--faint);">
- <i class="fas fa-history fa-2x mb-2 d-block" style="color: rgba(168,192,255,0.35);"></i>
- <p>No pickup history yet</p>
- </div>
- <?php endif; ?>
- </div>
- </div>
-
- </div>
+</div>
  </div>
  </div>
  </section>
-</div>
-
-<!-- QR Modal -->
-<div class="modal fade" id="qrModal" tabindex="-1">
- <div class="modal-dialog modal-dialog-centered modal-lg">
- <div class="modal-content">
- <div class="modal-header">
- <h5 class="modal-title"><i class="fas fa-qrcode mr-2" style="color: #4361ee;"></i><span id="qrModalTitle">QR Code</span></h5>
- <button type="button" class="close" data-dismiss="modal">&times;</button>
- </div>
- <div class="modal-body text-center" style="padding: 24px; background: #fff;">
- <img id="qrFullImage" src="" style="max-width:100%;max-height:60vh;padding:20px;">
- </div>
- <div class="modal-footer">
- <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">Close</button>
- </div>
- </div>
- </div>
 </div>
 
 <!-- Image Viewer Modal -->
@@ -354,13 +268,6 @@ body {
 
 <?= $this->section('scripts') ?>
 <script>
-function openQrModal(u, t) {
-    if (!u) { alert('No QR code available.'); return; }
-    $('#qrFullImage').attr('src', u);
-    $('#qrModalTitle').text(t || 'QR Code');
-    $('#qrModal').modal('show');
-}
-
 function openImageViewer(u, t) {
     if (!u) { alert('No photo available.'); return; }
     $('#imageViewerFull').attr('src', u);

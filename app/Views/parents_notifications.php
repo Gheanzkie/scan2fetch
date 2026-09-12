@@ -150,11 +150,77 @@ body {
     -webkit-text-fill-color: transparent;
 }
 
+.filter-section {
+    background: rgba(255,255,255,0.6);
+    border-radius: 18px;
+    padding: 16px 20px 12px 20px;
+    border: 1px solid rgba(108,140,255,0.12);
+}
+
+.filter-section .filter-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #5a5a7a;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.filter-section .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.filter-section .filter-item {
+    flex: 1;
+    min-width: 180px;
+}
+
+.filter-section .filter-item-sm {
+    flex: 0 0 auto;
+    min-width: 100px;
+}
+
+.form-control {
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    border: 2px solid rgba(160,160,180,0.15) !important;
+    color: #2d2d4a !important;
+    height: 42px !important;
+}
+
+.form-control:focus {
+    border-color: var(--soft-blue) !important;
+    box-shadow: 0 0 0 4px rgba(108,140,255,0.12) !important;
+}
+
+.btn-outline-secondary {
+    border-color: rgba(160,160,180,0.2) !important;
+    color: #7a7a9a !important;
+    border-radius: 50px !important;
+    font-weight: 700 !important;
+}
+
+.btn-outline-secondary:hover {
+    background: rgba(108,140,255,0.08) !important;
+    color: var(--soft-purple) !important;
+}
+
+.btn-outline-danger {
+    border-radius: 50px !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    padding: 6px 14px !important;
+}
+
 @media (max-width: 768px) {
     .card-body { padding: 1rem !important; }
     .content-header h1 { font-size: 1.5rem !important; }
     .table td, .table th { padding: 8px 4px !important; font-size: 11px !important; }
     .message-cell { max-width: 200px; }
+    .filter-section .filter-item { min-width: 100% !important; flex: 1 1 100% !important; }
+    .filter-section .filter-item-sm { min-width: 100% !important; flex: 1 1 100% !important; }
 }
 
 @media (max-width: 480px) {
@@ -186,21 +252,53 @@ body {
 
  <section class="content">
  <div class="container-fluid">
+ <?php if(session()->getFlashdata('msg')): ?>
+ <div class="alert alert-success"><i class="fas fa-check-circle mr-2"></i><?= session()->getFlashdata('msg') ?></div>
+ <?php endif; ?>
+ <?php if(session()->getFlashdata('error')): ?>
+ <div class="alert alert-danger"><i class="fas fa-exclamation-circle mr-2"></i><?= session()->getFlashdata('error') ?></div>
+ <?php endif; ?>
  <div class="row">
  <div class="col-12">
  <div class="card">
  <div class="card-header pt-3 pb-2">
- <div class="d-flex justify-content-between align-items-center">
+ <div class="d-flex justify-content-between align-items-center flex-wrap">
  <h5 class="mb-0">
  <i class="fas fa-list mr-2" style="color: var(--soft-blue);"></i>
                                     SMS Notification History
- <span class="badge" style="background: rgba(108,140,255,0.08); color: #2d2d4a; margin-left: 8px; font-weight: 700; font-size: 13px; padding: 6px 16px;">
+ <span class="badge" style="background: rgba(108,140,255,0.08); color: #2d2d4a; margin-left: 8px; font-weight: 700; font-size: 13px; padding: 6px 16px;" id="msgCount">
  <?= count($smsNotifications ?? []) ?> messages
  </span>
  </h5>
+ <div class="mt-1 mt-md-0">
+ <a href="<?= base_url('parents-notifications-clear') ?>" class="btn btn-outline-danger btn-sm"
+                 onclick="return confirm('Delete ALL your SMS notifications? This cannot be undone.');">
+ <i class="fas fa-trash-alt mr-1"></i> Delete All
+ </a>
  </div>
  </div>
- <div class="card-body p-0">
+ </div>
+ <div class="card-body p-0 pt-3">
+ <div style="padding: 0 20px 16px 20px;">
+ <div class="filter-section">
+ <div class="filter-row">
+ <div class="filter-item">
+ <label class="filter-label"> Search</label>
+ <input type="text" id="searchFilter" class="form-control form-control-sm" placeholder="Search student, phone or message...">
+ </div>
+ <div class="filter-item-sm">
+ <label class="filter-label"> Date</label>
+ <input type="date" id="dateFilter" class="form-control form-control-sm">
+ </div>
+ <div class="filter-item-sm">
+ <label class="filter-label">&nbsp;</label>
+ <button class="btn btn-outline-secondary btn-sm" id="resetFilterBtn" style="width:100%;">
+ <i class="fas fa-times"></i> Clear
+ </button>
+ </div>
+ </div>
+ </div>
+ </div>
  <div class="table-responsive">
  <table class="table table-hover mb-0">
  <thead class="bg-light">
@@ -210,11 +308,14 @@ body {
  <th> Student</th>
  <th> Message</th>
  <th> Status</th>
+ <th style="width:90px;"> Action</th>
  </tr>
  </thead>
  <tbody>
  <?php if (!empty($smsNotifications)): $i = 1; foreach ($smsNotifications as $s): ?>
- <tr>
+ <tr class="sms-row"
+                    data-search="<?= esc(strtolower(($s['student_fname'] ?? '') . ' ' . ($s['student_lname'] ?? '') . ' ' . ($s['grade_section'] ?? '') . ' ' . ($s['parent_phone'] ?? '') . ' ' . ($s['message'] ?? ''))) ?>"
+                    data-date="<?= date('Y-m-d', strtotime($s['sent_at'])) ?>">
  <td style="color: #b0b0c8; font-weight: 700;"><?= $i++ ?></td>
  <td style="color: #8888aa; font-size: 13px;"><?= date('M d, Y h:i A', strtotime($s['sent_at'])) ?></td>
  <td>
@@ -256,10 +357,18 @@ body {
  <i class="fas fa-check-circle mr-1"></i> Sent
  </span>
  </td>
+ <td>
+ <a href="<?= base_url('parents-notifications-delete/' . $s['id']) ?>" class="btn btn-outline-danger btn-sm"
+                onclick="return confirm('Delete this SMS notification?' +
+ '\n\nSent: ' + '<?= date('M d, Y h:i A', strtotime($s['sent_at'])) ?>' +
+ '\nTo: ' + '<?= esc($s['parent_phone'] ?? '') ?>');">
+ <i class="fas fa-trash-alt mr-1"></i> Delete
+ </a>
+ </td>
  </tr>
  <?php endforeach; else: ?>
  <tr>
- <td colspan="5" class="text-center py-5">
+ <td colspan="6" class="text-center py-5">
  <i class="fas fa-sms fa-3x mb-3 d-block" style="color: rgba(255,183,77,0.12);"></i>
  <h5 style="color: #7a7a9a; font-size: 18px;">No SMS notifications yet</h5>
  <p style="color: #b0b0c8; font-size: 15px;">SMS reminders will appear here when the school sends notifications.</p>
@@ -298,6 +407,41 @@ function toggleMessage(element) {
         }
     }
 }
+
+$(function() {
+    function filterTable() {
+        var searchVal = ($('#searchFilter').val() || '').toLowerCase();
+        var dateVal = $('#dateFilter').val();
+        var visibleCount = 0;
+
+        $('.sms-row').each(function() {
+            var search = $(this).data('search') || '';
+            var date = $(this).data('date') || '';
+            var matchSearch = searchVal === '' || search.indexOf(searchVal) > -1;
+            var matchDate = dateVal === '' || date === dateVal;
+
+            if (matchSearch && matchDate) {
+                $(this).show();
+                visibleCount++;
+            } else {
+                $(this).hide();
+            }
+        });
+
+        $('#msgCount').text(visibleCount + ' message' + (visibleCount === 1 ? '' : 's'));
+    }
+
+    $('#searchFilter').on('keyup', filterTable);
+    $('#dateFilter').on('change', filterTable);
+
+    $('#resetFilterBtn').click(function() {
+        $('#searchFilter').val('');
+        $('#dateFilter').val('');
+        filterTable();
+    });
+
+    filterTable();
+});
 
 var idleTime = 0;
 var refreshInterval = 30000;

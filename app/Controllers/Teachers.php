@@ -168,21 +168,9 @@ class Teachers extends BaseController
             ->get()
             ->getResultArray();
 
-        // Recent pickup history
-        $pickupHistory = $db->table('fetch_logs')
-            ->select('fetch_logs.*, parents.fname AS parent_fname, parents.lname AS parent_lname')
-            ->join('parents', 'parents.id = fetch_logs.parent_id', 'left')
-            ->where('fetch_logs.student_id', $id)
-            ->orderBy('fetch_logs.time_released', 'DESC')
-            ->limit(20)
-            ->get()
-            ->getResultArray();
-
         $data['student'] = $student;
         $data['parents'] = $parents;
         $data['subFetchers'] = $subFetchers;
-        $data['pickupHistory'] = $pickupHistory;
-        $data['teacherId'] = session('user_id');
 
         return view('teachers_student_view', $data);
     }
@@ -232,6 +220,43 @@ class Teachers extends BaseController
         }
 
         return view('teachers_notifications', $data);
+    }
+
+    // ===== DELETE OWN SMS NOTIFICATION =====
+    public function deleteNotification($id)
+    {
+        $db = \Config\Database::connect();
+        $teacherPhone = session('phone');
+
+        if (empty($teacherPhone)) {
+            return redirect()->to('/teachers-notifications')->with('error', 'No phone number linked to your account.');
+        }
+
+        $deleted = $db->table('sms_logs')
+            ->where('id', $id)
+            ->where('parent_phone', $teacherPhone)
+            ->delete();
+
+        if ($deleted) {
+            $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'delete', 'sms_notification', 'Deleted SMS notification (ID: '.$id.')');
+            return redirect()->to('/teachers-notifications')->with('msg', 'SMS notification deleted.');
+        }
+        return redirect()->to('/teachers-notifications')->with('error', 'Notification not found. You can only delete your own notifications.');
+    }
+
+    // ===== CLEAR ALL OWN SMS NOTIFICATIONS =====
+    public function clearAllNotifications()
+    {
+        $db = \Config\Database::connect();
+        $teacherPhone = session('phone');
+
+        if (empty($teacherPhone)) {
+            return redirect()->to('/teachers-notifications')->with('error', 'No phone number linked to your account.');
+        }
+
+        $deleted = $db->table('sms_logs')->where('parent_phone', $teacherPhone)->delete();
+        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'delete', 'sms_notification', 'Cleared all SMS notifications for phone '.$teacherPhone);
+        return redirect()->to('/teachers-notifications')->with('msg', 'All SMS notifications cleared.');
     }
 
     public function save()

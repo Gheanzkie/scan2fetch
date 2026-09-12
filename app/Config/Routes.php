@@ -41,6 +41,8 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('parents-update-from-student', 'Parents::updateFromStudent');
     $routes->get('parents-releases', 'Parents::releases');
     $routes->get('parents-notifications', 'Parents::notifications');
+    $routes->get('parents-notifications-delete/(:num)', 'Parents::deleteNotification/$1');
+    $routes->get('parents-notifications-clear', 'Parents::clearAllNotifications');
     $routes->get('parents-logs', 'Parents::logs');
 
     // ===== SUB-FETCHERS =====
@@ -61,6 +63,8 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('teachers-view/(:num)', 'Teachers::view/$1');
     $routes->get('teachers-student-view/(:num)', 'Teachers::studentView/$1');
     $routes->get('teachers-notifications', 'Teachers::notifications');
+    $routes->get('teachers-notifications-delete/(:num)', 'Teachers::deleteNotification/$1');
+    $routes->get('teachers-notifications-clear', 'Teachers::clearAllNotifications');
     $routes->post('teachers-save', 'Teachers::save');
     $routes->post('teachers-update', 'Teachers::update');
     $routes->get('teachers-delete/(:num)', 'Teachers::delete/$1');
@@ -83,6 +87,8 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     // ===== SMS LOGS =====
     $routes->get('sms-logs', 'Sms::index');
     $routes->get('sms-logs/details/(:num)', 'Sms::getSmsDetails/$1');
+    $routes->get('sms-logs/delete/(:num)', 'Sms::deleteLog/$1');
+    $routes->get('sms-logs/clear', 'Sms::clearAll');
 
     // ===== ACTIVITY LOGS =====
     $routes->get('logs', 'Logs::index');

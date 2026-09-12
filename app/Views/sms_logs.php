@@ -138,6 +138,28 @@ body {
     color: var(--soft-purple) !important;
 }
 
+.btn-outline-danger {
+    border-color: rgba(245,87,108,0.35) !important;
+    color: #c2185b !important;
+    background: rgba(255,255,255,0.3) !important;
+}
+
+.btn-outline-danger:hover {
+    background: #f5576c !important;
+    color: #fff !important;
+}
+
+.btn-group .btn-outline-danger {
+    background: #feecec !important;
+    color: #c2185b !important;
+    border-color: #ffd5dc !important;
+}
+
+.btn-group .btn-outline-danger:hover {
+    background: #ffd9de !important;
+    color: #9f1239 !important;
+}
+
 .form-control {
     background: rgba(255,255,255,0.6) !important;
     border: 2px solid rgba(160,160,180,0.12) !important;
@@ -310,6 +332,12 @@ body {
 
  <section class="content">
  <div class="container-fluid">
+ <?php if(session()->getFlashdata('msg')): ?>
+ <div class="alert alert-success"><i class="fas fa-check-circle mr-2"></i><?= session()->getFlashdata('msg') ?></div>
+ <?php endif; ?>
+ <?php if(session()->getFlashdata('error')): ?>
+ <div class="alert alert-danger"><i class="fas fa-exclamation-circle mr-2"></i><?= session()->getFlashdata('error') ?></div>
+ <?php endif; ?>
 
  <!-- ===== SMS LOGS TABLE ===== -->
  <div class="row">
@@ -317,21 +345,16 @@ body {
  <div class="card">
  <div class="card-header pt-3 pb-2">
  <div class="d-flex justify-content-between align-items-center flex-wrap">
- <h5 class="mb-0">
- <i class="fas fa-list mr-2" style="color: var(--soft-blue);"></i>
+<h5 class="mb-0">
+  <i class="fas fa-list mr-2" style="color: var(--soft-blue);"></i>
                                     SMS History
- <span class="badge badge-light ml-2"><?= count($smsLogs ?? []) ?></span>
- </h5>
- <div class="btn-group btn-group-sm mt-1 mt-md-0" style="flex-wrap: wrap; gap: 4px;">
- <button class="btn active" id="btnToday"> Today</button>
- <button class="btn" id="btnYesterday"> Yesterday</button>
- <button class="btn" id="btnWeek"> Week</button>
- <button class="btn" id="btnAll"> All</button>
- <button class="btn btn-outline-secondary" id="btnRefresh" title="Refresh">
- <i class="fas fa-sync-alt"></i>
- </button>
- </div>
- </div>
+  <span class="badge badge-light ml-2"><?= count($smsLogs ?? []) ?></span>
+  </h5>
+  <a href="<?= base_url('sms-logs/clear') ?>" class="btn btn-outline-danger btn-sm mt-1 mt-md-0" id="btnClearAll"
+                  onclick="return confirm('Delete ALL SMS logs? This cannot be undone.');">
+  <i class="fas fa-trash-alt mr-1"></i> Clear All
+  </a>
+  </div>
  </div>
  <div class="card-body pt-0">
                             
@@ -347,10 +370,10 @@ body {
  <input type="text" id="searchFilter" class="form-control form-control-sm" placeholder="Search phone or message...">
  </div>
  </div>
- <div class="filter-item">
- <label class="filter-label"> Date</label>
- <input type="date" id="dateFilter" class="form-control form-control-sm" value="<?= date('Y-m-d') ?>">
- </div>
+<div class="filter-item">
+  <label class="filter-label"> Date</label>
+  <input type="date" id="dateFilter" class="form-control form-control-sm">
+  </div>
  <div class="filter-item-sm">
  <label class="filter-label">&nbsp;</label>
  <button class="btn btn-outline-secondary btn-sm" id="resetFilterBtn" style="width:100%;">
@@ -368,24 +391,31 @@ body {
  <th style="width:40px;">#</th>
  <th style="width:150px;"> Phone</th>
  <th> Message</th>
- <th style="width:170px;"> Date/Time</th>
- </tr>
- </thead>
- <tbody>
- <?php if (!empty($smsLogs)): ?>
- <?php $i = 1; foreach ($smsLogs as $sms): ?>
- <tr class="sms-row" 
+<th style="width:170px;"> Date/Time</th>
+  <th style="width:110px;"> Action</th>
+  </tr>
+  </thead>
+  <tbody>
+  <?php if (!empty($smsLogs)): ?>
+  <?php $i = 1; foreach ($smsLogs as $sms): ?>
+  <tr class="sms-row" 
                                                 data-search="<?= esc(strtolower($sms['parent_phone'] . ' ' . $sms['message'])) ?>"
                                                 data-date="<?= date('Y-m-d', strtotime($sms['sent_at'])) ?>">
- <td style="color: #b0b0c8; font-size: 12px;"><?= $i++ ?></td>
- <td><code><?= esc($sms['parent_phone']) ?></code></td>
- <td style="color: #5a5a7a; font-size: 13px;"><?= esc($sms['message']) ?></td>
- <td style="color: #7a7a9a; font-size: 12px;"><?= date('M d, Y h:i A', strtotime($sms['sent_at'])) ?></td>
- </tr>
- <?php endforeach; ?>
- <?php else: ?>
- <tr>
- <td colspan="4" class="text-center py-5">
+  <td style="color: #b0b0c8; font-size: 12px;"><?= $i++ ?></td>
+  <td><code><?= esc($sms['parent_phone']) ?></code></td>
+  <td style="color: #5a5a7a; font-size: 13px;"><?= esc($sms['message']) ?></td>
+  <td style="color: #7a7a9a; font-size: 12px;"><?= date('M d, Y h:i A', strtotime($sms['sent_at'])) ?></td>
+  <td>
+  <a href="<?= base_url('sms-logs/delete/' . $sms['id']) ?>" class="btn btn-outline-danger btn-sm"
+                  onclick="return confirm('Delete this SMS record?\n\nTo: <?= esc($sms['parent_phone']) ?>\nSent: <?= date('M d, Y h:i A', strtotime($sms['sent_at'])) ?>');">
+  <i class="fas fa-trash-alt mr-1"></i> Delete
+  </a>
+  </td>
+  </tr>
+  <?php endforeach; ?>
+  <?php else: ?>
+  <tr>
+  <td colspan="5" class="text-center py-5">
  <i class="fas fa-sms fa-3x mb-3 d-block" style="color: rgba(160,160,180,0.15);"></i>
  <h5 style="color: #7a7a9a;">No SMS records found</h5>
  <p style="color: #b0b0c8; font-size: 14px;">SMS notifications will appear here when sent.</p>
@@ -414,19 +444,14 @@ body {
 <?= $this->section('scripts') ?>
 <script>
 $(function() {
-    var today = new Date().toISOString().split('T')[0];
-    if (!$('#dateFilter').val()) {
-        $('#dateFilter').val(today);
-    }
-
     function filterTable() {
-        var searchVal = $('#searchFilter').val().toLowerCase();
+        var searchVal = ($('#searchFilter').val() || '').toLowerCase();
         var dateVal = $('#dateFilter').val();
         var visibleCount = 0;
 
         $('.sms-row').each(function() {
-            var search = $(this).data('search');
-            var date = $(this).data('date');
+            var search = $(this).data('search') || '';
+            var date = $(this).data('date') || '';
 
             var matchSearch = searchVal === '' || search.indexOf(searchVal) > -1;
             var matchDate = dateVal === '' || date === dateVal;
@@ -442,93 +467,16 @@ $(function() {
         $('#showingCount').text(visibleCount);
     }
 
-    $('#btnToday').click(function() {
-        $(this).addClass('active').siblings('.btn').removeClass('active');
-        $('#dateFilter').val(today);
-        filterTable();
-    });
-
-    $('#btnYesterday').click(function() {
-        $(this).addClass('active').siblings('.btn').removeClass('active');
-        var yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        $('#dateFilter').val(yesterday.toISOString().split('T')[0]);
-        filterTable();
-    });
-
-    $('#btnWeek').click(function() {
-        $(this).addClass('active').siblings('.btn').removeClass('active');
-        var weekAgo = new Date();
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        var weekAgoStr = weekAgo.toISOString().split('T')[0];
-        
-        $('#dateFilter').val('');
-        $('.sms-row').each(function() {
-            var date = $(this).data('date');
-            if (date >= weekAgoStr) {
-                $(this).show();
-            } else {
-                $(this).hide();
-            }
-        });
-        updateCounts();
-    });
-
-    $('#btnAll').click(function() {
-        $(this).addClass('active').siblings('.btn').removeClass('active');
-        $('#dateFilter').val('');
-        $('#searchFilter').val('');
-        $('.sms-row').show();
-        updateCounts();
-    });
-
-    $('#btnRefresh').click(function() {
-        $(this).find('i').addClass('fa-spin');
-        location.reload();
-    });
-
-    function updateCounts() {
-        var count = $('.sms-row:visible').length;
-        $('#showingCount').text(count);
-    }
-
-    $('#searchFilter').on('keyup', function() {
-        $('.btn-group .btn').removeClass('active');
-        filterTable();
-    });
-    
-    $('#dateFilter').on('change', function() {
-        $('.btn-group .btn').removeClass('active');
-        filterTable();
-    });
+    $('#searchFilter').on('keyup', filterTable);
+    $('#dateFilter').on('change', filterTable);
 
     $('#resetFilterBtn').click(function() {
         $('#searchFilter').val('');
-        $('#dateFilter').val(today);
-        $('.btn-group .btn').removeClass('active');
-        $('#btnToday').addClass('active');
-        $('.sms-row').show();
-        updateCounts();
+        $('#dateFilter').val('');
         filterTable();
     });
 
     filterTable();
-
-    var refreshTimer = setInterval(function() {
-        if (!document.querySelector(':focus')) {
-            location.reload();
-        }
-    }, 30000);
-
-    $(document).on('focus', 'input, select, textarea', function() {
-        clearInterval(refreshTimer);
-    }).on('blur', 'input, select, textarea', function() {
-        refreshTimer = setInterval(function() {
-            if (!document.querySelector(':focus')) {
-                location.reload();
-            }
-        }, 30000);
-    });
 });
 </script>
 <?= $this->endSection() ?>

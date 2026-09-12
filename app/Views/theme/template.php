@@ -714,6 +714,15 @@ $(function(){
     refreshMsgBadges();
     setInterval(refreshMsgBadges, 20000);
 });
+
+// ===== AUTO-SUBMIT FILTER FORMS (debounced live search) =====
+window.__filterTimers = {};
+function autoSubmitForm(form) {
+    if (!form) return;
+    var id = form.getAttribute('id') || form.getAttribute('name') || 'form';
+    clearTimeout(window.__filterTimers[id]);
+    window.__filterTimers[id] = setTimeout(function() { form.submit(); }, 500);
+}
 </script>
 
 <?= $this->renderSection('scripts') ?>

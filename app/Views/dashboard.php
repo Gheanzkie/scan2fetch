@@ -281,21 +281,14 @@
  <div class="input-group-prepend">
  <span class="input-group-text" style="background:transparent;border:none;padding:6px 12px;"><i class="fas fa-search" style="color:#6C8CFF;font-size:13px;"></i></span>
  </div>
- <input type="text" name="q" value="<?= esc($search ?? '') ?>" class="form-control border-0" placeholder="Search student..." style="background:transparent;font-size:13px;padding:6px 12px;">
- <div class="input-group-append">
- <button type="submit" class="btn btn-sm" style="background:linear-gradient(135deg,#6C8CFF,#7C6CFF);color:#fff;border:none;border-radius:0 50px 50px 0;padding:6px 14px;font-size:12px;font-weight:700;">Search</button>
- </div>
- </div>
- </div>
- <div class="col-auto">
- <a href="<?= base_url('dashboard') ?>" class="btn btn-sm" style="border:2px solid rgba(108,140,255,0.15);background:rgba(255,255,255,0.3);border-radius:50px;font-size:12px;padding:6px 14px;font-weight:700;color:#6a6a8a;">
- <i class="fas fa-sync-alt mr-1"></i>Today
- </a>
- </div>
- </div>
- </form>
- </div>
- <div class="card-body">
+<input type="text" name="q" value="<?= esc($search ?? '') ?>" class="form-control border-0" placeholder="Search student..." style="background:transparent;font-size:13px;padding:6px 12px;" oninput="autoSubmitForm(this.form)">
+  </div>
+  </div>
+  </div>
+  </div>
+  </form>
+  </div>
+  <div class="card-body">
  <?php if (!empty($myStudents)): ?>
  <?php foreach ($myStudents as $st): ?>
  <div class="d-flex align-items-center p-3 mb-2" style="border:1px solid rgba(108,140,255,0.06);border-radius:14px;transition:background 0.2s;">
@@ -514,21 +507,14 @@
  <div class="input-group-prepend">
  <span class="input-group-text" style="background:transparent;border:none;padding:6px 12px;"><i class="fas fa-search" style="color:#6C8CFF;font-size:13px;"></i></span>
  </div>
- <input type="text" name="q" value="<?= esc($search ?? '') ?>" class="form-control border-0" placeholder="Search by child or fetcher name..." style="background:transparent;font-size:13px;padding:6px 12px;">
- <div class="input-group-append">
- <button type="submit" class="btn btn-sm" style="background:linear-gradient(135deg,#6C8CFF,#7C6CFF);color:#fff;border:none;border-radius:0 50px 50px 0;padding:6px 14px;font-size:12px;font-weight:700;">Search</button>
- </div>
- </div>
- </div>
- <div class="col-auto">
- <a href="<?= base_url('dashboard') ?>" class="btn btn-sm" style="border:2px solid rgba(108,140,255,0.15);background:rgba(255,255,255,0.3);border-radius:50px;font-size:12px;padding:6px 14px;font-weight:700;color:#6a6a8a;">
- <i class="fas fa-sync-alt mr-1"></i>All
- </a>
- </div>
- </div>
- </form>
- </div>
- <div class="card-body p-0">
+<input type="text" name="q" value="<?= esc($search ?? '') ?>" class="form-control border-0" placeholder="Search by child or fetcher name..." style="background:transparent;font-size:13px;padding:6px 12px;" oninput="autoSubmitForm(this.form)">
+  </div>
+  </div>
+  </div>
+  </div>
+  </form>
+  </div>
+  <div class="card-body p-0">
  <div class="table-responsive">
  <table class="table table-fun table-hover table-sm mb-0">
  <thead style="background:linear-gradient(135deg,#6C8CFF,#7C6CFF);"><tr style="color:#fff;"><th>Date & Time</th><th>Child</th><th>Picked up by</th><th>Method</th></tr></thead>

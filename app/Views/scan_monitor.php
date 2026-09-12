@@ -686,33 +686,19 @@ html.theme-dark .sms-mode-panel { background: #1e293b; border-color: #334155; }
  <input type="hidden" name="tab" value="released">
                                         
  <div style="flex:1;min-width:150px;">
- <input type="text" 
+<input type="text" 
                                                    name="search" 
                                                    class="form-control" 
                                                    placeholder="Search student or fetcher..." 
-                                                   value="<?= $search ?? '' ?>">
- </div>
+                                                   value="<?= $search ?? '' ?>"
+                                                   oninput="autoSubmitForm(this.form)">
+  </div>
                                         
- <div style="min-width:130px;">
- <select name="grade" class="form-control" onchange="this.form.submit()">
- <option value="">All Grades</option>
- <?php foreach($grades ?? [] as $g): ?>
- <option value="<?= esc($g['grade_section']) ?>" <?= ($selectedGrade ?? '') == $g['grade_section'] ? 'selected' : '' ?>>
- <?= esc($g['grade_section']) ?>
- </option>
- <?php endforeach; ?>
- </select>
- </div>
-                                        
- <button type="submit" class="btn btn-kid-primary btn-sm">
- <i class="fas fa-search mr-1"></i> Search
- </button>
-                                        
- <a href="<?= base_url('scan-monitor?date='.($selectedDate ?? date('Y-m-d')).'&tab=released') ?>" 
-                                           class="btn btn-outline-kid btn-sm">
- <i class="fas fa-times mr-1"></i> Clear
- </a>
- </form>
+  <a href="<?= base_url('scan-monitor?date='.($selectedDate ?? date('Y-m-d')).'&tab=released') ?>" 
+                                            class="btn btn-outline-kid btn-sm">
+  <i class="fas fa-times mr-1"></i> Clear
+  </a>
+  </form>
  </div>
                                 
  <div style="max-height:500px;overflow-y:auto;">
@@ -776,22 +762,19 @@ html.theme-dark .sms-mode-panel { background: #1e293b; border-color: #334155; }
  <input type="hidden" name="tab" value="declined">
                                         
  <div style="flex:1;min-width:150px;">
- <input type="text" 
+<input type="text" 
                                                    name="search" 
                                                    class="form-control" 
                                                    placeholder="Search declined records..." 
-                                                   value="<?= $search ?? '' ?>">
- </div>
+                                                   value="<?= $search ?? '' ?>"
+                                                   oninput="autoSubmitForm(this.form)">
+  </div>
                                         
- <button type="submit" class="btn btn-kid-primary btn-sm">
- <i class="fas fa-search mr-1"></i> Search
- </button>
-                                        
- <a href="<?= base_url('scan-monitor?date='.($selectedDate ?? date('Y-m-d')).'&tab=declined') ?>" 
-                                           class="btn btn-outline-kid btn-sm">
- <i class="fas fa-times mr-1"></i> Clear
- </a>
- </form>
+  <a href="<?= base_url('scan-monitor?date='.($selectedDate ?? date('Y-m-d')).'&tab=declined') ?>" 
+                                            class="btn btn-outline-kid btn-sm">
+  <i class="fas fa-times mr-1"></i> Clear
+  </a>
+  </form>
  </div>
                                 
  <div style="max-height:500px;overflow-y:auto;">
@@ -950,33 +933,19 @@ html.theme-dark .sms-mode-panel { background: #1e293b; border-color: #334155; }
  <input type="hidden" name="tab" value="pending">
                                         
  <div style="flex:1;min-width:150px;">
- <input type="text" 
+<input type="text" 
                                                    name="search" 
                                                    class="form-control" 
                                                    placeholder="Search student or grade..." 
-                                                   value="<?= $search ?? '' ?>">
- </div>
+                                                   value="<?= $search ?? '' ?>"
+                                                   oninput="autoSubmitForm(this.form)">
+  </div>
                                         
- <div style="min-width:130px;">
- <select name="grade" class="form-control" onchange="this.form.submit()">
- <option value="">All Grades</option>
- <?php foreach($grades ?? [] as $g): ?>
- <option value="<?= esc($g['grade_section']) ?>" <?= ($selectedGrade ?? '') == $g['grade_section'] ? 'selected' : '' ?>>
- <?= esc($g['grade_section']) ?>
- </option>
- <?php endforeach; ?>
- </select>
- </div>
-                                        
- <button type="submit" class="btn btn-kid-primary btn-sm">
- <i class="fas fa-search mr-1"></i> Search
- </button>
-                                        
- <a href="<?= base_url('scan-monitor?date='.($selectedDate ?? date('Y-m-d')).'&tab=pending') ?>" 
-                                           class="btn btn-outline-kid btn-sm">
- <i class="fas fa-times mr-1"></i> Clear
- </a>
- </form>
+  <a href="<?= base_url('scan-monitor?date='.($selectedDate ?? date('Y-m-d')).'&tab=pending') ?>" 
+                                            class="btn btn-outline-kid btn-sm">
+  <i class="fas fa-times mr-1"></i> Clear
+  </a>
+  </form>
  </div>
                                 
  <div style="max-height:500px;overflow-y:auto;">
