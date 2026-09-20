@@ -587,7 +587,7 @@
                 </div>
             </div>
 
-            <p class="footer-text">&copy; <?= date('Y') ?> BCC Scan2Fetch • All rights reserved</p>
+            <p class="footer-text">&copy; <?= date('Y') ?> Scan2Fetch • All rights reserved</p>
         </div>
     </div>
 
