@@ -11,6 +11,16 @@ class ScanMonitor extends BaseController
         }
     }
 
+    /**
+     * Date-management gate: [allowed, message].
+     * autoSync() inside releaseAllowed() also auto start/closes today.
+     */
+    private function scheduleGate(): array
+    {
+        $scheduleModel = new \App\Models\ScheduleModel();
+        return $scheduleModel->releaseAllowed();
+    }
+
     // The students-status/sms monitor is for admin/staff only.
     private function guardStaffOnly()
     {
@@ -29,6 +39,15 @@ class ScanMonitor extends BaseController
         if ($guard) {
             return $guard;
         }
+
+        // ===== DATE MANAGEMENT GATE =====
+        // Auto start/close today's status and surface it so the monitor
+        // shows CLOSED (and notifications are disabled) after closing time.
+        [$gateAllowed, $gateMessage] = $this->scheduleGate();
+        $data['gateAllowed'] = $gateAllowed;
+        $data['gateMessage'] = $gateMessage;
+        $data['gateHours']   = (new \App\Models\ScheduleModel())->effectiveHours(date('Y-m-d'));
+        $data['currentSession'] = (new \App\Models\ScheduleModel())->getCurrentSession();
 
         $db = \Config\Database::connect();
         
@@ -69,6 +88,16 @@ class ScanMonitor extends BaseController
         // Released count
         $data['releasedToday'] = $db->table('fetch_logs')
             ->where('DATE(time_released)', $selectedDate)
+            ->countAllResults();
+
+        // Released per session (morning / afternoon) — legacy rows = NULL session
+        $data['releasedMorning'] = $db->table('fetch_logs')
+            ->where('DATE(time_released)', $selectedDate)
+            ->where('session_type', 'morning')
+            ->countAllResults();
+        $data['releasedAfternoon'] = $db->table('fetch_logs')
+            ->where('DATE(time_released)', $selectedDate)
+            ->where('session_type', 'afternoon')
             ->countAllResults();
 
         // Declined count
@@ -307,6 +336,16 @@ class ScanMonitor extends BaseController
             return $guard;
         }
 
+        // ===== DATE MANAGEMENT GATE =====
+        [$gateAllowed, $gateMessage] = $this->scheduleGate();
+        if (! $gateAllowed) {
+            return $this->response->setJSON([
+                'success'            => false,
+                'blocked_by_schedule'=> true,
+                'message'            => $gateMessage,
+            ]);
+        }
+
         $db = \Config\Database::connect();
         $today = date('Y-m-d');
         
@@ -351,6 +390,16 @@ class ScanMonitor extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Forbidden']);
         }
 
+        // ===== DATE MANAGEMENT GATE =====
+        [$gateAllowed, $gateMessage] = $this->scheduleGate();
+        if (! $gateAllowed) {
+            return $this->response->setJSON([
+                'success'            => false,
+                'blocked_by_schedule'=> true,
+                'message'            => $gateMessage,
+            ]);
+        }
+
         $customMessage = $this->request->getPost('custom_message') ?? '';
         $result = $this->sendReminders($customMessage);
 
@@ -372,6 +421,19 @@ class ScanMonitor extends BaseController
         }
         if (session('role') != 'admin' && session('role') != 'staff') {
             return $this->response->setJSON(['success' => false, 'message' => 'Forbidden']);
+        }
+
+        // ===== DATE MANAGEMENT GATE =====
+        // No auto-SMS after the day is closed.
+        [$gateAllowed, $gateMessage] = $this->scheduleGate();
+        if (! $gateAllowed) {
+            return $this->response->setJSON([
+                'success'            => false,
+                'blocked_by_schedule'=> true,
+                'message'            => $gateMessage,
+                'mode'               => 'manual',
+                'fired'              => false,
+            ]);
         }
 
         $settingsModel = new \App\Models\SettingsModel();

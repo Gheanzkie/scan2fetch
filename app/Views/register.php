@@ -505,7 +505,7 @@ label .text-danger { color: #dc2626 !important; }
  <div class="card-header">
  <h5 class="mb-0">
  <i class="fas fa-file-excel mr-2" style="color: #1d9e4b;"></i>
-                                Bulk Import from Excel
+                                 Import from Excel
  </h5>
  </div>
  <div class="card-body">

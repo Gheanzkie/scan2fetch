@@ -114,6 +114,13 @@
  <li class="nav-header">REPORTS</li>
 
  <li class="nav-item">
+ <a href="<?= base_url('schedule') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'schedule') ? 'active' : '' ?>">
+ <i class="nav-icon fas fa-calendar-alt" style="color: #38bdf8;"></i>
+ <p>Date Management</p>
+ </a>
+ </li>
+
+ <li class="nav-item">
  <a href="<?= base_url('logs') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'logs') ? 'active' : '' ?>">
  <i class="nav-icon fas fa-history" style="color: #fbbf24;"></i>
  <p>Activity Logs</p>
@@ -184,9 +191,9 @@
  </li>
 
  <li class="nav-item">
- <a href="<?= base_url('sms-logs') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'sms-logs') ? 'active' : '' ?>">
- <i class="nav-icon fas fa-sms" style="color: #4ade80;"></i>
- <p>SMS Logs</p>
+ <a href="<?= base_url('schedule') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'schedule') ? 'active' : '' ?>">
+ <i class="nav-icon fas fa-calendar-alt" style="color: #38bdf8;"></i>
+ <p>Date Management</p>
  </a>
  </li>
 
@@ -194,6 +201,13 @@
  <a href="<?= base_url('logs') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'logs') ? 'active' : '' ?>">
  <i class="nav-icon fas fa-history" style="color: #fbbf24;"></i>
  <p>Activity Logs</p>
+ </a>
+ </li>
+
+ <li class="nav-item">
+ <a href="<?= base_url('sms-logs') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'sms-logs') ? 'active' : '' ?>">
+ <i class="nav-icon fas fa-sms" style="color: #4ade80;"></i>
+ <p>SMS Logs</p>
  </a>
  </li>
 

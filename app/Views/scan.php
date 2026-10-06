@@ -327,6 +327,15 @@ body {
  <!-- ===== ALERT AREA ===== -->
  <div id="alertArea" style="display:none;"></div>
 
+ <!-- ===== DAY STATUS BANNER (Date Management gate) ===== -->
+ <?php if (empty($gateAllowed)): ?>
+ <div class="alert alert-danger mb-3" style="border-radius:12px;" id="gateClosedBanner">
+  <i class="fas fa-lock mr-1"></i>
+  <strong>System CLOSED</strong> — <?= esc($gateMessage) ?>
+  <br><small>Releases and declines are disabled until the day is opened (Date Management).</small>
+ </div>
+ <?php endif; ?>
+
  <div class="row justify-content-center">
  <!-- ===== SCANNER + MANUAL INPUT ===== -->
  <div class="col-lg-8 col-md-10 col-12" id="scannerCol">
@@ -364,9 +373,6 @@ body {
  <div id="reader" style="width:100%;max-width:560px;margin:0 auto;display:none;"></div>
  <div id="photoReader" style="width:100%;max-width:560px;margin:0 auto;display:none;"></div>
  <div id="scanResult" class="mt-3"></div>
- <small class="text-muted mt-2 d-block" style="font-size:12.5px;">
- <i class="fas fa-info-circle mr-1"></i> Point the camera at the QR code
- </small>
  </div>
  </div>
 
@@ -402,10 +408,7 @@ body {
  <div class="card" id="emptyState">
  <div class="card-body text-center py-5 empty-state">
  <i class="fas fa-qrcode fa-5x mb-4 d-block"></i>
- <h4>Ready to Scan</h4>
- <p class="mb-0">Scan a QR code using the camera or type the code manually</p>
- <hr class="my-4" style="max-width:200px; margin: 1.5rem auto; border-color: rgba(63,43,150,0.10);">
- <small><i class="fas fa-lightbulb" style="color: var(--soft-orange);"></i> The QR code number is printed below each QR image</small>
+ <h4 class="mb-0">Ready to Scan</h4>
  </div>
  </div>
 
@@ -846,6 +849,95 @@ $(function() {
         ).show().delay(5000).fadeOut();
     }
 
+    // ===== DATE MANAGEMENT LIVE GATE =====
+    // Show/refresh the CLOSED banner and shut the scanner down.
+    function showClosedBanner(message) {
+        var $banner = $('#gateClosedBanner');
+        if ($banner.length) {
+            $banner.show();
+        } else {
+            $('#alertArea').before(
+                '<div class="alert alert-danger mb-3" style="border-radius:12px;" id="gateClosedBanner">' +
+                '<i class="fas fa-lock mr-1"></i>' +
+                '<strong>System CLOSED</strong> — Scanner is not available this time.' +
+                (message ? ' ' + $('<span>').text(message).html() : '') +
+                '<br><small>Releases and declines are disabled until the day is opened (Date Management).</small>' +
+                '</div>'
+            );
+        }
+        $('#gateOpenBanner').hide();
+        $('#startCameraBtn, #stopCameraBtn, #photoScanBtn, #mobileCamBtn, #verifyQrBtn').prop('disabled', true);
+    }
+
+    // The scan-session switch itself lives in Date Management > Edit.
+    // Here we only track the override so the released session stays
+    // consistent with the admin's pick.
+
+    function showOpenBanner(hours, session) {
+        if (session) { currentSession = session; }
+        $('#gateClosedBanner').hide();
+        $('#startCameraBtn, #photoScanBtn, #verifyQrBtn').prop('disabled', false);
+    }
+
+    var currentSession = <?= json_encode($currentSession ?? 'morning') ?>;
+    var sessionOverride = <?= json_encode($sessionOverride ?? null) ?>;
+    var gateClosed = <?= empty($gateAllowed) ? 'true' : 'false' ?>;
+    if (gateClosed) {
+        showClosedBanner(<?= json_encode($gateMessage ?? '') ?>);
+        stopCamera(true);
+    }
+
+    // Poll the schedule so the page auto-closes (and flashes the message)
+    // the moment the closing time is reached — and so the MORNING -> AFTERNOON
+    // switch at 12:00 updates the banner live (server clock is authoritative).
+    // An admin's manual switch (st.override) wins over the clock.
+    setInterval(function() {
+        fetch(BASE_URL + 'schedule/status')
+        .then(function(r) { return r.json(); })
+        .then(function(st) {
+            if (!st.success) return;
+            var wasClosed = gateClosed;
+            var ovChanged = (st.override || null) !== (sessionOverride || null);
+            var sessionChanged = !!st.session && st.session !== currentSession;
+            gateClosed = !st.allowed;
+            if (gateClosed) {
+                if (!wasClosed) {
+                    // Transitioned open -> closed: kill scanner, flash message.
+                    stopCamera(true);
+                    showClosedBanner(st.message || '');
+                    showAlert('Scanner is not available this time.', 'danger');
+                    $('#qrResult').html('<span style="color: var(--soft-rose); font-weight: bold;"><i class="fas fa-lock mr-1"></i> Scanner is not available this time.</span>');
+                    $('#qrInput').prop('disabled', true);
+                }
+            } else {
+                if (wasClosed) {
+                    showOpenBanner(st.hours || {}, st.session);
+                    showAlert('System is now OPEN.', 'success');
+                    $('#qrResult').html('');
+                    $('#qrInput').prop('disabled', false);
+                } else if (sessionChanged) {
+                    // 12:00 clock switch, or admin changed it in Date Management
+                    currentSession = st.session;
+                    showOpenBanner(st.hours || {}, st.session);
+                    showAlert(st.session.toUpperCase() + ' session active. Students not yet released in this session can now be scanned.', 'success');
+                } else {
+                    showOpenBanner(st.hours || {}, st.session);
+                }
+            }
+            // Track override changes (set from Date Management > Edit) so the
+            // banner's MANUAL SWITCH badge re-renders correctly.
+            if (ovChanged) {
+                sessionOverride = st.override || null;
+                if (!gateClosed) showOpenBanner(st.hours || {}, st.session);
+            }
+        })
+        .catch(function() {});
+    }, 15000);
+
+    if (gateClosed) {
+        $('#qrInput').prop('disabled', true);
+    }
+
     function verifyQrCode(qrCode) {
         $('#qrResult').html('<span style="color: var(--soft-teal);"><i class="fas fa-spinner fa-spin mr-1"></i> Verifying QR code...</span>');
 
@@ -926,6 +1018,14 @@ $(function() {
                     $('html, body').animate({ scrollTop: $('#parentCard').offset().top - 20 }, 300);
                 }
             } else {
+                if (res.blocked_by_schedule) {
+                    // Day closed / outside hours — kill the scanner and flash it.
+                    stopCamera(true);
+                    $('#qrResult').html('<span style="color: var(--soft-rose); font-weight: bold;"><i class="fas fa-lock mr-1"></i> Scanner is not available this time.</span>');
+                    showAlert(res.message || 'Scanner is not available this time.', 'danger');
+                    showClosedBanner(res.message || '');
+                    return;
+                }
                 $('#qrResult').html('<span style="color: var(--soft-rose); font-weight: bold;"><i class="fas fa-times-circle mr-1"></i> ' + (res.message || 'Invalid QR Code') + '</span>');
                 showAlert(res.message || 'Invalid QR Code', 'danger');
                 setTimeout(startCamera, 2000);
@@ -981,6 +1081,17 @@ $(function() {
             fetch(BASE_URL + 'scan/release', { method: 'POST', body: formData })
             .then(response => response.json())
             .then(res => {
+                if (res.blocked_by_schedule) {
+                    // Day closed / outside hours — stop the whole release loop and show why.
+                    $('#alertArea').show().html(
+                        '<div class="alert alert-danger" style="border-radius:12px;">' +
+                        '<i class="fas fa-lock mr-1"></i><strong>Blocked:</strong> ' +
+                        $('<span>').text(res.message || 'System is closed.') .html() +
+                        '</div>'
+                    );
+                    $('#gateClosedBanner').show();
+                    return;
+                }
                 if (res.already_released) {
                     alreadyCount++;
                     var $badge = $('.released-badge[data-student-id="' + sid + '"]');

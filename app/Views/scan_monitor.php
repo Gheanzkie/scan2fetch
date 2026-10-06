@@ -596,7 +596,17 @@ html.theme-dark .sms-mode-panel { background: #1e293b; border-color: #334155; }
  <section class="content">
  <div class="container-fluid">
 
- <div id="alertArea" style="display:none;"></div>
+
+
+ 
+ <?php if (empty($gateAllowed)): ?>
+ <div class="alert alert-danger mb-3" style="border-radius:12px;" id="gateClosedBanner">
+  <i class="fas fa-lock mr-1"></i>
+  <strong>Student monitoring is closed</strong> — <?= esc($gateMessage ?? 'Scanner is not available this time.') ?>
+  <br><small>Notifications and auto-SMS are disabled until the day is opened (Date Management).</small>
+ </div>
+
+ <?php endif; ?>
 
  <!-- ===== DATE SELECTOR ===== -->
  <div class="date-selector">
@@ -709,29 +719,39 @@ html.theme-dark .sms-mode-panel { background: #1e293b; border-color: #334155; }
  <th>#</th>
  <th>Student</th>
  <th>Grade</th>
- <th>Fetcher</th>
- <th>Time</th>
- </tr>
- </thead>
- <tbody>
- <?php $i = 1; foreach($releasedStudents as $r): ?>
- <tr>
- <td style="color:var(--faint);"><?= $i++ ?></td>
- <td>
- <strong>
- <?= esc($r['student_fname']) ?> <?= esc($r['student_lname']) ?>
- </strong>
- </td>
- <td><span class="badge badge-light"><?= esc($r['grade_section']) ?></span></td>
- <td style="font-size:12px;">
- <?= esc($r['fetcher_fname']) ?> <?= esc($r['fetcher_lname']) ?>
- <br><small style="color:var(--muted);"><?= esc($r['fetcher_relation'] ?? 'Parent') ?></small>
- </td>
- <td style="font-size:11.5px;color:var(--muted);">
- <?= date('h:i A', strtotime($r['time_released'])) ?>
- </td>
- </tr>
- <?php endforeach; ?>
+  <th>Fetcher</th>
+  <th>Session</th>
+  <th>Time</th>
+  </tr>
+  </thead>
+  <tbody>
+  <?php $i = 1; foreach($releasedStudents as $r): ?>
+  <tr>
+  <td style="color:var(--faint);"><?= $i++ ?></td>
+  <td>
+  <strong>
+  <?= esc($r['student_fname']) ?> <?= esc($r['student_lname']) ?>
+  </strong>
+  </td>
+  <td><span class="badge badge-light"><?= esc($r['grade_section']) ?></span></td>
+  <td style="font-size:12px;">
+  <?= esc($r['fetcher_fname']) ?> <?= esc($r['fetcher_lname']) ?>
+  <br><small style="color:var(--muted);"><?= esc($r['fetcher_relation'] ?? 'Parent') ?></small>
+  </td>
+  <td>
+  <?php if (!empty($r['session_type'])): ?>
+   <span class="badge <?= $r['session_type'] === 'morning' ? 'badge-warning' : 'badge-primary' ?>">
+   <?= strtoupper($r['session_type']) ?>
+   </span>
+  <?php else: ?>
+   <span class="badge badge-light">&mdash;</span>
+  <?php endif; ?>
+  </td>
+  <td style="font-size:11.5px;color:var(--muted);">
+  <?= date('h:i A', strtotime($r['time_released'])) ?>
+  </td>
+  </tr>
+  <?php endforeach; ?>
  </tbody>
  </table>
  <?php else: ?>

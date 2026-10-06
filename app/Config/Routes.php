@@ -76,6 +76,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('scan/verify', 'Scan::verify');
     $routes->post('scan/release', 'Scan::release');
     $routes->post('scan/decline', 'Scan::decline');
+    $routes->post('scan/set-session', 'Scan::setSession');
 
     // ===== SCAN MONITOR =====
     $routes->get('scan-monitor', 'ScanMonitor::index');
@@ -89,6 +90,15 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('sms-logs/details/(:num)', 'Sms::getSmsDetails/$1');
     $routes->get('sms-logs/delete/(:num)', 'Sms::deleteLog/$1');
     $routes->get('sms-logs/clear', 'Sms::clearAll');
+
+    // ===== DATE / SCHEDULE MANAGEMENT =====
+    $routes->get('schedule', 'Schedule::index');
+    $routes->get('schedule/day', 'Schedule::day');
+    $routes->get('schedule/status', 'Schedule::status');
+    $routes->post('schedule/open', 'Schedule::openDay');
+    $routes->post('schedule/close', 'Schedule::closeDay');
+    $routes->post('schedule/save', 'Schedule::save');
+    $routes->post('schedule/save-sessions', 'Schedule::saveSessions');
 
     // ===== ACTIVITY LOGS =====
     $routes->get('logs', 'Logs::index');

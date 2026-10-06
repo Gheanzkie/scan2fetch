@@ -9,13 +9,121 @@ use App\Models\ActivityLogModel;
 
 class Scan extends BaseController
 {
+    /**
+     * Manual session picked by the admin on the scan page
+     * ('morning' | 'afternoon' | null = follow server clock).
+     */
+    private function override(): ?string
+    {
+        return (new \App\Models\ScheduleModel())->sessionOverride();
+    }
+
     public function index()
     {
-        return view('scan');
+        // Surface the day status so staff sees open/closed BEFORE scanning.
+        $scheduleModel = new \App\Models\ScheduleModel();
+        [$gateAllowed, $gateMessage] = $scheduleModel->releaseAllowed(null, $this->override());
+        $hours = $scheduleModel->effectiveHours(date('Y-m-d'));
+        $todayRow = $scheduleModel->forDate(date('Y-m-d'));
+
+        $override = $this->override();
+
+        return view('scan', [
+            'gateAllowed' => $gateAllowed,
+            'gateMessage' => $gateMessage,
+            'gateHours'   => $hours,
+            'gateStatus'  => $todayRow['status'] ?? 'normal',
+            'currentSession' => $scheduleModel->resolveSession($override),
+            'sessionOverride' => $override,
+            'isShiftAdmin'    => session('role') === 'admin',
+        ]);
+    }
+
+    /**
+     * POST /scan/set-session — admin session switch.
+     * Params: session = 'morning' | 'afternoon' | 'auto'
+     * Stores the pick in the admin's own PHP session (scanner operator).
+     */
+    public function setSession()
+    {
+        if (strtoupper($this->request->getMethod()) !== 'POST') {
+            return $this->response->setStatusCode(405)->setJSON([
+                'success' => false,
+                'message' => 'Method not allowed',
+            ]);
+        }
+
+        if (session('role') !== 'admin') {
+            return $this->response->setStatusCode(403)->setJSON([
+                'success' => false,
+                'message' => 'Only admin can switch the scan session.',
+            ]);
+        }
+
+        // Global csrf filter is disabled in this app — verify manually.
+        $token = $this->request->getPost(csrf_token());
+        if (! is_string($token) || $token === '' || ! hash_equals(csrf_hash(), $token)) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'success' => false,
+                'message' => 'Invalid security token (CSRF). Refresh the page and try again.',
+            ]);
+        }
+
+        $picked = strtolower(trim((string) $this->request->getPost('session')));
+        if (! in_array($picked, ['morning', 'afternoon', 'auto'], true)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Invalid session. Use morning, afternoon or auto.',
+            ]);
+        }
+
+        if ($picked === 'auto') {
+            session()->remove('scan_session');
+            $override = null;
+        } else {
+            session()->set(['scan_session' => $picked]);
+            $override = $picked;
+        }
+
+        $scheduleModel = new \App\Models\ScheduleModel();
+        $effective = $scheduleModel->resolveSession($override);
+
+        (new ActivityLogModel())->addLog(
+            session('user_id'),
+            session('fname') . ' ' . session('lname'),
+            session('role'),
+            'update',
+            'scan',
+            'Session switch | ' . ($override ? strtoupper($override) . ' (manual)' : 'AUTO (server clock)') .
+            ' | Effective session: ' . strtoupper($effective)
+        );
+
+        return $this->response->setJSON([
+            'success'   => true,
+            'override'  => $override,
+            'session'   => $effective,
+            'message'   => $override
+                ? 'Scanning the ' . strtoupper($override) . ' session (manual switch).'
+                : 'Automatic session (server clock).',
+        ]);
     }
 
     public function verify()
     {
+        // ===== DATE MANAGEMENT GATE =====
+        // Block verification outside operating hours / closed days so the
+        // scanner UI can flash "scanner is not available this time".
+        $scheduleModel = new \App\Models\ScheduleModel();
+        $override = $this->override();
+        [$gateAllowed, $gateMessage] = $scheduleModel->releaseAllowed(null, $override);
+        if (! $gateAllowed) {
+            return $this->response->setJSON([
+                'success'            => false,
+                'blocked_by_schedule'=> true,
+                'message'            => $gateMessage,
+            ]);
+        }
+
         $qrCode = $this->request->getPost('qr_code');
         
         if (empty($qrCode)) {
@@ -74,6 +182,7 @@ class Scan extends BaseController
 
         return $this->response->setJSON([
             'success' => true,
+            'session' => $scheduleModel->resolveSession($override),
             'parent' => [
                 'id' => $parent['id'],
                 'fname' => $parent['fname'],
@@ -96,6 +205,25 @@ class Scan extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Missing data']);
         }
 
+        // ===== DATE MANAGEMENT GATE =====
+        // Block releases outside the configured open window / closed / holiday days.
+        $scheduleModel = new \App\Models\ScheduleModel();
+        $override = $this->override();
+        [$gateAllowed, $gateMessage] = $scheduleModel->releaseAllowed(null, $override);
+        if (! $gateAllowed) {
+            return $this->response->setJSON([
+                'success' => false,
+                'blocked_by_schedule' => true,
+                'message' => $gateMessage,
+            ]);
+        }
+
+        // ===== SERVER-SIDE SESSION (independent check — never trusts the client) =====
+        // Admin manual switch (PHP session 'scan_session') wins; otherwise the
+        // clock decides (MORNING before 12:00, AFTERNOON from 12:00). One
+        // release per student per session; the gate resets every midnight.
+        $session = $scheduleModel->resolveSession($override);
+
         $db = \Config\Database::connect();
         $studentModel = new StudentModel();
         $parentsModel = new ParentsModel();
@@ -112,16 +240,20 @@ class Scan extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Parent not found']);
         }
 
-        // Prevent duplicate release: if this student was already released today, skip.
+        // Prevent duplicate release WITHIN THE SAME SESSION: 1 morning scan
+        // + 1 afternoon scan per student per day. Old rows (session_type NULL)
+        // released today are treated as belonging to the opposite-free legacy set
+        // and no longer block — only same-session rows count.
         $alreadyReleased = $db->table('fetch_logs')
             ->where('student_id', $studentId)
             ->where('DATE(time_released)', date('Y-m-d'))
+            ->where('session_type', $session)
             ->countAllResults();
         if ($alreadyReleased > 0) {
             return $this->response->setJSON([
                 'success' => false,
                 'already_released' => true,
-                'message' => $student['fname'] . ' ' . $student['lname'] . ' is already released today.'
+                'message' => $student['fname'] . ' ' . $student['lname'] . ' is already released this ' . strtoupper($session) . ' session.'
             ]);
         }
 
@@ -145,7 +277,7 @@ class Scan extends BaseController
         $userName = session('fname') . ' ' . session('lname');
         $userRole = session('role');
 
-        // Insert fetch log
+        // Insert fetch log (session_type computed SERVER-side)
         $db->table('fetch_logs')->insert([
             'student_id'       => $studentId,
             'parent_id'        => $parentId,
@@ -154,6 +286,7 @@ class Scan extends BaseController
             'fetcher_lname'    => $fetcherLname,
             'fetcher_relation' => $fetcherRelation,
             'method'           => 'QR',
+            'session_type'     => $session,
             'time_released'    => date('Y-m-d H:i:s'),
         ]);
 
@@ -172,7 +305,7 @@ class Scan extends BaseController
             $userRole,
             'release',
             'scan',
-            "QR Release | Student: {$student['fname']} {$student['lname']} (ID: {$studentId}) | {$fetcherRelation}: {$fetcherFname} {$fetcherLname} | SMS sent"
+            "QR Release | Student: {$student['fname']} {$student['lname']} (ID: {$studentId}) | {$fetcherRelation}: {$fetcherFname} {$fetcherLname} | Session: " . strtoupper($session) . ($override ? ' (manual switch)' : '') . " | SMS sent"
         );
 
         return $this->response->setJSON(['success' => true, 'message' => 'Student released successfully']);
@@ -185,6 +318,17 @@ class Scan extends BaseController
 
         if (empty($studentId) || empty($parentId)) {
             return $this->response->setJSON(['success' => false, 'message' => 'Missing data']);
+        }
+
+        // ===== DATE MANAGEMENT GATE =====
+        $scheduleModel = new \App\Models\ScheduleModel();
+        [$gateAllowed, $gateMessage] = $scheduleModel->releaseAllowed(null, $this->override());
+        if (! $gateAllowed) {
+            return $this->response->setJSON([
+                'success' => false,
+                'blocked_by_schedule' => true,
+                'message' => $gateMessage,
+            ]);
         }
 
         $db = \Config\Database::connect();

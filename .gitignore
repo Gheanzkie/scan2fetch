@@ -1,0 +1,5 @@
+writable/session/*
+writable/debugbar/*
+writable/logs/*
+public/uploads/qr/*
+public/uploads/parents/*
