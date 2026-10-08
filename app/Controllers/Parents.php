@@ -25,15 +25,43 @@ class Parents extends BaseController
     public function index()
     {
         $db = \Config\Database::connect();
-        
-        $data['parents'] = $db->table('parents')
-            ->select('parents.*, students.fname as student_fname, students.lname as student_lname, students.grade_section as student_grade, student_parents.relation')
-            ->join('student_parents', 'student_parents.parent_id = parents.id', 'left')
-            ->join('students', 'students.id = student_parents.student_id', 'left')
-            ->orderBy('parents.created_at', 'DESC')
+
+        // One row per parent (a parent may have several children). The old
+        // join returned a separate row per child, so multi-child parents were
+        // listed more than once and only ever showed one student per row.
+        $parents = $db->table('parents')
+            ->orderBy('created_at', 'DESC')
             ->get()
             ->getResultArray();
-            
+
+        $links = $db->table('student_parents')
+            ->select('student_parents.parent_id, student_parents.relation,
+                      students.id AS student_id, students.fname, students.lname,
+                      students.grade_section, students.picture')
+            ->join('students', 'students.id = student_parents.student_id')
+            ->orderBy('students.lname', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        $byParent = [];
+        foreach ($links as $l) {
+            $byParent[$l['parent_id']][] = $l;
+        }
+
+        foreach ($parents as &$p) {
+            $kids = $byParent[$p['id']] ?? [];
+            $p['children']    = $kids;
+            $p['child_count'] = count($kids);
+            // Single-value aliases kept for the existing view template.
+            $p['student_fname'] = $kids[0]['fname']       ?? null;
+            $p['student_lname'] = $kids[0]['lname']       ?? null;
+            $p['student_grade'] = $kids[0]['grade_section'] ?? null;
+            $p['relation']      = $kids[0]['relation']    ?? null;
+        }
+        unset($p);
+
+        $data['parents'] = $parents;
+
         return view('parents', $data);
     }
 

@@ -210,6 +210,18 @@ class ScheduleModel extends Model
             return $row;
         }
 
+        // ===== ADMIN OVERRIDE: explicit "open" =====
+        // opened_by holds the admin's name when a human picked "open" in Date
+        // Management, and 'Auto (schedule)' when the clock opened the day.
+        // A human choice wins over the clock, so it is never dragged back to
+        // 'closed' after close_time. Rows the scheduler opened itself still
+        // fall through below, preserving normal auto-open/auto-close behaviour.
+        if ($row['status'] === 'open'
+            && ($row['opened_by'] ?? '') !== 'Auto (schedule)'
+            && ($row['opened_by'] ?? '') !== '') {
+            return $row;
+        }
+
         $hours = $this->effectiveHours($date);
         $open  = $hours['open'];
         $close = $hours['close'];
@@ -339,12 +351,20 @@ class ScheduleModel extends Model
         }
         // 'open' or NULL (default) -> continue with normal window checks below.
         if ($row && $row['status'] === 'open') {
-            // Manually opened: allowed, but still capped by close_time (autoSync
-            // would already have flipped it to 'closed' if past closing time).
+            // Manually opened (opened_by is a person): allowed regardless of the
+            // clock — the admin explicitly chose to keep the day open past
+            // close_time. Rows the clock opened itself are still capped by
+            // close_time, exactly as before.
+            $openedBy = (string) ($row['opened_by'] ?? '');
+            $manual   = $openedBy !== '' && $openedBy !== 'Auto (schedule)';
+
+            if ($manual) {
+                return [true, 'Day manually opened.'];
+            }
             if ($time >= $hours['close']) {
                 return [false, "Scanner is not available this time. System closed at {$hours['close']}. Current time {$time}."];
             }
-            return [true, 'Day manually opened.'];
+            return [true, 'Day opened.'];
         }
 
         // status normal (or no row): enforce default window.

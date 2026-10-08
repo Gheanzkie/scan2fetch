@@ -518,21 +518,30 @@ select.form-control option {
  <?php endif; ?>
  </td>
  <td><code><?= esc($p['phone']) ?></code></td>
- <td>
- <?php if(!empty($p['student_fname'])): ?>
- <div class="parent-name"><?= esc($p['student_fname']) ?> <?= esc($p['student_lname'] ?? '') ?></div>
- <div class="muted"><?= esc($p['student_grade'] ?? '') ?></div>
- <?php else: ?>
- <span class="muted">No students</span>
- <?php endif; ?>
- </td>
- <td>
- <?php if(!empty($p['relation'])): ?>
- <span class="badge badge-primary"><?= esc($p['relation']) ?></span>
- <?php else: ?>
- <span class="badge badge-soft">Parent</span>
- <?php endif; ?>
- </td>
+  <td>
+  <?php $kids = $p['children'] ?? []; ?>
+  <?php if(!empty($kids)): ?>
+    <?php foreach ($kids as $kid): ?>
+    <div class="parent-name">
+      <?= esc($kid['fname']) ?> <?= esc($kid['lname'] ?? '') ?>
+      <span class="badge badge-soft" style="font-size:10px;"><?= esc($kid['grade_section'] ?? '') ?></span>
+    </div>
+    <?php endforeach; ?>
+    <div class="muted" style="font-size:11px;">
+      <i class="fas fa-child"></i> <?= count($kids) ?> student<?= count($kids) > 1 ? 's' : '' ?>
+    </div>
+  <?php else: ?>
+    <span class="muted">No students</span>
+  <?php endif; ?>
+  </td>
+  <td>
+  <?php $rels = array_values(array_unique(array_filter(array_column($kids, 'relation')))); ?>
+  <?php if(!empty($rels)): foreach ($rels as $rel): ?>
+    <span class="badge badge-primary"><?= esc($rel) ?></span>
+  <?php endforeach; else: ?>
+    <span class="badge badge-soft">Parent</span>
+  <?php endif; ?>
+  </td>
  <td>
  <?php if(!empty($p['qr_code'])): ?>
  <img src="<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>"

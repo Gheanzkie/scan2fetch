@@ -293,7 +293,7 @@ label .text-danger { color: #dc2626 !important; }
     object-fit: cover;
 }
 
-#studentPhotoPreview {
+.student-photo-preview {
     width: 150px;
     height: 150px;
     margin: 0 auto 16px;
@@ -308,14 +308,14 @@ label .text-danger { color: #dc2626 !important; }
     transition: border-color 0.3s ease;
 }
 
-#studentPhotoPreview:hover { border-color: var(--soft-pink); }
+.student-photo-preview:hover { border-color: var(--soft-pink); }
 
-#studentPhotoPreview i {
+.student-photo-preview i {
     color: rgba(63,43,150,0.25);
     font-size: 60px;
 }
 
-#studentPhotoPreview img {
+.student-photo-preview img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -450,7 +450,7 @@ label .text-danger { color: #dc2626 !important; }
     .btn-lg { padding: 10px 20px !important; font-size: 14px !important; }
     .content-header h1 { font-size: 1.4rem !important; }
     .photo-preview { width: 64px; height: 64px; }
-    #studentPhotoPreview { width: 130px; height: 130px; }
+    .student-photo-preview { width: 130px; height: 130px; }
     .step-nav { border-radius: 24px; }
 }
 
@@ -556,84 +556,101 @@ label .text-danger { color: #dc2626 !important; }
                                         Student Information
  </h5>
  </div>
- <div class="card-body">
+  <div class="card-body">
 
- <!-- Student Photo -->
- <div class="form-group text-center mb-4">
- <label class="font-weight-bold" style="font-size: 0.95rem;">
+  <!-- ===== REPEATER: one .student-block per student, all sharing 1 parent + fetchers ===== -->
+  <div id="studentBlocks">
+
+  <div class="student-block" data-index="0" style="position:relative;">
+
+  <!-- Student Photo -->
+  <div class="form-group text-center mb-4">
+  <label class="font-weight-bold" style="font-size: 0.95rem;">
                                              Student Picture
- </label>
- <div id="studentPhotoPreview" onclick="$('#pictureInput').click()">
- <i class="fas fa-child"></i>
- </div>
- <div class="btn-group btn-group-sm" role="group" style="gap: 8px;">
- <button type="button" class="btn btn-kid-primary btn-sm open-camera-btn" data-target="student">
- <i class="fas fa-camera mr-1"></i> Take Photo
- </button>
- <label class="btn btn-kid-pink btn-sm mb-0" style="cursor:pointer;">
- <i class="fas fa-upload mr-1"></i> Upload
- <input type="file" name="picture" id="pictureInput" class="d-none" accept="image/*">
- </label>
- </div>
- <input type="hidden" name="picture_capture" id="pictureCapture">
- </div>
+  </label>
+  <div id="studentPhotoPreview0" class="student-photo-preview" onclick="$('#pictureInput0').click()">
+  <i class="fas fa-child"></i>
+  </div>
+  <div class="btn-group btn-group-sm" role="group" style="gap: 8px;">
+  <button type="button" class="btn btn-kid-primary btn-sm open-camera-btn" data-target="student">
+  <i class="fas fa-camera mr-1"></i> Take Photo
+  </button>
+  <label class="btn btn-kid-pink btn-sm mb-0" style="cursor:pointer;">
+  <i class="fas fa-upload mr-1"></i> Upload
+  <input type="file" name="picture[]" id="pictureInput0" class="d-none student-pic-input" accept="image/*">
+  </label>
+  </div>
+  <input type="hidden" name="picture_capture[]" id="pictureCapture0" class="student-pic-capture">
+  </div>
 
- <!-- Student Name -->
- <div class="row">
- <div class="col-4">
- <label>First Name <span class="text-danger">*</span></label>
- <input type="text" name="fname" class="form-control" placeholder="Juan" required>
- </div>
- <div class="col-4">
- <label>Middle Name</label>
- <input type="text" name="mname" class="form-control" placeholder="Dela">
- </div>
- <div class="col-4">
- <label>Last Name <span class="text-danger">*</span></label>
- <input type="text" name="lname" class="form-control" placeholder="Cruz" required>
- </div>
- </div>
+  <!-- Student Name -->
+  <div class="row">
+  <div class="col-4">
+  <label>First Name <span class="text-danger">*</span></label>
+  <input type="text" name="fname[]" class="form-control student-fname" placeholder="Juan" required>
+  </div>
+  <div class="col-4">
+  <label>Middle Name</label>
+  <input type="text" name="mname[]" class="form-control student-mname" placeholder="Dela">
+  </div>
+  <div class="col-4">
+  <label>Last Name <span class="text-danger">*</span></label>
+  <input type="text" name="lname[]" class="form-control student-lname" placeholder="Cruz" required>
+  </div>
+  </div>
 
- <!-- Grade & Section -->
- <div class="form-group mt-3">
- <label> Grade & Section <span class="text-danger">*</span></label>
- <select name="grade_section" class="form-control" required>
- <option value="">— Select Grade & Section —</option>
- <optgroup label="Kindergarten">
- <option>Kindergarten - A</option>
- <option>Kindergarten - B</option>
- </optgroup>
- <optgroup label=" Grade 1">
- <option>Grade 1 - A</option>
- <option>Grade 1 - B</option>
- </optgroup>
- <optgroup label=" Grade 2">
- <option>Grade 2 - A</option>
- <option>Grade 2 - B</option>
- </optgroup>
- <optgroup label=" Grade 3">
- <option>Grade 3 - A</option>
- <option>Grade 3 - B</option>
- </optgroup>
- <optgroup label=" Grade 4">
- <option>Grade 4 - A</option>
- <option>Grade 4 - B</option>
- </optgroup>
- <optgroup label=" Grade 5">
- <option>Grade 5 - A</option>
- <option>Grade 5 - B</option>
- </optgroup>
- <optgroup label=" Grade 6">
- <option>Grade 6 - A</option>
- <option>Grade 6 - B</option>
- </optgroup>
- </select>
- </div>
+  <!-- Grade & Section -->
+  <div class="form-group mt-3">
+  <label> Grade & Section <span class="text-danger">*</span></label>
+  <select name="grade_section[]" class="form-control student-grade" required>
+  <option value="">— Select Grade & Section —</option>
+  <optgroup label="Kindergarten">
+  <option>Kindergarten - A</option>
+  <option>Kindergarten - B</option>
+  </optgroup>
+  <optgroup label=" Grade 1">
+  <option>Grade 1 - A</option>
+  <option>Grade 1 - B</option>
+  </optgroup>
+  <optgroup label=" Grade 2">
+  <option>Grade 2 - A</option>
+  <option>Grade 2 - B</option>
+  </optgroup>
+  <optgroup label=" Grade 3">
+  <option>Grade 3 - A</option>
+  <option>Grade 3 - B</option>
+  </optgroup>
+  <optgroup label=" Grade 4">
+  <option>Grade 4 - A</option>
+  <option>Grade 4 - B</option>
+  </optgroup>
+  <optgroup label=" Grade 5">
+  <option>Grade 5 - A</option>
+  <option>Grade 5 - B</option>
+  </optgroup>
+  <optgroup label=" Grade 6">
+  <option>Grade 6 - A</option>
+  <option>Grade 6 - B</option>
+  </optgroup>
+  </select>
+  </div>
 
- <div class="alert alert-info mt-3 mb-0">
- <i class="fas fa-info-circle"></i>
- <small>Fill in student details first, then add parents and fetchers on the right!</small>
- </div>
+  </div><!-- /.student-block -->
+
+  </div><!-- /#studentBlocks -->
+
+  <button type="button" id="addStudentBtn" class="btn btn-outline-primary btn-block mt-2"
+          style="border-radius:12px; border-style:dashed; font-weight:600;">
+  <i class="fas fa-plus-circle mr-1"></i> Add another student
+  </button>
+  <small class="text-muted d-block mt-1" style="font-size:11px;">
+  Add every child in this family here — they all share the same parent and fetchers on the right.
+  </small>
+
+  <div class="alert alert-info mt-3 mb-0">
+  <i class="fas fa-info-circle"></i>
+  <small>Fill in student details first, then add parents and fetchers on the right!</small>
+  </div>
  </div>
  </div>
  </div>
@@ -947,18 +964,31 @@ $(function(){
     var stream;
     var currentTarget = 'student';
     var currentIndex = 0;
+    var currentStudentIndex = 0; // which .student-block the camera shot belongs to
 
-    // ===== STUDENT PHOTO =====
-    $('#pictureInput').on('change', function(){
+    // Shared: paint a photo into a specific student block.
+    function paintStudentPhoto(dataUrl, color) {
+        var $b = $('.student-block[data-index="' + currentStudentIndex + '"]');
+        if (!$b.length) $b = $('.student-block').first();
+        $b.find('.student-photo-preview').html('<img src="' + dataUrl + '">');
+        $b.find('.student-photo-preview').css('border-color', color);
+        $b.find('.student-pic-capture').val(dataUrl);
+    }
+
+    // ===== STUDENT PHOTO (delegated — works on blocks added later) =====
+    $(document).on('change', '.student-pic-input', function(){
         var file = this.files[0];
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                $('#studentPhotoPreview').html('<img src="' + e.target.result + '">');
-                $('#studentPhotoPreview').css('border-color', '#81c784');
-            };
-            reader.readAsDataURL(file);
-        }
+        if (!file) return;
+        var $block = $(this).closest('.student-block');
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            $block.find('.student-photo-preview').html('<img src="' + e.target.result + '">');
+            $block.find('.student-photo-preview').css('border-color', '#81c784');
+            // Mirror into the capture field so the server sees a photo even
+            // when the file input is what changed.
+            $block.find('.student-pic-capture').val(e.target.result);
+        };
+        reader.readAsDataURL(file);
     });
 
     // ===== PARENT PHOTO =====
@@ -990,6 +1020,10 @@ $(function(){
     // ===== OPEN CAMERA =====
     $(document).on('click', '.open-camera-btn', function(){
         currentTarget = $(this).data('target') || 'student';
+        // Remember which student block opened the camera so the capture lands
+        // on that block's preview + picture_capture[] slot.
+        var $sb = $(this).closest('.student-block');
+        currentStudentIndex = $sb.length ? $sb.data('index') : 0;
         $('#cameraModal').modal('show');
         // Chrome blocks the in-page camera on plain http:// (non-localhost).
         // Open the phone's native camera app directly instead.
@@ -1021,9 +1055,7 @@ $(function(){
         reader.onload = function(e) {
             var dataUrl = e.target.result;
             if (currentTarget === 'student') {
-                $('#studentPhotoPreview').html('<img src="' + dataUrl + '">');
-                $('#studentPhotoPreview').css('border-color', '#f093fb');
-                $('#pictureCapture').val(dataUrl);
+                paintStudentPhoto(dataUrl, '#f093fb');
             } else if (currentTarget === 'parent') {
                 var index = currentIndex;
                 $('.parent-preview[data-index="' + index + '"]').html('<img src="' + dataUrl + '">');
@@ -1049,9 +1081,7 @@ $(function(){
         var dataUrl = canvas.toDataURL('image/png');
         
         if (currentTarget === 'student') {
-            $('#studentPhotoPreview').html('<img src="' + dataUrl + '">');
-            $('#studentPhotoPreview').css('border-color', '#f093fb');
-            $('#pictureCapture').val(dataUrl);
+            paintStudentPhoto(dataUrl, '#f093fb');
         } else if (currentTarget === 'parent') {
             var index = currentIndex;
             $('.parent-preview[data-index="' + index + '"]').html('<img src="' + dataUrl + '">');
@@ -1083,25 +1113,85 @@ $(function(){
         }
     });
 
+    // ===== + ADD STUDENT (repeater) =====
+    var studentBlockSeq = 1; // next data-index
+
+    $('#addStudentBtn').on('click', function(){
+        var $first = $('.student-block').first();
+        var idx = studentBlockSeq++;
+
+        var $clone = $first.clone();
+        // Reset values / previews
+        $clone.attr('data-index', idx);
+        $clone.find('input[type=text]').val('');
+        $clone.find('select').prop('selectedIndex', 0);
+        $clone.find('input[type=file]').val('');
+        $clone.find('.student-pic-capture').val('');
+        $clone.find('.student-photo-preview').html('<i class="fas fa-child"></i>').css('border-color', '');
+        // Re-point the per-block ids (pictureInput0 / pictureCapture0 / preview)
+        $clone.find('.student-photo-preview').attr('id', 'studentPhotoPreview' + idx)
+              .attr('onclick', "$('#pictureInput" + idx + "').click()");
+        $clone.find('.student-pic-input').attr('id', 'pictureInput' + idx);
+        $clone.find('.student-pic-capture').attr('id', 'pictureCapture' + idx);
+
+        // Remove button (never on the first block)
+        $clone.find('.remove-student').remove();
+        $clone.append(
+            '<button type="button" class="btn btn-sm btn-outline-danger remove-student" ' +
+            'style="position:absolute;top:6px;right:6px;border-radius:8px;" ' +
+            'title="Remove this student"><i class="fas fa-times"></i></button>'
+        );
+
+        // Numbering label
+        $clone.find('.block-label').remove();
+        $clone.prepend('<div class="block-label badge badge-primary mb-2">Student ' + (idx + 1) + '</div>');
+
+        $('#studentBlocks').append($clone);
+        $clone.find('.student-fname').first().focus();
+        refreshStudentBlockLabels();
+    });
+
+    $(document).on('click', '.remove-student', function(){
+        if ($('.student-block').length <= 1) return;
+        $(this).closest('.student-block').remove();
+        refreshStudentBlockLabels();
+    });
+
+    function refreshStudentBlockLabels(){
+        $('.student-block').each(function(i){
+            var $b = $(this);
+            if (!$b.find('.block-label').length) {
+                $b.prepend('<div class="block-label badge badge-primary mb-2"></div>');
+            }
+            $b.find('.block-label').text('Student ' + (i + 1));
+            // Keep the remove affordance on every block except the first.
+            if (i === 0) { $b.find('.remove-student').remove(); }
+            else if (!$b.find('.remove-student').length) {
+                $b.append('<button type="button" class="btn btn-sm btn-outline-danger remove-student" ' +
+                    'style="position:absolute;top:6px;right:6px;border-radius:8px;" ' +
+                    'title="Remove this student"><i class="fas fa-times"></i></button>');
+            }
+        });
+    }
+    refreshStudentBlockLabels();
+
     // ===== FORM VALIDATION =====
     $('#registrationForm').on('submit', function(e) {
-        var fname = $('input[name="fname"]').val().trim();
-        var lname = $('input[name="lname"]').val().trim();
-        var grade = $('select[name="grade_section"]').val();
+        var badIndex = -1;
+        $('.student-block').each(function(i){
+            var $b = $(this);
+            var fname = $b.find('.student-fname').val().trim();
+            var lname = $b.find('.student-lname').val().trim();
+            var grade = $b.find('.student-grade').val();
+            if (!fname || !lname) { badIndex = i; e.preventDefault(); alert(' Oops! Please fill in student ' + (i+1) + ' first name and last name. '); return false; }
+            if (!grade) { badIndex = i; e.preventDefault(); alert(' Please select grade & section for student ' + (i+1) + '. '); return false; }
+        });
+        if (badIndex > -1) { $('.student-block').eq(badIndex).find('.student-fname').focus(); return; }
+
         var parentFname = $('input[name="parent_fname[]"]').first().val().trim();
         var parentLname = $('input[name="parent_lname[]"]').first().val().trim();
         var parentPhone = $('input[name="parent_phone[]"]').first().val().trim();
 
-        if (!fname || !lname) {
-            alert(' Oops! Please fill in student first name and last name. ');
-            e.preventDefault();
-            return;
-        }
-        if (!grade) {
-            alert(' Please select grade & section. ');
-            e.preventDefault();
-            return;
-        }
         if (!parentFname || !parentLname || !parentPhone) {
             alert(' Please fill in all required parent/guardian fields. ‍');
             e.preventDefault();

@@ -28,7 +28,33 @@ class Students extends BaseController
     // ========== LIST ==========
     public function index()
     {
-        $data['students'] = $this->studentModel->orderBy('created_at', 'DESC')->findAll();
+        $db = \Config\Database::connect();
+
+        $students = $this->studentModel->orderBy('created_at', 'DESC')->findAll();
+
+        // Attach every linked parent/guardian to each student so the Student
+        // Management table can show a full household instead of nothing.
+        $links = $db->table('student_parents')
+            ->select('student_parents.student_id, student_parents.relation,
+                      parents.id AS parent_id, parents.fname, parents.lname,
+                      parents.phone, parents.picture')
+            ->join('parents', 'parents.id = student_parents.parent_id')
+            ->get()
+            ->getResultArray();
+
+        $byStudent = [];
+        foreach ($links as $l) {
+            $byStudent[$l['student_id']][] = $l;
+        }
+
+        foreach ($students as &$s) {
+            $s['parents']     = $byStudent[$s['id']] ?? [];
+            $s['parent_count'] = count($s['parents']);
+        }
+        unset($s);
+
+        $data['students'] = $students;
+
         return view('students', $data);
     }
 
@@ -80,52 +106,107 @@ class Students extends BaseController
         $db->transStart();
 
         try {
-            $pictureName = $this->uploadStudentPicture();
+            // ===== ONE FORM, MANY STUDENTS =====
+            // The register form can hold several student blocks ("+ Add student").
+            // Each block posts fname/mname/lname/grade_section as a parallel array.
+            // Single-block forms are normalised to arrays, so both shapes work.
+            $sFnames = $this->asArray($this->request->getPost('fname'));
+            $sMnames = $this->asArray($this->request->getPost('mname'));
+            $sLnames = $this->asArray($this->request->getPost('lname'));
+            $sGrades = $this->asArray($this->request->getPost('grade_section'));
+            $sPics   = $this->uploadStudentPictures();
 
-            $studentId = $this->studentModel->insert([
-                'fname'         => $this->request->getPost('fname'),
-                'mname'         => $this->request->getPost('mname'),
-                'lname'         => $this->request->getPost('lname'),
-                'grade_section' => $this->request->getPost('grade_section'),
-                'picture'       => $pictureName,
-                'created_by'    => session('user_id'),
-            ]);
-
-            if (!$studentId) {
-                throw new \Exception('Failed to save student');
+            if ($sFnames === []) {
+                throw new \Exception('No student details provided');
             }
+
+            $studentIds = [];
+            $createdNames = [];
+
+            foreach ($sFnames as $i => $sFname) {
+                if (trim((string) $sFname) === '') {
+                    continue;
+                }
+                $sLname = trim((string) ($sLnames[$i] ?? ''));
+                if ($sLname === '') {
+                    throw new \Exception('Student surname is required');
+                }
+
+                $sid = $this->studentModel->insert([
+                    'fname'         => $sFname,
+                    'mname'         => $sMnames[$i] ?? null,
+                    'lname'         => $sLname,
+                    'grade_section' => $sGrades[$i] ?? null,
+                    'picture'       => $sPics[$i] ?? null,
+                    'created_by'    => session('user_id'),
+                ]);
+
+                if (!$sid) {
+                    throw new \Exception('Failed to save student');
+                }
+
+                $studentIds[] = $sid;
+                $createdNames[] = trim($sFname . ' ' . $sLname);
+            }
+
+            if ($studentIds === []) {
+                throw new \Exception('No valid student details provided');
+            }
+
+            // First student id kept for flashdata/back-compat (success modal).
+            $studentId = $studentIds[0];
 
             $firstParentId = null;
             $registeredParents = [];
             $passwordSmsFailed = false;
 
             // Save parents (max 3)
-            $parentFnames = $this->request->getPost('parent_fname');
+            // The form posts parent_fname[] etc. Normalise scalars to arrays so a
+            // single non-bracketed field can't fatal() the whole registration.
+            $parentFnames = $this->asArray($this->request->getPost('parent_fname'));
             if ($parentFnames) {
-                $parentMnames    = $this->request->getPost('parent_mname');
-                $parentLnames    = $this->request->getPost('parent_lname');
-                $parentPhones    = $this->request->getPost('parent_phone');
-                $parentRelations = $this->request->getPost('parent_relation');
+                $parentMnames    = $this->asArray($this->request->getPost('parent_mname'));
+                $parentLnames    = $this->asArray($this->request->getPost('parent_lname'));
+                $parentPhones    = $this->asArray($this->request->getPost('parent_phone'));
+                $parentRelations = $this->asArray($this->request->getPost('parent_relation'));
                 $parentPictures  = $this->uploadParentPictures();
 
                 foreach ($parentFnames as $i => $fname) {
                     if (empty($fname) || $i >= 3) continue;
 
-                    $qrValue = $this->generateQR();
-                    $parentId = $this->parentsModel->insert([
-                        'fname'        => $fname,
-                        'mname'        => $parentMnames[$i] ?? null,
-                        'lname'        => $parentLnames[$i],
-                        'phone'        => $parentPhones[$i],
-                        'password'     => null,
-                        'password_sent'=> 0,
-                        'qr_code'      => $qrValue,
-                        'picture'      => $parentPictures[$i] ?? null,
-                        'created_by'   => session('user_id'),
-                    ]);
+                    $phone   = trim((string) ($parentPhones[$i] ?? ''));
+                    $relation = $parentRelations[$i] ?? 'Parent';
 
-                    if (!$parentId) {
-                        throw new \Exception('Failed to save parent');
+                    // ===== ONE PARENT, MANY CHILDREN =====
+                    // parents.phone is UNIQUE. If the phone already belongs to a
+                    // registered parent, LINK that parent instead of inserting a
+                    // duplicate (which would throw 1062 and roll the whole
+                    // registration back). This is how a mother with two students
+                    // in the same school gets registered under one account.
+                    $existingParent = $phone !== ''
+                        ? $this->parentsModel->where('phone', $phone)->first()
+                        : null;
+
+                    if ($existingParent) {
+                        $parentId = $existingParent['id'];
+                        $qrValue  = $existingParent['qr_code'];
+                    } else {
+                        $qrValue  = $this->generateQR();
+                        $parentId = $this->parentsModel->insert([
+                            'fname'        => $fname,
+                            'mname'        => $parentMnames[$i] ?? null,
+                            'lname'        => $parentLnames[$i],
+                            'phone'        => $phone,
+                            'password'     => null,
+                            'password_sent'=> 0,
+                            'qr_code'      => $qrValue,
+                            'picture'      => $parentPictures[$i] ?? null,
+                            'created_by'   => session('user_id'),
+                        ]);
+
+                        if (!$parentId) {
+                            throw new \Exception('Failed to save parent');
+                        }
                     }
 
                     if ($firstParentId === null) {
@@ -133,31 +214,46 @@ class Students extends BaseController
                     }
 
                     $registeredParents[] = [
-                        'fname'    => $fname,
-                        'lname'    => $parentLnames[$i],
+                        'fname'    => $existingParent ? $existingParent['fname'] : $fname,
+                        'lname'    => $existingParent ? $existingParent['lname'] : $parentLnames[$i],
                         'qr_code'  => $qrValue,
-                        'relation' => $parentRelations[$i] ?? 'Parent',
+                        'relation' => $relation,
+                        'existing' => (bool) $existingParent,
                     ];
 
-                    $linked = $db->table('student_parents')->insert([
-                        'student_id' => $studentId,
-                        'parent_id'  => $parentId,
-                        'relation'   => $parentRelations[$i] ?? 'Parent',
-                    ]);
+                    // Idempotent link: every student created in this form gets
+                    // tied to this parent. Re-submitting must not duplicate rows.
+                    foreach ($studentIds as $sid) {
+                        $alreadyLinked = $db->table('student_parents')
+                            ->where('student_id', $sid)
+                            ->where('parent_id', $parentId)
+                            ->countAllResults();
 
-                    if (!$linked) {
-                        throw new \Exception('Failed to link parent to student');
+                        if (! $alreadyLinked) {
+                            $linked = $db->table('student_parents')->insert([
+                                'student_id' => $sid,
+                                'parent_id'  => $parentId,
+                                'relation'   => $relation,
+                            ]);
+
+                            if (!$linked) {
+                                throw new \Exception('Failed to link parent to student');
+                            }
+                        }
                     }
                 }
             }
 
             // Save fetchers to sub_fetchers table (max 2)
+            // sub_fetchers.parent_id drives Scan::verify(), which then returns
+            // EVERY student linked to that parent — so one fetcher QR covers
+            // all siblings registered in this form.
             $registeredFetchers = [];
-            $fetcherFnames = $this->request->getPost('fetcher_fname');
+            $fetcherFnames = $this->asArray($this->request->getPost('fetcher_fname'));
             if ($fetcherFnames && $firstParentId) {
-                $fetcherMnames = $this->request->getPost('fetcher_mname');
-                $fetcherLnames = $this->request->getPost('fetcher_lname');
-                $fetcherPhones = $this->request->getPost('fetcher_phone');
+                $fetcherMnames = $this->asArray($this->request->getPost('fetcher_mname'));
+                $fetcherLnames = $this->asArray($this->request->getPost('fetcher_lname'));
+                $fetcherPhones = $this->asArray($this->request->getPost('fetcher_phone'));
                 $fetcherPictures = $this->uploadFetcherPictures();
 
                 foreach ($fetcherFnames as $i => $fname) {
@@ -166,7 +262,7 @@ class Students extends BaseController
                     $qrValue = $this->generateQR();
                     $fetcherId = $this->subFetcherModel->insert([
                         'parent_id'  => $firstParentId,
-                        'student_id' => $studentId,
+                        'student_id' => $studentIds[0],
                         'fname'      => $fname,
                         'mname'      => $fetcherMnames[$i] ?? null,
                         'lname'      => $fetcherLnames[$i],
@@ -194,7 +290,9 @@ class Students extends BaseController
                 session('role'), 
                 'create', 
                 'student', 
-                'Created: '.$this->request->getPost('fname').' '.$this->request->getPost('lname')
+                'Created: '.implode(', ', $createdNames)
+                    . ' | ' . count($studentIds) . ' student(s) linked to '
+                    . count($registeredParents) . ' parent(s)'
             );
 
             $db->transComplete();
@@ -204,7 +302,8 @@ class Students extends BaseController
             }
 
             session()->setFlashdata('registration_success', true);
-            session()->setFlashdata('student_name', $this->request->getPost('fname') . ' ' . $this->request->getPost('lname'));
+            session()->setFlashdata('student_name', implode(', ', $createdNames));
+            session()->setFlashdata('student_names', $createdNames);
             session()->setFlashdata('registered_parents', $registeredParents);
             session()->setFlashdata('registered_fetchers', $registeredFetchers);
             session()->setFlashdata('student_id', $studentId);
@@ -523,6 +622,22 @@ class Students extends BaseController
     }
 
     // ========== HELPERS ==========
+
+    /**
+     * Force a posted value into an array. The register form always posts
+     * bracketed fields (parent_fname[]), but a hand-built or single-field
+     * request returns a plain string, which breaks the foreach() below.
+     *
+     * @return array<int,mixed>
+     */
+    private function asArray($value): array
+    {
+        if ($value === null || $value === '') {
+            return [];
+        }
+        return is_array($value) ? $value : [$value];
+    }
+
     private function uploadStudentPicture()
     {
         $captureData = $this->request->getPost('picture_capture');
@@ -539,6 +654,44 @@ class Students extends BaseController
             return $name;
         }
         return null;
+    }
+
+    /**
+     * One photo per student block (the "+ Add student" repeater posts
+     * picture[] / picture_capture[] as parallel arrays). Missing or invalid
+     * slots are padded with null so indexes stay aligned with fname[].
+     *
+     * @return array<int,?string>
+     */
+    private function uploadStudentPictures(): array
+    {
+        $count = count($this->asArray($this->request->getPost('fname')));
+        $pics  = array_fill(0, max($count, 1), null);
+
+        // Camera-capture payloads (data URLs) posted per block.
+        $captures = $this->asArray($this->request->getPost('picture_capture'));
+        // Uploaded files (input type=file name="picture[]").
+        $files = $this->request->getFileMultiple('picture') ?: [];
+
+        for ($i = 0; $i < $count; $i++) {
+            $capture = $captures[$i] ?? null;
+            if (is_string($capture) && strpos($capture, 'data:image') === 0) {
+                $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $capture));
+                $name = 'student_' . time() . '_' . uniqid() . '.png';
+                file_put_contents('uploads/students/' . $name, $imageData);
+                $pics[$i] = $name;
+                continue;
+            }
+
+            $file = $files[$i] ?? null;
+            if ($file && $file->isValid() && ! $file->hasMoved()) {
+                $name = $file->getRandomName();
+                $file->move('uploads/students', $name);
+                $pics[$i] = $name;
+            }
+        }
+
+        return $pics;
     }
 
     private function uploadParentPicture()

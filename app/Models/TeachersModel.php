@@ -15,9 +15,13 @@ class TeachersModel extends Model
     public function studentCounts(): array
     {
         $db = \Config\Database::connect();
+        // Count by ADVISER (students.adviser_id), not by grade_section — a
+        // teacher's class list is defined by adviser_id so one teacher can
+        // hold students from every grade level.
         return $db->table('students')
-            ->select('grade_section, COUNT(*) as total')
-            ->groupBy('grade_section')
+            ->select('adviser_id, COUNT(*) as total')
+            ->where('adviser_id IS NOT NULL', null, false)
+            ->groupBy('adviser_id')
             ->get()
             ->getResultArray();
     }

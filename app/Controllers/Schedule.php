@@ -317,10 +317,36 @@ class Schedule extends BaseController
             'notes'     => $notes !== '' ? $notes : null,
         ];
 
-        // Preserve manual open/close stamps unless status changed away from them
-        if ($status !== 'open') {
-            // keep opened_at history; just don't reset
+        // ===== STATUS STAMPS =====
+        // ScheduleModel::autoSync() has to tell an admin's explicit choice
+        // apart from its own clock-driven transitions. open_by being a person
+        // means "a human chose this"; 'Auto (schedule)' means "the clock did".
+        $existing  = $this->scheduleModel->forDate($date);
+        $prev      = $existing['status'] ?? null;
+        $who       = trim((session('fname') ?? '') . ' ' . (session('lname') ?? ''));
+        $who       = $who !== '' ? $who : 'Admin';
+        $stamp     = date('Y-m-d H:i:s');
+
+        if ($status === 'open') {
+            // Explicit "open" — pin it so the clock cannot drag it back to closed.
+            if ($prev !== 'open') {
+                $data['opened_at'] = $stamp;
+                $data['opened_by'] = $who;
+            }
+            $data['closed_at'] = null;
+            $data['closed_by'] = null;
+        } elseif ($status === 'closed') {
+            if ($prev !== 'closed') {
+                $data['closed_at'] = $stamp;
+                $data['closed_by'] = $who;
+            }
+        } elseif ($status === 'normal') {
+            // Hand control back to the clock: clear the manual discriminator so
+            // autoSync() resumes auto-open/auto-close on the configured hours.
+            $data['opened_by'] = null;
+            $data['closed_by'] = null;
         }
+        // 'holiday' leaves the stamps untouched (autoSync ignores holidays anyway).
 
         $row = $this->scheduleModel->upsert($date, $data);
 

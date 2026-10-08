@@ -576,12 +576,13 @@ select.form-control option {
  <table class="table table-hover">
  <thead>
  <tr>
- <th style="width:50px;">#</th>
- <th style="width:60px;">Photo</th>
- <th>Name</th>
- <th>Grade</th>
- <th>Created</th>
- <th class="text-center" style="width:120px;">Action</th>
+  <th style="width:50px;">#</th>
+  <th style="width:60px;">Photo</th>
+  <th>Name</th>
+  <th>Grade</th>
+  <th>Parent / Guardian</th>
+  <th>Created</th>
+  <th class="text-center" style="width:120px;">Action</th>
  </tr>
  </thead>
  <tbody>
@@ -602,8 +603,24 @@ select.form-control option {
  <?= esc($s['fname']) ?> <?= esc($s['lname']) ?>
  </a>
  </td>
- <td><span class="badge badge-soft"><?= esc($s['grade_section']) ?></span></td>
- <td class="muted"><?= date('M d, Y', strtotime($s['created_at'])) ?></td>
+  <td><span class="badge badge-soft"><?= esc($s['grade_section']) ?></span></td>
+  <td>
+  <?php $sparents = $s['parents'] ?? []; ?>
+  <?php if (!empty($sparents)): foreach ($sparents as $sp): ?>
+    <div class="parent-name" style="font-size:13px;">
+      <?= esc($sp['fname']) ?> <?= esc($sp['lname']) ?>
+      <span class="badge badge-primary" style="font-size:9px;"><?= esc($sp['relation']) ?></span>
+    </div>
+    <div class="muted" style="font-size:11px;"><code><?= esc($sp['phone']) ?></code></div>
+  <?php endforeach; ?>
+    <div class="muted" style="font-size:11px;">
+      <i class="fas fa-users"></i> <?= count($sparents) ?> guardian<?= count($sparents) > 1 ? 's' : '' ?>
+    </div>
+  <?php else: ?>
+    <span class="muted">No parent linked</span>
+  <?php endif; ?>
+  </td>
+  <td class="muted"><?= date('M d, Y', strtotime($s['created_at'])) ?></td>
  <td class="text-center">
  <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
  <a href="<?= base_url('students-view/'.$s['id']) ?>" class="btn-action btn-action-view">
@@ -629,7 +646,7 @@ select.form-control option {
  </tr>
  <?php endforeach; else: ?>
  <tr>
- <td colspan="6" class="text-center py-5 empty-state">
+  <td colspan="7" class="text-center py-5 empty-state">
  <i class="fas fa-user-graduate fa-3x mb-3 d-block"></i>
  <h5>No students yet</h5>
  <p>Register a student to get started!</p>

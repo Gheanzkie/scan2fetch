@@ -505,7 +505,7 @@ $(function() {
         } else {
             $('#mobileCamBtn').show();
             $('#mobileCamBtn').html('<i class="fas fa-image mr-1"></i> Camera / Photo');
-            $('#scanResult').html('<span style="color: var(--soft-orange);"><i class="fas fa-info-circle mr-1"></i> Live camera is blocked on this connection (needs localhost or https). On this laptop open <strong>http://localhost:8080/scan</strong> to use the live external camera.</span>');
+                $('#scanResult').html('<span style="color: var(--soft-orange);"><i class="fas fa-info-circle mr-1"></i> Live camera is blocked on this connection (needs localhost or https). On this laptop open <strong>' + BASE_URL + 'scan</strong> to use the live external camera.</span>');
         }
     }
 
@@ -982,10 +982,20 @@ $(function() {
                     }
                 }
 
-                // Build student profiles to release
+                // Build student profiles to release.
+                // 1 child  -> direct release (no confirmation), as before.
+                // 2+ child -> show selectable list; operator picks who is being
+                //             fetched and confirms before anything is released.
+                var stuList = res.students || [];
+                var isMulti = stuList.length > 1;
                 var html = '';
-                if (res.students && res.students.length > 0) {
-                    res.students.forEach(function(s) {
+
+                // Keep the scan context so the manual "Release selected" button
+                // can post the same payload the auto path uses.
+                window.__scanCtx = { parentId: res.parent.id, qrCode: qrCode, fetcherName: fetcherName };
+
+                if (stuList.length > 0) {
+                    stuList.forEach(function(s) {
                         var sid = s.student_id || s.id;
                         var studentPic = s.picture ? BASE_URL + 'uploads/students/' + s.picture : '';
                         html += '<div class="d-flex align-items-center border rounded p-3 mb-2 student-item">';
@@ -997,10 +1007,28 @@ $(function() {
                         }
                         html += '</div>';
                         html += '<div class="flex-grow-1"><strong style="font-size:1.05rem; color: var(--ink);">' + s.fname + ' ' + s.lname + '</strong><br><span class="badge badge-light" style="font-size:12px; padding:5px 12px;">' + (s.grade_section || 'N/A') + '</span></div>';
-                        html += '<span class="badge badge-success released-badge" data-student-id="' + sid + '" data-name="' + s.fname + ' ' + s.lname + '"><i class="fas fa-check-circle mr-1"></i>Released</span>';
+
+                        if (isMulti) {
+                            html += '<div class="text-right mr-3">';
+                            html += '<input type="checkbox" class="student-check" id="chk_' + sid + '" value="' + sid + '" checked style="width:22px;height:22px;cursor:pointer;">';
+                            html += '<label for="chk_' + sid + '" style="display:block;font-size:11px;margin-top:4px;cursor:pointer;color:var(--muted);">Select</label>';
+                            html += '</div>';
+                            html += '<span class="badge badge-secondary released-badge" data-student-id="' + sid + '" data-name="' + s.fname + ' ' + s.lname + '" style="background:#90a4ae;"><i class="fas fa-clock mr-1"></i>Pending</span>';
+                        } else {
+                            html += '<span class="badge badge-success released-badge" data-student-id="' + sid + '" data-name="' + s.fname + ' ' + s.lname + '"><i class="fas fa-check-circle mr-1"></i>Released</span>';
+                        }
                         html += '</div>';
                     });
-                    $('#studentCount').text(res.students.length);
+
+                    if (isMulti) {
+                        html += '<div class="alert alert-info mt-2 mb-0" style="border-radius:12px;font-size:13px;">' +
+                                '<i class="fas fa-info-circle mr-1"></i>' + stuList.length +
+                                ' students linked. Tick only who is being picked up, then confirm.</div>';
+                        html += '<button type="button" id="releaseSelectedBtn" class="btn btn-success btn-block mt-2" style="border-radius:12px;font-weight:600;">' +
+                                '<i class="fas fa-check-double mr-1"></i>Release selected</button>';
+                    }
+
+                    $('#studentCount').text(stuList.length);
                 } else {
                     html = '<div class="text-center py-4 empty-state"><i class="fas fa-user-slash fa-3x mb-3 d-block"></i><p>No students linked to this parent/fetcher.</p></div>';
                     $('#studentCount').text('0');
@@ -1010,8 +1038,38 @@ $(function() {
                 $('#emptyState').hide();
                 $('#scannerCol').hide();
 
-                // Auto-release every linked student
-                autoReleaseAll(res.students, res.parent.id, qrCode, fetcherName);
+                if (isMulti) {
+                    // Multi-child: WAIT for the operator's choice + confirmation.
+                    $('#releaseSelectedBtn').on('click', function () {
+                        var picked = [];
+                        $('.student-check:checked').each(function () {
+                            var sid = $(this).val();
+                            var $row = $(this).closest('.student-item');
+                            var $badge = $row.find('.released-badge');
+                            picked.push({ student_id: sid, name: $badge.data('name') || '' });
+                        });
+
+                        if (picked.length === 0) {
+                            showAlert('Select at least one student to release.', 'warning');
+                            return;
+                        }
+
+                        // No blocking confirm() here: on purpose the button fires
+                        // the release straight away. The selected tick boxes are
+                        // already the operator's confirmation of who is fetched.
+                        var ctx = window.__scanCtx || {};
+                        var onlyPicked = stuList.filter(function (s) {
+                            var sid = String(s.student_id || s.id);
+                            return picked.some(function (x) { return String(x.student_id) === sid; });
+                        });
+                        $(this).prop('disabled', true)
+                               .html('<i class="fas fa-spinner fa-spin mr-1"></i>Releasing…');
+                        autoReleaseAll(onlyPicked, ctx.parentId, ctx.qrCode, ctx.fetcherName);
+                    });
+                } else {
+                    // Single child: direct release, no confirmation.
+                    autoReleaseAll(stuList, res.parent.id, qrCode, fetcherName);
+                }
 
                 // Scroll to parent card on mobile
                 if ($(window).width() < 768) {

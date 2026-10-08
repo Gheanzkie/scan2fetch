@@ -417,7 +417,7 @@ body {
  <span class="badge badge-grade"><i class="fas fa-book mr-1"></i><?= esc($teacher['grade_section']) ?></span>
  </td>
  <td class="text-center">
- <span class="badge badge-soft"><?= $studentCounts[$teacher['grade_section']] ?? 0 ?></span>
+ <span class="badge badge-soft"><?= (int) ($studentCounts[$teacher['id']] ?? 0) ?></span>
  </td>
  <td class="text-center">
  <?php if (!empty($teacher['password_sent'])): ?>

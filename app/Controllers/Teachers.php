@@ -28,7 +28,7 @@ class Teachers extends BaseController
 
         $counts = [];
         foreach ($model->studentCounts() as $row) {
-            $counts[$row['grade_section']] = (int) $row['total'];
+            $counts[$row['adviser_id']] = (int) $row['total'];
         }
 
         $data['teachers'] = $teachers;
@@ -66,7 +66,7 @@ class Teachers extends BaseController
 
         $query = $db->table('students')
             ->select('students.*')
-            ->where('students.grade_section', $teacher['grade_section']);
+            ->where('students.adviser_id', $id);
         if ($search !== '') {
             $query->groupStart()
                 ->like('students.fname', $search)
