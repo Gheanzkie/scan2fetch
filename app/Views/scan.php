@@ -495,7 +495,7 @@ body {
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-<script src="<?= base_url('html5qrcode/html5-qrcode.min.js') ?>"></script>
+<script src="<?= base_url('public/html5qrcode/html5-qrcode.min.js') ?>"></script>
 
 <script>
 var BASE_URL = '<?= base_url() ?>/';

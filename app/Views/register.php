@@ -848,7 +848,7 @@ label .text-danger { color: #dc2626 !important; }
  <div class="qr-row">
  <div>
  <?php if(!empty($p['qr_code'])): ?>
- <img src="<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>" alt="QR">
+ <img src="<?= base_url('public/uploads/qr/'.$p['qr_code'].'.png') ?>" alt="QR">
  <?php else: ?>
  <i class="fas fa-qrcode" style="color: var(--soft-blue);"></i>
  <?php endif; ?>
@@ -880,7 +880,7 @@ label .text-danger { color: #dc2626 !important; }
  <div class="qr-row">
  <div>
  <?php if(!empty($f['qr_code'])): ?>
- <img src="<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>" alt="QR">
+ <img src="<?= base_url('public/uploads/qr/'.$f['qr_code'].'.png') ?>" alt="QR">
  <?php else: ?>
  <i class="fas fa-qrcode" style="color: var(--soft-blue);"></i>
  <?php endif; ?>

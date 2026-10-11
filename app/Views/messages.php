@@ -373,7 +373,7 @@ html.theme-dark .empty-chat { color: #94a3b8 !important; }
             body.append('to_parent', toParent);
         }
 
-        fetch('/messages/send', {
+        fetch((window.BASE_URL || '/') + 'messages/send', {
             method: 'POST',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
             body: body
@@ -394,9 +394,9 @@ html.theme-dark .empty-chat { color: #94a3b8 !important; }
     function refreshThread() {
         var url;
         if (ROLE === 'parent') {
-            url = '/messages/thread/' + ME;
+            url = (window.BASE_URL || '/') + 'messages/thread/' + ME;
         } else if (toParent) {
-            url = '/messages/thread/' + toParent;
+            url = (window.BASE_URL || '/') + 'messages/thread/' + toParent;
         } else {
             return;
         }
@@ -408,7 +408,7 @@ html.theme-dark .empty-chat { color: #94a3b8 !important; }
     }
 
     function refreshBadges() {
-        fetch('/messages/unread', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        fetch((window.BASE_URL || '/') + 'messages/unread', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(function(r) { return r.json(); })
             .then(function(d) {
                 var n = (d && d.count) ? d.count : 0;

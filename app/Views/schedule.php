@@ -585,7 +585,7 @@ function commitSave() {
     savingNow = true;
     var payload = buildPayload();
 
-    $.post('schedule/save', payload, function (d) {
+    $.post((window.BASE_URL || '/') + 'schedule/save', payload, function (d) {
         savingNow = false;
         if (d.success) {
             flashSaved();
@@ -879,7 +879,7 @@ $(function () {
         if (picked === SCAN_SESSION && (SCAN_SESSION_OVR || null) === picked) return; // already there
 
         $tg.addClass('is-busy');
-        $.post('schedule/set-session', { session: picked, [CSRF_NAME]: CSRF_HASH }, function (d) {
+        $.post((window.BASE_URL || '/') + 'schedule/set-session', { session: picked, [CSRF_NAME]: CSRF_HASH }, function (d) {
             $tg.removeClass('is-busy');
             if (d && d.success) {
                 SCAN_SESSION = d.session;
@@ -933,7 +933,7 @@ $(function () {
         payload[CSRF_NAME] = CSRF_HASH;
 
         $sw.prop('disabled', true);
-        $.post('schedule/save-sessions', payload, function (d) {
+        $.post((window.BASE_URL || '/') + 'schedule/save-sessions', payload, function (d) {
             $sw.prop('disabled', false);
             if (d.success) {
                 toast(cap + ' session ' + (checked ? 'OPENED' : 'CLOSED') + ' for ' + date + '.', true);
@@ -958,7 +958,7 @@ $(function () {
     $(document).on('change', '#defOpen, #defClose', function () {
         clearTimeout(defTimer);
         defTimer = setTimeout(function () {
-            $.post('schedule/save', {
+                $.post((window.BASE_URL || '/') + 'schedule/save', {
                 defaults_only: 1,
                 default_open: $('#defOpen').val() || '',
                 default_close: $('#defClose').val() || '',

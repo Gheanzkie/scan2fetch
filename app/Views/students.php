@@ -466,7 +466,7 @@ select.form-control option {
  </div>
  <div class="col-md-7 text-center">
  <div style="display:inline-block;border:2px solid var(--soft-green);border-radius:12px;padding:8px;background:#fff;">
- <img src="<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>"
+ <img src="<?= base_url('public/uploads/qr/'.$p['qr_code'].'.png') ?>"
                                              style="width:160px;height:auto;display:block;"
                                              alt="QR Code">
  <div style="background: var(--soft-green); color: #fff; padding: 4px 10px; border-radius: 0 0 8px 8px; margin-top: 4px; font-weight: bold; font-size: 13px;">
@@ -474,7 +474,7 @@ select.form-control option {
  </div>
  </div>
  <div class="mt-2">
- <a href="<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>"
+ <a href="<?= base_url('public/uploads/qr/'.$p['qr_code'].'.png') ?>"
                                            download="<?= esc($p['qr_code']) ?>.png"
                                            class="btn btn-kid-success btn-sm">
  <i class="fas fa-download mr-1"></i> Download
@@ -506,7 +506,7 @@ select.form-control option {
  </div>
  <div class="col-md-7 text-center">
  <div style="display:inline-block;border:2px solid var(--soft-orange);border-radius:12px;padding:8px;background:#fff;">
- <img src="<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>"
+ <img src="<?= base_url('public/uploads/qr/'.$f['qr_code'].'.png') ?>"
                                              style="width:160px;height:auto;display:block;"
                                              alt="QR Code">
  <div style="background: var(--soft-orange); color: #fff; padding: 4px 10px; border-radius: 0 0 8px 8px; margin-top: 4px; font-weight: bold; font-size: 13px;">
@@ -514,7 +514,7 @@ select.form-control option {
  </div>
  </div>
  <div class="mt-2">
- <a href="<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>"
+ <a href="<?= base_url('public/uploads/qr/'.$f['qr_code'].'.png') ?>"
                                            download="<?= esc($f['qr_code']) ?>.png"
                                            class="btn btn-kid-success btn-sm">
  <i class="fas fa-download mr-1"></i> Download
@@ -586,12 +586,12 @@ select.form-control option {
  </tr>
  </thead>
  <tbody>
- <?php if(!empty($students)): $i=1; foreach($students as $s): $pic=!empty($s['picture'])?base_url('uploads/students/'.$s['picture']):''; ?>
+ <?php if(!empty($students)): $i=1; foreach($students as $s): $pic=!empty($s['picture'])?base_url('public/uploads/students/'.$s['picture']):''; ?>
  <tr class="student-row" data-name="<?= esc(strtolower($s['fname'].' '.$s['lname'])) ?>" data-grade="<?= esc(strtolower($s['grade_section'])) ?>">
  <td class="num"><?= $i++ ?></td>
  <td class="photo-cell" onclick="openImageViewer('<?= $pic ?>','<?= esc($s['fname'].' '.$s['lname']) ?>')">
  <?php if(!empty($s['picture'])): ?>
- <img src="<?= base_url('uploads/students/'.$s['picture']) ?>" class="img-circle" style="width:42px;height:42px;">
+ <img src="<?= base_url('public/uploads/students/'.$s['picture']) ?>" class="img-circle" style="width:42px;height:42px;">
  <?php else: ?>
  <div class="photo-empty d-flex align-items-center justify-content-center" style="width:42px;height:42px;">
  <i class="fas fa-child" style="color: var(--faint); font-size: 18px;"></i>

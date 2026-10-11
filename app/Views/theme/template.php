@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en" style="font-size: 14px;">
 <head>
- <link rel="icon" href="<?= base_url('image/qr-code-76.png') ?>">
+ <link rel="icon" href="<?= base_url('public/image/qr-code-76.png') ?>">
  <meta name="csrf-name" content="<?= csrf_token() ?>">
  <meta name="csrf-token" content="<?= csrf_hash() ?>">
  <meta charset="utf-8">
@@ -669,6 +669,12 @@
 <script src="<?= base_url('public/assets/plugins/jquery/jquery.min.js') ?>"></script>
 <script src="<?= base_url('public/assets/plugins/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
 <script src="<?= base_url('public/assets/dist/js/adminlte.min.js') ?>"></script>
+
+<script>
+window.BASE_URL  = '<?= rtrim(base_url(), '/') ?>/';
+window.CSRF_NAME = '<?= csrf_token() ?>';
+window.CSRF_HASH = '<?= csrf_hash() ?>';
+</script>
 
 <!-- DataTables -->
 <script src="<?= base_url('public/assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>

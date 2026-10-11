@@ -179,7 +179,7 @@ label {
  <label> Student Picture</label>
  <div id="studentPhotoPreview" style="width:130px;height:130px;margin:0 auto 10px;border-radius:50%;overflow:hidden;border:4px solid var(--soft-blue);background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
  <?php if(!empty($student['picture'])): ?>
- <img src="<?= base_url('uploads/students/'.$student['picture']) ?>" style="width:100%;height:100%;object-fit:cover;">
+ <img src="<?= base_url('public/uploads/students/'.$student['picture']) ?>" style="width:100%;height:100%;object-fit:cover;">
  <?php else: ?>
  <i class="fas fa-child fa-3x" style="color: #b0b0c8;"></i>
  <?php endif; ?>

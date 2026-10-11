@@ -9,12 +9,14 @@
  <i class="fas fa-bars fa-lg"></i>
  </a>
  </li>
+ <?php if (session('role') != 'staff'): ?>
  <li class="nav-item d-none d-sm-inline-block">
  <a href="<?= base_url('dashboard') ?>" class="nav-link text-white px-2 font-weight-semibold"
-               style="font-size: 15px;">
+ style="font-size: 15px;">
  <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
  </a>
  </li>
+ <?php endif; ?>
  </ul>
 
  <ul class="navbar-nav ml-auto align-items-center">
@@ -60,14 +62,18 @@
                         ?>
  </small>
  </div>
- <div class="dropdown-divider"></div>
- <a href="<?= base_url('dashboard') ?>" class="dropdown-item">
- <i class="fas fa-tachometer-alt mr-2" style="color: #64748b;"></i> Dashboard
- </a>
- <a href="<?= base_url('messages') ?>" class="dropdown-item <?= $role == 'teacher' ? 'd-none' : '' ?>">
- <i class="fas fa-comments mr-2" style="color: #64748b;"></i> Messages
- <span class="badge badge-danger msg-badge" style="display:none;">0</span>
- </a>
+  <div class="dropdown-divider"></div>
+  <?php if ($role != 'staff'): ?>
+  <a href="<?= base_url('dashboard') ?>" class="dropdown-item">
+  <i class="fas fa-tachometer-alt mr-2" style="color: #64748b;"></i> Dashboard
+  </a>
+  <?php endif; ?>
+  <?php if ($role != 'staff'): ?>
+  <a href="<?= base_url('messages') ?>" class="dropdown-item">
+  <i class="fas fa-comments mr-2" style="color: #64748b;"></i> Messages
+  <span class="badge badge-danger msg-badge" style="display:none;">0</span>
+  </a>
+  <?php endif; ?>
  <div class="dropdown-divider"></div>
  <a href="#" class="dropdown-item" data-toggle="modal" data-target="#changePasswordModal">
  <i class="fas fa-key mr-2" style="color: #64748b;"></i> Change Password
@@ -256,7 +262,7 @@
         body.append('new_password', np);
         body.append('confirm_password', conf);
 
-        fetch('/change-password', {
+        fetch((window.BASE_URL || '/') + 'change-password', {
             method: 'POST',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
             body: body

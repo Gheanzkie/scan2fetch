@@ -504,7 +504,7 @@ select.form-control option {
  <td class="num"><?= $i++ ?></td>
  <td>
  <?php if(!empty($p['picture'])): ?>
- <img src="<?= base_url('uploads/parents/'.$p['picture']) ?>" class="img-circle" style="width:42px;height:42px;">
+ <img src="<?= base_url('public/uploads/parents/'.$p['picture']) ?>" class="img-circle" style="width:42px;height:42px;">
  <?php else: ?>
  <div class="photo-empty d-flex align-items-center justify-content-center" style="width:42px;height:42px;">
  <i class="fas fa-user" style="color: var(--faint); font-size: 16px;"></i>
@@ -544,9 +544,9 @@ select.form-control option {
   </td>
  <td>
  <?php if(!empty($p['qr_code'])): ?>
- <img src="<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>"
+ <img src="<?= base_url('public/uploads/qr/'.$p['qr_code'].'.png') ?>"
                                                              class="qr-thumb"
-                                                             onclick="openQrModal('<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>')"
+                                                             onclick="openQrModal('<?= base_url('public/uploads/qr/'.$p['qr_code'].'.png') ?>')"
                                                              title="Click to enlarge">
  <?php else: ?>
  <span class="muted" style="font-size:12px;">No QR</span>

@@ -1,0 +1,46 @@
+# ----------------------------------------------------------------------
+# Front controller for DEPLOYED environments where the web root is the
+# project root (not /public).  Rewrites every non-file request into the
+# root index.php so CodeIgniter's router handles it.
+# ----------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+    Options +FollowSymlinks
+    RewriteEngine On
+
+    # Redirect Trailing Slashes
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [R=301,L]
+
+    # Force HTTPS when the site is live (uncomment on the hosting box):
+    # RewriteCond %{HTTPS} !=on
+    # RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+    # Serve existing files/dirs as-is (css, js, images, uploads, phpqrcode…)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Everything else goes through CodeIgniter
+    RewriteRule ^ index.php [L,NC,QSA]
+
+    # Pass the Authorization header through (needed for HTTP basic / APIs)
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+</IfModule>
+
+# Deny direct access to sensitive folders
+<IfModule mod_rewrite.c>
+    RewriteRule ^app/ - [F,L]
+    RewriteRule ^system/ - [F,L]
+    RewriteRule ^writable/ - [F,L]
+    RewriteRule ^vendor/ - [F,L]
+    RewriteRule ^\.env - [F,L]
+    RewriteRule ^composer\.(json|lock) - [F,L]
+    RewriteRule ^scan2fetch\.sql - [F,L]
+    RewriteRule ^spark - [F,L]
+    RewriteRule ^preload\.php - [F,L]
+</IfModule>
+
+Options -Indexes
+ServerSignature Off

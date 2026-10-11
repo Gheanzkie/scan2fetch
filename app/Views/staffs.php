@@ -516,7 +516,7 @@ label .text-danger { color: var(--soft-rose) !important; }
  <td>
  <div class="d-flex align-items-center">
  <?php if (!empty($staff['picture'])): ?>
- <img src="<?= base_url('uploads/staffs/' . $staff['picture']) ?>" alt="Staff"
+ <img src="<?= base_url('public/uploads/staffs/' . $staff['picture']) ?>" alt="Staff"
                     class="avatar-circle mr-2" style="width:40px;height:40px;min-width:40px;object-fit:cover;background:#f1f5f9;">
  <?php else: ?>
  <div class="avatar-circle mr-2" style="width:40px;height:40px;min-width:40px;">
@@ -765,7 +765,7 @@ $(function(){
 
         var pic = button.data('picture');
         if (pic) {
-            $('#editPhotoImg').attr('src', '<?= base_url('uploads/staffs/') ?>' + pic).show();
+            $('#editPhotoImg').attr('src', '<?= base_url('public/uploads/staffs/') ?>' + pic).show();
             $('#editPhotoIcon').hide();
         } else {
             $('#editPhotoImg').attr('src', '').hide();

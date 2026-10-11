@@ -356,9 +356,9 @@ body {
  <div class="card-body text-center">
                             
  <!-- Parent Photo -->
- <div id="parentPhotoContainer" style="width:130px;height:130px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #e2e8f0;cursor:pointer;box-shadow:0 1px 4px rgba(15,23,42,.12);" onclick="openImageViewer('<?= !empty($parent['picture'])?base_url('uploads/parents/'.$parent['picture']):'' ?>','<?= esc($parent['fname'].' '.$parent['lname']) ?>')">
+ <div id="parentPhotoContainer" style="width:130px;height:130px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #e2e8f0;cursor:pointer;box-shadow:0 1px 4px rgba(15,23,42,.12);" onclick="openImageViewer('<?= !empty($parent['picture'])?base_url('public/uploads/parents/'.$parent['picture']):'' ?>','<?= esc($parent['fname'].' '.$parent['lname']) ?>')">
  <?php if(!empty($parent['picture'])): ?>
- <img id="parentPic" src="<?= base_url('uploads/parents/'.$parent['picture']) ?>" style="width:100%;height:100%;object-fit:cover;">
+ <img id="parentPic" src="<?= base_url('public/uploads/parents/'.$parent['picture']) ?>" style="width:100%;height:100%;object-fit:cover;">
  <?php else: ?>
  <div id="parentNoPic" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f1f5f9;">
  <i class="fas fa-user fa-3x" style="color: #94a3b8;"></i>
@@ -394,9 +394,9 @@ body {
  <!-- QR Code -->
  <?php if(!empty($parent['qr_code'])): ?>
  <div class="mb-2">
- <img src="<?= base_url('uploads/qr/'.$parent['qr_code'].'.png') ?>" 
+ <img src="<?= base_url('public/uploads/qr/'.$parent['qr_code'].'.png') ?>" 
                                      style="width:100px;height:100px;border:3px solid var(--soft-blue);border-radius:12px;cursor:pointer;" 
-                                     onclick="openQrModal('<?= base_url('uploads/qr/'.$parent['qr_code'].'.png') ?>')">
+                                     onclick="openQrModal('<?= base_url('public/uploads/qr/'.$parent['qr_code'].'.png') ?>')">
  </div>
  <?php endif; ?>
 
@@ -420,9 +420,9 @@ body {
  <div class="card-body">
  <?php if(!empty($subFetchers)): foreach($subFetchers as $f): ?>
  <div class="d-flex align-items-center border rounded p-2 mb-2" style="border-color: rgba(108,140,255,0.08) !important;">
- <div class="mr-2" style="cursor:pointer;" onclick="openImageViewer('<?= !empty($f['picture'])?base_url('uploads/parents/'.$f['picture']):'' ?>','<?= esc($f['fname'].' '.$f['lname']) ?>')">
+ <div class="mr-2" style="cursor:pointer;" onclick="openImageViewer('<?= !empty($f['picture'])?base_url('public/uploads/parents/'.$f['picture']):'' ?>','<?= esc($f['fname'].' '.$f['lname']) ?>')">
  <?php if(!empty($f['picture'])): ?>
- <img src="<?= base_url('uploads/parents/'.$f['picture']) ?>" class="img-circle" style="width:40px;height:40px;object-fit:cover;border:2px solid var(--soft-green);">
+ <img src="<?= base_url('public/uploads/parents/'.$f['picture']) ?>" class="img-circle" style="width:40px;height:40px;object-fit:cover;border:2px solid var(--soft-green);">
  <?php else: ?>
  <div class="img-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;border:2px solid var(--soft-green);background:rgba(255,255,255,0.3);">
  <i class="fas fa-user" style="color: #b0b0c8;"></i>
@@ -434,9 +434,9 @@ body {
  <br><small style="color: #b0b0c8;"><?= esc($f['phone']) ?></small>
  </div>
  <?php if(!empty($f['qr_code'])): ?>
- <img src="<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>" 
+ <img src="<?= base_url('public/uploads/qr/'.$f['qr_code'].'.png') ?>" 
                                          style="width:35px;height:35px;border:2px solid var(--soft-blue);border-radius:8px;cursor:pointer;margin-right:4px;" 
-                                         onclick="openQrModal('<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>')">
+                                         onclick="openQrModal('<?= base_url('public/uploads/qr/'.$f['qr_code'].'.png') ?>')">
  <?php endif; ?>
  <button class="btn btn-outline-secondary btn-xs mr-1 edit-subfetcher-btn" 
                                         data-id="<?= $f['id'] ?>" 
@@ -495,7 +495,7 @@ body {
  <div class="col-md-6 text-right">
  <a href="<?= base_url('students-view/'.$s['student_id']) ?>">
  <?php if(!empty($s['picture'])): ?>
- <img src="<?= base_url('uploads/students/'.$s['picture']) ?>" 
+ <img src="<?= base_url('public/uploads/students/'.$s['picture']) ?>" 
                                               class="img-circle" 
                                               style="width:70px;height:70px;object-fit:cover;border:3px solid var(--soft-blue);cursor:pointer;" 
                                               title="View <?= esc($s['fname'].' '.$s['lname']) ?>">

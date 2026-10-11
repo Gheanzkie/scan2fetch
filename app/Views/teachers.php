@@ -397,7 +397,7 @@ body {
  <td>
  <div class="d-flex align-items-center">
  <?php if (!empty($teacher['picture'])): ?>
- <img src="<?= base_url('uploads/teachers/' . $teacher['picture']) ?>" alt="Teacher"
+ <img src="<?= base_url('public/uploads/teachers/' . $teacher['picture']) ?>" alt="Teacher"
                     class="avatar-circle mr-2" style="width:40px;height:40px;min-width:40px;object-fit:cover;background:#f1f5f9;">
  <?php else: ?>
  <div class="avatar-circle mr-2" style="width:40px;height:40px;min-width:40px;">
@@ -734,7 +734,7 @@ $(function(){
 
         var pic = button.data('picture');
         if (pic) {
-            $('#editPhotoImg').attr('src', '<?= base_url('uploads/teachers/') ?>' + pic).show();
+            $('#editPhotoImg').attr('src', '<?= base_url('public/uploads/teachers/') ?>' + pic).show();
             $('#editPhotoIcon').hide();
         } else {
             $('#editPhotoImg').attr('src', '').hide();

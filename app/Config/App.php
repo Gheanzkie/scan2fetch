@@ -19,6 +19,42 @@ class App extends BaseConfig
     public string $baseURL = 'http://localhost:8080/';
 
     /**
+     * Auto-detect the base URL from the current request when running in
+     * production or when the configured baseURL still points at localhost.
+     * This way the same code works locally (php spark serve) and on any
+     * shared host / VPS / subfolder install without editing App.php.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        // Only override when we are actually handling an HTTP request
+        // and the configured baseURL is a localhost placeholder.
+        if (
+            isset($_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'])
+            && (str_contains($this->baseURL, 'localhost') || $this->baseURL === '')
+        ) {
+            $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+                || (($_SERVER['SERVER_PORT'] ?? 80) == 443);
+
+            $scheme = $https ? 'https' : 'http';
+            $host   = $_SERVER['HTTP_HOST'];
+
+            // Derive the subfolder path from the front-controller location.
+            // When index.php lives in /public, dirname(SCRIPT_NAME) = '/sub'.
+            // When index.php is at the web root (our deployment layout),
+            // dirname(SCRIPT_NAME) = '/' or ''.
+            $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/'));
+            if ($scriptDir === '/' || $scriptDir === '.' || $scriptDir === '') {
+                $scriptDir = '';
+            }
+
+            $this->baseURL = $scheme . '://' . $host . $scriptDir . '/';
+        }
+    }
+
+    /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
      * If you want to accept multiple Hostnames, set this.
      *
