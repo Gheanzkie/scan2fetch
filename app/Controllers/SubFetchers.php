@@ -44,7 +44,6 @@ class SubFetchers extends BaseController
             return redirect()->to('/parents-view/' . $parentId)->with('error', 'Student is not linked to this parent');
         }
 
-        $pictureName = $this->uploadFetcherPicture();
         $qrValue = $this->generateQR();
 
         $this->subFetcherModel->insert([
@@ -54,7 +53,6 @@ class SubFetchers extends BaseController
             'mname'      => $this->request->getPost('mname'),
             'lname'      => $this->request->getPost('lname'),
             'phone'      => $this->request->getPost('phone'),
-            'picture'    => $pictureName,
             'qr_code'    => $qrValue,
             'created_by' => session('user_id'),
         ]);
@@ -83,21 +81,6 @@ class SubFetchers extends BaseController
             'phone' => $this->request->getPost('phone'),
         ];
 
-        $captureData = $this->request->getPost('picture_capture');
-        if ($captureData && strpos($captureData, 'data:image') === 0) {
-            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $captureData));
-            $pictureName = 'subfetcher_' . time() . '.png';
-            file_put_contents('uploads/parents/' . $pictureName, $imageData);
-            $data['picture'] = $pictureName;
-        } else {
-            $file = $this->request->getFile('picture');
-            if ($file && $file->isValid() && !$file->hasMoved()) {
-                $pictureName = $file->getRandomName();
-                $file->move('uploads/parents', $pictureName);
-                $data['picture'] = $pictureName;
-            }
-        }
-
         $this->subFetcherModel->update($id, $data);
         $this->logModel->addLog(
             session('user_id'), 
@@ -123,24 +106,6 @@ class SubFetchers extends BaseController
             'Deleted sub-fetcher ID: '.$id
         );
         return redirect()->to('/parents-view/' . $parentId)->with('msg', 'Sub-Fetcher removed successfully! 🗑️');
-    }
-
-    private function uploadFetcherPicture()
-    {
-        $captureData = $this->request->getPost('picture_capture');
-        if ($captureData && strpos($captureData, 'data:image') === 0) {
-            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $captureData));
-            $pictureName = 'fetcher_' . time() . '.png';
-            file_put_contents('uploads/parents/' . $pictureName, $imageData);
-            return $pictureName;
-        }
-        $file = $this->request->getFile('picture');
-        if ($file && $file->isValid() && !$file->hasMoved()) {
-            $pictureName = $file->getRandomName();
-            $file->move('uploads/parents', $pictureName);
-            return $pictureName;
-        }
-        return null;
     }
 
     private function generateQR()

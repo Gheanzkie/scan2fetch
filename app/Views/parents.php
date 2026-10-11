@@ -461,6 +461,13 @@ select.form-control option {
                                                 onclick="return confirm('Send passwords to all parents who have not received one yet?')">
  <i class="fas fa-sms mr-1"></i> Send All Passwords
  </a>
+ <?php if (session('role') == 'admin'): ?>
+ <a href="<?= base_url('parents-delete-all') ?>" class="btn btn-danger btn-sm mr-2"
+                                                title="Delete ALL parents (and orphaned students)"
+                                                onclick="return confirm('DELETE ALL PARENTS?\n\nThis will permanently delete ALL parent accounts, their sub-fetchers, and any students left without parents.\n\nThis cannot be undone!')">
+ <i class="fas fa-trash-alt mr-1"></i> Delete All
+ </a>
+ <?php endif; ?>
  </div>
  </div>
  <div class="card-body pt-0">
@@ -486,7 +493,6 @@ select.form-control option {
  <thead>
  <tr>
  <th style="width:50px;">#</th>
- <th style="width:60px;">Photo</th>
  <th>Name</th>
  <th>Phone</th>
  <th>Student / Grade</th>
@@ -502,15 +508,6 @@ select.form-control option {
  <?php $i = 1; foreach ($parents as $p): ?>
  <tr class="parent-row" data-search="<?= esc(strtolower($p['fname'].' '.($p['mname']??'').' '.$p['lname'].' '.$p['phone'])) ?>">
  <td class="num"><?= $i++ ?></td>
- <td>
- <?php if(!empty($p['picture'])): ?>
- <img src="<?= base_url('public/uploads/parents/'.$p['picture']) ?>" class="img-circle" style="width:42px;height:42px;">
- <?php else: ?>
- <div class="photo-empty d-flex align-items-center justify-content-center" style="width:42px;height:42px;">
- <i class="fas fa-user" style="color: var(--faint); font-size: 16px;"></i>
- </div>
- <?php endif; ?>
- </td>
  <td>
  <div class="parent-name"><?= esc($p['fname']) ?> <?= esc($p['lname']) ?></div>
  <?php if(!empty($p['mname'])): ?>
@@ -544,9 +541,9 @@ select.form-control option {
   </td>
  <td>
  <?php if(!empty($p['qr_code'])): ?>
- <img src="<?= base_url('public/uploads/qr/'.$p['qr_code'].'.png') ?>"
+ <img src="<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>"
                                                              class="qr-thumb"
-                                                             onclick="openQrModal('<?= base_url('public/uploads/qr/'.$p['qr_code'].'.png') ?>')"
+                                                             onclick="openQrModal('<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>')"
                                                              title="Click to enlarge">
  <?php else: ?>
  <span class="muted" style="font-size:12px;">No QR</span>

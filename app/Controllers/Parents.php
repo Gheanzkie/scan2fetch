@@ -37,7 +37,7 @@ class Parents extends BaseController
         $links = $db->table('student_parents')
             ->select('student_parents.parent_id, student_parents.relation,
                       students.id AS student_id, students.fname, students.lname,
-                      students.grade_section, students.picture')
+                      students.grade_section')
             ->join('students', 'students.id = student_parents.student_id')
             ->orderBy('students.lname', 'ASC')
             ->get()
@@ -75,7 +75,7 @@ class Parents extends BaseController
         $db = \Config\Database::connect();
         
         $data['students'] = $db->table('student_parents')
-            ->select('student_parents.*, students.fname, students.mname, students.lname, students.grade_section, students.picture, students.id as student_id')
+            ->select('student_parents.*, students.fname, students.mname, students.lname, students.grade_section, students.id as student_id')
             ->join('students', 'students.id = student_parents.student_id')
             ->where('student_parents.parent_id', $id)
             ->get()
@@ -106,7 +106,6 @@ class Parents extends BaseController
 
     public function save()
     {
-        $picture = $this->uploadPicture('picture');
         $qrValue = $this->generateQR();
 
         $this->parentsModel->save([
@@ -116,7 +115,6 @@ class Parents extends BaseController
             'phone' => $this->request->getPost('phone'),
             'password' => null,
             'password_sent' => 0,
-            'picture' => $picture,
             'qr_code' => $qrValue,
             'created_by' => session('user_id'),
         ]);
@@ -192,10 +190,6 @@ class Parents extends BaseController
         if ($this->request->getPost('password')) {
             $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
         }
-        $picture = $this->uploadPicture('picture');
-        if ($picture) {
-            $data['picture'] = $picture;
-        }
         $this->parentsModel->update($id, $data);
         $this->logModel->addLog(
             session('user_id'),
@@ -206,6 +200,48 @@ class Parents extends BaseController
             'Updated parent: ' . $data['fname'] . ' ' . $data['lname'] . ' (ID: ' . $id . ')'
         );
         return redirect()->to('/parents')->with('msg', 'Parent updated');
+    }
+
+    // ========== DELETE ALL PARENTS (ADMIN ONLY) ==========
+    public function deleteAll()
+    {
+        if (session('role') != 'admin') {
+            return redirect()->to('/parents')->with('error', 'Admin only.');
+        }
+
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        try {
+            $count = $this->parentsModel->countAllResults();
+
+            // Wipe children first (FK-safe), then parents, then orphaned students
+            $db->table('sub_fetchers')->emptyTable();
+            $db->table('student_parents')->emptyTable();
+            $this->parentsModel->emptyTable();
+
+            $studentCount = $db->table('students')->countAllResults();
+            $db->table('fetch_logs')->emptyTable();
+            $db->table('students')->emptyTable();
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                throw new \Exception('Transaction failed');
+            }
+
+            $this->logModel->addLog(
+                session('user_id'), session('fname') . ' ' . session('lname'), session('role'),
+                'delete', 'parent',
+                "DELETED ALL parents ($count) with linked students ($studentCount), sub-fetchers and logs"
+            );
+
+            return redirect()->to('/parents')->with('msg', "All $count parent(s) deleted. $studentCount orphaned student(s) also removed.");
+        } catch (\Exception $e) {
+            $db->transRollback();
+            log_message('error', 'Delete all parents failed: ' . $e->getMessage());
+            return redirect()->to('/parents')->with('error', 'Delete all failed: ' . $e->getMessage());
+        }
     }
 
     // ========== DELETE PARENT (With Student Deletion) ==========
@@ -290,12 +326,7 @@ class Parents extends BaseController
 
     public function updatePicture()
     {
-        $id = $this->request->getPost('id');
-        $picture = $this->uploadPicture('picture');
-        if ($picture) {
-            $this->parentsModel->update($id, ['picture' => $picture]);
-        }
-        return redirect()->to('/parents-view/' . $id)->with('msg', 'Photo updated');
+        return redirect()->to('/parents')->with('error', 'Photo upload is disabled');
     }
 
     public function updateFromStudent()
@@ -310,10 +341,6 @@ class Parents extends BaseController
         ];
         if ($this->request->getPost('password')) {
             $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
-        }
-        $picture = $this->uploadPicture('picture');
-        if ($picture) {
-            $data['picture'] = $picture;
         }
         $this->parentsModel->update($id, $data);
         $this->logModel->addLog(
@@ -617,24 +644,6 @@ class Parents extends BaseController
         }
         
         return view('parents_logs', $data);
-    }
-
-    private function uploadPicture($fieldName)
-    {
-        $captureData = $this->request->getPost('picture_capture');
-        if ($captureData && strpos($captureData, 'data:image') === 0) {
-            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $captureData));
-            $pictureName = 'photo_' . time() . '.png';
-            file_put_contents('uploads/parents/' . $pictureName, $imageData);
-            return $pictureName;
-        }
-        $file = $this->request->getFile($fieldName);
-        if ($file && $file->isValid() && !$file->hasMoved()) {
-            $pictureName = $file->getRandomName();
-            $file->move('uploads/parents', $pictureName);
-            return $pictureName;
-        }
-        return null;
     }
 
     private function generateQR()

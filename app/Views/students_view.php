@@ -166,13 +166,7 @@ body {
  <div class="col-md-4">
  <div class="card">
  <div class="card-body text-center">
- <div style="width:130px;height:130px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #e2e8f0;cursor:pointer;box-shadow:0 1px 4px rgba(15,23,42,.12);" onclick="openImageViewer('<?= !empty($student['picture']) ? base_url('public/uploads/students/' . $student['picture']) : '' ?>', '<?= esc($student['fname'] . ' ' . $student['lname']) ?>')">
- <?php if (!empty($student['picture'])): ?>
- <img src="<?= base_url('public/uploads/students/' . $student['picture']) ?>" style="width:100%;height:100%;object-fit:cover;">
- <?php else: ?>
- <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f1f5f9;"><i class="fas fa-child fa-3x" style="color: #94a3b8;"></i></div>
- <?php endif; ?>
- </div>
+ <div style="width:130px;height:130px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #e2e8f0;background:#f1f5f9;display:flex;align-items:center;justify-content:center;"><i class="fas fa-child fa-3x" style="color: #94a3b8;"></i></div>
  <h3 class="mt-3 mb-0" style="color: #0f172a;"><?= esc($student['fname']) ?> <?= esc($student['lname']) ?></h3>
  <p class="text-muted mb-0" style="color: #8888aa !important;"><?= esc($student['grade_section']) ?></p>
  <p class="text-muted small" style="color: #b0b0c8 !important;"><i class="fas fa-calendar mr-1"></i> <?= date('M d, Y', strtotime($student['created_at'])) ?></p>
@@ -196,19 +190,15 @@ body {
  <?php if(!empty($parents)): ?>
  <?php foreach($parents as $p): ?>
  <div class="d-flex align-items-center border rounded p-3 mb-2" style="border-color: rgba(108,140,255,0.08) !important;">
- <div class="mr-3" style="cursor:pointer;" onclick="openImageViewer('<?= !empty($p['picture']) ? base_url('public/uploads/parents/' . $p['picture']) : '' ?>', '<?= esc($p['fname'] . ' ' . $p['lname']) ?>')">
- <?php if(!empty($p['picture'])): ?>
- <img src="<?= base_url('public/uploads/parents/' . $p['picture']) ?>" class="img-circle" style="width:55px;height:55px;object-fit:cover;border:3px solid var(--soft-blue);">
- <?php else: ?>
+ <div class="mr-3">
  <div class="img-circle d-flex align-items-center justify-content-center" style="width:55px;height:55px;border:3px solid var(--soft-blue);background:rgba(255,255,255,0.3);"><i class="fas fa-user" style="color: #b0b0c8;"></i></div>
- <?php endif; ?>
  </div>
  <div class="flex-grow-1">
  <strong style="color: #2d2d4a;"><?= esc($p['fname']) ?> <?= esc($p['lname']) ?></strong>
  <br><small style="color: #b0b0c8;"><?= esc($p['relation'] ?? 'Parent') ?> | <?= esc($p['phone']) ?></small>
  </div>
  <?php if(!empty($p['qr_code'])): ?>
- <img src="<?= base_url('public/uploads/qr/'.$p['qr_code'].'.png') ?>" style="width:50px;height:50px;border:2px solid var(--soft-blue);border-radius:8px;cursor:pointer;margin-right:5px;" onclick="openQrModal('<?= base_url('public/uploads/qr/'.$p['qr_code'].'.png') ?>')">
+ <img src="<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>" style="width:50px;height:50px;border:2px solid var(--soft-blue);border-radius:8px;cursor:pointer;margin-right:5px;" onclick="openQrModal('<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>')">
  <?php endif; ?>
  <a href="<?= base_url('parents-view/'.$p['parent_id']) ?>" class="btn btn-outline-secondary btn-xs ml-1" title="Go to Parent">
  <i class="fas fa-user-check"></i> Go to Parent
@@ -230,19 +220,15 @@ body {
  <?php if(!empty($subFetchers)): ?>
  <?php foreach($subFetchers as $f): ?>
  <div class="d-flex align-items-center border rounded p-3 mb-2" style="border-color: rgba(108,140,255,0.08) !important; border-left: 3px solid var(--soft-green) !important;">
- <div class="mr-3" style="cursor:pointer;" onclick="openImageViewer('<?= !empty($f['picture']) ? base_url('public/uploads/parents/' . $f['picture']) : '' ?>', '<?= esc($f['fname'] . ' ' . $f['lname']) ?>')">
- <?php if(!empty($f['picture'])): ?>
- <img src="<?= base_url('public/uploads/parents/' . $f['picture']) ?>" class="img-circle" style="width:50px;height:50px;object-fit:cover;border:2px solid var(--soft-green);">
- <?php else: ?>
+ <div class="mr-3">
  <div class="img-circle d-flex align-items-center justify-content-center" style="width:50px;height:50px;border:2px solid var(--soft-green);background:rgba(255,255,255,0.3);"><i class="fas fa-user" style="color: #b0b0c8;"></i></div>
- <?php endif; ?>
  </div>
  <div class="flex-grow-1">
  <strong style="color: #2d2d4a;"><?= esc($f['fname']) ?> <?= esc($f['lname']) ?></strong>
  <br><small style="color: #b0b0c8;">Fetcher | <?= esc($f['phone']) ?></small>
  </div>
  <?php if(!empty($f['qr_code'])): ?>
- <img src="<?= base_url('public/uploads/qr/'.$f['qr_code'].'.png') ?>" style="width:45px;height:45px;border:2px solid var(--soft-green);border-radius:8px;cursor:pointer;margin-right:5px;" onclick="openQrModal('<?= base_url('public/uploads/qr/'.$f['qr_code'].'.png') ?>')">
+ <img src="<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>" style="width:45px;height:45px;border:2px solid var(--soft-green);border-radius:8px;cursor:pointer;margin-right:5px;" onclick="openQrModal('<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>')">
  <?php endif; ?>
  <a href="<?= base_url('parents-view/'.$f['parent_id']) ?>" class="btn btn-outline-secondary btn-xs ml-1" title="Go to Fetcher">
  <i class="fas fa-user-friends"></i> Go to Fetcher

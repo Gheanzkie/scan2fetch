@@ -250,14 +250,9 @@ body {
  <div class="col-md-4">
  <div class="card">
  <div class="card-body text-center">
- <?php if (!empty($teacher['picture'])): ?>
- <img src="<?= base_url('public/uploads/teachers/' . $teacher['picture']) ?>" alt="Teacher Photo"
-            style="width:110px;height:110px;margin:0 auto;border-radius:50%;object-fit:cover;border:4px solid #e2e8f0;box-shadow:0 1px 4px rgba(15,23,42,.12);background:#f1f5f9;">
- <?php else: ?>
  <div style="width:110px;height:110px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #e2e8f0;box-shadow:0 1px 4px rgba(15,23,42,.12);background:#f1f5f9;display:flex;align-items:center;justify-content:center;">
  <i class="fas fa-chalkboard-teacher" style="font-size:42px;color:#94a3b8;"></i>
  </div>
- <?php endif; ?>
 
  <h3 class="mt-3 mb-0" style="color: #0f172a;"><?= esc($teacher['fname']) ?> <?= esc($teacher['lname']) ?></h3>
  <?php if(!empty($teacher['mname'])): ?>

@@ -215,9 +215,24 @@ class Dashboard extends BaseController
 
             $myStudents = [];
             $studentIds = [];
-            if (!empty($gradeSection)) {
+            // Class list = students.adviser_id (same source as TeachersModel::studentCounts
+            // and Teachers::view). Fallback to grade_section only if adviser is unset.
+            $query = $db->table('students')->where('adviser_id', $userId);
+            if ($search !== '') {
+                $query->groupStart()
+                    ->like('fname', $search)
+                    ->orLike('lname', $search)
+                    ->orLike('mname', $search)
+                    ->groupEnd();
+            }
+            $students = $query->orderBy('lname', 'ASC')
+                ->get()
+                ->getResultArray();
+
+            if ($students === [] && !empty($gradeSection)) {
                 $query = $db->table('students')
-                    ->where('grade_section', $gradeSection);
+                    ->where('grade_section', $gradeSection)
+                    ->where('adviser_id IS NULL', null, false);
                 if ($search !== '') {
                     $query->groupStart()
                         ->like('fname', $search)
@@ -228,19 +243,16 @@ class Dashboard extends BaseController
                 $students = $query->orderBy('lname', 'ASC')
                     ->get()
                     ->getResultArray();
-
-                foreach ($students as $st) {
-                    $st['parents'] = [];
-                    $st['relation'] = '';
-                    $studentIds[] = (int) $st['id'];
-                    $myStudents[] = $st;
-                }
-                $data['myStudents'] = $myStudents;
-                $data['totalStudents'] = count($myStudents);
-            } else {
-                $data['myStudents'] = [];
-                $data['totalStudents'] = 0;
             }
+
+            foreach ($students as $st) {
+                $st['parents'] = [];
+                $st['relation'] = '';
+                $studentIds[] = (int) $st['id'];
+                $myStudents[] = $st;
+            }
+            $data['myStudents'] = $myStudents;
+            $data['totalStudents'] = count($myStudents);
 
             $data['releasedToday'] = 0;
             $data['pendingToday'] = 0;

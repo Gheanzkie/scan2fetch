@@ -73,31 +73,6 @@ abstract class BaseController extends Controller
     }
 
     /**
-     * Upload the submitted "picture" file into public/uploads/{$dir}.
-     * Returns the stored filename or null when no file was sent.
-     */
-    protected function saveUploadedPicture(string $dir): ?string
-    {
-        $file = $this->request->getFile('picture');
-        if (! $file || ! $file->isValid() || $file->hasMoved()) {
-            return null;
-        }
-        $name = $file->getRandomName();
-        $file->move('uploads/' . $dir, $name);
-        return $name;
-    }
-
-    /**
-     * Remove an uploaded picture file (when a profile is deleted).
-     */
-    protected function deleteUploadedPicture(?string $dir, ?string $filename): void
-    {
-        if ($dir && $filename && is_file(FCPATH . 'uploads/' . $dir . '/' . $filename)) {
-            @unlink(FCPATH . 'uploads/' . $dir . '/' . $filename);
-        }
-    }
-
-    /**
      * Record a locally "sent" SMS in sms_logs without calling any gateway/API.
      *
      * @return array{status: string, success: bool, message: string, phone: string}

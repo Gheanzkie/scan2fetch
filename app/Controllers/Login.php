@@ -11,7 +11,7 @@ class Login extends BaseController
         // navigates or edits the URL to /login stays parked on the login
         // screen while still holding its session - a half-logout.
         if (session()->get('logged_in')) {
-            return redirect()->to('/dashboard');
+            return redirect()->to(session('role') === 'staff' ? '/scan' : '/dashboard');
         }
 
         return view('login');

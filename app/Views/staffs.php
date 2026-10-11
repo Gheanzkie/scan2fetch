@@ -473,6 +473,13 @@ label .text-danger { color: var(--soft-rose) !important; }
                                                 onclick="return confirm('Send passwords to all staff who have not received one yet?')">
  <i class="fas fa-sms mr-1"></i> Send All Passwords
  </a>
+ <?php if (session('role') == 'admin'): ?>
+ <a href="<?= base_url('staffs-delete-all') ?>" class="btn btn-danger btn-sm mr-2"
+                                                title="Delete ALL staff accounts"
+                                                onclick="return confirm('DELETE ALL STAFF?\n\nThis will permanently delete ALL staff accounts.\n\nThis cannot be undone!')">
+ <i class="fas fa-trash-alt mr-1"></i> Delete All
+ </a>
+ <?php endif; ?>
  <button type="button" class="btn btn-kid-primary btn-sm" data-toggle="modal" data-target="#addStaffModal">
  <i class="fas fa-plus mr-1"></i> Add Staff
  </button>
@@ -515,14 +522,9 @@ label .text-danger { color: var(--soft-rose) !important; }
  <td class="num"><?= $i++ ?></td>
  <td>
  <div class="d-flex align-items-center">
- <?php if (!empty($staff['picture'])): ?>
- <img src="<?= base_url('public/uploads/staffs/' . $staff['picture']) ?>" alt="Staff"
-                    class="avatar-circle mr-2" style="width:40px;height:40px;min-width:40px;object-fit:cover;background:#f1f5f9;">
- <?php else: ?>
  <div class="avatar-circle mr-2" style="width:40px;height:40px;min-width:40px;">
  <i class="fas fa-user-tie" style="font-size:17px;"></i>
  </div>
- <?php endif; ?>
  <div>
  <div class="staff-name"><?= esc($staff['fname']) ?> <?= esc($staff['lname']) ?></div>
  <?php if(!empty($staff['mname'])): ?>
@@ -553,8 +555,7 @@ label .text-danger { color: var(--soft-rose) !important; }
  data-fname="<?= esc($staff['fname']) ?>"
  data-mname="<?= esc($staff['mname'] ?? '') ?>"
  data-lname="<?= esc($staff['lname']) ?>"
- data-phone="<?= esc($staff['phone']) ?>"
- data-picture="<?= esc($staff['picture'] ?? '') ?>">
+ data-phone="<?= esc($staff['phone']) ?>">
  <i class="fas fa-edit mr-2" style="color:#b8750a;"></i> Edit
  </a>
  <div class="dropdown-divider"></div>
@@ -647,15 +648,6 @@ label .text-danger { color: var(--soft-rose) !important; }
  <i class="fas fa-info-circle mr-1" style="color: var(--soft-blue);"></i>
                         Passwords are not sent automatically — use "Send Password" / "Send All Passwords" to deliver them.
  </div>
-
- <div class="text-center mt-3">
- <div class="staff-photo-preview" id="addPhotoPreview" onclick="document.getElementById('addPhotoInput').click()">
- <i class="fas fa-user" id="addPhotoIcon"></i>
- <img id="addPhotoImg" src="" alt="">
- </div>
- <input type="file" id="addPhotoInput" class="d-none" accept="image/*" name="picture">
- <small class="form-text text-muted">Optional staff photo</small>
- </div>
  </div>
  <div class="modal-footer">
  <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">Cancel</button>
@@ -719,17 +711,8 @@ label .text-danger { color: var(--soft-rose) !important; }
  <span class="input-group-text"><i class="fas fa-lock"></i></span>
  </div>
  <input type="password" name="password" class="form-control" placeholder="••••••••" minlength="6">
- </div>
- </div>
-
- <div class="text-center mt-3">
- <div class="staff-photo-preview" id="editPhotoPreview" onclick="document.getElementById('editPhotoInput').click()">
- <i class="fas fa-user" id="editPhotoIcon"></i>
- <img id="editPhotoImg" src="" alt="">
- </div>
- <input type="file" id="editPhotoInput" class="d-none" accept="image/*" name="picture">
- <small class="form-text text-muted">Leave empty to keep current photo</small>
- </div>
+  </div>
+  </div>
  </div>
  <div class="modal-footer">
  <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">Cancel</button>
@@ -762,36 +745,6 @@ $(function(){
         $('#editMname').val(button.data('mname'));
         $('#editLname').val(button.data('lname'));
         $('#editPhone').val(button.data('phone'));
-
-        var pic = button.data('picture');
-        if (pic) {
-            $('#editPhotoImg').attr('src', '<?= base_url('public/uploads/staffs/') ?>' + pic).show();
-            $('#editPhotoIcon').hide();
-        } else {
-            $('#editPhotoImg').attr('src', '').hide();
-            $('#editPhotoIcon').show();
-        }
-        document.getElementById('editPhotoInput').value = '';
-    });
-
-    function previewStaffPhoto(input, imgId, iconId) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (ev) {
-                $('#' + imgId).attr('src', ev.target.result).show();
-                $('#' + iconId).hide();
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    $('#addPhotoInput').on('change', function () { previewStaffPhoto(this, 'addPhotoImg', 'addPhotoIcon'); });
-    $('#editPhotoInput').on('change', function () { previewStaffPhoto(this, 'editPhotoImg', 'editPhotoIcon'); });
-
-    $('#addStaffModal').on('hidden.bs.modal', function () {
-        $('#addPhotoImg').attr('src', '').hide();
-        $('#addPhotoIcon').show();
-        document.getElementById('addPhotoInput').value = '';
     });
 
     $('#addStaffModal').on('shown.bs.modal', function() {

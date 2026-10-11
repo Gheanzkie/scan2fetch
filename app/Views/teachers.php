@@ -352,6 +352,13 @@ body {
                                                 onclick="return confirm('Send passwords to all teachers who have not received one yet?')">
  <i class="fas fa-sms mr-1"></i> Send All Passwords
  </a>
+ <?php if (session('role') == 'admin'): ?>
+ <a href="<?= base_url('teachers-delete-all') ?>" class="btn btn-danger btn-sm mr-2"
+                                                title="Delete ALL teacher accounts"
+                                                onclick="return confirm('DELETE ALL TEACHERS?\n\nThis will permanently delete ALL teacher accounts.\n\nThis cannot be undone!')">
+ <i class="fas fa-trash-alt mr-1"></i> Delete All
+ </a>
+ <?php endif; ?>
  <button type="button" class="btn btn-kid-primary btn-sm" data-toggle="modal" data-target="#addTeacherModal">
  <i class="fas fa-plus mr-1"></i> Add Teacher
  </button>
@@ -396,14 +403,9 @@ body {
  <td class="num"><?= $i++ ?></td>
  <td>
  <div class="d-flex align-items-center">
- <?php if (!empty($teacher['picture'])): ?>
- <img src="<?= base_url('public/uploads/teachers/' . $teacher['picture']) ?>" alt="Teacher"
-                    class="avatar-circle mr-2" style="width:40px;height:40px;min-width:40px;object-fit:cover;background:#f1f5f9;">
- <?php else: ?>
  <div class="avatar-circle mr-2" style="width:40px;height:40px;min-width:40px;">
  <i class="fas fa-chalkboard-teacher" style="font-size:17px;"></i>
  </div>
- <?php endif; ?>
  <div>
  <div class="teacher-name"><?= esc($teacher['fname']) ?> <?= esc($teacher['lname']) ?></div>
  <?php if(!empty($teacher['mname'])): ?>
@@ -449,8 +451,7 @@ body {
                                                                    data-mname="<?= esc($teacher['mname'] ?? '') ?>"
                                                                    data-lname="<?= esc($teacher['lname']) ?>"
 data-phone="<?= esc($teacher['phone']) ?>"
-                                                                    data-grade="<?= esc($teacher['grade_section']) ?>"
-                                                                    data-picture="<?= esc($teacher['picture'] ?? '') ?>">
+ data-grade="<?= esc($teacher['grade_section']) ?>">
  <i class="fas fa-edit mr-2" style="color:#b8750a;"></i> Edit
  </a>
  <div class="dropdown-divider"></div>
@@ -584,15 +585,6 @@ data-phone="<?= esc($teacher['phone']) ?>"
                         The teacher is linked to the grade/section above, so their students and parents connect automatically.
                         Passwords are not sent automatically — use "Send Password" / "Send All Passwords" to deliver them.
  </div>
-
- <div class="text-center mt-3">
- <div class="teacher-photo-preview" id="addPhotoPreview" onclick="document.getElementById('addPhotoInput').click()">
- <i class="fas fa-user" id="addPhotoIcon"></i>
- <img id="addPhotoImg" src="" alt="">
- </div>
- <input type="file" id="addPhotoInput" class="d-none" accept="image/*" name="picture">
- <small class="form-text text-muted">Optional teacher photo</small>
- </div>
  </div>
  <div class="modal-footer">
  <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">Cancel</button>
@@ -689,15 +681,6 @@ data-phone="<?= esc($teacher['phone']) ?>"
  </div>
  </div>
  </div>
-
- <div class="text-center mt-3">
- <div class="teacher-photo-preview" id="editPhotoPreview" onclick="document.getElementById('editPhotoInput').click()">
- <i class="fas fa-user" id="editPhotoIcon"></i>
- <img id="editPhotoImg" src="" alt="">
- </div>
- <input type="file" id="editPhotoInput" class="d-none" accept="image/*" name="picture">
- <small class="form-text text-muted">Leave empty to keep current photo</small>
- </div>
  </div>
  <div class="modal-footer">
  <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">Cancel</button>
@@ -731,36 +714,6 @@ $(function(){
         $('#editLname').val(button.data('lname'));
         $('#editPhone').val(button.data('phone'));
         $('#editGrade').val(button.data('grade'));
-
-        var pic = button.data('picture');
-        if (pic) {
-            $('#editPhotoImg').attr('src', '<?= base_url('public/uploads/teachers/') ?>' + pic).show();
-            $('#editPhotoIcon').hide();
-        } else {
-            $('#editPhotoImg').attr('src', '').hide();
-            $('#editPhotoIcon').show();
-        }
-        document.getElementById('editPhotoInput').value = '';
-    });
-
-    function previewTeacherPhoto(input, imgId, iconId) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (ev) {
-                $('#' + imgId).attr('src', ev.target.result).show();
-                $('#' + iconId).hide();
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    $('#addPhotoInput').on('change', function () { previewTeacherPhoto(this, 'addPhotoImg', 'addPhotoIcon'); });
-    $('#editPhotoInput').on('change', function () { previewTeacherPhoto(this, 'editPhotoImg', 'editPhotoIcon'); });
-
-    $('#addTeacherModal').on('hidden.bs.modal', function () {
-        $('#addPhotoImg').attr('src', '').hide();
-        $('#addPhotoIcon').show();
-        document.getElementById('addPhotoInput').value = '';
     });
 
     $('#addTeacherModal').on('shown.bs.modal', function() {

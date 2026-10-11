@@ -25,6 +25,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('students-import', 'Students::importExcel');
     $routes->post('students-update', 'Students::update');
     $routes->get('students-delete/(:num)', 'Students::delete/$1');
+    $routes->get('students-delete-all', 'Students::deleteAll');
     $routes->get('students-remove-parent/(:num)/(:num)', 'Students::removeParent/$1/$2');
     $routes->post('students-add-parent', 'Students::addParent');
 
@@ -35,6 +36,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('parents-save', 'Parents::save');
     $routes->post('parents-update', 'Parents::update');
     $routes->get('parents-delete/(:num)', 'Parents::delete/$1');
+    $routes->get('parents-delete-all', 'Parents::deleteAll');
     $routes->get('parents-send-password/(:num)', 'Parents::sendPassword/$1');
     $routes->get('parents-send-all', 'Parents::sendAllPasswords');
     $routes->post('parents-update-picture', 'Parents::updatePicture');
@@ -55,6 +57,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('staffs-save', 'Staffs::save');
     $routes->post('staffs-update', 'Staffs::update');
     $routes->get('staffs-delete/(:num)', 'Staffs::delete/$1');
+    $routes->get('staffs-delete-all', 'Staffs::deleteAll');
     $routes->get('staffs-send-password/(:num)', 'Staffs::sendPassword/$1');
     $routes->get('staffs-send-all', 'Staffs::sendAllPasswords');
 
@@ -68,11 +71,13 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('teachers-save', 'Teachers::save');
     $routes->post('teachers-update', 'Teachers::update');
     $routes->get('teachers-delete/(:num)', 'Teachers::delete/$1');
+    $routes->get('teachers-delete-all', 'Teachers::deleteAll');
     $routes->get('teachers-send-password/(:num)', 'Teachers::sendPassword/$1');
     $routes->get('teachers-send-all', 'Teachers::sendAllPasswords');
 
     // ===== QR SCAN =====
     $routes->get('scan', 'Scan::index');
+    $routes->get('scan-kiosk', 'Scan::kiosk');
     $routes->post('scan/verify', 'Scan::verify');
     $routes->post('scan/release', 'Scan::release');
     $routes->post('scan/decline', 'Scan::decline');

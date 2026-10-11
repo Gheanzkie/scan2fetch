@@ -9,10 +9,7 @@ use App\Models\ActivityLogModel;
 
 class Scan extends BaseController
 {
-    /**
-     * Manual session picked by the admin on the scan page
-     * ('morning' | 'afternoon' | null = follow server clock).
-     */
+    
     private function override(): ?string
     {
         return (new \App\Models\ScheduleModel())->sessionOverride();
@@ -20,7 +17,7 @@ class Scan extends BaseController
 
     public function index()
     {
-        // Surface the day status so staff sees open/closed BEFORE scanning.
+        
         $scheduleModel = new \App\Models\ScheduleModel();
         [$gateAllowed, $gateMessage] = $scheduleModel->releaseAllowed(null, $this->override());
         $hours = $scheduleModel->effectiveHours(date('Y-m-d'));
@@ -39,11 +36,20 @@ class Scan extends BaseController
         ]);
     }
 
-    /**
-     * POST /scan/set-session — admin session switch.
-     * Params: session = 'morning' | 'afternoon' | 'auto'
-     * Stores the pick in the admin's own PHP session (scanner operator).
-     */
+    
+    public function kiosk()
+    {
+        $scheduleModel = new \App\Models\ScheduleModel();
+        [$gateAllowed, $gateMessage] = $scheduleModel->releaseAllowed(null, $this->override());
+
+        return view('scan_kiosk', [
+            'gateAllowed'    => $gateAllowed,
+            'gateMessage'    => $gateMessage,
+            'currentSession' => $scheduleModel->resolveSession($this->override()),
+        ]);
+    }
+
+    
     public function setSession()
     {
         if (strtoupper($this->request->getMethod()) !== 'POST') {
@@ -60,7 +66,7 @@ class Scan extends BaseController
             ]);
         }
 
-        // Global csrf filter is disabled in this app — verify manually.
+        
         $token = $this->request->getPost(csrf_token());
         if (! is_string($token) || $token === '' || ! hash_equals(csrf_hash(), $token)) {
             return $this->response->setStatusCode(403)->setJSON([
@@ -84,6 +90,10 @@ class Scan extends BaseController
             session()->set(['scan_session' => $picked]);
             $override = $picked;
         }
+
+        
+        
+        (new \App\Models\SettingsModel())->setSetting('active_session', $picked === 'auto' ? '' : $picked);
 
         $scheduleModel = new \App\Models\ScheduleModel();
         $effective = $scheduleModel->resolveSession($override);
@@ -110,9 +120,9 @@ class Scan extends BaseController
 
     public function verify()
     {
-        // ===== DATE MANAGEMENT GATE =====
-        // Block verification outside operating hours / closed days so the
-        // scanner UI can flash "scanner is not available this time".
+        
+        
+        
         $scheduleModel = new \App\Models\ScheduleModel();
         $override = $this->override();
         [$gateAllowed, $gateMessage] = $scheduleModel->releaseAllowed(null, $override);
@@ -146,7 +156,6 @@ class Scan extends BaseController
                 'fname' => $parent['fname'],
                 'lname' => $parent['lname'],
                 'phone' => $parent['phone'],
-                'picture' => $parent['picture'] ?? null,
                 'id' => $parent['id'],
             ];
         } else {
@@ -160,7 +169,6 @@ class Scan extends BaseController
                     'fname' => $subFetcher['fname'],
                     'lname' => $subFetcher['lname'],
                     'phone' => $subFetcher['phone'],
-                    'picture' => $subFetcher['picture'] ?? null,
                     'id' => $subFetcher['id'],
                 ];
             } else {
@@ -174,21 +182,32 @@ class Scan extends BaseController
 
         $db = \Config\Database::connect();
         $students = $db->table('student_parents')
-            ->select('student_parents.student_id, students.fname, students.lname, students.grade_section, students.picture')
+            ->select('student_parents.student_id, students.fname, students.lname, students.grade_section')
             ->join('students', 'students.id = student_parents.student_id')
             ->where('student_parents.parent_id', $parentId)
             ->get()
             ->getResultArray();
 
+        
+        
+        $activeSession = $scheduleModel->resolveSession($override);
+        foreach ($students as &$s) {
+            $s['already_released'] = $db->table('fetch_logs')
+                ->where('student_id', $s['student_id'])
+                ->where('DATE(time_released)', date('Y-m-d'))
+                ->where('session_type', $activeSession)
+                ->countAllResults() > 0;
+        }
+        unset($s);
+
         return $this->response->setJSON([
             'success' => true,
-            'session' => $scheduleModel->resolveSession($override),
+            'session' => $activeSession,
             'parent' => [
                 'id' => $parent['id'],
                 'fname' => $parent['fname'],
                 'lname' => $parent['lname'],
                 'phone' => $parent['phone'],
-                'picture' => $parent['picture'] ?? null,
             ],
             'fetcher' => $fetcher,
             'fetcher_type' => $fetcherType,
@@ -205,8 +224,8 @@ class Scan extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Missing data']);
         }
 
-        // ===== DATE MANAGEMENT GATE =====
-        // Block releases outside the configured open window / closed / holiday days.
+        
+        
         $scheduleModel = new \App\Models\ScheduleModel();
         $override = $this->override();
         [$gateAllowed, $gateMessage] = $scheduleModel->releaseAllowed(null, $override);
@@ -218,10 +237,10 @@ class Scan extends BaseController
             ]);
         }
 
-        // ===== SERVER-SIDE SESSION (independent check — never trusts the client) =====
-        // Admin manual switch (PHP session 'scan_session') wins; otherwise the
-        // clock decides (MORNING before 12:00, AFTERNOON from 12:00). One
-        // release per student per session; the gate resets every midnight.
+        
+        
+        
+        
         $session = $scheduleModel->resolveSession($override);
 
         $db = \Config\Database::connect();
@@ -240,10 +259,10 @@ class Scan extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Parent not found']);
         }
 
-        // Prevent duplicate release WITHIN THE SAME SESSION: 1 morning scan
-        // + 1 afternoon scan per student per day. Old rows (session_type NULL)
-        // released today are treated as belonging to the opposite-free legacy set
-        // and no longer block — only same-session rows count.
+        
+        
+        
+        
         $alreadyReleased = $db->table('fetch_logs')
             ->where('student_id', $studentId)
             ->where('DATE(time_released)', date('Y-m-d'))
@@ -257,12 +276,12 @@ class Scan extends BaseController
             ]);
         }
 
-        // Check if fetcher is sub-fetcher or parent
+        
         $fetcherFname = $parent['fname'];
         $fetcherLname = $parent['lname'];
         $fetcherRelation = 'Parent';
         
-        // Check if there's a sub-fetcher with this QR code
+        
         $qrCode = $this->request->getPost('qr_code') ?? '';
         if (!empty($qrCode)) {
             $subFetcher = $subFetcherModel->where('qr_code', $qrCode)->first();
@@ -277,7 +296,7 @@ class Scan extends BaseController
         $userName = session('fname') . ' ' . session('lname');
         $userRole = session('role');
 
-        // Insert fetch log (session_type computed SERVER-side)
+        
         $db->table('fetch_logs')->insert([
             'student_id'       => $studentId,
             'parent_id'        => $parentId,
@@ -290,7 +309,7 @@ class Scan extends BaseController
             'time_released'    => date('Y-m-d H:i:s'),
         ]);
 
-        // Insert SMS log
+        
         $message = "Your child {$student['fname']} {$student['lname']} has been released at " . date('h:i A') . ". - BCC Scan2Fetch";
         $db->table('sms_logs')->insert([
             'parent_phone' => $parent['phone'],
@@ -298,7 +317,7 @@ class Scan extends BaseController
             'status'       => 'sent',
         ]);
 
-        // Log with fetcher name
+        
         $logModel->addLog(
             $userId,
             $userName,
@@ -320,7 +339,7 @@ class Scan extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Missing data']);
         }
 
-        // ===== DATE MANAGEMENT GATE =====
+        
         $scheduleModel = new \App\Models\ScheduleModel();
         [$gateAllowed, $gateMessage] = $scheduleModel->releaseAllowed(null, $this->override());
         if (! $gateAllowed) {
@@ -347,12 +366,12 @@ class Scan extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Parent not found']);
         }
 
-        // Check if fetcher is sub-fetcher or parent
+        
         $fetcherFname = $parent['fname'];
         $fetcherLname = $parent['lname'];
         $fetcherRelation = 'Parent';
         
-        // Check if there's a sub-fetcher with this QR code
+        
         $qrCode = $this->request->getPost('qr_code') ?? '';
         if (!empty($qrCode)) {
             $subFetcher = $subFetcherModel->where('qr_code', $qrCode)->first();
@@ -367,7 +386,7 @@ class Scan extends BaseController
         $userName = session('fname') . ' ' . session('lname');
         $userRole = session('role');
 
-        // Insert SMS log
+        
         $message = "Pickup attempt for {$student['fname']} {$student['lname']} has been DECLINED at " . date('h:i A') . ". - BCC Scan2Fetch";
         $db->table('sms_logs')->insert([
             'parent_phone' => $parent['phone'],
@@ -375,7 +394,7 @@ class Scan extends BaseController
             'status'       => 'sent',
         ]);
 
-        // Log with fetcher name
+        
         $logModel->addLog(
             $userId,
             $userName,

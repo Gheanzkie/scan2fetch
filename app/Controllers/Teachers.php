@@ -151,8 +151,13 @@ class Teachers extends BaseController
             return redirect()->to('/teachers-view/' . session('user_id'))->with('error', 'Student not found');
         }
 
-        // Teachers can only view students in their grade section
-        if ($student['grade_section'] !== $gradeSection) {
+        // Teachers can only view their own students (adviser_id). Fallback:
+        // same grade_section when adviser is still unset (legacy rows).
+        $isOwn = ((int) ($student['adviser_id'] ?? 0)) === (int) session('user_id');
+        if (!$isOwn && (empty($student['adviser_id']) || $student['adviser_id'] === null)) {
+            $isOwn = $student['grade_section'] === $gradeSection;
+        }
+        if (!$isOwn) {
             return redirect()->to('/teachers-view/' . session('user_id'))->with('error', 'You can only view students in your class.');
         }
 
@@ -272,7 +277,7 @@ class Teachers extends BaseController
             return redirect()->to('/teachers')->with('error', 'A teacher with that phone number already exists');
         }
 
-        $model->save([
+        $teacherId = $model->save([
             'fname' => $this->request->getPost('fname'),
             'mname' => $this->request->getPost('mname'),
             'lname' => $this->request->getPost('lname'),
@@ -280,11 +285,12 @@ class Teachers extends BaseController
             'grade_section' => $this->request->getPost('grade_section'),
             'password' => null,
             'password_sent' => 0,
-            'picture' => $this->saveUploadedPicture('teachers'),
             'created_by' => session('user_id'),
         ]);
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'create', 'teacher', 'Created teacher: '.$this->request->getPost('fname').' '.$this->request->getPost('lname').' ('.trim($this->request->getPost('grade_section')).')');
-        return redirect()->to('/teachers')->with('msg', 'Teacher added');
+        // Absorb any existing students in this grade that had no adviser.
+        $claimed = $this->claimUnassignedStudents((int) $teacherId, $this->request->getPost('grade_section'));
+        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'create', 'teacher', 'Created teacher: '.$this->request->getPost('fname').' '.$this->request->getPost('lname').' ('.trim($this->request->getPost('grade_section')).')'.$claimed);
+        return redirect()->to('/teachers')->with('msg', 'Teacher added'.$claimed);
     }
 
     public function update()
@@ -301,13 +307,32 @@ class Teachers extends BaseController
             'phone' => $this->request->getPost('phone'),
             'grade_section' => $this->request->getPost('grade_section'),
         ];
-        $picture = $this->saveUploadedPicture('teachers');
-        if ($picture) {
-            $data['picture'] = $picture;
-        }
         $model->update($id, $data);
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'update', 'teacher', 'Updated teacher: '.$data['fname'].' '.$data['lname'].' (ID: '.$id.')');
-        return redirect()->to('/teachers')->with('msg', 'Teacher updated');
+        // Re-link unassigned students if grade_section changed.
+        $claimed = $this->claimUnassignedStudents((int) $id, $data['grade_section']);
+        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'update', 'teacher', 'Updated teacher: '.$data['fname'].' '.$data['lname'].' (ID: '.$id.')'.$claimed);
+        return redirect()->to('/teachers')->with('msg', 'Teacher updated'.$claimed);
+    }
+
+    /**
+     * Attach students in $gradeSection that still have adviser_id NULL.
+     * Returns a short suffix for flash/log, e.g. " (+12 students linked)".
+     */
+    private function claimUnassignedStudents(int $teacherId, ?string $gradeSection): string
+    {
+        $gradeSection = trim((string) $gradeSection);
+        if ($teacherId <= 0 || $gradeSection === '') {
+            return '';
+        }
+
+        $db = \Config\Database::connect();
+        $db->table('students')
+            ->where('grade_section', $gradeSection)
+            ->where('adviser_id IS NULL', null, false)
+            ->update(['adviser_id' => $teacherId]);
+
+        $n = $db->affectedRows();
+        return $n > 0 ? " (+$n student(s) linked)" : '';
     }
 
     public function delete($id)
@@ -318,9 +343,21 @@ class Teachers extends BaseController
         $model = new TeachersModel();
         $teacher = $model->find($id);
         $model->delete($id);
-        $this->deleteUploadedPicture('teachers', $teacher['picture'] ?? null);
         $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'delete', 'teacher', 'Deleted teacher: '.$teacher['fname'].' '.$teacher['lname'].' (ID: '.$id.')');
         return redirect()->to('/teachers')->with('msg', 'Teacher deleted');
+    }
+
+    // ========== DELETE ALL TEACHERS (ADMIN ONLY) ==========
+    public function deleteAll()
+    {
+        if (session('role') != 'admin') {
+            return redirect()->to('/teachers')->with('error', 'Admin only.');
+        }
+        $model = new TeachersModel();
+        $count = $model->countAllResults();
+        $model->truncate();
+        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'delete', 'teacher', "DELETED ALL teachers ($count accounts)");
+        return redirect()->to('/teachers')->with('msg', "All $count teacher(s) deleted.");
     }
 
     public function sendPassword($id)

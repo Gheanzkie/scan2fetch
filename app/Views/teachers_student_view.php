@@ -137,15 +137,9 @@ body {
  <div class="col-md-4">
  <div class="card">
  <div class="card-body text-center">
- <?php if (!empty($student['picture'])): ?>
- <img src="<?= base_url('public/uploads/students/' . $student['picture']) ?>" alt="Student Photo"
-            style="width:130px;height:130px;margin:0 auto;border-radius:50%;object-fit:cover;border:4px solid #e2e8f0;box-shadow:0 1px 4px rgba(15,23,42,.12);background:#f1f5f9;cursor:pointer;"
-            onclick="openImageViewer('<?= base_url('public/uploads/students/' . $student['picture']) ?>', '<?= esc($student['fname'] . ' ' . $student['lname']) ?>')">
- <?php else: ?>
  <div style="width:130px;height:130px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #e2e8f0;box-shadow:0 1px 4px rgba(15,23,42,.12);background:#f1f5f9;display:flex;align-items:center;justify-content:center;">
  <i class="fas fa-child" style="font-size:42px;color:#94a3b8;"></i>
  </div>
- <?php endif; ?>
 
  <h3 class="mt-3 mb-0" style="color: #0f172a;"><?= esc($student['fname']) ?> <?= esc($student['lname']) ?></h3>
  <?php if(!empty($student['mname'])): ?>
@@ -185,14 +179,9 @@ body {
  <?php foreach($parents as $p): ?>
  <div class="d-flex align-items-center p-3 mb-2" style="border: 1px solid rgba(63,43,150,0.06); border-radius: 14px;">
  <div class="mr-3">
- <?php if(!empty($p['picture'])): ?>
- <img src="<?= base_url('public/uploads/parents/' . $p['picture']) ?>" class="img-circle" style="width:55px;height:55px;object-fit:cover;border:3px solid #e2e8f0;cursor:pointer;"
-              onclick="openImageViewer('<?= base_url('public/uploads/parents/' . $p['picture']) ?>', '<?= esc($p['fname'] . ' ' . $p['lname']) ?>')">
- <?php else: ?>
  <div class="img-circle d-flex align-items-center justify-content-center" style="width:55px;height:55px;border:3px solid #e2e8f0;background:#f1f5f9;">
  <i class="fas fa-user" style="color: #94a3b8;"></i>
  </div>
- <?php endif; ?>
  </div>
  <div class="flex-grow-1">
  <strong style="color: #2d2d4a;"><?= esc($p['fname']) ?> <?= esc($p['lname']) ?></strong>
@@ -219,14 +208,9 @@ body {
  <?php foreach($subFetchers as $f): ?>
  <div class="d-flex align-items-center p-3 mb-2" style="border: 1px solid rgba(63,43,150,0.06); border-radius: 14px; border-left: 3px solid var(--soft-green);">
  <div class="mr-3">
- <?php if(!empty($f['picture'])): ?>
- <img src="<?= base_url('public/uploads/parents/' . $f['picture']) ?>" class="img-circle" style="width:50px;height:50px;object-fit:cover;border:2px solid var(--soft-green);cursor:pointer;"
-              onclick="openImageViewer('<?= base_url('public/uploads/parents/' . $f['picture']) ?>', '<?= esc($f['fname'] . ' ' . $f['lname']) ?>')">
- <?php else: ?>
  <div class="img-circle d-flex align-items-center justify-content-center" style="width:50px;height:50px;border:2px solid var(--soft-green);background:#f1f5f9;">
  <i class="fas fa-user" style="color: #94a3b8;"></i>
  </div>
- <?php endif; ?>
  </div>
  <div class="flex-grow-1">
  <strong style="color: #2d2d4a;"><?= esc($f['fname']) ?> <?= esc($f['lname']) ?></strong>

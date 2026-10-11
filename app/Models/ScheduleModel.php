@@ -295,11 +295,20 @@ class ScheduleModel extends Model
     }
 
     /**
-     * The override currently stored in the caller's PHP session, if any.
+     * The session override currently in effect, if any.
+     *
+     * GLOBAL first (settings table) — set from Date Management or the scan
+     * page, visible to every device/browser. Falls back to the caller's PHP
+     * session ('scan_session') for legacy per-browser switches.
      * 'auto' (or anything unexpected) = no override.
      */
     public function sessionOverride(): ?string
     {
+        $settings = new SettingsModel();
+        $v = $settings->getSetting('active_session', null);
+        if ($v === 'morning' || $v === 'afternoon') {
+            return $v;
+        }
         $v = session('scan_session');
         return ($v === 'morning' || $v === 'afternoon') ? $v : null;
     }

@@ -32,7 +32,6 @@ class Staffs extends BaseController
             'lname' => $this->request->getPost('lname'), 'phone' => $this->request->getPost('phone'),
             'password' => null,
             'password_sent' => 0,
-            'picture' => $this->saveUploadedPicture('staffs'),
         ]);
         $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'create', 'staff', 'Created staff: '.$this->request->getPost('fname').' '.$this->request->getPost('lname'));
         return redirect()->to('/staffs')->with('msg', 'Staff added');
@@ -43,10 +42,6 @@ class Staffs extends BaseController
         $model = new StaffsModel();
         $id = $this->request->getPost('id');
         $data = ['fname' => $this->request->getPost('fname'), 'mname' => $this->request->getPost('mname'), 'lname' => $this->request->getPost('lname'), 'phone' => $this->request->getPost('phone')];
-        $picture = $this->saveUploadedPicture('staffs');
-        if ($picture) {
-            $data['picture'] = $picture;
-        }
         if ($this->request->getPost('password')) {
             $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
         }
@@ -89,8 +84,20 @@ class Staffs extends BaseController
         $model = new StaffsModel();
         $staff = $model->find($id);
         $model->delete($id);
-        $this->deleteUploadedPicture('staffs', $staff['picture'] ?? null);
         $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'delete', 'staff', 'Deleted staff: '.$staff['fname'].' '.$staff['lname'].' (ID: '.$id.')');
         return redirect()->to('/staffs')->with('msg', 'Staff deleted');
+    }
+
+    // ========== DELETE ALL STAFF (ADMIN ONLY) ==========
+    public function deleteAll()
+    {
+        if (session('role') != 'admin') {
+            return redirect()->to('/staffs')->with('error', 'Admin only.');
+        }
+        $model = new StaffsModel();
+        $count = $model->countAllResults();
+        $model->truncate();
+        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'delete', 'staff', "DELETED ALL staff accounts ($count)");
+        return redirect()->to('/staffs')->with('msg', "All $count staff account(s) deleted.");
     }
 }

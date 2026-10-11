@@ -563,26 +563,6 @@ label .text-danger { color: #dc2626 !important; }
 
   <div class="student-block" data-index="0" style="position:relative;">
 
-  <!-- Student Photo -->
-  <div class="form-group text-center mb-4">
-  <label class="font-weight-bold" style="font-size: 0.95rem;">
-                                             Student Picture
-  </label>
-  <div id="studentPhotoPreview0" class="student-photo-preview" onclick="$('#pictureInput0').click()">
-  <i class="fas fa-child"></i>
-  </div>
-  <div class="btn-group btn-group-sm" role="group" style="gap: 8px;">
-  <button type="button" class="btn btn-kid-primary btn-sm open-camera-btn" data-target="student">
-  <i class="fas fa-camera mr-1"></i> Take Photo
-  </button>
-  <label class="btn btn-kid-pink btn-sm mb-0" style="cursor:pointer;">
-  <i class="fas fa-upload mr-1"></i> Upload
-  <input type="file" name="picture[]" id="pictureInput0" class="d-none student-pic-input" accept="image/*">
-  </label>
-  </div>
-  <input type="hidden" name="picture_capture[]" id="pictureCapture0" class="student-pic-capture">
-  </div>
-
   <!-- Student Name -->
   <div class="row">
   <div class="col-4">
@@ -673,15 +653,6 @@ label .text-danger { color: #dc2626 !important; }
  <i class="fas fa-user mr-1"></i> Parent / Guardian
  </h6>
 
- <div class="text-center mb-2">
- <div class="photo-preview parent-preview" data-index="0" onclick="$('#parentPictureInput0').click()">
- <i class="fas fa-user"></i>
- </div>
- <input type="file" id="parentPictureInput0" class="d-none parent-pic-input" accept="image/*" data-index="0">
- <input type="hidden" name="parent_picture_capture" class="parent-picture-capture" data-index="0">
- <small class="d-block text-muted" style="font-size:11px;">Click photo to upload</small>
- </div>
-
  <div class="row">
  <div class="col-4">
  <label class="small">First Name <span class="text-danger">*</span></label>
@@ -705,7 +676,6 @@ label .text-danger { color: #dc2626 !important; }
  </div>
  </div>
  <input type="hidden" name="parent_relation[]" value="Parent">
- <input type="hidden" name="parent_picture[]">
  </div>
 
  <!-- Fetcher 1 (Optional) -->
@@ -714,15 +684,6 @@ label .text-danger { color: #dc2626 !important; }
  <span class="badge badge-info"> Optional</span>
  <i class="fas fa-user-friends mr-1"></i> Fetcher 1
  </h6>
-
- <div class="text-center mb-2">
- <div class="photo-preview fetcher-preview" data-index="0" onclick="$('#fetcherPictureInput0').click()">
- <i class="fas fa-user"></i>
- </div>
- <input type="file" id="fetcherPictureInput0" class="d-none fetcher-pic-input" accept="image/*" data-index="0">
- <input type="hidden" name="fetcher_picture_capture" class="fetcher-picture-capture" data-index="0">
- <small class="d-block text-muted" style="font-size:11px;">Click photo to upload</small>
- </div>
 
  <div class="row">
  <div class="col-4">
@@ -746,7 +707,6 @@ label .text-danger { color: #dc2626 !important; }
  </div>
  </div>
  </div>
- <input type="hidden" name="fetcher_picture[]">
  </div>
 
  <!-- Fetcher 2 (Optional) -->
@@ -755,15 +715,6 @@ label .text-danger { color: #dc2626 !important; }
  <span class="badge badge-warning"> Optional</span>
  <i class="fas fa-user-friends mr-1"></i> Fetcher 2
  </h6>
-
- <div class="text-center mb-2">
- <div class="photo-preview fetcher-preview" data-index="1" onclick="$('#fetcherPictureInput1').click()">
- <i class="fas fa-user"></i>
- </div>
- <input type="file" id="fetcherPictureInput1" class="d-none fetcher-pic-input" accept="image/*" data-index="1">
- <input type="hidden" name="fetcher_picture_capture" class="fetcher-picture-capture" data-index="1">
- <small class="d-block text-muted" style="font-size:11px;">Click photo to upload</small>
- </div>
 
  <div class="row">
  <div class="col-4">
@@ -848,7 +799,7 @@ label .text-danger { color: #dc2626 !important; }
  <div class="qr-row">
  <div>
  <?php if(!empty($p['qr_code'])): ?>
- <img src="<?= base_url('public/uploads/qr/'.$p['qr_code'].'.png') ?>" alt="QR">
+ <img src="<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>" alt="QR">
  <?php else: ?>
  <i class="fas fa-qrcode" style="color: var(--soft-blue);"></i>
  <?php endif; ?>
@@ -880,7 +831,7 @@ label .text-danger { color: #dc2626 !important; }
  <div class="qr-row">
  <div>
  <?php if(!empty($f['qr_code'])): ?>
- <img src="<?= base_url('public/uploads/qr/'.$f['qr_code'].'.png') ?>" alt="QR">
+ <img src="<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>" alt="QR">
  <?php else: ?>
  <i class="fas fa-qrcode" style="color: var(--soft-blue);"></i>
  <?php endif; ?>
@@ -925,194 +876,15 @@ label .text-danger { color: #dc2626 !important; }
  <?php endif; ?>
 
  </div>
- </section>
+</section>
 </div>
 
-<!-- ===== CAMERA MODAL ===== -->
-<div class="modal fade" id="cameraModal" tabindex="-1">
- <div class="modal-dialog modal-dialog-centered">
- <div class="modal-content">
- <div class="modal-header">
- <h6><i class="fas fa-camera mr-2" style="color: var(--soft-blue);"></i>Take Photo</h6>
- <button type="button" class="close" data-dismiss="modal" style="color: var(--ink);">&times;</button>
- </div>
- <div class="modal-body text-center p-2">
- <video id="cameraVideo" autoplay playsinline style="width:100%;max-height:400px;border-radius:12px;background:#1a1a2e;"></video>
- <canvas id="cameraCanvas" style="display:none;"></canvas>
- <div class="mt-2">
- <button type="button" class="btn btn-kid-primary" id="captureBtn">
- <i class="fas fa-camera mr-1"></i> Capture
- </button>
- <button type="button" class="btn btn-outline-secondary" id="cancelCameraBtn">
- <i class="fas fa-times mr-1"></i> Cancel
- </button>
- <button type="button" class="btn btn-outline-success" id="cameraFallbackBtn">
- <i class="fas fa-mobile-alt mr-1"></i> Use Phone Camera / Upload
- </button>
- <input type="file" id="cameraFallbackInput" class="d-none" accept="image/*" capture="environment">
- </div>
- </div>
- </div>
- </div>
-</div>
 
-<?= $this->endSection() ?>
+ <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
 $(function(){
-    var stream;
-    var currentTarget = 'student';
-    var currentIndex = 0;
-    var currentStudentIndex = 0; // which .student-block the camera shot belongs to
-
-    // Shared: paint a photo into a specific student block.
-    function paintStudentPhoto(dataUrl, color) {
-        var $b = $('.student-block[data-index="' + currentStudentIndex + '"]');
-        if (!$b.length) $b = $('.student-block').first();
-        $b.find('.student-photo-preview').html('<img src="' + dataUrl + '">');
-        $b.find('.student-photo-preview').css('border-color', color);
-        $b.find('.student-pic-capture').val(dataUrl);
-    }
-
-    // ===== STUDENT PHOTO (delegated — works on blocks added later) =====
-    $(document).on('change', '.student-pic-input', function(){
-        var file = this.files[0];
-        if (!file) return;
-        var $block = $(this).closest('.student-block');
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            $block.find('.student-photo-preview').html('<img src="' + e.target.result + '">');
-            $block.find('.student-photo-preview').css('border-color', '#81c784');
-            // Mirror into the capture field so the server sees a photo even
-            // when the file input is what changed.
-            $block.find('.student-pic-capture').val(e.target.result);
-        };
-        reader.readAsDataURL(file);
-    });
-
-    // ===== PARENT PHOTO =====
-    $(document).on('change', '.parent-pic-input', function(){
-        var index = $(this).data('index');
-        var file = this.files[0];
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                $('.parent-preview[data-index="' + index + '"]').html('<img src="' + e.target.result + '">');
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // ===== FETCHER PHOTO =====
-    $(document).on('change', '.fetcher-pic-input', function(){
-        var index = $(this).data('index');
-        var file = this.files[0];
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                $('.fetcher-preview[data-index="' + index + '"]').html('<img src="' + e.target.result + '">');
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // ===== OPEN CAMERA =====
-    $(document).on('click', '.open-camera-btn', function(){
-        currentTarget = $(this).data('target') || 'student';
-        // Remember which student block opened the camera so the capture lands
-        // on that block's preview + picture_capture[] slot.
-        var $sb = $(this).closest('.student-block');
-        currentStudentIndex = $sb.length ? $sb.data('index') : 0;
-        $('#cameraModal').modal('show');
-        // Chrome blocks the in-page camera on plain http:// (non-localhost).
-        // Open the phone's native camera app directly instead.
-        if (!window.isSecureContext && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
-            $('#cameraFallbackInput').click();
-            return;
-        }
-        setTimeout(function(){
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: 640, height: 480 } })
-            .then(function(st) {
-                stream = st;
-                $('#cameraVideo')[0].srcObject = stream;
-            })
-            .catch(function() {
-                $('#cameraFallbackBtn').show();
-            });
-        }, 500);
-    });
-
-    // ===== USE PHONE CAMERA / UPLOAD FALLBACK =====
-    $('#cameraFallbackBtn').click(function(){
-        $('#cameraFallbackInput').click();
-    });
-
-    $('#cameraFallbackInput').on('change', function(){
-        var file = this.files[0];
-        if (!file) return;
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            var dataUrl = e.target.result;
-            if (currentTarget === 'student') {
-                paintStudentPhoto(dataUrl, '#f093fb');
-            } else if (currentTarget === 'parent') {
-                var index = currentIndex;
-                $('.parent-preview[data-index="' + index + '"]').html('<img src="' + dataUrl + '">');
-                $('.parent-picture-capture[data-index="' + index + '"]').val(dataUrl);
-            } else if (currentTarget === 'fetcher') {
-                var index = currentIndex;
-                $('.fetcher-preview[data-index="' + index + '"]').html('<img src="' + dataUrl + '">');
-                $('.fetcher-picture-capture[data-index="' + index + '"]').val(dataUrl);
-            }
-            $('#cameraModal').modal('hide');
-        };
-        reader.readAsDataURL(file);
-        this.value = '';
-    });
-
-    // ===== CAPTURE PHOTO =====
-    $('#captureBtn').click(function(){
-        var video = $('#cameraVideo')[0];
-        var canvas = $('#cameraCanvas')[0];
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-        var dataUrl = canvas.toDataURL('image/png');
-        
-        if (currentTarget === 'student') {
-            paintStudentPhoto(dataUrl, '#f093fb');
-        } else if (currentTarget === 'parent') {
-            var index = currentIndex;
-            $('.parent-preview[data-index="' + index + '"]').html('<img src="' + dataUrl + '">');
-            $('.parent-picture-capture[data-index="' + index + '"]').val(dataUrl);
-        } else if (currentTarget === 'fetcher') {
-            var index = currentIndex;
-            $('.fetcher-preview[data-index="' + index + '"]').html('<img src="' + dataUrl + '">');
-            $('.fetcher-picture-capture[data-index="' + index + '"]').val(dataUrl);
-        }
-        
-        if (stream) {
-            stream.getTracks().forEach(function(track) { track.stop(); });
-        }
-        $('#cameraModal').modal('hide');
-    });
-
-    // ===== CANCEL CAMERA =====
-    $('#cancelCameraBtn').click(function(){
-        if (stream) {
-            stream.getTracks().forEach(function(track) { track.stop(); });
-        }
-        $('#cameraModal').modal('hide');
-    });
-
-    // ===== STOP CAMERA ON MODAL CLOSE =====
-    $('#cameraModal').on('hidden.bs.modal', function(){
-        if (stream) {
-            stream.getTracks().forEach(function(track) { track.stop(); });
-        }
-    });
-
     // ===== + ADD STUDENT (repeater) =====
     var studentBlockSeq = 1; // next data-index
 
@@ -1126,13 +898,6 @@ $(function(){
         $clone.find('input[type=text]').val('');
         $clone.find('select').prop('selectedIndex', 0);
         $clone.find('input[type=file]').val('');
-        $clone.find('.student-pic-capture').val('');
-        $clone.find('.student-photo-preview').html('<i class="fas fa-child"></i>').css('border-color', '');
-        // Re-point the per-block ids (pictureInput0 / pictureCapture0 / preview)
-        $clone.find('.student-photo-preview').attr('id', 'studentPhotoPreview' + idx)
-              .attr('onclick', "$('#pictureInput" + idx + "').click()");
-        $clone.find('.student-pic-input').attr('id', 'pictureInput' + idx);
-        $clone.find('.student-pic-capture').attr('id', 'pictureCapture' + idx);
 
         // Remove button (never on the first block)
         $clone.find('.remove-student').remove();

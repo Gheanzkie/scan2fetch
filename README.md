@@ -2,6 +2,26 @@
 
 Hello! I'm **Ghean De La Cruz**, an Information Technology student at **Kabankalan Catholic College**. I'd like to share my system that is currently working.
 
+admin 
+user admin   
+pass ghean123
+
+staff
+user staff
+pass ghean123
+
+teacher1 
+user teacher1
+pass ghean123
+
+teacher2 
+user teacher2
+pass ghean123
+
+teacher3 
+user teacher3
+pass ghean123
+
 ---
 
 ## 📋 About the System

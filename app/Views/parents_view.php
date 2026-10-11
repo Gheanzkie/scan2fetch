@@ -176,44 +176,6 @@ body {
     -webkit-text-fill-color: transparent;
 }
 
-/* ===== IMAGES ===== */
-.img-circle { border-radius: 50% !important; }
-
-#parentPhotoContainer {
-    border: 4px solid var(--soft-blue) !important;
-    box-shadow: 0 4px 15px rgba(108,140,255,0.2) !important;
-}
-
-/* ===== PHOTO PREVIEW ===== */
-.photo-preview {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 3px solid rgba(168,192,255,0.25);
-    background: rgba(255,255,255,0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    margin: 0 auto;
-}
-
-.photo-preview:hover {
-    border-color: var(--soft-pink);
-}
-
-.photo-preview i {
-    color: rgba(160,160,180,0.2);
-    font-size: 30px;
-}
-
-.photo-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
 /* ===== MODAL ===== */
 .modal-content {
     border-radius: 28px !important;
@@ -355,36 +317,6 @@ body {
  <div class="card">
  <div class="card-body text-center">
                             
- <!-- Parent Photo -->
- <div id="parentPhotoContainer" style="width:130px;height:130px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #e2e8f0;cursor:pointer;box-shadow:0 1px 4px rgba(15,23,42,.12);" onclick="openImageViewer('<?= !empty($parent['picture'])?base_url('public/uploads/parents/'.$parent['picture']):'' ?>','<?= esc($parent['fname'].' '.$parent['lname']) ?>')">
- <?php if(!empty($parent['picture'])): ?>
- <img id="parentPic" src="<?= base_url('public/uploads/parents/'.$parent['picture']) ?>" style="width:100%;height:100%;object-fit:cover;">
- <?php else: ?>
- <div id="parentNoPic" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f1f5f9;">
- <i class="fas fa-user fa-3x" style="color: #94a3b8;"></i>
- </div>
- <?php endif; ?>
- </div>
-
- <!-- Photo Upload & Camera Buttons -->
- <div class="btn-group btn-group-sm mt-2" role="group" style="gap: 4px;">
- <button type="button" class="btn btn-outline-secondary btn-xs open-camera-btn" data-target="parent-pic">
- <i class="fas fa-camera mr-1"></i> Take Photo
- </button>
- <label class="btn btn-outline-secondary btn-xs mb-0" style="cursor:pointer;">
- <i class="fas fa-upload mr-1"></i> Upload
- <input type="file" class="d-none parent-pic-input" accept="image/*">
- </label>
- </div>
-
- <!-- Hidden Form for Parent Photo Update -->
- <form class="picture-form" action="<?= base_url('parents-update-picture') ?>" method="post" enctype="multipart/form-data" style="display:none;">
- <?= csrf_field() ?>
- <input type="hidden" name="id" value="<?= $parent['id'] ?>">
- <input type="hidden" name="picture_capture" class="parent-picture-capture">
- <input type="file" name="picture" class="d-none parent-picture-file">
- </form>
-
  <!-- Parent Info -->
  <h3 class="mt-3 mb-0" style="color: #2d2d4a;"><?= esc($parent['fname']) ?> <?= esc($parent['lname']) ?></h3>
  <p class="text-muted mb-2" style="color: #8888aa !important;">
@@ -394,9 +326,9 @@ body {
  <!-- QR Code -->
  <?php if(!empty($parent['qr_code'])): ?>
  <div class="mb-2">
- <img src="<?= base_url('public/uploads/qr/'.$parent['qr_code'].'.png') ?>" 
+ <img src="<?= base_url('uploads/qr/'.$parent['qr_code'].'.png') ?>" 
                                      style="width:100px;height:100px;border:3px solid var(--soft-blue);border-radius:12px;cursor:pointer;" 
-                                     onclick="openQrModal('<?= base_url('public/uploads/qr/'.$parent['qr_code'].'.png') ?>')">
+                                     onclick="openQrModal('<?= base_url('uploads/qr/'.$parent['qr_code'].'.png') ?>')">
  </div>
  <?php endif; ?>
 
@@ -420,23 +352,19 @@ body {
  <div class="card-body">
  <?php if(!empty($subFetchers)): foreach($subFetchers as $f): ?>
  <div class="d-flex align-items-center border rounded p-2 mb-2" style="border-color: rgba(108,140,255,0.08) !important;">
- <div class="mr-2" style="cursor:pointer;" onclick="openImageViewer('<?= !empty($f['picture'])?base_url('public/uploads/parents/'.$f['picture']):'' ?>','<?= esc($f['fname'].' '.$f['lname']) ?>')">
- <?php if(!empty($f['picture'])): ?>
- <img src="<?= base_url('public/uploads/parents/'.$f['picture']) ?>" class="img-circle" style="width:40px;height:40px;object-fit:cover;border:2px solid var(--soft-green);">
- <?php else: ?>
+ <div class="mr-2">
  <div class="img-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;border:2px solid var(--soft-green);background:rgba(255,255,255,0.3);">
  <i class="fas fa-user" style="color: #b0b0c8;"></i>
  </div>
- <?php endif; ?>
  </div>
  <div class="flex-grow-1">
  <strong style="color: #2d2d4a;"><?= esc($f['fname']) ?> <?= esc($f['lname']) ?></strong>
  <br><small style="color: #b0b0c8;"><?= esc($f['phone']) ?></small>
  </div>
  <?php if(!empty($f['qr_code'])): ?>
- <img src="<?= base_url('public/uploads/qr/'.$f['qr_code'].'.png') ?>" 
+ <img src="<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>" 
                                          style="width:35px;height:35px;border:2px solid var(--soft-blue);border-radius:8px;cursor:pointer;margin-right:4px;" 
-                                         onclick="openQrModal('<?= base_url('public/uploads/qr/'.$f['qr_code'].'.png') ?>')">
+                                         onclick="openQrModal('<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>')">
  <?php endif; ?>
  <button class="btn btn-outline-secondary btn-xs mr-1 edit-subfetcher-btn" 
                                         data-id="<?= $f['id'] ?>" 
@@ -494,17 +422,10 @@ body {
  </div>
  <div class="col-md-6 text-right">
  <a href="<?= base_url('students-view/'.$s['student_id']) ?>">
- <?php if(!empty($s['picture'])): ?>
- <img src="<?= base_url('public/uploads/students/'.$s['picture']) ?>" 
-                                              class="img-circle" 
-                                              style="width:70px;height:70px;object-fit:cover;border:3px solid var(--soft-blue);cursor:pointer;" 
-                                              title="View <?= esc($s['fname'].' '.$s['lname']) ?>">
- <?php else: ?>
  <div class="img-circle d-inline-flex align-items-center justify-content-center" 
                                               style="width:70px;height:70px;border:3px solid var(--soft-blue);background:rgba(255,255,255,0.3);cursor:pointer;">
  <i class="fas fa-child fa-2x" style="color: #b0b0c8;"></i>
  </div>
- <?php endif; ?>
  </a>
  </div>
  </div>
@@ -546,16 +467,6 @@ body {
  <?php if(!empty($students)): ?>
  <br>Authorized to pick up: <strong><?= esc($students[0]['fname']) ?> <?= esc($students[0]['lname']) ?></strong>
  <?php endif; ?>
- </div>
-                    
- <!-- Sub-Fetcher Photo -->
- <div class="text-center mb-3">
- <div class="photo-preview" id="subFetcherPhotoPreview" onclick="$('#subFetcherPictureInput').click()">
- <i class="fas fa-user"></i>
- </div>
- <input type="file" id="subFetcherPictureInput" class="d-none" accept="image/*" name="picture">
- <input type="hidden" name="picture_capture" id="subFetcherPictureCapture">
- <small class="d-block text-muted" style="font-size:11px;">Click photo to upload</small>
  </div>
                     
  <div class="row">
@@ -619,16 +530,6 @@ body {
  <label> Phone <span class="text-danger">*</span></label>
  <input type="text" name="phone" id="editSubFetcherPhone" class="form-control form-control-sm" required>
  </div>
-                    
- <!-- Edit Sub-Fetcher Photo -->
- <div class="text-center mb-3">
- <div class="photo-preview" id="editSubFetcherPhotoPreview" onclick="$('#editSubFetcherPictureInput').click()">
- <i class="fas fa-user"></i>
- </div>
- <input type="file" id="editSubFetcherPictureInput" class="d-none" accept="image/*" name="picture">
- <input type="hidden" name="picture_capture" id="editSubFetcherPictureCapture">
- <small class="d-block text-muted" style="font-size:11px;">Click photo to update</small>
- </div>
  </div>
  <div class="modal-footer">
  <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">Cancel</button>
@@ -637,29 +538,6 @@ body {
  </button>
  </div>
  </form>
- </div>
- </div>
-</div>
-
-<!-- ===== CAMERA MODAL ===== -->
-<div class="modal fade" id="cameraModal" tabindex="-1">
- <div class="modal-dialog modal-dialog-centered">
- <div class="modal-content">
- <div class="modal-header">
- <h6><i class="fas fa-camera mr-2" style="color: var(--soft-blue);"></i>Take Photo</h6>
- <button type="button" class="close" data-dismiss="modal" style="color: #2d2d4a;">&times;</button>
- </div>
- <div class="modal-body text-center p-2" style="background: #f5f0ff; border-radius: 0 0 20px 20px;">
- <video id="cameraVideo" autoplay playsinline style="width:100%;max-height:350px;border-radius:12px;background:#000;"></video>
- <canvas id="cameraCanvas" style="display:none;"></canvas>
- <button type="button" class="btn btn-primary btn-sm mt-2" id="captureBtn">
- <i class="fas fa-camera"></i> Capture
- </button>
- <button type="button" class="btn btn-outline-secondary btn-sm mt-2 ml-1" id="cameraFallbackBtn">
- <i class="fas fa-mobile-alt mr-1"></i> Use Phone Camera / Upload
- </button>
- <input type="file" id="cameraFallbackInput" class="d-none" accept="image/*" capture="environment">
- </div>
  </div>
  </div>
 </div>
@@ -685,68 +563,11 @@ body {
  </div>
 </div>
 
-<!-- ===== IMAGE VIEWER MODAL ===== -->
-<div class="modal fade" id="imageViewerModal" tabindex="-1">
- <div class="modal-dialog modal-dialog-centered modal-lg">
- <div class="modal-content">
- <div class="modal-header">
- <h5><i class="fas fa-image mr-2" style="color: var(--soft-blue);"></i><span id="imageViewerTitle"> Photo</span></h5>
- <button type="button" class="close" data-dismiss="modal" style="color: #2d2d4a;">&times;</button>
- </div>
- <div class="modal-body text-center" style="background: #fff; border-radius: 0 0 25px 25px; padding: 20px;">
- <img id="imageViewerFull" src="" style="max-width:100%;max-height:70vh; border-radius: 15px;">
- </div>
- <div class="modal-footer">
- <a id="imageDownloadBtn" href="" download="photo.png" class="btn btn-primary btn-sm">
- <i class="fas fa-download"></i> Download
- </a>
- <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">Close</button>
- </div>
- </div>
- </div>
-</div>
-
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
 $(function(){
-    var s, currentTarget = '';
-
-    // ===== PARENT PHOTO UPLOAD =====
-    $(document).on('change', '.parent-pic-input', function(){
-        var f = this.files[0];
-        if (f) {
-            var form = $('.picture-form');
-            form.find('.parent-picture-file').prop('files', this.files);
-            form.find('.parent-picture-capture').val('');
-            form.submit();
-        }
-    });
-
-    // ===== SUB-FETCHER PHOTO PREVIEW =====
-    $('#subFetcherPictureInput').on('change', function() {
-        var file = this.files[0];
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                $('#subFetcherPhotoPreview').html('<img src="' + e.target.result + '">');
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    $('#editSubFetcherPictureInput').on('change', function() {
-        var file = this.files[0];
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                $('#editSubFetcherPhotoPreview').html('<img src="' + e.target.result + '">');
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
     // ===== EDIT SUB-FETCHER - POPULATE FIELDS =====
     $(document).on('click', '.edit-subfetcher-btn', function() {
         $('#editSubFetcherId').val($(this).data('id'));
@@ -754,107 +575,18 @@ $(function(){
         $('#editSubFetcherMname').val($(this).data('mname'));
         $('#editSubFetcherLname').val($(this).data('lname'));
         $('#editSubFetcherPhone').val($(this).data('phone'));
-        
-        // Reset photo preview for edit
-        $('#editSubFetcherPhotoPreview').html('<i class="fas fa-user"></i>');
     });
 
-    // ===== CAMERA FUNCTIONS =====
-    $(document).on('click', '.open-camera-btn', function() {
-        currentTarget = $(this).data('target') || 'subfetcher';
-        $('#cameraModal').modal('show');
-        // Chrome blocks the in-page camera on plain http:// (non-localhost).
-        // Open the phone's native camera app directly instead.
-        if (!window.isSecureContext && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
-            $('#cameraFallbackInput').click();
-            return;
+    // ===== OPEN QR MODAL =====
+    function openQrModal(u) {
+        if (!u) { 
+            alert(' No QR code available. '); 
+            return; 
         }
-        setTimeout(function() {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: 400, height: 400 } })
-            .then(function(st) { 
-                s = st; 
-                $('#cameraVideo')[0].srcObject = s; 
-            })
-            .catch(function() { 
-                $('#cameraFallbackBtn').show(); 
-            });
-        }, 500);
-    });
-
-    $('#cameraFallbackBtn').click(function() {
-        $('#cameraFallbackInput').click();
-    });
-
-    $('#cameraFallbackInput').on('change', function() {
-        var f2 = this.files[0];
-        if (!f2) return;
-        var r3 = new FileReader();
-        r3.onload = function(e) {
-            var dataUrl = e.target.result;
-            if (currentTarget === 'parent-pic') {
-                var form = $('.picture-form');
-                form.find('.parent-picture-capture').val(dataUrl);
-                form.find('.parent-picture-file').val('');
-                form.submit();
-            } else {
-                $('#subFetcherPhotoPreview').html('<img src="' + dataUrl + '">');
-                $('#subFetcherPictureCapture').val(dataUrl);
-            }
-            $('#cameraModal').modal('hide');
-        };
-        r3.readAsDataURL(f2);
-        this.value = '';
-    });
-
-    $('#captureBtn').click(function() {
-        var v = $('#cameraVideo')[0], c = $('#cameraCanvas')[0];
-        c.width = v.videoWidth || 400; 
-        c.height = v.videoHeight || 400;
-        c.getContext('2d').drawImage(v, 0, 0);
-        var d = c.toDataURL('image/png');
-        
-        if (currentTarget === 'parent-pic') {
-            var form = $('.picture-form');
-            form.find('.parent-picture-capture').val(d);
-            form.find('.parent-picture-file').val('');
-            form.submit();
-        } else {
-            // For sub-fetcher
-            $('#subFetcherPhotoPreview').html('<img src="' + d + '">');
-            $('#subFetcherPictureCapture').val(d);
-        }
-        
-        if (s) { s.getTracks().forEach(function(t) { t.stop(); }); }
-        $('#cameraModal').modal('hide');
-    });
-
-    $('#cameraModal').on('hidden.bs.modal', function() {
-        if (s) { s.getTracks().forEach(function(t) { t.stop(); }); }
-    });
+        $('#qrFullImage').attr('src', u);
+        $('#qrDownloadBtn').attr('href', u);
+        $('#qrModal').modal('show');
+    }
 });
-
-// ===== OPEN IMAGE VIEWER =====
-function openImageViewer(u, t) {
-    if (!u) { 
-        alert(' No photo available. '); 
-        return; 
-    }
-    $('#imageViewerFull').attr('src', u);
-    $('#imageDownloadBtn').attr('href', u);
-    $('#imageDownloadBtn').attr('download', t.replace(/\s+/g, '_') + '.png');
-    $('#imageViewerTitle').text(' ' + (t || 'Photo'));
-    $('#imageViewerModal').modal('show');
-}
-
-// ===== OPEN QR MODAL =====
-function openQrModal(u) {
-    if (!u) { 
-        alert(' No QR code available. '); 
-        return; 
-    }
-    $('#qrFullImage').attr('src', u);
-    $('#qrDownloadBtn').attr('href', u);
-    $('#qrModal').modal('show');
-}
 </script>
 <?= $this->endSection() ?>

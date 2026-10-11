@@ -37,7 +37,7 @@ class Students extends BaseController
         $links = $db->table('student_parents')
             ->select('student_parents.student_id, student_parents.relation,
                       parents.id AS parent_id, parents.fname, parents.lname,
-                      parents.phone, parents.picture')
+                      parents.phone')
             ->join('parents', 'parents.id = student_parents.parent_id')
             ->get()
             ->getResultArray();
@@ -114,7 +114,6 @@ class Students extends BaseController
             $sMnames = $this->asArray($this->request->getPost('mname'));
             $sLnames = $this->asArray($this->request->getPost('lname'));
             $sGrades = $this->asArray($this->request->getPost('grade_section'));
-            $sPics   = $this->uploadStudentPictures();
 
             if ($sFnames === []) {
                 throw new \Exception('No student details provided');
@@ -132,12 +131,11 @@ class Students extends BaseController
                     throw new \Exception('Student surname is required');
                 }
 
-                $sid = $this->studentModel->insert([
+                $sid = $this->studentModel->insertWithAdviser([
                     'fname'         => $sFname,
                     'mname'         => $sMnames[$i] ?? null,
                     'lname'         => $sLname,
                     'grade_section' => $sGrades[$i] ?? null,
-                    'picture'       => $sPics[$i] ?? null,
                     'created_by'    => session('user_id'),
                 ]);
 
@@ -169,7 +167,6 @@ class Students extends BaseController
                 $parentLnames    = $this->asArray($this->request->getPost('parent_lname'));
                 $parentPhones    = $this->asArray($this->request->getPost('parent_phone'));
                 $parentRelations = $this->asArray($this->request->getPost('parent_relation'));
-                $parentPictures  = $this->uploadParentPictures();
 
                 foreach ($parentFnames as $i => $fname) {
                     if (empty($fname) || $i >= 3) continue;
@@ -200,7 +197,6 @@ class Students extends BaseController
                             'password'     => null,
                             'password_sent'=> 0,
                             'qr_code'      => $qrValue,
-                            'picture'      => $parentPictures[$i] ?? null,
                             'created_by'   => session('user_id'),
                         ]);
 
@@ -254,7 +250,6 @@ class Students extends BaseController
                 $fetcherMnames = $this->asArray($this->request->getPost('fetcher_mname'));
                 $fetcherLnames = $this->asArray($this->request->getPost('fetcher_lname'));
                 $fetcherPhones = $this->asArray($this->request->getPost('fetcher_phone'));
-                $fetcherPictures = $this->uploadFetcherPictures();
 
                 foreach ($fetcherFnames as $i => $fname) {
                     if (empty($fname) || $i >= 2) continue;
@@ -267,7 +262,6 @@ class Students extends BaseController
                         'mname'      => $fetcherMnames[$i] ?? null,
                         'lname'      => $fetcherLnames[$i],
                         'phone'      => $fetcherPhones[$i],
-                        'picture'    => $fetcherPictures[$i] ?? null,
                         'qr_code'    => $qrValue,
                         'created_by' => session('user_id'),
                     ]);
@@ -382,12 +376,11 @@ class Students extends BaseController
                     continue;
                 }
 
-                $studentId = $this->studentModel->insert([
+                $studentId = $this->studentModel->insertWithAdviser([
                     'fname'         => $sfname,
                     'mname'         => $smname ?: null,
                     'lname'         => $slname,
                     'grade_section' => $grade,
-                    'picture'       => null,
                     'created_by'    => session('user_id'),
                 ]);
                 if (!$studentId) {
@@ -404,7 +397,6 @@ class Students extends BaseController
                     'password'     => null,
                     'password_sent'=> 0,
                     'qr_code'      => $qrValue,
-                    'picture'      => null,
                     'created_by'   => session('user_id'),
                 ]);
                 if (!$parentId) {
@@ -459,9 +451,7 @@ class Students extends BaseController
             'lname' => $this->request->getPost('lname'),
             'grade_section' => $this->request->getPost('grade_section'),
         ];
-        $pictureName = $this->uploadStudentPicture();
-        if ($pictureName) $data['picture'] = $pictureName;
-        $this->studentModel->update($id, $data);
+        $this->studentModel->updateWithAdviser($id, $data);
         $this->logModel->addLog(
             session('user_id'), 
             session('fname').' '.session('lname'), 
@@ -556,6 +546,48 @@ class Students extends BaseController
         }
     }
 
+    // ========== DELETE ALL STUDENTS (ADMIN ONLY) ==========
+    public function deleteAll()
+    {
+        if (session('role') != 'admin') {
+            return redirect()->to('/students')->with('error', 'Admin only.');
+        }
+
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        try {
+            $count = $this->studentModel->countAllResults();
+
+            // FK-safe order: children first, then students, then orphaned parents
+            $db->table('fetch_logs')->emptyTable();
+            $db->table('sub_fetchers')->emptyTable();
+            $db->table('student_parents')->emptyTable();
+            $this->studentModel->emptyTable();
+
+            $parentCount = $this->parentsModel->countAllResults();
+            $this->parentsModel->emptyTable();
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                throw new \Exception('Transaction failed');
+            }
+
+            $this->logModel->addLog(
+                session('user_id'), session('fname').' '.session('lname'), session('role'),
+                'delete', 'student',
+                "DELETED ALL students ($count), parents ($parentCount), sub-fetchers and logs"
+            );
+
+            return redirect()->to('/students')->with('msg', "All $count student(s) deleted. $parentCount orphaned parent(s) also removed.");
+        } catch (\Exception $e) {
+            $db->transRollback();
+            log_message('error', 'Delete all students failed: ' . $e->getMessage());
+            return redirect()->to('/students')->with('error', 'Delete all failed: ' . $e->getMessage());
+        }
+    }
+
     // ========== REMOVE PARENT ==========
     public function removeParent($studentId, $parentId)
     {
@@ -587,7 +619,6 @@ class Students extends BaseController
             return redirect()->to('/students-view/' . $studentId)->with('error', 'Maximum 3 parents');
         }
 
-        $pictureName = $this->uploadParentPicture();
         $qrValue = $this->generateQR();
 
         $parentId = $this->parentsModel->insert([
@@ -597,7 +628,6 @@ class Students extends BaseController
             'phone'        => $this->request->getPost('phone'),
             'password'     => null,
             'password_sent'=> 0,
-            'picture'      => $pictureName,
             'qr_code'      => $qrValue,
             'created_by'   => session('user_id'),
         ]);
@@ -636,120 +666,6 @@ class Students extends BaseController
             return [];
         }
         return is_array($value) ? $value : [$value];
-    }
-
-    private function uploadStudentPicture()
-    {
-        $captureData = $this->request->getPost('picture_capture');
-        if ($captureData && strpos($captureData, 'data:image') === 0) {
-            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $captureData));
-            $name = 'student_' . time() . '.png';
-            file_put_contents('uploads/students/' . $name, $imageData);
-            return $name;
-        }
-        $file = $this->request->getFile('picture');
-        if ($file && $file->isValid() && !$file->hasMoved()) {
-            $name = $file->getRandomName();
-            $file->move('uploads/students', $name);
-            return $name;
-        }
-        return null;
-    }
-
-    /**
-     * One photo per student block (the "+ Add student" repeater posts
-     * picture[] / picture_capture[] as parallel arrays). Missing or invalid
-     * slots are padded with null so indexes stay aligned with fname[].
-     *
-     * @return array<int,?string>
-     */
-    private function uploadStudentPictures(): array
-    {
-        $count = count($this->asArray($this->request->getPost('fname')));
-        $pics  = array_fill(0, max($count, 1), null);
-
-        // Camera-capture payloads (data URLs) posted per block.
-        $captures = $this->asArray($this->request->getPost('picture_capture'));
-        // Uploaded files (input type=file name="picture[]").
-        $files = $this->request->getFileMultiple('picture') ?: [];
-
-        for ($i = 0; $i < $count; $i++) {
-            $capture = $captures[$i] ?? null;
-            if (is_string($capture) && strpos($capture, 'data:image') === 0) {
-                $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $capture));
-                $name = 'student_' . time() . '_' . uniqid() . '.png';
-                file_put_contents('uploads/students/' . $name, $imageData);
-                $pics[$i] = $name;
-                continue;
-            }
-
-            $file = $files[$i] ?? null;
-            if ($file && $file->isValid() && ! $file->hasMoved()) {
-                $name = $file->getRandomName();
-                $file->move('uploads/students', $name);
-                $pics[$i] = $name;
-            }
-        }
-
-        return $pics;
-    }
-
-    private function uploadParentPicture()
-    {
-        $captureData = $this->request->getPost('parent_picture_capture');
-        if ($captureData && strpos($captureData, 'data:image') === 0) {
-            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $captureData));
-            $name = 'parent_' . time() . '.png';
-            file_put_contents('uploads/parents/' . $name, $imageData);
-            return $name;
-        }
-        $file = $this->request->getFile('parent_picture');
-        if ($file && $file->isValid() && !$file->hasMoved()) {
-            $name = $file->getRandomName();
-            $file->move('uploads/parents', $name);
-            return $name;
-        }
-        return null;
-    }
-
-    private function uploadParentPictures()
-    {
-        $pictures = [];
-        $parentPictures = $this->request->getFileMultiple('parent_picture');
-        
-        if ($parentPictures) {
-            foreach ($parentPictures as $file) {
-                if ($file && $file->isValid() && !$file->hasMoved()) {
-                    $name = 'parent_' . time() . '_' . uniqid() . '.png';
-                    $file->move('uploads/parents', $name);
-                    $pictures[] = $name;
-                } else {
-                    $pictures[] = null;
-                }
-            }
-        }
-        
-        return $pictures;
-    }
-
-    private function uploadFetcherPictures()
-    {
-        $pictures = [];
-        $fetcherPictures = $this->request->getFileMultiple('fetcher_picture');
-        
-        if ($fetcherPictures) {
-            foreach ($fetcherPictures as $file) {
-                if ($file && $file->isValid() && !$file->hasMoved()) {
-                    $name = 'fetcher_' . time() . '_' . uniqid() . '.png';
-                    $file->move('uploads/parents', $name);
-                    $pictures[] = $name;
-                } else {
-                    $pictures[] = null;
-                }
-            }
-        }
-        
-        return $pictures;
     }
 
     private function generateQR()

@@ -35,7 +35,6 @@ class Auth extends BaseController
                 'lname'         => $admin['lname'],
                 'phone'         => $admin['phone'],
                 'role'          => 'admin',
-                'picture'       => $admin['picture'] ?? null,
                 'logged_in'     => true,
                 'last_activity' => time()
             ]);
@@ -55,12 +54,11 @@ class Auth extends BaseController
                 'lname'         => $staff['lname'],
                 'phone'         => $staff['phone'],
                 'role'          => 'staff',
-                'picture'       => $staff['picture'] ?? null,
                 'logged_in'     => true,
                 'last_activity' => time()
             ]);
             $this->logModel->addLog($staff['id'], $staff['fname'].' '.$staff['lname'], 'staff', 'login', 'auth', 'Staff logged in | Phone: '.$staff['phone']);
-            return redirect()->to('/dashboard');
+            return redirect()->to('/scan');
         }
 
         // Check Teacher
@@ -76,7 +74,6 @@ class Auth extends BaseController
                 'phone'         => $teacher['phone'],
                 'grade_section' => $teacher['grade_section'],
                 'role'          => 'teacher',
-                'picture'       => $teacher['picture'] ?? null,
                 'logged_in'     => true,
                 'last_activity' => time()
             ]);
@@ -96,7 +93,6 @@ class Auth extends BaseController
                 'lname'         => $parent['lname'],
                 'phone'         => $parent['phone'],
                 'role'          => 'parent',
-                'picture'       => $parent['picture'] ?? null,
                 'logged_in'     => true,
                 'last_activity' => time()
             ]);
@@ -179,17 +175,6 @@ class Auth extends BaseController
 
         $data = ['fname' => $fname, 'mname' => $mname, 'lname' => $lname];
 
-        // Photo upload
-        $newPicture = $this->saveUploadedPicture($table);
-        if ($newPicture) {
-            $db = \Config\Database::connect();
-            $old = $db->table($table)->where('id', $me)->get()->getRowArray();
-            if ($old && !empty($old['picture']) && $old['picture'] !== $newPicture) {
-                $this->deleteUploadedPicture($table, $old['picture']);
-            }
-            $data['picture'] = $newPicture;
-        }
-
         // Optional password change
         $new = $this->request->getPost('new_password');
         if (! empty($new)) {
@@ -215,7 +200,6 @@ class Auth extends BaseController
         session()->set([
             'fname'   => $fname,
             'lname'   => $lname,
-            'picture' => $newPicture ?? session('picture'),
         ]);
 
         $this->logModel->addLog($me, $fname.' '.$lname, $role, 'update', 'profile', ucfirst($role).' updated their profile');

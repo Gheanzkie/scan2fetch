@@ -70,16 +70,6 @@ body {
 .card-header h5 { color: var(--ink) !important; font-weight: 700 !important; font-size: 1.05rem !important; }
 .card-body { padding: 1.4rem !important; }
 
-/* ===== SCANNER ===== */
-#reader {
-    border: 3px solid rgba(168,192,255,0.5) !important;
-    border-radius: 16px !important;
-    overflow: hidden !important;
-    background: rgba(255,255,255,0.6) !important;
-}
-
-#reader video { border-radius: 12px !important; }
-
 /* ===== BUTTONS ===== */
 .btn {
     border-radius: 50px !important;
@@ -336,90 +326,93 @@ body {
  </div>
  <?php endif; ?>
 
- <div class="row justify-content-center">
- <!-- ===== SCANNER + MANUAL INPUT ===== -->
- <div class="col-lg-8 col-md-10 col-12" id="scannerCol">
-
- <!-- Camera Scanner -->
+ <!-- ===== STATUS STRIP ===== -->
  <div class="card mb-3">
- <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+ <div class="card-body d-flex align-items-center flex-wrap justify-content-between" style="padding:1rem 1.5rem;">
+ <div class="d-flex align-items-center flex-wrap" style="gap:8px;">
+ <span class="badge badge-light" id="opHoursBadge" title="Operating hours from Date Management"
+ style="background:rgba(168,192,255,0.18);color:var(--soft-purple);font-size:13px;padding:7px 14px;">
+ <i class="far fa-clock mr-1"></i>
+ <?= esc($gateHours['open'] ?? '07:00') ?> &ndash; <?= esc($gateHours['close'] ?? '17:00') ?>
+ </span>
+ <span class="badge" id="sessionBadge"
+ style="background:<?= ($currentSession ?? 'morning') === 'morning' ? '#fef3c7' : '#e0e7ff' ?>;color:<?= ($currentSession ?? 'morning') === 'morning' ? '#b45309' : '#3730a3' ?>;font-size:13px;padding:7px 14px;">
+ <i class="fas fa-sun mr-1" id="sessionIcon"></i><span id="sessionLabel"><?= strtoupper($currentSession ?? 'MORNING') ?></span>
+ <span id="sessionManualTag" style="display:<?= !empty($sessionOverride) ? 'inline' : 'none' ?>;font-weight:700;">&middot; MANUAL</span>
+ </span>
+ <span class="badge badge-success" id="dayStatusBadge" style="display:none;font-size:13px;padding:7px 14px;">
+ <i class="fas fa-lock-open mr-1"></i>OPEN
+ </span>
+ </div>
+ <div id="scanResult" style="font-size:13px;"></div>
+ </div>
+ </div>
+
+ <div class="row" id="scannerCol">
+
+ <!-- ===== LEFT: LAUNCH FULLSCREEN SCANNER ===== -->
+ <div class="col-lg-7 col-md-6 col-12 mb-3">
+ <div class="card h-100">
+ <div class="card-header">
  <h5 class="mb-0">
  <i class="fas fa-camera mr-2" style="color: var(--soft-blue);"></i>
-                                Camera Scanner
+                                        Fullscreen Scanner
  </h5>
-
- <!-- Operating hours + active session strip -->
- <div class="d-flex align-items-center flex-wrap" style="gap:6px;">
-   <span class="badge badge-light" id="opHoursBadge" title="Operating hours from Date Management"
-         style="background:rgba(168,192,255,0.18);color:var(--soft-purple);">
-     <i class="far fa-clock mr-1"></i>
-     <?= esc($gateHours['open'] ?? '07:00') ?> &ndash; <?= esc($gateHours['close'] ?? '17:00') ?>
-   </span>
-   <span class="badge" id="sessionBadge"
-         style="background:<?= ($currentSession ?? 'morning') === 'morning' ? '#fef3c7' : '#e0e7ff' ?>;color:<?= ($currentSession ?? 'morning') === 'morning' ? '#b45309' : '#3730a3' ?>;">
-     <i class="fas fa-sun mr-1" id="sessionIcon"></i><span id="sessionLabel"><?= strtoupper($currentSession ?? 'MORNING') ?></span>
-     <span id="sessionManualTag" style="display:<?= !empty($sessionOverride) ? 'inline' : 'none' ?>;font-weight:700;">&middot; MANUAL</span>
-   </span>
-   <span class="badge badge-success" id="dayStatusBadge" style="display:none;">
-     <i class="fas fa-lock-open mr-1"></i>OPEN
-   </span>
  </div>
-
- <div class="d-flex align-items-center" style="gap: 6px;">
- <button class="btn btn-kid-success btn-sm" id="startCameraBtn">
- <i class="fas fa-play mr-1"></i> Start
- </button>
- <button class="btn btn-danger btn-sm" id="stopCameraBtn" style="display:none;">
- <i class="fas fa-stop mr-1"></i> Stop
- </button>
- <button class="btn btn-outline-primary btn-sm" id="photoScanBtn" title="Opens the camera app and reads the QR from the photo (works even when the live camera is blocked)">
- <i class="fas fa-image mr-1"></i> Scan from Photo
- </button>
- <label for="photoScanInput" id="mobileCamBtn" class="btn btn-kid-success btn-sm mb-1" style="display:none; margin:0;">
- <i class="fas fa-camera mr-1"></i> Open Camera
- </label>
- <input type="file" id="photoScanInput" class="d-none" accept="image/*" capture="environment">
+ <div class="card-body d-flex flex-column align-items-center justify-content-center text-center" style="min-height:420px;">
+ <div style="width:110px;height:110px;border-radius:28px;background:linear-gradient(135deg,rgba(168,192,255,0.25),rgba(240,147,251,0.18));display:flex;align-items:center;justify-content:center;margin-bottom:22px;">
+ <i class="fas fa-expand-arrows-alt fa-3x" style="color: var(--soft-purple);"></i>
+ </div>
+ <h4 style="color: var(--ink); font-weight:800; margin-bottom:6px;">Open the live camera scanner</h4>
+ <p style="color: var(--muted); font-size:14px; max-width:440px; margin:0 auto 26px; line-height:1.6;">
+ Fullscreen camera in a new tab — no sidebar, no menus. Detects QR codes anywhere in view,
+ any size, any angle. Results appear here automatically. Exit = close that tab.
+ </p>
+ <a href="<?= base_url('scan-kiosk') ?>" target="_blank" rel="noopener"
+ class="btn btn-kid-success btn-lg px-5" style="font-size:16px; padding:14px 48px !important;">
+ <i class="fas fa-qrcode mr-2"></i> Launch Scanner
+ </a>
+ <div class="mt-4" style="font-size:12.5px; color: var(--faint);">
+ <i class="fas fa-lightbulb mr-1"></i>
+                                    Keep this tab open — scanned results show in the panel below.
  </div>
  </div>
- <div class="card-body text-center">
- <div id="cameraControl" style="display:none;" class="mb-3 text-left">
- <select id="cameraSelect" class="form-control">
- <option value="back">Back Camera</option>
- <option value="front">Front Camera</option>
- </select>
- </div>
- <div id="reader" style="width:100%;max-width:560px;margin:0 auto;display:none;"></div>
- <div id="photoReader" style="width:100%;max-width:560px;margin:0 auto;display:none;"></div>
- <div id="scanResult" class="mt-3"></div>
  </div>
  </div>
 
- <!-- Manual Input -->
- <div class="card mb-4">
+ <!-- ===== RIGHT: MANUAL INPUT ===== -->
+ <div class="col-lg-5 col-md-6 col-12 mb-3">
+ <div class="card h-100">
  <div class="card-header">
  <h5 class="mb-0">
  <i class="fas fa-keyboard mr-2" style="color: var(--soft-teal);"></i>
-                                Manual QR Code Input
+                                        Manual QR Code Input
  </h5>
  </div>
- <div class="card-body text-center">
+ <div class="card-body d-flex flex-column justify-content-center" style="min-height:420px;">
+ <p style="color: var(--muted); font-size:13px; margin-bottom:16px;">
+ Backup mode — type the QR code printed on the parent/fetcher card if the camera is unavailable.
+ </p>
  <div class="input-group mb-3">
  <div class="input-group-prepend">
  <span class="input-group-text"><i class="fas fa-qrcode"></i></span>
  </div>
  <input type="text" id="qrInput" class="form-control text-center font-weight-bold"
-                                        placeholder="Enter QR Code (e.g. QR-4A2B8C3D1E5F)"
-                                        style="text-transform:uppercase;">
+ placeholder="e.g. QR-4A2B8C3D1E5F"
+ style="text-transform:uppercase;">
  </div>
-  <button class="btn btn-kid-primary px-4" id="verifyQrBtn">
+ <button class="btn btn-kid-primary btn-block" id="verifyQrBtn" style="padding:12px;">
  <i class="fas fa-search mr-1"></i> Verify QR Code
  </button>
- <div class="mt-3" id="qrResult"></div>
+ <div class="mt-3 text-center" id="qrResult"></div>
  </div>
  </div>
  </div>
 
+ </div>
+
  <!-- ===== BELOW: Results (Full Width) ===== -->
+ <div class="row">
  <div class="col-12">
 
  <!-- Empty State -->
@@ -495,7 +488,7 @@ body {
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-<script src="<?= base_url('public/html5qrcode/html5-qrcode.min.js') ?>"></script>
+<script src="<?= base_url('html5qrcode/html5-qrcode.min.js') ?>"></script>
 
 <script>
 var BASE_URL = '<?= base_url() ?>/';
@@ -504,379 +497,13 @@ var CSRF_HASH = '<?= csrf_hash() ?>';
 
 $(function() {
     var html5QrCode, isScanning = false, pendingStudentId = null, pendingParentId = null;
-    var availableCameras = [];
-    var selectedCamera = 'back';
     var scanStartTime = 0;
 
-    initCameraSelector();
-
-    // On insecure http the browser BLOCKS the live in-page camera. Split behaviour:
-    //   - Phone/tablet : use the native camera app (open the photo input via a <label>).
-    //   - Laptop/desktop: keep the normal live-camera UI (works on localhost/https)
-    //                     and only add the camera-app button as a backup.
-    if (isInsecureHttp()) {
-        if (isMobileDevice()) {
-            $('#startCameraBtn, #stopCameraBtn, #photoScanBtn, #cameraControl').hide();
-            $('#mobileCamBtn').show();
-            $('#mobileCamBtn').html('<i class="fas fa-camera mr-1"></i> TAP to Open Camera &amp; Scan QR');
-            $('#mobileCamBtn').addClass('btn-lg btn-block');
-            $('#scanResult').html('<span style="color: var(--soft-orange);"><i class="fas fa-info-circle mr-1"></i> Live camera is blocked here, so the green button uses your phone\'s camera app. Steps: <strong>1)</strong> tap the green button  camera opens. <strong>2)</strong> take the photo close-up (QR code fills the screen, good light). <strong>3)</strong> wait — it is read automatically.</span>');
-        } else {
-            $('#mobileCamBtn').show();
-            $('#mobileCamBtn').html('<i class="fas fa-image mr-1"></i> Camera / Photo');
-                $('#scanResult').html('<span style="color: var(--soft-orange);"><i class="fas fa-info-circle mr-1"></i> Live camera is blocked on this connection (needs localhost or https). On this laptop open <strong>' + BASE_URL + 'scan</strong> to use the live external camera.</span>');
-        }
-    }
-
-    // Enumerate available cameras and populate the Back/Front selector
-    function initCameraSelector() {
-        if (!Html5Qrcode.getCameras) return;
-        Html5Qrcode.getCameras().then(function(devices) {
-            availableCameras = devices || [];
-            if (availableCameras.length === 0) return;
-
-            var backFound = false, frontFound = false;
-            availableCameras.forEach(function(cam) {
-                var label = (cam.label || '').toLowerCase();
-                if (/back|rear|environment|后|右/i.test(label)) backFound = true;
-                if (/front|user|前置|自拍/i.test(label)) frontFound = true;
-            });
-
-            var $sel = $('#cameraSelect');
-            $sel.find('option:not(.base)').remove();
-            $sel.append('<option value="back">Back Camera</option>');
-            $sel.append('<option value="front">Front Camera</option>');
-            availableCameras.forEach(function(cam, i) {
-                $sel.append('<option value="' + cam.id + '">' + (cam.label || ('Camera ' + (i + 1))) + '</option>');
-            });
-
-            // Thumbnail heuristic: preferred default stays "back"
-            if (backFound) selectedCamera = 'back';
-            else if (frontFound) selectedCamera = 'front';
-            else selectedCamera = availableCameras[0].id;
-            $sel.val(selectedCamera);
-            $('#cameraControl').show();
-        }).catch(function() {});
-    }
-
-    // Rebuild html5QrCode and read the selected device
-    function getCameraConfig() {
-        var val = $('#cameraSelect').val() || selectedCamera;
-        if (val === 'back') return { facingMode: { exact: 'environment' } };
-        if (val === 'front') return { facingMode: { exact: 'user' } };
-        return { deviceId: { exact: val } };
-    }
-
-    function startCamera() {
-        if (isScanning) return;
-        scanStartTime = performance.now();
-        // On plain http (non-localhost) the in-page live camera is always
-        // blocked by the browser.
-        if (isInsecureHttp()) {
-            if (isMobileDevice()) {
-                // Phone: go straight to the phone's camera app (same QR-photo flow).
-                $('#scanResult').html('<span style="color: var(--muted);"><i class="fas fa-camera mr-1"></i> Live camera is blocked on this connection — opening the camera app instead...</span>');
-                $('#photoScanInput').click();
-            } else {
-                // Desktop: explain how to get the live (external) camera back.
-                $('#scanResult').html('<span style="color: var(--soft-orange);"><i class="fas fa-info-circle mr-1"></i> Live camera is blocked on this connection. On this laptop open <strong>http://localhost:8080/scan</strong> to use the live external camera, or tap "Camera / Photo".</span>');
-            }
-            return;
-        }
-        isScanning = true;
-        $('#reader').show();
-        $('#startCameraBtn').hide();
-        $('#stopCameraBtn').show();
-        $('#cameraSelect').prop('disabled', true);
-        $('#scanResult').html('<span style="color: var(--muted);"><i class="fas fa-sync-alt fa-spin mr-1"></i> Starting camera...</span>');
-
-        html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start(
-            getCameraConfig(),
-            {
-                fps: 30,
-                qrbox: function(viewWidth, viewHeight) {
-                    var min = Math.floor(Math.min(viewWidth, viewHeight) * 0.8);
-                    return { width: min, height: min };
-                },
-                aspectRatio: 1.0,
-                disableFlip: false,
-                rememberLastUsedCamera: true,
-                supportedScanTypes: [0],
-                useBarCodeDetectorIfSupported: true,
-                experimentalFeatures: { useBarCodeDetectorIfSupported: true }
-            },
-            function(decodedText) {
-                if (!decodedText) return;
-                $('#scanResult').html('<span style="color: var(--soft-green); font-weight: bold;"><i class="fas fa-check-circle mr-1"></i> QR Code Scanned! (' + Math.round(performance.now() - scanStartTime) + 'ms)</span>');
-                stopCamera(false, true);
-                verifyQrCode(decodedText);
-            },
-            function(errorMessage) {
-                // Scanning in progress, do nothing
-            }
-        ).then(function() {
-            $('#scanResult').html('<span style="color: var(--soft-green);"><i class="fas fa-camera mr-1"></i> Camera ready. Point at the QR code.</span>');
-        }).catch(function(err) {
-            isScanning = false;
-            $('#startCameraBtn').show();
-            $('#stopCameraBtn').hide();
-            $('#cameraSelect').prop('disabled', false);
-            var msg = (err && err.message) ? err.message : 'Camera error';
-            $('#scanResult').html('<span style="color: var(--soft-rose);"><i class="fas fa-exclamation-triangle mr-1"></i> Camera error: ' + msg + '</span>');
-            setTimeout(function() {
-                if (isInsecureHttp() && !isMobileDevice()) {
-                    $('#scanResult').html('<span style="color: var(--muted);"><i class="fas fa-exclamation-circle mr-1"></i> Tip: open <strong>http://localhost:8080/scan</strong> on this laptop for the live external camera.</span>');
-                } else {
-                    $('#scanResult').html('<span style="color: var(--muted);"><i class="fas fa-exclamation-circle mr-1"></i> If the camera does not open, tap Start above to retry.</span>');
-                }
-            }, 6000);
-        });
-    }
-
-    function stopCamera(showStart, keepScanning) {
-        if (html5QrCode) {
-            html5QrCode.stop().then(function() {
-                isScanning = false;
-                $('#reader').hide();
-                $('#stopCameraBtn').hide();
-                $('#cameraSelect').prop('disabled', false);
-                if (showStart !== false) $('#startCameraBtn').show();
-                if (!keepScanning) $('#scanResult').html('');
-            }).catch(function() {});
-        }
-    }
-
-    $('#stopCameraBtn').click(function() { stopCamera(true); });
-
-    $('#startCameraBtn').click(function() {
-        startCamera();
-    });
-
-    // ===== SCAN QR CODE FROM A PHOTO (uses the phone camera app, works over http) =====
-    function isInsecureHttp() {
-        return !window.isSecureContext && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
-    }
-
-    // True for phones/tablets that need the native camera app on http.
-    // Uses UA + touch-points + userAgentData so it stays correct even on
-    // phones whose UA string is abbreviated or custom.
-    function isMobileDevice() {
-        if (/Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile|BlackBerry/i.test(navigator.userAgent)) return true;
-        if (navigator.maxTouchPoints > 1 && (screen.width < 1024 || /Android/i.test(navigator.userAgent))) return true;
-        if (navigator.userAgentData && navigator.userAgentData.mobile) return true;
-        return false;
-    }
-
-    // Load a picked File into an <img> element (browser applies EXIF orientation).
-    function loadImage(file) {
-        return new Promise(function(resolve, reject) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                var img = new Image();
-                img.onload = function() { resolve(img); };
-                img.onerror = reject;
-                img.src = e.target.result;
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-        });
-    }
-
-    // Redraw the image onto a white canvas at a max dimension and export as a
-    // normalized JPEG File. This fixes HEIC/PNG/rotate formats that the QR
-    // decoder cannot read and clips huge photos to a scan-friendly size.
-    function normalizeImage(img, maxDim) {
-        var scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-        var cw = Math.max(1, Math.round(img.width * scale));
-        var ch = Math.max(1, Math.round(img.height * scale));
-        var canvas = document.createElement('canvas');
-        canvas.width = cw;
-        canvas.height = ch;
-        var ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(0, 0, cw, ch);
-        ctx.drawImage(img, 0, 0, cw, ch);
-        return new Promise(function(resolve) {
-            canvas.toBlob(function(blob) {
-                if (blob) {
-                    resolve(new File([blob], 'scan.jpg', { type: 'image/jpeg' }));
-                } else {
-                    resolve(null);
-                }
-            }, 'image/jpeg', 0.95);
-        });
-    }
-
-    // Zoom into the center of the photo where the QR usually sits and re-encode
-    // as a JPEG. Helps when the QR is small inside the shot.
-    function centerCropCandidate(img, zoom) {
-        var srcW = img.naturalWidth || img.width;
-        var srcH = img.naturalHeight || img.height;
-        var cw = Math.max(1, Math.round(srcW / zoom));
-        var ch = Math.max(1, Math.round(srcH / zoom));
-        var sx = Math.floor((srcW - cw) / 2);
-        var sy = Math.floor((srcH - ch) / 2);
-        var outMax = 1400;
-        var scale = outMax / Math.max(cw, ch);
-        if (scale > 1) scale = 1;
-        var dw = Math.max(1, Math.round(cw * scale));
-        var dh = Math.max(1, Math.round(ch * scale));
-        var canvas = document.createElement('canvas');
-        canvas.width = dw;
-        canvas.height = dh;
-        var ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(0, 0, dw, dh);
-        ctx.drawImage(img, sx, sy, cw, ch, 0, 0, dw, dh);
-        return new Promise(function(resolve) {
-            canvas.toBlob(function(blob) {
-                resolve(blob ? new File([blob], 'crop.jpg', { type: 'image/jpeg' }) : null);
-            }, 'image/jpeg', 0.95);
-        });
-    }
-
-    // Convert the photo to high-contrast black & white (Otsu threshold).
-    // This is the single most effective trick for phone photos affected by
-    // glare, low light, moiré or slight blur — the QR becomes sharp black/white.
-    function binarizeCandidate(img, maxDim) {
-        var scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-        var cw = Math.max(1, Math.round(img.width * scale));
-        var ch = Math.max(1, Math.round(img.height * scale));
-        var canvas = document.createElement('canvas');
-        canvas.width = cw;
-        canvas.height = ch;
-        var ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(0, 0, cw, ch);
-        ctx.drawImage(img, 0, 0, cw, ch);
-        var px = ctx.getImageData(0, 0, cw, ch).data;
-
-        var hist = new Array(256).fill(0);
-        for (var i = 0; i < px.length; i += 4) {
-            hist[Math.round(0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2])]++;
-        }
-        var total = cw * ch, sum = 0, sumB = 0, wB = 0, maxVar = -1, threshold = 128;
-        for (var t = 0; t < 256; t++) sum += t * hist[t];
-        for (var t = 0; t < 256; t++) {
-            wB += hist[t];
-            if (wB === 0) continue;
-            var wF = total - wB;
-            if (wF === 0) break;
-            sumB += t * hist[t];
-            var mB = sumB / wB, mF = (sum - sumB) / wF;
-            var between = wB * wF * (mB - mF) * (mB - mF);
-            if (between > maxVar) { maxVar = between; threshold = t; }
-        }
-
-        var out = ctx.createImageData(cw, ch);
-        var d = out.data;
-        for (var j = 0; j < px.length; j += 4) {
-            var lum = Math.round(0.299 * px[j] + 0.587 * px[j + 1] + 0.114 * px[j + 2]);
-            var v = lum < threshold ? 0 : 255;
-            d[j] = d[j + 1] = d[j + 2] = v;
-            d[j + 3] = 255;
-        }
-        ctx.putImageData(out, 0, 0);
-        return new Promise(function(resolve) {
-            canvas.toBlob(function(blob) {
-                resolve(blob ? new File([blob], 'bin.jpg', { type: 'image/jpeg' }) : null);
-            }, 'image/jpeg', 0.92);
-        });
-    }
-
-    // Race ALL candidates in parallel — first success wins, hard 3s cap.
-    function tryScan(files) {
-        return new Promise(function(resolve, reject) {
-            if (!files || !files.length) return reject(null);
-            var settled = 0, winner = null;
-            var scanners = files.map(function(f) {
-                return new Html5Qrcode("photoReader");
-            });
-            var timeout = setTimeout(function() {
-                if (!winner) {
-                    scanners.forEach(function(s) { try { s.clear(); } catch(e){} });
-                    reject(null);
-                }
-            }, 3000);
-            files.forEach(function(f, i) {
-                scanners[i].scanFile(f, true)
-                    .then(function(decodedText) {
-                        if (winner === null && decodedText) {
-                            winner = decodedText;
-                            clearTimeout(timeout);
-                            scanners.forEach(function(s) { try { s.clear(); } catch(e){} });
-                            resolve(decodedText);
-                        }
-                    })
-                    .catch(function() {
-                        settled++;
-                        if (settled === files.length && !winner) {
-                            clearTimeout(timeout);
-                            scanners.forEach(function(s) { try { s.clear(); } catch(e){} });
-                            reject(null);
-                        }
-                    });
-            });
-        });
-    }
-
-    $('#photoScanBtn').click(function() {
-        if (isScanning) { stopCamera(true, true); }
-        $('#photoScanInput').click();
-    });
-
-    $('#photoScanInput').on('change', function() {
-        var file = this.files[0];
-        this.value = '';
-        if (!file) return;
-        $('#photoReader').show();
-        $('#scanResult').html('<span style="color: var(--muted);"><i class="fas fa-spinner fa-spin mr-1"></i> Reading QR code from photo...</span>');
-        loadImage(file)
-            .then(function(img) {
-                // Build all candidates in parallel.
-                return Promise.all([
-                    binarizeCandidate(img, 1200),
-                    normalizeImage(img, 1600),
-                    centerCropCandidate(img, 2.2),
-                    centerCropCandidate(img, 3.5),
-                    normalizeImage(img, 700),
-                    Promise.resolve(file)
-                ]).then(function(arr) {
-                    return arr.filter(Boolean);
-                });
-            })
-            .then(function(candidates) {
-                return tryScan(candidates);
-            })
-            .then(function(decodedText) {
-                $('#photoReader').hide();
-                $('#scanResult').html('<span style="color: var(--soft-green); font-weight: bold;"><i class="fas fa-check-circle mr-1"></i> QR Code Scanned!</span>');
-                verifyQrCode(decodedText);
-            })
-            .catch(function() {
-                $('#photoReader').hide();
-                $('#scanResult').html('<span style="color: var(--soft-rose);"><i class="fas fa-exclamation-triangle mr-1"></i> Could not read the QR code from the photo. Take the shot close-up with the QR code filling the frame and good lighting, then retry, or type the code manually.</span>');
-                setTimeout(function() {
-                    $('#scanResult').html('');
-                }, 8000);
-            });
-    });
-
-    // Switch front/back camera live
-    $('#cameraSelect').on('change', function() {
-        if (isScanning) {
-            html5QrCode.stop().then(function() {
-                isScanning = false;
-                $('#reader').hide();
-                startCamera();
-            }).catch(function() {
-                startCamera();
-            });
-        } else {
-            startCamera();
-        }
-    });
+    // Camera now lives on the fullscreen kiosk page (/scan-kiosk). These are
+    // no-op stubs so verify/release/reset flows below keep working unchanged.
+    var html5QrCode = null, isScanning = false, pendingStudentId = null, pendingParentId = null;
+    function startCamera() {}
+    function stopCamera() {}
 
     // Manual verify
     $('#verifyQrBtn').click(function() {
@@ -923,7 +550,7 @@ $(function() {
             );
         }
         $('#gateOpenBanner').hide();
-        $('#startCameraBtn, #stopCameraBtn, #photoScanBtn, #mobileCamBtn, #verifyQrBtn').prop('disabled', true);
+        $('#verifyQrBtn').prop('disabled', true);
     }
 
     // The scan-session switch itself lives in Date Management > Edit.
@@ -980,7 +607,7 @@ $(function() {
         if (session) { currentSession = session; }
         refreshStatusBadges(hours, session, sessionOverride, true);
         $('#gateClosedBanner').hide();
-        $('#startCameraBtn, #photoScanBtn, #verifyQrBtn').prop('disabled', false);
+        $('#verifyQrBtn').prop('disabled', false);
     }
 
     if (gateClosed) {
@@ -1098,14 +725,9 @@ $(function() {
                 if (stuList.length > 0) {
                     stuList.forEach(function(s) {
                         var sid = s.student_id || s.id;
-                        var studentPic = s.picture ? BASE_URL + 'uploads/students/' + s.picture : '';
                         html += '<div class="d-flex align-items-center border rounded p-3 mb-2 student-item">';
                         html += '<div class="mr-3">';
-                        if (s.picture) {
-                            html += '<img src="' + studentPic + '" class="img-circle" style="width:56px;height:56px;border:3px solid rgba(129,199,132,0.5);">';
-                        } else {
-                            html += '<div class="img-circle d-flex align-items-center justify-content-center" style="width:56px;height:56px;border:3px solid rgba(129,199,132,0.35);background:rgba(129,199,132,0.10);"><i class="fas fa-child" style="color: var(--soft-green); font-size:22px;"></i></div>';
-                        }
+                        html += '<div class="img-circle d-flex align-items-center justify-content-center" style="width:56px;height:56px;border:3px solid rgba(129,199,132,0.35);background:rgba(129,199,132,0.10);"><i class="fas fa-child" style="color: var(--soft-green); font-size:22px;"></i></div>';
                         html += '</div>';
                         html += '<div class="flex-grow-1"><strong style="font-size:1.05rem; color: var(--ink);">' + s.fname + ' ' + s.lname + '</strong><br><span class="badge badge-light" style="font-size:12px; padding:5px 12px;">' + (s.grade_section || 'N/A') + '</span></div>';
 

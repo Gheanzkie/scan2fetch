@@ -292,14 +292,10 @@
  <?php if (!empty($myStudents)): ?>
  <?php foreach ($myStudents as $st): ?>
  <div class="d-flex align-items-center p-3 mb-2" style="border:1px solid rgba(108,140,255,0.06);border-radius:14px;transition:background 0.2s;">
- <div class="mr-3" style="cursor:pointer;" onclick="openImageViewer('<?= !empty($st['picture']) ? base_url('public/uploads/students/' . $st['picture']) : '' ?>', '<?= esc($st['fname'] . ' ' . $st['lname']) ?>')">
- <?php if (!empty($st['picture'])): ?>
- <img src="<?= base_url('public/uploads/students/' . $st['picture']) ?>" class="img-circle" style="width:45px;height:45px;object-fit:cover;">
- <?php else: ?>
+ <div class="mr-3">
  <div class="img-circle d-flex align-items-center justify-content-center" style="width:45px;height:45px;background:#f1f5f9;">
  <i class="fas fa-child" style="color: #94a3b8; font-size: 1.1rem;"></i>
  </div>
- <?php endif; ?>
  </div>
  <div class="flex-grow-1">
  <strong style="color: #0f172a; font-size:14px;"><?= esc($st['fname']) ?> <?= esc($st['lname']) ?></strong>
@@ -371,15 +367,10 @@
  <div class="col-md-4 mb-3">
  <div class="kid-card">
  <div class="card-body text-center">
- <div style="width:110px;height:110px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #eef2ff;box-shadow: 0 4px 12px rgba(15,23,42,.08);cursor:pointer;"
-                                 onclick="openImageViewer('<?= !empty($parentProfile['picture']) ? base_url('public/uploads/parents/' . $parentProfile['picture']) : '' ?>', '<?= esc(($parentProfile['fname'] ?? session('fname')) . ' ' . ($parentProfile['lname'] ?? session('lname'))) ?>')">
- <?php if (!empty($parentProfile['picture'])): ?>
- <img src="<?= base_url('public/uploads/parents/' . $parentProfile['picture']) ?>" style="width:100%;height:100%;object-fit:cover;">
- <?php else: ?>
+ <div style="width:110px;height:110px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #eef2ff;box-shadow: 0 4px 12px rgba(15,23,42,.08);">
  <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f1f5f9;">
  <i class="fas fa-user fa-3x" style="color: #94a3b8;"></i>
  </div>
- <?php endif; ?>
  </div>
  <h5 class="mt-3 mb-1" style="color: #0f172a;">
  <?= esc($parentProfile['fname'] ?? session('fname')) ?>
@@ -390,9 +381,9 @@
  </p>
  <?php if (!empty($parentProfile['qr_code'])): ?>
  <div class="mb-2">
- <img src="<?= base_url('public/uploads/qr/' . $parentProfile['qr_code'] . '.png') ?>"
+ <img src="<?= base_url('uploads/qr/' . $parentProfile['qr_code'] . '.png') ?>"
                                      style="width:100px;height:100px;border:2px solid #e2e8f0;border-radius:8px;cursor:pointer;"
-                                     onclick="openQrModal('<?= base_url('public/uploads/qr/' . $parentProfile['qr_code'] . '.png') ?>', '<?= esc($parentProfile['fname'] ?? session('fname')) ?>')">
+                                     onclick="openQrModal('<?= base_url('uploads/qr/' . $parentProfile['qr_code'] . '.png') ?>', '<?= esc($parentProfile['fname'] ?? session('fname')) ?>')">
  <p style="color: #64748b; font-size: 0.8rem; margin-top: 5px;">
                                     My QR Code
  </p>
@@ -413,23 +404,19 @@
  <div class="card-body">
  <?php foreach ($subFetchers as $f): ?>
  <div class="subfetcher-item d-flex align-items-center p-2 mb-2">
- <div class="mr-2" style="cursor:pointer;" onclick="openImageViewer('<?= !empty($f['picture']) ? base_url('public/uploads/parents/' . $f['picture']) : '' ?>', '<?= esc($f['fname'] . ' ' . $f['lname']) ?>')">
- <?php if(!empty($f['picture'])): ?>
- <img src="<?= base_url('public/uploads/parents/' . $f['picture']) ?>" class="img-circle" style="width:40px;height:40px;object-fit:cover;">
- <?php else: ?>
+ <div class="mr-2">
  <div class="img-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;background:#f1f5f9;">
  <i class="fas fa-user" style="color: #94a3b8;"></i>
  </div>
- <?php endif; ?>
  </div>
  <div class="flex-grow-1">
  <strong style="color: #0f172a;"><?= esc($f['fname']) ?> <?= esc($f['lname']) ?></strong>
  <br><small class="text-muted"><?= esc($f['phone']) ?></small>
  </div>
  <?php if(!empty($f['qr_code'])): ?>
- <img src="<?= base_url('public/uploads/qr/'.$f['qr_code'].'.png') ?>"
+ <img src="<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>"
                                          style="width:32px;height:32px;border:1px solid #e2e8f0;border-radius:4px;cursor:pointer;"
-                                         onclick="openQrModal('<?= base_url('public/uploads/qr/'.$f['qr_code'].'.png') ?>', '<?= esc($f['fname']) ?>')">
+                                         onclick="openQrModal('<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>', '<?= esc($f['fname']) ?>')">
  <?php endif; ?>
  </div>
  <?php endforeach; ?>
@@ -453,14 +440,10 @@
  <?php foreach ($myChildren as $child): ?>
  <div class="col-md-6 mb-3">
  <div class="child-item d-flex align-items-center p-3">
- <div class="mr-3" style="cursor:pointer;" onclick="openImageViewer('<?= !empty($child['picture']) ? base_url('public/uploads/students/' . $child['picture']) : '' ?>', '<?= esc($child['fname'] . ' ' . $child['lname']) ?>')">
- <?php if (!empty($child['picture'])): ?>
- <img src="<?= base_url('public/uploads/students/' . $child['picture']) ?>" class="img-circle" style="width:50px;height:50px;object-fit:cover;">
- <?php else: ?>
+ <div class="mr-3">
  <div class="img-circle d-flex align-items-center justify-content-center" style="width:50px;height:50px;background:#f1f5f9;">
  <i class="fas fa-child" style="color: #94a3b8; font-size: 1.3rem;"></i>
  </div>
- <?php endif; ?>
  </div>
  <div class="flex-grow-1">
  <strong style="color: #0f172a;"><?= esc($child['fname']) ?> <?= esc($child['lname']) ?></strong>
