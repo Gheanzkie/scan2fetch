@@ -879,7 +879,7 @@ $(function () {
         if (picked === SCAN_SESSION && (SCAN_SESSION_OVR || null) === picked) return; // already there
 
         $tg.addClass('is-busy');
-        $.post('scan/set-session', { session: picked, [CSRF_NAME]: CSRF_HASH }, function (d) {
+        $.post('schedule/set-session', { session: picked, [CSRF_NAME]: CSRF_HASH }, function (d) {
             $tg.removeClass('is-busy');
             if (d && d.success) {
                 SCAN_SESSION = d.session;

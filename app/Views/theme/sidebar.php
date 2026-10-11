@@ -46,13 +46,15 @@
  <nav class="mt-2">
  <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
 
- <!-- Dashboard -->
+ <?php if (session('role') != 'staff'): ?>
+ <!-- Dashboard (staff sidebar = QR Scan + Students Status only) -->
  <li class="nav-item">
  <a href="<?= base_url('dashboard') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'dashboard') ? 'active' : '' ?>">
  <i class="nav-icon fas fa-tachometer-alt"></i>
  <p>Dashboard</p>
  </a>
  </li>
+ <?php endif; ?>
 
  <?php if (session('role') == 'admin'): ?>
  <!-- ===== MANAGEMENT ===== -->
@@ -93,25 +95,11 @@
  </a>
  </li>
 
- <!-- ===== OPERATIONS ===== -->
- <li class="nav-header">OPERATIONS</li>
+  <!-- ===== OPERATIONS ===== -->
+  <!-- QR Scan is staff-only now (removed from admin sidebar). -->
 
- <li class="nav-item">
- <a href="<?= base_url('scan') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'scan') ? 'active' : '' ?>">
- <i class="nav-icon fas fa-qrcode" style="color: #f472b6;"></i>
- <p>QR Scan</p>
- </a>
- </li>
-
- <li class="nav-item">
- <a href="<?= base_url('scan-monitor') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'scan-monitor') ? 'active' : '' ?>">
- <i class="nav-icon fas fa-desktop" style="color: #38bdf8;"></i>
- <p>Students Status</p>
- </a>
- </li>
-
- <!-- ===== REPORTS ===== -->
- <li class="nav-header">REPORTS</li>
+  <!-- ===== REPORTS ===== -->
+  <li class="nav-header">REPORTS</li>
 
  <li class="nav-item">
  <a href="<?= base_url('schedule') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'schedule') ? 'active' : '' ?>">
@@ -145,16 +133,7 @@
 
 
  <?php if (session('role') == 'staff'): ?>
- <!-- ===== OPERATIONS ===== -->
- <li class="nav-header">OPERATIONS</li>
-
- <li class="nav-item">
- <a href="<?= base_url('register') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'students-add') ? 'active' : '' ?>">
- <i class="nav-icon fas fa-user-plus" style="color: #4ade80;"></i>
- <p>Register Student</p>
- </a>
- </li>
-
+ <!-- ===== STAFF: QR Scanner + Student Monitoring only ===== -->
  <li class="nav-item">
  <a href="<?= base_url('scan') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'scan') ? 'active' : '' ?>">
  <i class="nav-icon fas fa-qrcode" style="color: #f472b6;"></i>
@@ -166,56 +145,6 @@
  <a href="<?= base_url('scan-monitor') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'scan-monitor') ? 'active' : '' ?>">
  <i class="nav-icon fas fa-desktop" style="color: #38bdf8;"></i>
  <p>Students Status</p>
- </a>
- </li>
-
- <li class="nav-item">
- <a href="<?= base_url('students') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'students') ? 'active' : '' ?>">
- <i class="nav-icon fas fa-user-graduate" style="color: #fbbf24;"></i>
- <p>Students</p>
- </a>
- </li>
-
- <li class="nav-item">
- <a href="<?= base_url('parents') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'parents') ? 'active' : '' ?>">
- <i class="nav-icon fas fa-users" style="color: #38bdf8;"></i>
- <p>Parents</p>
- </a>
- </li>
-
- <li class="nav-item">
- <a href="<?= base_url('teachers') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'teachers-view') ? 'active' : '' ?>">
- <i class="nav-icon fas fa-chalkboard-teacher" style="color: #f472b6;"></i>
- <p>Teachers</p>
- </a>
- </li>
-
- <li class="nav-item">
- <a href="<?= base_url('schedule') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'schedule') ? 'active' : '' ?>">
- <i class="nav-icon fas fa-calendar-alt" style="color: #38bdf8;"></i>
- <p>Date Management</p>
- </a>
- </li>
-
- <li class="nav-item">
- <a href="<?= base_url('logs') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'logs') ? 'active' : '' ?>">
- <i class="nav-icon fas fa-history" style="color: #fbbf24;"></i>
- <p>Activity Logs</p>
- </a>
- </li>
-
- <li class="nav-item">
- <a href="<?= base_url('sms-logs') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'sms-logs') ? 'active' : '' ?>">
- <i class="nav-icon fas fa-sms" style="color: #4ade80;"></i>
- <p>SMS Logs</p>
- </a>
- </li>
-
- <li class="nav-item">
- <a href="<?= base_url('messages') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'messages') ? 'active' : '' ?>">
- <i class="nav-icon fas fa-comments" style="color: #f472b6;"></i>
- <p>Messages</p>
- <span class="right badge badge-danger msg-badge" style="display:none;">0</span>
  </a>
  </li>
  <?php endif; ?>

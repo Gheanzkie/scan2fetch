@@ -4,7 +4,7 @@ use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
 
-$routes->get('/', 'Welcome::index');
+$routes->get('/', 'index::index');
 $routes->get('login', 'Login::index');
 $routes->post('login', 'Auth::auth');
 
@@ -99,6 +99,9 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('schedule/close', 'Schedule::closeDay');
     $routes->post('schedule/save', 'Schedule::save');
     $routes->post('schedule/save-sessions', 'Schedule::saveSessions');
+    // Session switch lives here now (admin-only via schedule ACL) since
+    // /scan/* is staff-only — scan/set-session is kept for staff use too.
+    $routes->post('schedule/set-session', 'Scan::setSession');
 
     // ===== ACTIVITY LOGS =====
     $routes->get('logs', 'Logs::index');

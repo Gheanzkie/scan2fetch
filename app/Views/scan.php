@@ -347,6 +347,24 @@ body {
  <i class="fas fa-camera mr-2" style="color: var(--soft-blue);"></i>
                                 Camera Scanner
  </h5>
+
+ <!-- Operating hours + active session strip -->
+ <div class="d-flex align-items-center flex-wrap" style="gap:6px;">
+   <span class="badge badge-light" id="opHoursBadge" title="Operating hours from Date Management"
+         style="background:rgba(168,192,255,0.18);color:var(--soft-purple);">
+     <i class="far fa-clock mr-1"></i>
+     <?= esc($gateHours['open'] ?? '07:00') ?> &ndash; <?= esc($gateHours['close'] ?? '17:00') ?>
+   </span>
+   <span class="badge" id="sessionBadge"
+         style="background:<?= ($currentSession ?? 'morning') === 'morning' ? '#fef3c7' : '#e0e7ff' ?>;color:<?= ($currentSession ?? 'morning') === 'morning' ? '#b45309' : '#3730a3' ?>;">
+     <i class="fas fa-sun mr-1" id="sessionIcon"></i><span id="sessionLabel"><?= strtoupper($currentSession ?? 'MORNING') ?></span>
+     <span id="sessionManualTag" style="display:<?= !empty($sessionOverride) ? 'inline' : 'none' ?>;font-weight:700;">&middot; MANUAL</span>
+   </span>
+   <span class="badge badge-success" id="dayStatusBadge" style="display:none;">
+     <i class="fas fa-lock-open mr-1"></i>OPEN
+   </span>
+ </div>
+
  <div class="d-flex align-items-center" style="gap: 6px;">
  <button class="btn btn-kid-success btn-sm" id="startCameraBtn">
  <i class="fas fa-play mr-1"></i> Start
@@ -488,6 +506,7 @@ $(function() {
     var html5QrCode, isScanning = false, pendingStudentId = null, pendingParentId = null;
     var availableCameras = [];
     var selectedCamera = 'back';
+    var scanStartTime = 0;
 
     initCameraSelector();
 
@@ -550,6 +569,7 @@ $(function() {
 
     function startCamera() {
         if (isScanning) return;
+        scanStartTime = performance.now();
         // On plain http (non-localhost) the in-page live camera is always
         // blocked by the browser.
         if (isInsecureHttp()) {
@@ -573,9 +593,22 @@ $(function() {
         html5QrCode = new Html5Qrcode("reader");
         html5QrCode.start(
             getCameraConfig(),
-            { fps: 10, qrbox: { width: 320, height: 320 } },
+            {
+                fps: 30,
+                qrbox: function(viewWidth, viewHeight) {
+                    var min = Math.floor(Math.min(viewWidth, viewHeight) * 0.8);
+                    return { width: min, height: min };
+                },
+                aspectRatio: 1.0,
+                disableFlip: false,
+                rememberLastUsedCamera: true,
+                supportedScanTypes: [0],
+                useBarCodeDetectorIfSupported: true,
+                experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+            },
             function(decodedText) {
-                $('#scanResult').html('<span style="color: var(--soft-green); font-weight: bold;"><i class="fas fa-check-circle mr-1"></i> QR Code Scanned!</span>');
+                if (!decodedText) return;
+                $('#scanResult').html('<span style="color: var(--soft-green); font-weight: bold;"><i class="fas fa-check-circle mr-1"></i> QR Code Scanned! (' + Math.round(performance.now() - scanStartTime) + 'ms)</span>');
                 stopCamera(false, true);
                 verifyQrCode(decodedText);
             },
@@ -752,21 +785,40 @@ $(function() {
         });
     }
 
-    function tryScan(files, attempt) {
-        $('#scanResult').html('<span style="color: var(--muted);"><i class="fas fa-sync-alt fa-spin mr-1"></i> Reading QR code from photo... (attempt ' + (attempt + 1) + ' of ' + files.length + ')</span>');
-        var scanner = new Html5Qrcode("photoReader");
-        return scanner.scanFile(files[attempt], true)
-            .then(function(decodedText) {
-                scanner.clear();
-                return decodedText;
-            })
-            .catch(function() {
-                scanner.clear();
-                if (attempt + 1 < files.length) {
-                    return tryScan(files, attempt + 1);
-                }
-                return Promise.reject(null);
+    // Race ALL candidates in parallel — first success wins, hard 3s cap.
+    function tryScan(files) {
+        return new Promise(function(resolve, reject) {
+            if (!files || !files.length) return reject(null);
+            var settled = 0, winner = null;
+            var scanners = files.map(function(f) {
+                return new Html5Qrcode("photoReader");
             });
+            var timeout = setTimeout(function() {
+                if (!winner) {
+                    scanners.forEach(function(s) { try { s.clear(); } catch(e){} });
+                    reject(null);
+                }
+            }, 3000);
+            files.forEach(function(f, i) {
+                scanners[i].scanFile(f, true)
+                    .then(function(decodedText) {
+                        if (winner === null && decodedText) {
+                            winner = decodedText;
+                            clearTimeout(timeout);
+                            scanners.forEach(function(s) { try { s.clear(); } catch(e){} });
+                            resolve(decodedText);
+                        }
+                    })
+                    .catch(function() {
+                        settled++;
+                        if (settled === files.length && !winner) {
+                            clearTimeout(timeout);
+                            scanners.forEach(function(s) { try { s.clear(); } catch(e){} });
+                            reject(null);
+                        }
+                    });
+            });
+        });
     }
 
     $('#photoScanBtn').click(function() {
@@ -782,16 +834,20 @@ $(function() {
         $('#scanResult').html('<span style="color: var(--muted);"><i class="fas fa-spinner fa-spin mr-1"></i> Reading QR code from photo...</span>');
         loadImage(file)
             .then(function(img) {
-                var candidates = [];
-                var chain = Promise.resolve();
-                var add = function(f) { if (f) candidates.push(f); };
-                chain = chain.then(function() { return binarizeCandidate(img, 1200); }).then(add);
-                chain = chain.then(function() { return normalizeImage(img, 1600); }).then(add);
-                chain = chain.then(function() { return centerCropCandidate(img, 2.2); }).then(add);
-                chain = chain.then(function() { return centerCropCandidate(img, 3.5); }).then(add);
-                chain = chain.then(function() { return normalizeImage(img, 700); }).then(add);
-                chain = chain.then(function() { return Promise.resolve(file); }).then(add);
-                return chain.then(function() { return tryScan(candidates, 0); });
+                // Build all candidates in parallel.
+                return Promise.all([
+                    binarizeCandidate(img, 1200),
+                    normalizeImage(img, 1600),
+                    centerCropCandidate(img, 2.2),
+                    centerCropCandidate(img, 3.5),
+                    normalizeImage(img, 700),
+                    Promise.resolve(file)
+                ]).then(function(arr) {
+                    return arr.filter(Boolean);
+                });
+            })
+            .then(function(candidates) {
+                return tryScan(candidates);
             })
             .then(function(decodedText) {
                 $('#photoReader').hide();
@@ -852,6 +908,7 @@ $(function() {
     // ===== DATE MANAGEMENT LIVE GATE =====
     // Show/refresh the CLOSED banner and shut the scanner down.
     function showClosedBanner(message) {
+        refreshStatusBadges(null, null, sessionOverride, false);
         var $banner = $('#gateClosedBanner');
         if ($banner.length) {
             $banner.show();
@@ -873,15 +930,59 @@ $(function() {
     // Here we only track the override so the released session stays
     // consistent with the admin's pick.
 
-    function showOpenBanner(hours, session) {
-        if (session) { currentSession = session; }
-        $('#gateClosedBanner').hide();
-        $('#startCameraBtn, #photoScanBtn, #verifyQrBtn').prop('disabled', false);
+    // Sync the card-header strip (hours badge, session badge, MANUAL tag)
+    // with the latest server state from /schedule/status.
+    function refreshStatusBadges(hours, session, override, allowed) {
+        if (hours && hours.open && hours.close) {
+            $('#opHoursBadge').html('<i class="far fa-clock mr-1"></i>' + hours.open + ' \u2013 ' + hours.close);
+        }
+        if (session) {
+            currentSession = session;
+            var isMorning = session === 'morning';
+            $('#sessionLabel').text(session.toUpperCase());
+            $('#sessionIcon').attr('class', isMorning ? 'fas fa-sun mr-1' : 'fas fa-moon mr-1');
+            $('#sessionBadge').css({
+                background: isMorning ? '#fef3c7' : '#e0e7ff',
+                color: isMorning ? '#b45309' : '#3730a3'
+            });
+        }
+        if (override) {
+            sessionOverride = override;
+            $('#sessionManualTag').show();
+        } else {
+            sessionOverride = null;
+            $('#sessionManualTag').hide();
+        }
+        if (typeof allowed !== 'undefined') {
+            if (allowed) {
+                $('#dayStatusBadge').show().removeClass('badge-danger').addClass('badge-success')
+                    .html('<i class="fas fa-lock-open mr-1"></i>OPEN');
+            } else {
+                $('#dayStatusBadge').show().removeClass('badge-success').addClass('badge-danger')
+                    .html('<i class="fas fa-lock mr-1"></i>CLOSED');
+            }
+        }
     }
 
     var currentSession = <?= json_encode($currentSession ?? 'morning') ?>;
     var sessionOverride = <?= json_encode($sessionOverride ?? null) ?>;
     var gateClosed = <?= empty($gateAllowed) ? 'true' : 'false' ?>;
+
+    // Initial paint from PHP-passed values
+    refreshStatusBadges(
+        <?= json_encode($gateHours ?? []) ?>,
+        currentSession,
+        sessionOverride,
+        !gateClosed
+    );
+
+    function showOpenBanner(hours, session) {
+        if (session) { currentSession = session; }
+        refreshStatusBadges(hours, session, sessionOverride, true);
+        $('#gateClosedBanner').hide();
+        $('#startCameraBtn, #photoScanBtn, #verifyQrBtn').prop('disabled', false);
+    }
+
     if (gateClosed) {
         showClosedBanner(<?= json_encode($gateMessage ?? '') ?>);
         stopCamera(true);

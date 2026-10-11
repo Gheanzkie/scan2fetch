@@ -20,32 +20,37 @@ class AuthFilter implements FilterInterface
 {
     /** URI prefix => roles allowed. Matched on the first path segment. */
     private const ACL = [
-        // --- shared ---
-        'dashboard'        => ['admin', 'staff', 'teacher', 'parent'],
+        // --- shared account routes ---
         'logout'           => ['admin', 'staff', 'teacher', 'parent'],
         'change-password'  => ['admin', 'staff', 'teacher', 'parent'],
         'update-profile'   => ['admin', 'staff', 'teacher', 'parent'],
-        'messages'         => ['admin', 'staff', 'teacher', 'parent'],
 
-        // --- admin/staff management ---
+        // --- admin operations ---
+        'dashboard'        => ['admin', 'teacher', 'parent'],
+        'messages'         => ['admin', 'teacher', 'parent'],
+
         // 'students' also carries students-view, which Students::view() hands
         // over to /teachers-student-view for the teacher role.
-        'students'         => ['admin', 'staff', 'teacher'],
-        'register'         => ['admin', 'staff'],
-        'subfetchers'      => ['admin', 'staff'],
-        'logs'             => ['admin', 'staff'],
-        'sms-logs'         => ['admin', 'staff'],
-        'schedule'         => ['admin', 'staff'],
-        'scan'             => ['admin', 'staff'],
+        'students'         => ['admin', 'teacher'],
+        'register'         => ['admin'],
+        'subfetchers'      => ['admin'],
+        'logs'             => ['admin'],
+        'sms-logs'         => ['admin'],
+        'schedule'         => ['admin'],
+
+        // --- staff-only modules (QR scanner + student monitoring) ---
+        // No dashboard for staff: login and deny-redirects send them to /scan.
+        // Scanner is staff-only now (admin removed per operator request).
+        'scan'             => ['staff'],
         'scan-monitor'     => ['admin', 'staff'],
 
         // 'parents' also carries the parent self-service pages
         // (parents-releases / parents-notifications / parents-logs).
-        'parents'          => ['admin', 'staff', 'parent'],
+        'parents'          => ['admin', 'parent'],
 
         // 'teachers' also carries the teacher self-service pages
         // (teachers-view / teachers-student-view / teachers-notifications).
-        'teachers'         => ['admin', 'staff', 'teacher'],
+        'teachers'         => ['admin', 'teacher'],
 
         // admin-only modules
         'staffs'           => ['admin'],
@@ -61,9 +66,9 @@ class AuthFilter implements FilterInterface
             return redirect()->to('/login')->with('error', 'Please login first.');
         }
 
-        // ---- 2. already logged in: /login and / bounce to the dashboard ----
+        // ---- 2. already logged in: /login and / bounce to the role home ----
         if ($uri === '' || $uri === 'login') {
-            return redirect()->to('/dashboard');
+            return redirect()->to($this->home());
         }
 
         // ---- 3. role ACL (deny by default) ----
@@ -90,9 +95,15 @@ class AuthFilter implements FilterInterface
         }
 
         if (! in_array($role, self::ACL[$matched], true)) {
-            return redirect()->to('/dashboard')
+            return redirect()->to($this->home())
                 ->with('error', 'Access denied: the "' . $matched . '" module is not available to your account.');
         }
+    }
+
+    /** Role-aware landing page. Staff = QR scanner only. */
+    private function home(): string
+    {
+        return session('role') === 'staff' ? '/scan' : '/dashboard';
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
