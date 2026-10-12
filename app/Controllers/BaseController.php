@@ -96,6 +96,113 @@ abstract class BaseController extends Controller
     }
 
     /**
+     * Generate a QR PNG for $qrValue and return its URL path.
+     *
+     * Everything is resolved from FCPATH (the public folder) instead of the
+     * process CWD, because the old code used include_once('phpqrcode/...') and
+     * 'uploads/qr/...' which only resolve when index.php has already chdir()'d
+     * into /public - any other entry point fataled with "Class QRcode not
+     * found" and killed the whole registration / Excel import.
+     *
+     * Never throws: QR art is cosmetic, the QR *value* is what matters, so a
+     * missing library / directory / GD simply skips the PNG.
+     *
+     * @return string public URL path to the PNG, or '' when not generated
+     */
+    protected function generateQrFile(string $qrValue, int $textHeight = 40): string
+    {
+        $qrDir = FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'qr';
+
+        if (! is_dir($qrDir)) {
+            @mkdir($qrDir, 0775, true);
+        }
+        if (! is_dir($qrDir)) {
+            log_message('error', 'QR: cannot create ' . $qrDir);
+            return '';
+        }
+
+        $lib = FCPATH . 'phpqrcode' . DIRECTORY_SEPARATOR . 'qrlib.php';
+        if (! is_file($lib)) {
+            $lib = ROOTPATH . 'public' . DIRECTORY_SEPARATOR . 'phpqrcode' . DIRECTORY_SEPARATOR . 'qrlib.php';
+        }
+        if (is_file($lib)) {
+            require_once $lib;
+        }
+        if (! class_exists('QRcode')) {
+            log_message('error', 'QR: phpqrcode library not found (looked in ' . FCPATH . 'phpqrcode)');
+            return '';
+        }
+        if (! function_exists('imagecreatetruecolor')) {
+            log_message('error', 'QR: GD extension not loaded, skipping QR image');
+            return '';
+        }
+
+        $tmpPng   = $qrDir . DIRECTORY_SEPARATOR . $qrValue . '_tmp.png';
+        $finalPng = $qrDir . DIRECTORY_SEPARATOR . $qrValue . '.png';
+
+        try {
+            \QRcode::png($qrValue, $tmpPng, QR_ECLEVEL_H, 8, 2);
+
+            $qrImage = @imagecreatefrompng($tmpPng);
+            if ($qrImage === false) {
+                // Keep the plain QR at least - better than nothing.
+                @rename($tmpPng, $finalPng);
+                return 'uploads/qr/' . $qrValue . '.png';
+            }
+
+            $qrWidth  = imagesx($qrImage);
+            $qrHeight = imagesy($qrImage);
+            $totalH   = $qrHeight + $textHeight;
+            $totalW   = $qrWidth;
+
+            $combined = imagecreatetruecolor($totalW, $totalH);
+            $white    = imagecolorallocate($combined, 255, 255, 255);
+            imagefill($combined, 0, 0, $white);
+            imagecopy($combined, $qrImage, 0, 0, 0, 0, $qrWidth, $qrHeight);
+
+            $black   = imagecolorallocate($combined, 0, 0, 0);
+            $fontSize = 5;
+            $textW   = imagefontwidth($fontSize) * strlen($qrValue);
+            $textX   = (int) max(0, ($totalW - $textW) / 2);
+            $textY   = $qrHeight + 8;
+
+            imageline($combined, 0, $qrHeight, $totalW, $qrHeight, $black);
+            imagestring($combined, $fontSize, $textX, $textY, $qrValue, $black);
+
+            imagepng($combined, $finalPng);
+
+            imagedestroy($qrImage);
+            imagedestroy($combined);
+        } catch (\Throwable $e) {
+            log_message('error', 'QR generation failed for ' . $qrValue . ': ' . $e->getMessage());
+        } finally {
+            if (is_file($tmpPng)) {
+                @unlink($tmpPng);
+            }
+        }
+
+        return is_file($finalPng) ? 'uploads/qr/' . $qrValue . '.png' : '';
+    }
+
+    /**
+     * Empty a table without violating foreign keys.
+     *
+     * Neither of the obvious options works here:
+     *  - emptyTable()/truncate()  -> MySQL refuses to TRUNCATE a table that is
+     *                                referenced by a FK (fk_fetchlogs_parent...);
+     *  - $db->table($t)->delete() -> CodeIgniter throws DataException
+     *                                "Deletes are not allowed unless they
+     *                                contain a where or like clause".
+     * A bare DELETE FROM honours ON DELETE CASCADE / SET NULL and has neither
+     * problem, so this is the only safe way to wipe these tables.
+     */
+    protected function wipeTable(string $table): void
+    {
+        $db = \Config\Database::connect();
+        $db->query('DELETE FROM `' . $table . '`');
+    }
+
+    /**
      * Allow only admin and staff roles (used by protected management actions).
      * Returns true when access is granted, otherwise redirects and returns false.
      */

@@ -192,7 +192,7 @@ class Students extends BaseController
                         $parentId = $this->parentsModel->insert([
                             'fname'        => $fname,
                             'mname'        => $parentMnames[$i] ?? null,
-                            'lname'        => $parentLnames[$i],
+                            'lname'        => $parentLnames[$i] ?? '',
                             'phone'        => $phone,
                             'password'     => null,
                             'password_sent'=> 0,
@@ -211,7 +211,7 @@ class Students extends BaseController
 
                     $registeredParents[] = [
                         'fname'    => $existingParent ? $existingParent['fname'] : $fname,
-                        'lname'    => $existingParent ? $existingParent['lname'] : $parentLnames[$i],
+                        'lname'    => $existingParent ? $existingParent['lname'] : ($parentLnames[$i] ?? ''),
                         'qr_code'  => $qrValue,
                         'relation' => $relation,
                         'existing' => (bool) $existingParent,
@@ -260,8 +260,8 @@ class Students extends BaseController
                         'student_id' => $studentIds[0],
                         'fname'      => $fname,
                         'mname'      => $fetcherMnames[$i] ?? null,
-                        'lname'      => $fetcherLnames[$i],
-                        'phone'      => $fetcherPhones[$i],
+                        'lname'      => $fetcherLnames[$i] ?? '',
+                        'phone'      => $fetcherPhones[$i] ?? '',
                         'qr_code'    => $qrValue,
                         'created_by' => session('user_id'),
                     ]);
@@ -272,7 +272,7 @@ class Students extends BaseController
 
                     $registeredFetchers[] = [
                         'fname'   => $fname,
-                        'lname'   => $fetcherLnames[$i],
+                        'lname'   => $fetcherLnames[$i] ?? '',
                         'qr_code' => $qrValue,
                     ];
                 }
@@ -346,36 +346,74 @@ class Students extends BaseController
             return redirect()->to('/register')->with('error', 'The Excel file has no data rows.');
         }
 
-        // Remove the header row (first row).
-        $rows = array_values(array_slice($rows, 1));
-
-        $imported = 0;
-        $skipped = 0;
-        $errors = [];
-        $limit = 500;
-
-        $db->transStart();
-        try {
-            foreach ($rows as $r) {
-                if ($imported + $skipped >= $limit) break;
-
-                $vals = array_values($r);
-
-                $sfname = trim((string)($vals[0] ?? ''));
-                $smname = trim((string)($vals[1] ?? ''));
-                $slname = trim((string)($vals[2] ?? ''));
-                $grade  = trim((string)($vals[3] ?? ''));
-                $pfname = trim((string)($vals[4] ?? ''));
-                $pmname = trim((string)($vals[5] ?? ''));
-                $plname = trim((string)($vals[6] ?? ''));
-                $pphone = trim((string)($vals[7] ?? ''));
-                $rel    = trim((string)($vals[8] ?? '')) ?: 'Parent';
-
-                if ($sfname === '' || $slname === '' || $pfname === '' || $plname === '' || $pphone === '') {
-                    $skipped++;
-                    continue;
+        // Drop blank rows first, then drop the HEADER row (if it looks like
+        // one). The old code blindly sliced off row 1, so a sheet starting
+        // with an empty row imported the header itself as a student record.
+        $rows = array_values(array_filter($rows, static function ($r) {
+            if (!is_array($r)) {
+                return false;
+            }
+            foreach ($r as $v) {
+                if (trim((string) $v) !== '') {
+                    return true;
                 }
+            }
+            return false;
+        }));
 
+        if ($rows !== [] && $this->looksLikeHeaderRow($rows[0])) {
+            array_shift($rows);
+        }
+
+        if ($rows === []) {
+            return redirect()->to('/register')->with('error', 'The Excel file has no data rows.');
+        }
+
+        $imported    = 0;
+        $reused      = 0;   // rows whose parent already existed (phone linked)
+        $skipped     = 0;
+        $skipReasons = [];
+        $limit       = 500;
+
+        // transStrict(false): CI4 otherwise latches transStatus=false for the
+        // WHOLE connection after the first failed query, which is exactly why
+        // one duplicate phone used to make every later row report "transaction
+        // failed" even when it had already committed.
+        $db->transStrict(false);
+
+        foreach ($rows as $rowIndex => $r) {
+            if ($imported + $skipped >= $limit) {
+                break;
+            }
+
+            $vals = is_array($r) ? array_values($r) : [];
+
+            $sfname = trim((string) ($vals[0] ?? ''));
+            $smname = trim((string) ($vals[1] ?? ''));
+            $slname = trim((string) ($vals[2] ?? ''));
+            $grade  = trim((string) ($vals[3] ?? ''));
+            $pfname = trim((string) ($vals[4] ?? ''));
+            $pmname = trim((string) ($vals[5] ?? ''));
+            $plname = trim((string) ($vals[6] ?? ''));
+            $pphone = trim((string) ($vals[7] ?? ''));
+            $rel    = trim((string) ($vals[8] ?? '')) ?: 'Parent';
+
+            $excelRow = $rowIndex + 1;
+
+            if ($sfname === '' || $slname === '' || $pfname === '' || $plname === '' || $pphone === '') {
+                $skipped++;
+                $skipReasons[] = "row $excelRow: missing required field(s)";
+                continue;
+            }
+
+            // parents.phone is UNIQUE. Resolve BEFORE writing so one
+            // duplicate phone can no longer abort the whole import.
+            $existingParent = $this->parentsModel->where('phone', $pphone)->first();
+
+            // Each row gets its own transaction: one bad row skips itself
+            // instead of rolling back every previously imported row.
+            $db->transStart();
+            try {
                 $studentId = $this->studentModel->insertWithAdviser([
                     'fname'         => $sfname,
                     'mname'         => $smname ?: null,
@@ -384,43 +422,61 @@ class Students extends BaseController
                     'created_by'    => session('user_id'),
                 ]);
                 if (!$studentId) {
-                    $skipped++;
-                    continue;
+                    throw new \Exception('could not save student');
                 }
 
-                $qrValue  = $this->generateQR();
-                $parentId = $this->parentsModel->insert([
-                    'fname'        => $pfname,
-                    'mname'        => $pmname ?: null,
-                    'lname'        => $plname,
-                    'phone'        => $pphone,
-                    'password'     => null,
-                    'password_sent'=> 0,
-                    'qr_code'      => $qrValue,
-                    'created_by'   => session('user_id'),
-                ]);
-                if (!$parentId) {
-                    $skipped++;
-                    continue;
+                if ($existingParent) {
+                    $parentId = $existingParent['id'];
+                    $reused++;
+                } else {
+                    $qrValue  = $this->generateQR();
+                    $parentId = $this->parentsModel->insert([
+                        'fname'         => $pfname,
+                        'mname'         => $pmname ?: null,
+                        'lname'         => $plname,
+                        'phone'         => $pphone,
+                        'password'      => null,
+                        'password_sent' => 0,
+                        'qr_code'       => $qrValue,
+                        'created_by'    => session('user_id'),
+                    ]);
+                    if (!$parentId) {
+                        throw new \Exception('could not save parent');
+                    }
                 }
 
-                $db->table('student_parents')->insert([
-                    'student_id' => $studentId,
-                    'parent_id'  => $parentId,
-                    'relation'   => $rel,
-                ]);
+                // Idempotent link: re-importing the same sheet must not
+                // duplicate student_parents rows either.
+                $alreadyLinked = $db->table('student_parents')
+                    ->where('student_id', $studentId)
+                    ->where('parent_id', $parentId)
+                    ->countAllResults();
+                if (!$alreadyLinked) {
+                    $linked = $db->table('student_parents')->insert([
+                        'student_id' => $studentId,
+                        'parent_id'  => $parentId,
+                        'relation'   => $rel,
+                    ]);
+                    if (!$linked) {
+                        throw new \Exception('could not link parent to student');
+                    }
+                }
+
+                $db->transComplete();
+
+                if ($db->transStatus() === false) {
+                    throw new \Exception('database rejected the row');
+                }
 
                 $imported++;
+            } catch (\Throwable $e) {
+                // Safe at depth 0 (no-op) and closes an open row transaction
+                // otherwise, so one bad row can't poison the next iteration.
+                $db->transRollback();
+                $skipped++;
+                $skipReasons[] = "row $excelRow: " . $e->getMessage();
+                log_message('error', "Excel import row $excelRow failed: " . $e->getMessage());
             }
-
-            $db->transComplete();
-        } catch (\Throwable $e) {
-            $db->transRollback();
-            return redirect()->to('/register')->with('error', 'Import failed: ' . $e->getMessage());
-        }
-
-        if ($db->transStatus() === false) {
-            return redirect()->to('/register')->with('error', 'Import transaction failed.');
         }
 
         if ($imported > 0) {
@@ -435,10 +491,36 @@ class Students extends BaseController
         }
 
         $msg = "Import complete! <strong>$imported</strong> student(s) registered.";
+        if ($reused > 0) {
+            $msg .= " <strong>$reused</strong> parent(s) already existed (phone linked, not duplicated).";
+        }
         if ($skipped > 0) {
-            $msg .= " <strong>$skipped</strong> row(s) skipped (missing required fields).";
+            $msg .= " <strong>$skipped</strong> row(s) skipped: " . htmlspecialchars(implode('; ', array_slice($skipReasons, 0, 5)));
+            if (count($skipReasons) > 5) {
+                $msg .= ' …';
+            }
         }
         return redirect()->to('/register')->with('msg', $msg);
+    }
+
+    /**
+     * True when the first cell(s) of a row are column titles rather than data.
+     *
+     * IMPORTANT: toArray(..., $returnCellRef = true) keys each row by cell
+     * reference ('A', 'B', 'C' ...), NOT by 0-based index, so the raw row
+     * must be re-indexed before reading position 0.
+     */
+    private function looksLikeHeaderRow(array $row): bool
+    {
+        $values = array_values($row);
+        $first  = strtolower(trim((string) ($values[0] ?? '')));
+        if ($first === '') {
+            return false;
+        }
+
+        return str_starts_with($first, 'student first')
+            || str_starts_with($first, 'first name')
+            || in_array($first, ['firstname', 'student', 'name'], true);
     }
 
     // ========== UPDATE STUDENT ==========
@@ -559,14 +641,20 @@ class Students extends BaseController
         try {
             $count = $this->studentModel->countAllResults();
 
-            // FK-safe order: children first, then students, then orphaned parents
-            $db->table('fetch_logs')->emptyTable();
-            $db->table('sub_fetchers')->emptyTable();
-            $db->table('student_parents')->emptyTable();
-            $this->studentModel->emptyTable();
+            // DELETE, never TRUNCATE: MySQL refuses to TRUNCATE a table that
+            // is referenced by a foreign key (fk_fetchlogs_student etc.),
+            // which made this method roll back every time.
+            // Children first, then students, then parents; wipeTable() runs a
+            // bare DELETE FROM so the ON DELETE CASCADE / SET NULL clauses
+            // handle the rest (TRUNCATE is refused by MySQL on FK'd tables).
+            $this->wipeTable('fetch_logs');
+            $this->wipeTable('sub_fetchers');
+            $this->wipeTable('student_parents');
 
             $parentCount = $this->parentsModel->countAllResults();
-            $this->parentsModel->emptyTable();
+
+            $this->wipeTable('students');
+            $this->wipeTable('parents');
 
             $db->transComplete();
 
@@ -670,46 +758,10 @@ class Students extends BaseController
 
     private function generateQR()
     {
+        // Value first, PNG best-effort. The old copy used CWD-relative
+        // include/paths and could fatal() the whole registration or import.
         $qrValue = $this->generateQrValue();
-        include_once('phpqrcode/qrlib.php');
-        
-        $qrImagePath = 'uploads/qr/' . $qrValue . '_tmp.png';
-        \QRcode::png($qrValue, $qrImagePath, QR_ECLEVEL_H, 8, 2);
-        
-        $qrImage = imagecreatefrompng($qrImagePath);
-        $qrWidth = imagesx($qrImage);
-        $qrHeight = imagesy($qrImage);
-        
-        $textHeight = 35;
-        $totalHeight = $qrHeight + $textHeight;
-        $totalWidth = $qrWidth;
-        
-        $combinedImage = imagecreatetruecolor($totalWidth, $totalHeight);
-        $white = imagecolorallocate($combinedImage, 255, 255, 255);
-        imagefill($combinedImage, 0, 0, $white);
-        imagecopy($combinedImage, $qrImage, 0, 0, 0, 0, $qrWidth, $qrHeight);
-        
-        $black = imagecolorallocate($combinedImage, 0, 0, 0);
-        $fontSize = 5;
-        $text = $qrValue;
-        
-        $textWidth = imagefontwidth($fontSize) * strlen($text);
-        $textX = max(0, ($totalWidth - $textWidth) / 2);
-        $textY = $qrHeight + 8;
-        
-        imageline($combinedImage, 0, $qrHeight, $totalWidth, $qrHeight, $black);
-        imagestring($combinedImage, $fontSize, (int)$textX, $textY, $text, $black);
-        
-        $finalPath = 'uploads/qr/' . $qrValue . '.png';
-        imagepng($combinedImage, $finalPath);
-        
-        imagedestroy($qrImage);
-        imagedestroy($combinedImage);
-        
-        if (file_exists($qrImagePath)) {
-            unlink($qrImagePath);
-        }
-        
+        $this->generateQrFile($qrValue, 35);
         return $qrValue;
     }
 }

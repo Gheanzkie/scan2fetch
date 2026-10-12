@@ -124,8 +124,9 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     // For admin profile update
     $routes->post('admin/updateProfile', 'Admin::updateProfile');
 
-// For other roles
-    $routes->post('update-profile', 'Auth::updateProfile');
+    // NOTE: 'update-profile' is already registered above in the ACCOUNT
+    // block (line 116). A second identical declaration was removed here -
+    // duplicate route names silently shadow each other in CodeIgniter.
 
 });
 

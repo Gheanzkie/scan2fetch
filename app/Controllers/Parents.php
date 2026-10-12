@@ -215,14 +215,20 @@ class Parents extends BaseController
         try {
             $count = $this->parentsModel->countAllResults();
 
-            // Wipe children first (FK-safe), then parents, then orphaned students
-            $db->table('sub_fetchers')->emptyTable();
-            $db->table('student_parents')->emptyTable();
-            $this->parentsModel->emptyTable();
+            // DELETE, never TRUNCATE. MySQL refuses to TRUNCATE a table that
+            // is referenced by a foreign key, which is why this used to die
+            // with "Cannot truncate a table referenced in a foreign key
+            // constraint (... fk_fetchlogs_parent ...)" and roll back.
+            // Children must go first. wipeTable() runs a bare DELETE FROM,
+            // which honours ON DELETE CASCADE / SET NULL on every FK.
+            $this->wipeTable('fetch_logs');
+            $this->wipeTable('sub_fetchers');
+            $this->wipeTable('student_parents');
 
             $studentCount = $db->table('students')->countAllResults();
-            $db->table('fetch_logs')->emptyTable();
-            $db->table('students')->emptyTable();
+            $this->wipeTable('students');
+
+            $this->wipeTable('parents');
 
             $db->transComplete();
 
@@ -648,44 +654,10 @@ class Parents extends BaseController
 
     private function generateQR()
     {
+        // Value first, PNG best-effort. The old copy used CWD-relative
+        // include/paths and could fatal() the whole parent save.
         $qrValue = $this->generateQrValue();
-        include_once('phpqrcode/qrlib.php');
-        
-        $qrImagePath = 'uploads/qr/' . $qrValue . '_qrcode.png';
-        \QRcode::png($qrValue, $qrImagePath, QR_ECLEVEL_H, 8, 2);
-        
-        $qrImage = imagecreatefrompng($qrImagePath);
-        $qrWidth = imagesx($qrImage);
-        $qrHeight = imagesy($qrImage);
-        
-        $textHeight = 40;
-        $padding = 10;
-        $totalWidth = $qrWidth;
-        $totalHeight = $qrHeight + $textHeight + $padding;
-        
-        $combinedImage = imagecreatetruecolor($totalWidth, $totalHeight);
-        $white = imagecolorallocate($combinedImage, 255, 255, 255);
-        imagefill($combinedImage, 0, 0, $white);
-        imagecopy($combinedImage, $qrImage, 0, 0, 0, 0, $qrWidth, $qrHeight);
-        
-        $black = imagecolorallocate($combinedImage, 0, 0, 0);
-        $fontSize = 5;
-        $text = $qrValue;
-        
-        $textWidth = imagefontwidth($fontSize) * strlen($text);
-        $textX = ($totalWidth - $textWidth) / 2;
-        $textY = $qrHeight + 12;
-        imagestring($combinedImage, $fontSize, $textX, $textY, $text, $black);
-        
-        $finalPath = 'uploads/qr/' . $qrValue . '.png';
-        imagepng($combinedImage, $finalPath);
-        imagedestroy($qrImage);
-        imagedestroy($combinedImage);
-        
-        if (file_exists($qrImagePath)) {
-            unlink($qrImagePath);
-        }
-        
+        $this->generateQrFile($qrValue, 40);
         return $qrValue;
     }
 }

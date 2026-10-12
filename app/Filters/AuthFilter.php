@@ -59,7 +59,21 @@ class AuthFilter implements FilterInterface
 
     public function before(RequestInterface $request, $arguments = null)
     {
-        $uri = strtolower(trim((string) $request->getUri()->getPath(), '/'));
+        // getPath() returns the ROUTER-relative path (subfolder already
+        // stripped, e.g. "dashboard"). getUri()->getPath() returns the raw
+        // request path ("/scan2fetch/dashboard"), whose first segment is the
+        // install folder, so every ACL lookup missed and all pages bounced
+        // to /this-does-not-exist.
+        $rawPath = method_exists($request, 'getPath') ? $request->getPath() : (string) $request->getUri()->getPath();
+
+        // Belt-and-braces: strip the baseURL subfolder manually in case a
+        // future CI version hands us the raw path again.
+        $basePath = rtrim(parse_url((string) config('App')->baseURL, PHP_URL_PATH) ?? '', '/');
+        if ($basePath !== '' && strpos($rawPath, $basePath) === 0) {
+            $rawPath = substr($rawPath, strlen($basePath));
+        }
+
+        $uri = strtolower(trim($rawPath, '/'));
 
         // ---- 1. must be logged in ----
         if (! session()->get('logged_in')) {
