@@ -52,6 +52,13 @@ class AuthFilter implements FilterInterface
         // (teachers-view / teachers-student-view / teachers-notifications).
         'teachers'         => ['admin', 'teacher'],
 
+        // Live gate clock polled by BOTH scanner pages (scan.php every 15s,
+        // scan_kiosk.php every 10s). It was only in the 'schedule' (admin)
+        // rule below, so for a STAFF scanner the poll got a 302 -> HTML, the
+        // .json() parse threw, the silent .catch() swallowed it, GATE_OK never
+        // flipped, and staff had to close + reopen the page to scan again.
+        'schedule-status'  => ['admin', 'staff'],
+
         // admin-only modules
         'staffs'           => ['admin'],
         'admin'            => ['admin'],
@@ -95,11 +102,21 @@ class AuthFilter implements FilterInterface
         // so 'parents-releases' resolves to the 'parents' rule instead of
         // falling through to "unknown module" and 404ing a valid page.
         $matched = null;
-        foreach (array_keys(self::ACL) as $prefix) {
-            if ($segment === $prefix || str_starts_with($segment, $prefix . '-')) {
-                if ($matched === null || strlen($prefix) > strlen($matched)) {
-                    $matched = $prefix;
+        // Match the FULL path first (slashes -> dashes) so 'schedule/status'
+        // can resolve to the more specific 'schedule-status' rule instead of
+        // falling through to the admin-only 'schedule' prefix. If nothing
+        // matches, retry on the first segment alone for the hyphenated
+        // single-segment routes (parents-releases, students-view, ...).
+        foreach ([str_replace('/', '-', $uri), $segment] as $matchOn) {
+            foreach (array_keys(self::ACL) as $prefix) {
+                if ($matchOn === $prefix || str_starts_with($matchOn, $prefix . '-')) {
+                    if ($matched === null || strlen($prefix) > strlen($matched)) {
+                        $matched = $prefix;
+                    }
                 }
+            }
+            if ($matched !== null) {
+                break;
             }
         }
 

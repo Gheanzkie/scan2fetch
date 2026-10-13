@@ -29,10 +29,21 @@ if (!function_exists('routeTitle')) {
             'staffs'               => 'Staffs',
             'scan'                 => 'QR Scan',
             'scan-monitor'         => 'Students Status',
+            'scan-kiosk'           => 'Kiosk Scanner',
             'logs'                 => 'Activity Logs',
             'sms-logs'             => 'SMS Logs',
             'messages'             => 'Messages',
-            'welcome'              => 'Home',
+            'schedule'             => 'Class Schedule',
+            'subfetchers'          => 'Sub-Fetchers',
+            'admin'                => 'Admin Account',
+
+            // Hyphenated sub-pages: without these the fallback ucfirst()
+            // produced "Parents-releases", "Teachers-notifications", etc.
+            'parents-releases'       => 'Parent Releases',
+            'parents-notifications'  => 'Parent Notifications',
+            'parents-logs'           => 'Parent Activity Logs',
+            'teachers-notifications' => 'Teacher Notifications',
+            'students-release'       => 'Student Release',
         ];
 
         // Detail / edit pages get a more specific label.
