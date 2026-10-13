@@ -100,13 +100,6 @@ class ScanMonitor extends BaseController
             ->where('session_type', 'afternoon')
             ->countAllResults();
 
-        // Declined count
-        $data['declinedToday'] = $db->table('activity_logs')
-            ->where('DATE(created_at)', $selectedDate)
-            ->where('action', 'decline')
-            ->where('module', 'scan')
-            ->countAllResults();
-
         // ===== PENDING COUNT (FIXED - No Negative) =====
         $totalStudents = $db->table('students')->countAllResults();
         
@@ -185,56 +178,6 @@ class ScanMonitor extends BaseController
         $releasedBuilder->orderBy('fetch_logs.time_released', 'DESC');
         $data['releasedStudents'] = $releasedBuilder->get()->getResultArray();
 
-        // ===== DECLINED STUDENTS =====
-        $declinedBuilder = $db->table('activity_logs');
-        $declinedBuilder->select('activity_logs.*');
-        $declinedBuilder->where('DATE(activity_logs.created_at)', $selectedDate);
-        $declinedBuilder->where('action', 'decline');
-        $declinedBuilder->where('module', 'scan');
-        
-        if (!empty($search)) {
-            $declinedBuilder->like('description', $search);
-        }
-        
-        $declinedBuilder->orderBy('activity_logs.created_at', 'DESC');
-        $declinedResults = $declinedBuilder->get()->getResultArray();
-
-        $data['declinedStudents'] = [];
-        foreach ($declinedResults as $d) {
-            $desc = $d['description'] ?? '';
-            $studentName = 'Unknown';
-            $studentId = null;
-            $fetcherName = $d['user_name'] ?? 'Unknown';
-            
-            if (preg_match('/Student:\s*([^\s]+)\s*([^\s]+)\s*\(ID:\s*(\d+)\)/', $desc, $matches)) {
-                $studentName = $matches[1] . ' ' . $matches[2];
-                $studentId = $matches[3];
-            } elseif (preg_match('/Student:\s*([^\s]+)\s*([^\s]+)/', $desc, $matches)) {
-                $studentName = $matches[1] . ' ' . $matches[2];
-            }
-            
-            if (preg_match('/(?:Sub-Fetcher|Parent|Fetcher):\s*([^\s]+)\s*([^\s]+)/', $desc, $fetcherMatches)) {
-                $fetcherName = $fetcherMatches[1] . ' ' . $fetcherMatches[2];
-            }
-            
-            $gradeSection = '—';
-            if ($studentId) {
-                $student = $db->table('students')
-                    ->select('grade_section')
-                    ->where('id', $studentId)
-                    ->get()
-                    ->getRowArray();
-                if ($student) {
-                    $gradeSection = $student['grade_section'];
-                }
-            }
-            
-            $d['student_name'] = $studentName;
-            $d['grade_section'] = $gradeSection;
-            $d['fetcher_display'] = $fetcherName;
-            $data['declinedStudents'][] = $d;
-        }
-
         // ===== GET ALL GRADES FOR FILTER =====
         $data['grades'] = $db->table('students')
             ->select('grade_section')
@@ -262,58 +205,7 @@ class ScanMonitor extends BaseController
             }
         }
 
-        $declines = $db->table('activity_logs')
-            ->select('activity_logs.*')
-            ->where('DATE(activity_logs.created_at)', $selectedDate)
-            ->where('action', 'decline')
-            ->where('module', 'scan')
-            ->orderBy('activity_logs.created_at', 'DESC')
-            ->limit(100)
-            ->get()
-            ->getResultArray();
-
-        foreach ($declines as &$d) {
-            $desc = $d['description'] ?? '';
-            $studentName = 'Unknown';
-            $studentId = null;
-            $fetcherName = $d['user_name'] ?? 'Unknown';
-            
-            if (preg_match('/Student:\s*([^\s]+)\s*([^\s]+)\s*\(ID:\s*(\d+)\)/', $desc, $matches)) {
-                $studentName = $matches[1] . ' ' . $matches[2];
-                $studentId = $matches[3];
-            } elseif (preg_match('/Student:\s*([^\s]+)\s*([^\s]+)/', $desc, $matches)) {
-                $studentName = $matches[1] . ' ' . $matches[2];
-            }
-            
-            if (preg_match('/(?:Sub-Fetcher|Parent|Fetcher):\s*([^\s]+)\s*([^\s]+)/', $desc, $fetcherMatches)) {
-                $fetcherName = $fetcherMatches[1] . ' ' . $fetcherMatches[2];
-            }
-            
-            $gradeSection = '—';
-            if ($studentId) {
-                $student = $db->table('students')
-                    ->select('grade_section')
-                    ->where('id', $studentId)
-                    ->get()
-                    ->getRowArray();
-                if ($student) {
-                    $gradeSection = $student['grade_section'];
-                }
-            }
-            
-            $d['student_fname'] = $studentName;
-            $d['student_lname'] = '';
-            $d['grade_section'] = $gradeSection;
-            $d['fetcher_display'] = $fetcherName;
-            $d['action'] = 'decline';
-        }
-
-        $data['scanLogs'] = array_merge($releases, $declines);
-        usort($data['scanLogs'], function($a, $b) {
-            return strtotime($b['created_at']) - strtotime($a['created_at']);
-        });
-        
-        $data['scanLogs'] = array_slice($data['scanLogs'], 0, 100);
+        $data['scanLogs'] = $releases;
 
         // ===== VIEW DATA =====
         $data['selectedDate'] = $selectedDate;

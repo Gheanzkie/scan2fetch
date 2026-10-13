@@ -25,9 +25,11 @@ class AuthFilter implements FilterInterface
         'change-password'  => ['admin', 'staff', 'teacher', 'parent'],
         'update-profile'   => ['admin', 'staff', 'teacher', 'parent'],
 
-        // --- admin operations ---
+        // --- shared modules ---
         'dashboard'        => ['admin', 'teacher', 'parent'],
-        'messages'         => ['admin', 'teacher', 'parent'],
+        // Messages: admin <-> parent only. Staff and teachers are not part
+        // of the conversation (operator request: only admin receives).
+        'messages'         => ['admin', 'parent'],
 
         // 'students' also carries students-view, which Students::view() hands
         // over to /teachers-student-view for the teacher role.
@@ -39,8 +41,7 @@ class AuthFilter implements FilterInterface
         'schedule'         => ['admin'],
 
         // --- staff-only modules (QR scanner + student monitoring) ---
-        // No dashboard for staff: login and deny-redirects send them to /scan.
-        // Scanner is staff-only now (admin removed per operator request).
+        // Scanner is staff-only (admin removed per operator request).
         'scan'             => ['staff'],
         'scan-monitor'     => ['admin', 'staff'],
 
@@ -52,11 +53,7 @@ class AuthFilter implements FilterInterface
         // (teachers-view / teachers-student-view / teachers-notifications).
         'teachers'         => ['admin', 'teacher'],
 
-        // Live gate clock polled by BOTH scanner pages (scan.php every 15s,
-        // scan_kiosk.php every 10s). It was only in the 'schedule' (admin)
-        // rule below, so for a STAFF scanner the poll got a 302 -> HTML, the
-        // .json() parse threw, the silent .catch() swallowed it, GATE_OK never
-        // flipped, and staff had to close + reopen the page to scan again.
+        // Live gate clock polled by BOTH scanner pages.
         'schedule-status'  => ['admin', 'staff'],
 
         // admin-only modules

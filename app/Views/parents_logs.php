@@ -228,7 +228,7 @@ body {
  <?php if (!empty($releases)): $i = 1; foreach ($releases as $r): ?>
  <tr>
  <td style="color: #b0b0c8; font-weight: 700;"><?= $i++ ?></td>
- <td style="color: #8888aa; font-size: 13px;"><?= date('M d, Y h:i A', strtotime($r['time_released'])) ?></td>
+ <td style="color: #8888aa; font-size: 13px;"><?= date('M d, Y h:i A', strtotime($r['time_released'])) ?><?php if (!empty($r['session_type'])): ?> <span class="badge" style="background:<?= $r['session_type'] === 'morning' ? '#fef3c7' : '#e0e7ff' ?>;color:<?= $r['session_type'] === 'morning' ? '#b45309' : '#3730a3' ?>;"><?= strtoupper($r['session_type']) ?></span><?php endif; ?></td>
  <td><strong style="color: #2d2d4a;"><?= esc($r['sfname'] ?? '') ?> <?= esc($r['smname'] ?? '') ?> <?= esc($r['slname'] ?? '') ?></strong></td>
  <td><?= esc($r['fetcher_fname']) ?> <?= esc($r['fetcher_lname']) ?></td>
  <td><span class="badge badge-info"><?= esc($r['fetcher_relation'] ?? 'Parent') ?></span></td>

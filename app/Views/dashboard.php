@@ -31,7 +31,7 @@
  <section class="content">
  <div class="container-fluid">
 
- <!-- ==================== ADMIN DASHBOARD ==================== -->
+  <!-- ==================== ADMIN DASHBOARD ==================== -->
  <?php if (session('role') == 'admin'): ?>
  <div class="row">
  <div class="col-lg-3 col-6 mb-3">
@@ -93,7 +93,7 @@
  </div>
  <?php endif; ?>
 
- <!-- ==================== STAFF DASHBOARD ==================== -->
+  <!-- ==================== STAFF DASHBOARD ==================== -->
  <?php if (session('role') == 'staff'): ?>
  <div class="row">
  <div class="col-lg-3 col-6 mb-3">
@@ -184,7 +184,7 @@
  </div>
  <?php endif; ?>
 
- <!-- ==================== TEACHER DASHBOARD ==================== -->
+  <!-- ==================== TEACHER DASHBOARD ==================== -->
  <?php if (session('role') == 'teacher'): ?>
  <div class="row">
  <div class="col-lg-3 col-6 mb-3">
@@ -224,110 +224,9 @@
  </div>
  </div>
  </div>
-
- <div class="row">
- <!-- Teacher profile -->
- <div class="col-md-4">
- <div class="kid-card">
- <div class="card-header">
- <h5 class="mb-0">
- <i class="fas fa-chalkboard-teacher mr-2" style="color: #4361ee;"></i>
-                                My Profile
- </h5>
- </div>
- <div class="card-body text-center py-4">
- <div style="width:80px;height:80px;margin:0 auto;border-radius:50%;background:#eef2ff;
-                                        display:flex;align-items:center;justify-content:center;">
- <i class="fas fa-chalkboard-teacher" style="font-size:30px;color:#4361ee;"></i>
- </div>
- <h5 class="mt-3 mb-1" style="color: #0f172a;">
- <?= esc(($teacherProfile['fname'] ?? session('fname'))) ?> <?= esc(($teacherProfile['lname'] ?? session('lname'))) ?>
- </h5>
- <span class="badge badge-light mt-1">
- <i class="fas fa-book mr-1"></i><?= esc(session('grade_section')) ?>
- </span>
- <div class="mt-3" style="color: #64748b; font-size: 13px;">
- <i class="fas fa-phone mr-1"></i> <?= esc($teacherProfile['phone'] ?? session('phone')) ?>
- </div>
- <a href="<?= base_url('teachers-view/' . session('user_id')) ?>" class="btn btn-primary btn-sm mt-3 px-3">
- <i class="fas fa-list mr-1"></i> Full Roster
- </a>
- </div>
- </div>
- </div>
-
- <!-- My Students -->
- <div class="col-md-8">
- <div class="kid-card">
- <div class="card-header">
- <div class="d-flex justify-content-between align-items-center mb-3">
- <h5 class="mb-0">
- <i class="fas fa-child mr-2" style="color: #4361ee;"></i>
-                                    My Students (<?= count($myStudents ?? []) ?>)
- </h5>
- </div>
- <form method="GET" action="<?= base_url('dashboard') ?>" id="teacherFilterForm">
- <div class="row no-gutters align-items-center">
- <div class="col-auto pr-2">
- <div class="input-group input-group-sm" style="border-radius:50px;overflow:hidden;border:2px solid rgba(108,140,255,0.12);background:rgba(255,255,255,0.7);">
- <div class="input-group-prepend">
- <span class="input-group-text" style="background:transparent;border:none;padding:6px 12px;"><i class="fas fa-calendar-alt" style="color:#7C6CFF;font-size:13px;"></i></span>
- </div>
- <input type="date" id="teacherDate" name="date" value="<?= esc($selectedDate ?? date('Y-m-d')) ?>" class="form-control border-0" style="background:transparent;font-size:13px;font-weight:600;color:#2d2d4a;padding:6px 8px;max-width:170px;" onchange="document.getElementById('teacherFilterForm').submit()">
- </div>
- </div>
- <div class="col pr-2">
- <div class="input-group input-group-sm" style="border-radius:50px;overflow:hidden;border:2px solid rgba(108,140,255,0.12);background:rgba(255,255,255,0.7);">
- <div class="input-group-prepend">
- <span class="input-group-text" style="background:transparent;border:none;padding:6px 12px;"><i class="fas fa-search" style="color:#6C8CFF;font-size:13px;"></i></span>
- </div>
-<input type="text" name="q" value="<?= esc($search ?? '') ?>" class="form-control border-0" placeholder="Search student..." style="background:transparent;font-size:13px;padding:6px 12px;" oninput="autoSubmitForm(this.form)">
-  </div>
-  </div>
-  </div>
-  </div>
-  </form>
-  </div>
-  <div class="card-body">
- <?php if (!empty($myStudents)): ?>
- <?php foreach ($myStudents as $st): ?>
- <div class="d-flex align-items-center p-3 mb-2" style="border:1px solid rgba(108,140,255,0.06);border-radius:14px;transition:background 0.2s;">
- <div class="mr-3">
- <div class="img-circle d-flex align-items-center justify-content-center" style="width:45px;height:45px;background:#f1f5f9;">
- <i class="fas fa-child" style="color: #94a3b8; font-size: 1.1rem;"></i>
- </div>
- </div>
- <div class="flex-grow-1">
- <strong style="color: #0f172a; font-size:14px;"><?= esc($st['fname']) ?> <?= esc($st['lname']) ?></strong>
- <br><small class="text-muted"><?= esc($st['grade_section']) ?></small>
- <?php if (!empty($dateReleasedMap[$st['id']])): ?>
- <br><span class="badge badge-success mt-1" style="font-size:11px;">Picked up <?= date('h:i A', strtotime($dateReleasedMap[$st['id']])) ?></span>
- <?php else: ?>
- <br><span class="badge badge-warning mt-1" style="font-size:11px;">Still in school</span>
- <?php endif; ?>
- </div>
- <a href="<?= base_url('teachers-student-view/' . $st['id']) ?>" class="btn btn-sm btn-outline-secondary ml-1" title="View Details">
- <i class="fas fa-eye"></i>
- </a>
- </div>
- <?php endforeach; ?>
- <?php else: ?>
- <div class="text-center text-muted py-5">
- <i class="fas fa-user-graduate" style="font-size: 3rem; color: #cbd5e1;"></i>
- <?php if (!empty($search ?? '')): ?>
- <p class="mt-3">No students match "<strong><?= esc($search) ?></strong>"</p>
- <?php else: ?>
- <p class="mt-3">No students under your class yet</p>
- <?php endif; ?>
- </div>
- <?php endif; ?>
- </div>
- </div>
- </div>
- </div>
  <?php endif; ?>
 
- <!-- ==================== PARENT DASHBOARD ==================== -->
+  <!-- ==================== PARENT DASHBOARD ==================== -->
  <?php if (session('role') == 'parent'): ?>
 
  <!-- Parent Stats -->
@@ -356,182 +255,6 @@
  <div class="icon-circle"><i class="fas fa-user-friends"></i></div>
  <span class="number"><?= count($subFetchers ?? []) ?></span>
  <span class="label">Sub-Fetchers</span>
- </div>
- </div>
- </div>
- </div>
-
- <!-- Parent Profile & My Children -->
- <div class="row">
- <!-- Parent Profile Card -->
- <div class="col-md-4 mb-3">
- <div class="kid-card">
- <div class="card-body text-center">
- <div style="width:110px;height:110px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #eef2ff;box-shadow: 0 4px 12px rgba(15,23,42,.08);">
- <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f1f5f9;">
- <i class="fas fa-user fa-3x" style="color: #94a3b8;"></i>
- </div>
- </div>
- <h5 class="mt-3 mb-1" style="color: #0f172a;">
- <?= esc($parentProfile['fname'] ?? session('fname')) ?>
- <?= esc($parentProfile['lname'] ?? session('lname')) ?>
- </h5>
- <p class="mb-3" style="color: #64748b;">
- <i class="fas fa-phone mr-1"></i> <?= esc($parentProfile['phone'] ?? session('phone')) ?>
- </p>
- <?php if (!empty($parentProfile['qr_code'])): ?>
- <div class="mb-2">
- <img src="<?= base_url('uploads/qr/' . $parentProfile['qr_code'] . '.png') ?>"
-                                     style="width:100px;height:100px;border:2px solid #e2e8f0;border-radius:8px;cursor:pointer;"
-                                     onclick="openQrModal('<?= base_url('uploads/qr/' . $parentProfile['qr_code'] . '.png') ?>', '<?= esc($parentProfile['fname'] ?? session('fname')) ?>')">
- <p style="color: #64748b; font-size: 0.8rem; margin-top: 5px;">
-                                    My QR Code
- </p>
- </div>
- <?php endif; ?>
- </div>
- </div>
-
- <!-- Sub-Fetchers -->
- <?php if (!empty($subFetchers)): ?>
- <div class="kid-card mt-3">
- <div class="card-header">
- <h6 class="mb-0">
- <i class="fas fa-user-friends mr-2" style="color: #16a34a;"></i>
-                                My Sub-Fetchers (<?= count($subFetchers) ?>)
- </h6>
- </div>
- <div class="card-body">
- <?php foreach ($subFetchers as $f): ?>
- <div class="subfetcher-item d-flex align-items-center p-2 mb-2">
- <div class="mr-2">
- <div class="img-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;background:#f1f5f9;">
- <i class="fas fa-user" style="color: #94a3b8;"></i>
- </div>
- </div>
- <div class="flex-grow-1">
- <strong style="color: #0f172a;"><?= esc($f['fname']) ?> <?= esc($f['lname']) ?></strong>
- <br><small class="text-muted"><?= esc($f['phone']) ?></small>
- </div>
- <?php if(!empty($f['qr_code'])): ?>
- <img src="<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>"
-                                         style="width:32px;height:32px;border:1px solid #e2e8f0;border-radius:4px;cursor:pointer;"
-                                         onclick="openQrModal('<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>', '<?= esc($f['fname']) ?>')">
- <?php endif; ?>
- </div>
- <?php endforeach; ?>
- </div>
- </div>
- <?php endif; ?>
- </div>
-
- <!-- My Children -->
- <div class="col-md-8">
- <div class="kid-card">
- <div class="card-header">
- <h5 class="mb-0">
- <i class="fas fa-child mr-2" style="color: #4361ee;"></i>
-                                My Children (<?= count($myChildren ?? []) ?>)
- </h5>
- </div>
- <div class="card-body">
- <?php if (!empty($myChildren)): ?>
- <div class="row">
- <?php foreach ($myChildren as $child): ?>
- <div class="col-md-6 mb-3">
- <div class="child-item d-flex align-items-center p-3">
- <div class="mr-3">
- <div class="img-circle d-flex align-items-center justify-content-center" style="width:50px;height:50px;background:#f1f5f9;">
- <i class="fas fa-child" style="color: #94a3b8; font-size: 1.3rem;"></i>
- </div>
- </div>
- <div class="flex-grow-1">
- <strong style="color: #0f172a;"><?= esc($child['fname']) ?> <?= esc($child['lname']) ?></strong>
- <br><small class="text-muted"><?= esc($child['grade_section']) ?></small>
- </div>
- </div>
- </div>
- <?php endforeach; ?>
- </div>
- <?php else: ?>
- <div class="text-center text-muted py-5">
- <i class="fas fa-child" style="font-size: 3rem; color: #cbd5e1;"></i>
- <p class="mt-3">No children registered yet</p>
- </div>
- <?php endif; ?>
- </div>
- </div>
-
- <!-- Recent Pickup History -->
- <div class="kid-card mt-3">
- <div class="card-header">
- <div class="d-flex justify-content-between align-items-center mb-3">
- <h5 class="mb-0">
- <i class="fas fa-history mr-2" style="color: #4361ee;"></i>
-                                Pickup History
- <span class="badge" style="background:rgba(67,97,238,0.1);color:#4361ee;margin-left:8px;font-size:12px;padding:5px 12px;"><?= count($parentReleaseHistory ?? []) ?> records</span>
- </h5>
- <a href="<?= base_url('parents-releases') ?>" class="btn btn-sm btn-primary" style="font-size:12px;border-radius:50px;">
- <i class="fas fa-list mr-1"></i> View All
- </a>
- </div>
- <form method="GET" action="<?= base_url('dashboard') ?>" id="parentFilterForm">
- <div class="row no-gutters align-items-center">
- <div class="col-auto pr-2">
- <div class="input-group input-group-sm" style="border-radius:50px;overflow:hidden;border:2px solid rgba(108,140,255,0.12);background:rgba(255,255,255,0.7);">
- <div class="input-group-prepend">
- <span class="input-group-text" style="background:transparent;border:none;padding:6px 12px;"><i class="fas fa-calendar-alt" style="color:#7C6CFF;font-size:13px;"></i></span>
- </div>
- <input type="date" id="parentDate" name="date" value="<?= esc($selectedDate ?? '') ?>" class="form-control border-0" style="background:transparent;font-size:13px;font-weight:600;color:#2d2d4a;padding:6px 8px;max-width:170px;" onchange="document.getElementById('parentFilterForm').submit()">
- </div>
- </div>
- <div class="col pr-2">
- <div class="input-group input-group-sm" style="border-radius:50px;overflow:hidden;border:2px solid rgba(108,140,255,0.12);background:rgba(255,255,255,0.7);">
- <div class="input-group-prepend">
- <span class="input-group-text" style="background:transparent;border:none;padding:6px 12px;"><i class="fas fa-search" style="color:#6C8CFF;font-size:13px;"></i></span>
- </div>
-<input type="text" name="q" value="<?= esc($search ?? '') ?>" class="form-control border-0" placeholder="Search by child or fetcher name..." style="background:transparent;font-size:13px;padding:6px 12px;" oninput="autoSubmitForm(this.form)">
-  </div>
-  </div>
-  </div>
-  </div>
-  </form>
-  </div>
-  <div class="card-body p-0">
- <div class="table-responsive">
- <table class="table table-fun table-hover table-sm mb-0">
- <thead style="background:linear-gradient(135deg,#6C8CFF,#7C6CFF);"><tr style="color:#fff;"><th>Date & Time</th><th>Child</th><th>Picked up by</th><th>Method</th></tr></thead>
- <tbody>
- <?php if(!empty($parentReleaseHistory)): foreach($parentReleaseHistory as $rh): ?>
- <tr>
- <td class="small" style="color: #64748b; white-space: nowrap;">
- <i class="fas fa-calendar-alt mr-1" style="color: #94a3b8;"></i><?= date('M d, Y', strtotime($rh['time_released'])) ?>
- <br><small style="color: #94a3b8;"><?= date('h:i A', strtotime($rh['time_released'])) ?></small>
- </td>
- <td>
- <strong style="color: #0f172a;"><?= esc($rh['student_fname'] ?? '') ?> <?= esc($rh['student_lname'] ?? '') ?></strong>
- </td>
- <td>
- <?= esc(trim(($rh['fetcher_fname'] ?? '') . ' ' . ($rh['fetcher_lname'] ?? ''))) ?>
- <?php if (!empty($rh['fetcher_relation'])): ?>
- <br><small class="text-muted"><?= esc($rh['fetcher_relation']) ?></small>
- <?php endif; ?>
- </td>
- <td><span class="badge badge-primary" style="<?= ($rh['method'] ?? '') == 'QR' ? '' : 'background-color:#eef2ff;color:#4338ca;' ?>"><?= $rh['method'] ?? '—' ?></span></td>
- </tr>
- <?php endforeach; else: ?>
- <tr><td colspan="4" class="text-center text-muted py-4">
- <?php if (!empty($selectedDate) || !empty($search ?? '')): ?>
- <i class="fas fa-search fa-2x mb-2 d-block" style="color:rgba(108,140,255,0.2);"></i>
- <p>No records found for this filter</p>
- <?php else: ?>
- <i class="fas fa-history fa-2x mb-2 d-block" style="color:rgba(108,140,255,0.2);"></i>
- <p>No releases yet</p>
- <?php endif; ?>
- </td></tr>
- <?php endif; ?>
- </tbody>
- </table>
  </div>
  </div>
  </div>

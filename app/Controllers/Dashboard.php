@@ -51,7 +51,7 @@ class Dashboard extends BaseController
 
             $db = \Config\Database::connect();
             $data['recentReleases'] = $db->table('fetch_logs')
-                ->select('fetch_logs.student_id, fetch_logs.fetcher_fname, fetch_logs.fetcher_lname, fetch_logs.fetcher_relation, fetch_logs.method, fetch_logs.time_released, students.fname AS student_fname, students.lname AS student_lname, students.grade_section, parents.fname AS parent_fname, parents.lname AS parent_lname')
+                ->select('fetch_logs.student_id, fetch_logs.fetcher_fname, fetch_logs.fetcher_lname, fetch_logs.fetcher_relation, fetch_logs.method, fetch_logs.session_type, fetch_logs.time_released, students.fname AS student_fname, students.lname AS student_lname, students.grade_section, parents.fname AS parent_fname, parents.lname AS parent_lname')
                 ->join('students', 'students.id = fetch_logs.student_id', 'left')
                 ->join('parents', 'parents.id = fetch_logs.parent_id', 'left')
                 ->orderBy('fetch_logs.time_released', 'DESC')
@@ -71,7 +71,7 @@ class Dashboard extends BaseController
 
             $db = \Config\Database::connect();
             $data['todayReleases'] = $db->table('fetch_logs')
-                ->select('fetch_logs.student_id, fetch_logs.fetcher_fname, fetch_logs.fetcher_lname, fetch_logs.fetcher_relation, fetch_logs.method, fetch_logs.time_released, students.fname AS student_fname, students.lname AS student_lname, students.grade_section, parents.fname AS parent_fname, parents.lname AS parent_lname')
+                ->select('fetch_logs.student_id, fetch_logs.fetcher_fname, fetch_logs.fetcher_lname, fetch_logs.fetcher_relation, fetch_logs.method, fetch_logs.session_type, fetch_logs.time_released, students.fname AS student_fname, students.lname AS student_lname, students.grade_section, parents.fname AS parent_fname, parents.lname AS parent_lname')
                 ->join('students', 'students.id = fetch_logs.student_id', 'left')
                 ->join('parents', 'parents.id = fetch_logs.parent_id', 'left')
                 ->where('fetch_logs.staff_id', $userId)
@@ -293,9 +293,9 @@ class Dashboard extends BaseController
                     }
                 }
                 $data['pendingToday'] = count(array_diff($studentIds, $releasedIds));
-            } else {
-                $data['recentReleases'] = [];
-            }
+        } else {
+            $data['recentReleases'] = [];
+        }
 
             $data['smsCount'] = 0;
             $teacherPhone = $db->table('teachers')->where('id', $userId)->get()->getRowArray()['phone'] ?? '';

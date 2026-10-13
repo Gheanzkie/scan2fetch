@@ -632,7 +632,7 @@ html.theme-dark .sms-mode-panel { background: #1e293b; border-color: #334155; }
 
  <!-- ===== STATS WITH CLICKABLE TABS ===== -->
  <div class="row mt-3">
- <div class="col-lg-4 col-6 mb-2">
+ <div class="col-lg-6 col-6 mb-2">
  <a href="<?= base_url('scan-monitor?date='.($selectedDate ?? date('Y-m-d')).'&tab=released') ?>" style="text-decoration:none;color:inherit;">
  <div class="info-box d-flex align-items-center <?= ($activeTab ?? 'released') == 'released' ? 'active' : '' ?>">
  <span class="info-box-icon mr-3" style="background:#16a34a;">
@@ -646,21 +646,7 @@ html.theme-dark .sms-mode-panel { background: #1e293b; border-color: #334155; }
  </a>
  </div>
 
- <div class="col-lg-4 col-6 mb-2">
- <a href="<?= base_url('scan-monitor?date='.($selectedDate ?? date('Y-m-d')).'&tab=declined') ?>" style="text-decoration:none;color:inherit;">
- <div class="info-box d-flex align-items-center <?= ($activeTab ?? 'released') == 'declined' ? 'active' : '' ?>">
- <span class="info-box-icon mr-3" style="background:#dc2626;">
- <i class="fas fa-times-circle"></i>
- </span>
- <div>
- <div class="info-box-text">Declined</div>
- <div class="info-box-number"><?= $declinedToday ?? 0 ?></div>
- </div>
- </div>
- </a>
- </div>
-
- <div class="col-lg-4 col-6 mb-2">
+ <div class="col-lg-6 col-6 mb-2">
  <a href="<?= base_url('scan-monitor?date='.($selectedDate ?? date('Y-m-d')).'&tab=pending') ?>" style="text-decoration:none;color:inherit;">
  <div class="info-box d-flex align-items-center <?= ($activeTab ?? 'released') == 'pending' ? 'active' : '' ?>">
  <span class="info-box-icon mr-3" style="background:#d97706;">
@@ -758,84 +744,6 @@ html.theme-dark .sms-mode-panel { background: #1e293b; border-color: #334155; }
  <div class="text-center py-4 empty-table">
  <i class="fas fa-inbox fa-2x mb-2 d-block empty-state"></i>
                                         No releases found
- </div>
- <?php endif; ?>
- </div>
- </div>
- </div>
- </div>
-
- <!-- ===== DECLINED TAB ===== -->
- <div class="tab-content <?= ($activeTab ?? 'released') == 'declined' ? 'active' : '' ?>" id="tab-declined">
- <div class="card">
- <div class="card-header" style="border-bottom: 3px solid var(--soft-rose);">
- <h5>
- <i class="fas fa-times-circle mr-2" style="color:var(--soft-rose);"></i>
-                                    Declined Students
- <span class="badge badge-danger ml-2"><?= count($declinedStudents ?? []) ?></span>
- </h5>
- </div>
- <div class="card-body p-0">
- <div class="tab-filters">
- <form method="GET" action="<?= base_url('scan-monitor') ?>" class="d-flex flex-wrap align-items-center" style="gap:8px;width:100%;">
- <input type="hidden" name="date" value="<?= $selectedDate ?? date('Y-m-d') ?>">
- <input type="hidden" name="tab" value="declined">
-                                        
- <div style="flex:1;min-width:150px;">
-<input type="text" 
-                                                   name="search" 
-                                                   class="form-control" 
-                                                   placeholder="Search declined records..." 
-                                                   value="<?= $search ?? '' ?>"
-                                                   oninput="autoSubmitForm(this.form)">
-  </div>
-                                        
-  <a href="<?= base_url('scan-monitor?date='.($selectedDate ?? date('Y-m-d')).'&tab=declined') ?>" 
-                                            class="btn btn-outline-kid btn-sm">
-  <i class="fas fa-times mr-1"></i> Clear
-  </a>
-  </form>
- </div>
-                                
- <div style="max-height:500px;overflow-y:auto;">
- <?php if(!empty($declinedStudents)): ?>
- <table class="table table-hover">
- <thead>
- <tr>
- <th>#</th>
- <th>Time</th>
- <th>Student</th>
- <th>Grade</th>
- <th>Fetcher</th>
- <th>Description</th>
- </tr>
- </thead>
- <tbody>
- <?php $i = 1; foreach($declinedStudents as $d): ?>
- <tr>
- <td style="color:var(--faint);"><?= $i++ ?></td>
- <td style="font-size:11.5px;color:var(--muted);">
- <?= date('h:i A', strtotime($d['created_at'])) ?>
- </td>
- <td>
- <strong>
- <?= esc($d['student_name'] ?? 'Unknown') ?>
- </strong>
- </td>
- <td><span class="badge badge-light"><?= esc($d['grade_section'] ?? '—') ?></span></td>
- <td style="font-size:12px;">
- <?= esc($d['fetcher_display'] ?? $d['user_name'] ?? '—') ?>
- <br><small style="color:var(--muted);"><?= esc($d['role'] ?? '') ?></small>
- </td>
- <td style="font-size:11.5px;color:var(--muted);"><?= esc($d['description'] ?? '—') ?></td>
- </tr>
- <?php endforeach; ?>
- </tbody>
- </table>
- <?php else: ?>
- <div class="text-center py-4 empty-table">
- <i class="fas fa-check-circle fa-2x mb-2 d-block empty-state"></i>
-                                        No declined attempts for this date
  </div>
  <?php endif; ?>
  </div>

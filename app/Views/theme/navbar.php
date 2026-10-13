@@ -68,7 +68,7 @@
   <i class="fas fa-tachometer-alt mr-2" style="color: #64748b;"></i> Dashboard
   </a>
   <?php endif; ?>
-  <?php if ($role != 'staff'): ?>
+  <?php if ($role == 'admin' || $role == 'parent'): ?>
   <a href="<?= base_url('messages') ?>" class="dropdown-item">
   <i class="fas fa-comments mr-2" style="color: #64748b;"></i> Messages
   <span class="badge badge-danger msg-badge" style="display:none;">0</span>

@@ -95,11 +95,18 @@
  </a>
  </li>
 
-  <!-- ===== OPERATIONS ===== -->
-  <!-- QR Scan is staff-only now (removed from admin sidebar). -->
+ <li class="nav-item">
+ <a href="<?= base_url('scan-monitor') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'scan-monitor') ? 'active' : '' ?>">
+ <i class="nav-icon fas fa-desktop" style="color: #38bdf8;"></i>
+ <p>Students Status</p>
+ </a>
+ </li>
 
-  <!-- ===== REPORTS ===== -->
-  <li class="nav-header">REPORTS</li>
+ <!-- ===== OPERATIONS ===== -->
+ <!-- QR Scan is staff-only now (removed from admin sidebar). -->
+
+ <!-- ===== REPORTS ===== -->
+ <li class="nav-header">REPORTS</li>
 
  <li class="nav-item">
  <a href="<?= base_url('schedule') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'schedule') ? 'active' : '' ?>">

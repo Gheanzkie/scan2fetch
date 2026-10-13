@@ -585,6 +585,7 @@ select.form-control option {
  <tr>
   <th style="width:50px;">#</th>
   <th>Name</th>
+  <th>Teacher</th>
   <th>Grade</th>
   <th>Parent / Guardian</th>
   <th>Created</th>
@@ -600,6 +601,13 @@ select.form-control option {
  <?= esc($s['fname']) ?> <?= esc($s['lname']) ?>
  </a>
  </td>
+  <td>
+  <?php if (!empty($s['adviser_fname'])): ?>
+    <span style="font-size:13px;"><?= esc($s['adviser_fname']) ?> <?= esc($s['adviser_lname']) ?></span>
+  <?php else: ?>
+    <span class="muted" style="font-size:12px;">—</span>
+  <?php endif; ?>
+  </td>
   <td><span class="badge badge-soft"><?= esc($s['grade_section']) ?></span></td>
   <td>
   <?php $sparents = $s['parents'] ?? []; ?>

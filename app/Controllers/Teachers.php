@@ -82,10 +82,16 @@ class Teachers extends BaseController
 
         // Selected date's release status per student
         $releasedIds = [];
+        // PER-SESSION map: a student can be released TWICE in one day
+        // (morning + afternoon). The old code did
+        //     $releasedIds[$sid] = $l;   // ORDER BY time ASC
+        // so the LAST row (afternoon) silently overwrote the morning one and
+        // only one session was ever visible. Keep one entry per session.
+        $releasedBySession = [];
         $recentHistory = [];
         if (!empty($studentIds)) {
             $dateLogs = $db->table('fetch_logs')
-                ->select('student_id, time_released')
+                ->select('student_id, time_released, session_type')
                 ->where('DATE(time_released)', $selectedDate)
                 ->whereIn('student_id', $studentIds)
                 ->orderBy('time_released', 'ASC')
@@ -93,11 +99,15 @@ class Teachers extends BaseController
                 ->getResultArray();
             foreach ($dateLogs as $l) {
                 $releasedIds[$l['student_id']] = $l;
+                $ses = $l['session_type'] ?: null;
+                if ($ses !== null) {
+                    $releasedBySession[$l['student_id']][$ses] = $l['time_released'];
+                }
             }
 
             // Recent pickup history per student (last 30 days)
             $historyLogs = $db->table('fetch_logs')
-                ->select('student_id, time_released, fetcher_fname, fetcher_lname, method')
+                ->select('student_id, time_released, session_type, fetcher_fname, fetcher_lname, method')
                 ->where('DATE(time_released) >=', date('Y-m-d', strtotime('-30 days')))
                 ->whereIn('student_id', $studentIds)
                 ->orderBy('time_released', 'DESC')
@@ -119,6 +129,8 @@ class Teachers extends BaseController
 
             $s['released'] = isset($releasedIds[$s['id']]);
             $s['released_time'] = $releasedIds[$s['id']]['time_released'] ?? null;
+            $s['released_session'] = $releasedIds[$s['id']]['session_type'] ?? null;
+            $s['released_sessions'] = $releasedBySession[$s['id']] ?? [];
             $s['recent_history'] = $recentHistory[$s['id']] ?? [];
 
             $rows[] = [

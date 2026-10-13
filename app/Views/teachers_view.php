@@ -342,31 +342,52 @@ body {
  </div>
  </div>
  <div class="card-body pt-2">
- <?php if(!empty($rows)): foreach($rows as $r): ?>
+ <?php if(!empty($rows)): ?>
+ <div class="table-responsive">
+ <table class="table table-hover" style="margin-bottom:0;">
+ <thead>
+ <tr>
+ <th style="width:50px;">#</th>
+ <th>Student</th>
+ <th>Grade</th>
+ <th class="text-center" style="width:100px;">MORNING</th>
+ <th class="text-center" style="width:100px;">AFTERNOON</th>
+ </tr>
+ </thead>
+ <tbody>
+ <?php $mi = 1; foreach($rows as $r): ?>
  <?php $s = $r['student']; ?>
- <div class="student-row mb-3 p-3">
- <div class="d-flex align-items-center justify-content-between mb-2">
- <div class="d-flex align-items-center">
- <i class="fas fa-child mr-3" style="color: #b0b0c8; font-size: 16px;"></i>
- <div>
- <strong style="color: var(--ink); font-size: 14px;"><?= esc($s['fname']) ?> <?= esc(($s['mname']??'')) ?> <?= esc($s['lname']) ?></strong>
- <span class="badge badge-count ml-2"><?= esc($s['grade_section']) ?></span>
- </div>
- </div>
- <div class="d-flex align-items-center">
- <?php if (!empty($s['released'])): ?>
- <span class="badge badge-released">
- <i class="fas fa-check-circle mr-1"></i> Picked up <?= date('M d, Y h:i A', strtotime($s['released_time'])) ?>
- </span>
+ <?php
+  $rs = $s['released_sessions'] ?? [];
+  $amReleased = $rs['morning'] ?? null;
+  $pmReleased = $rs['afternoon'] ?? null;
+ ?>
+ <tr>
+ <td style="color:var(--faint);font-weight:700;"><?= $mi++ ?></td>
+ <td>
+ <strong style="color:var(--ink);font-size:13.5px;"><?= esc($s['fname']) ?> <?= esc(($s['mname']??'')) ?> <?= esc($s['lname']) ?></strong>
+ </td>
+ <td><span class="badge badge-soft"><?= esc($s['grade_section']) ?></span></td>
+ <td class="text-center session-strip">
+ <?php if ($amReleased): ?>
+ <i class="fas fa-check-circle" style="color:#16a34a;font-size:17px;" title="Released: <?= date('M d, Y h:i A', strtotime($amReleased)) ?>"></i>
  <?php else: ?>
- <span class="badge badge-pending">
- <i class="fas fa-times-circle mr-1"></i> Not Fetched
- </span>
+ <strong style="color:var(--soft-rose);font-size:17px;">X</strong>
  <?php endif; ?>
+ </td>
+ <td class="text-center session-strip">
+ <?php if ($pmReleased): ?>
+ <i class="fas fa-check-circle" style="color:#16a34a;font-size:17px;" title="Released: <?= date('M d, Y h:i A', strtotime($pmReleased)) ?>"></i>
+ <?php else: ?>
+ <strong style="color:var(--soft-rose);font-size:17px;">X</strong>
+ <?php endif; ?>
+ </td>
+ </tr>
+ <?php endforeach; ?>
+ </tbody>
+ </table>
  </div>
- </div>
- </div>
- <?php endforeach; else: ?>
+ <?php else: ?>
  <div class="text-center py-5" style="color: var(--faint);">
  <i class="fas fa-user-graduate fa-3x mb-3 d-block" style="color: rgba(168,192,255,0.35);"></i>
  <h5 style="color: var(--muted);">No students under this grade/section yet</h5>

@@ -172,14 +172,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
  <?php if (!empty($logs)): $i = 1; foreach ($logs as $r): ?>
  <tr>
  <td style="color: #b0b0c8; font-weight: 700;"><?= $i++ ?></td>
- <td style="color: #8888aa; font-size: 13px;"><?= date('M d, Y h:i A', strtotime($r['time_released'] ?? $r['created_at'])) ?></td>
+ <td style="color: #8888aa; font-size: 13px;"><?= date('M d, Y h:i A', strtotime($r['time_released'])) ?><?php if (!empty($r['session_type'])): ?> <span class="badge" style="background:<?= $r['session_type'] === 'morning' ? '#fef3c7' : '#e0e7ff' ?>;color:<?= $r['session_type'] === 'morning' ? '#b45309' : '#3730a3' ?>;"><?= strtoupper($r['session_type']) ?></span><?php endif; ?></td>
  <td>
  <strong style="color: #2d2d4a;">
- <?php if(($r['action'] ?? '') == 'decline'): ?>
- <?= esc($r['sfname'] ?? 'Unknown') ?>
- <?php else: ?>
  <?= esc($r['sfname'] ?? '') ?> <?= esc($r['smname'] ?? '') ?> <?= esc($r['slname'] ?? '') ?>
- <?php endif; ?>
  </strong>
  <br>
  <small style="color: #8888aa; font-size: 12px;">
@@ -187,34 +183,18 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
  </small>
  </td>
  <td>
- <?php if(($r['action'] ?? '') == 'decline'): ?>
- <?= esc($r['fetcher_fname'] ?? 'System') ?>
- <?php else: ?>
  <?= esc($r['fetcher_fname']) ?> <?= esc($r['fetcher_lname']) ?>
- <?php endif; ?>
  </td>
  <td>
- <?php if(($r['action'] ?? '') == 'decline'): ?>
- <span class="badge badge-light"><?= esc($r['fetcher_relation'] ?? 'Staff') ?></span>
- <?php else: ?>
  <span class="badge badge-info"><?= esc($r['fetcher_relation'] ?? 'Parent') ?></span>
- <?php endif; ?>
  </td>
  <td>
- <?php if(($r['action'] ?? '') == 'decline'): ?>
- <span class="badge badge-light">—</span>
- <?php else: ?>
  <span class="badge badge-<?= ($r['method'] ?? '') == 'QR' ? 'primary' : 'info' ?>">
  <?= $r['method'] ?? '—' ?>
  </span>
- <?php endif; ?>
  </td>
  <td>
- <?php if(($r['action'] ?? '') == 'decline'): ?>
- <span class="badge badge-danger"> Declined</span>
- <?php else: ?>
  <span class="badge badge-success"> Released</span>
- <?php endif; ?>
  </td>
  </tr>
  <?php endforeach; else: ?>
@@ -222,7 +202,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
  <td colspan="7" class="text-center py-5">
  <i class="fas fa-history fa-3x mb-3 d-block" style="color: rgba(108,140,255,0.12);"></i>
  <h5 style="color: #7a7a9a; font-size: 18px;">No history yet</h5>
- <p style="color: #b0b0c8; font-size: 15px;">Releases and declines will appear here.</p>
+ <p style="color: #b0b0c8; font-size: 15px;">Releases will appear here.</p>
  </td>
  </tr>
  <?php endif; ?>

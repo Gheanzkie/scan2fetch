@@ -3,18 +3,20 @@
 namespace App\Controllers;
 
 /**
- * Simple in-app chat between parents and the "office" (admin/staff).
+ * Simple in-app chat between parents and the school ADMIN.
  *
- * Message flow:
- *   - Parent → office : receiver_id = NULL (any admin/staff can read & reply)
- *   - Office → parent : receiver_id = <parent id> (single conversation per parent)
+ * Message flow (admin <-> parent only):
+ *   - Parent → admin : receiver_id = NULL (admin reads & replies)
+ *   - Admin → parent : receiver_id = <parent id> (single conversation per parent)
+ *
+ * Staff and teachers are NOT part of this conversation (operator request).
  *
  * Table `messages` (create it in MySQL if not present):
  *   CREATE TABLE messages (
  *     id INT AUTO_INCREMENT PRIMARY KEY,
  *     sender_id INT NOT NULL,
- *     sender_role VARCHAR(20) NOT NULL,      -- parent | staff | admin
- *     receiver_id INT NULL,                  -- NULL = to the office
+ *     sender_role VARCHAR(20) NOT NULL,      -- parent | admin
+ *     receiver_id INT NULL,                  -- NULL = to admin
  *     message TEXT NOT NULL,
  *     is_read TINYINT(1) NOT NULL DEFAULT 0,
  *     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -35,10 +37,16 @@ class Messages extends BaseController
         $me   = (int) session('user_id');
         $db   = \Config\Database::connect();
 
+        // Only admin (office) and parent may use messages.
+        if (! in_array($role, ['admin', 'parent'], true)) {
+            return redirect()->to($role === 'staff' ? '/scan' : '/dashboard')
+                ->with('error', 'Messages are only available to admin and parents.');
+        }
+
         $data = ['title' => 'Messages'];
 
         if ($role == 'parent') {
-            // Single conversation between this parent and the school office.
+            // Single conversation between this parent and the school admin.
             $data['thread'] = $db->table('messages')
                 ->where("(sender_role = 'parent' AND sender_id = {$me}) OR receiver_id = {$me}")
                 ->orderBy('created_at', 'ASC')
@@ -50,13 +58,13 @@ class Messages extends BaseController
             }
             unset($m);
 
-            // Mark incoming office replies as read.
+            // Mark incoming admin replies as read.
             $db->table('messages')
                 ->where('receiver_id', $me)
                 ->where('is_read', 0)
                 ->update(['is_read' => 1]);
         } else {
-            // Office inbox (admin/staff): one thread per parent.
+            // Admin inbox: one thread per parent.
             $data['threads'] = $this->officeThreads($db);
 
             $with = (int) $this->request->getGet('with');
@@ -81,14 +89,18 @@ class Messages extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
         }
 
+        $role = session('role');
+        if (! in_array($role, ['admin', 'parent'], true)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Messages are only available to admin and parents.']);
+        }
+
         $text = trim($this->request->getPost('message'));
         if ($text === '') {
             return $this->response->setJSON(['success' => false, 'message' => 'Message is empty.']);
         }
 
-        $role = session('role');
-        $me   = (int) session('user_id');
-        $db   = \Config\Database::connect();
+        $me = (int) session('user_id');
+        $db = \Config\Database::connect();
 
         if ($role == 'parent') {
             $db->table('messages')->insert([
@@ -106,7 +118,7 @@ class Messages extends BaseController
             }
             $db->table('messages')->insert([
                 'sender_id'   => $me,
-                'sender_role' => $role,
+                'sender_role' => 'admin',
                 'receiver_id' => $toParent,
                 'message'     => $this->enc($text),
                 'is_read'     => 0,
@@ -123,13 +135,17 @@ class Messages extends BaseController
             return $this->response->setJSON(['success' => false]);
         }
 
+        $role = session('role');
+        if (! in_array($role, ['admin', 'parent'], true)) {
+            return $this->response->setJSON(['success' => false]);
+        }
+
         $pid = (int) $parentId;
         if ($pid <= 0) {
             return $this->response->setJSON(['success' => false]);
         }
 
-        $role = session('role');
-        $me   = (int) session('user_id');
+        $me = (int) session('user_id');
 
         // A parent may only load their OWN conversation.
         if ($role == 'parent') {
@@ -146,7 +162,7 @@ class Messages extends BaseController
         }
         unset($m);
 
-        if ($role != 'parent') {
+        if ($role == 'admin') {
             $this->markParentRead($db, $pid);
         }
 
@@ -165,10 +181,11 @@ class Messages extends BaseController
 
         if ($role == 'parent') {
             $count = $db->table('messages')->where('receiver_id', $me)->where('is_read', 0)->countAllResults();
-        } elseif ($role == 'teacher') {
-            $count = 0;
-        } else {
+        } elseif ($role == 'admin') {
             $count = $db->table('messages')->where('sender_role', 'parent')->where('is_read', 0)->countAllResults();
+        } else {
+            // Staff / teacher are not part of the conversation.
+            $count = 0;
         }
 
         return $this->response->setJSON(['count' => (int) $count]);

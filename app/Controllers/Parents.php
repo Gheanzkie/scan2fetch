@@ -397,77 +397,27 @@ class Parents extends BaseController
         if (!empty($studentIds)) {
             $fetchLogModel = new \App\Models\FetchLogModel();
             $query = $fetchLogModel
-                ->whereIn('student_id', $studentIds);
+                ->select('fetch_logs.*, students.fname AS sfname, students.mname AS smname, students.lname AS slname, students.grade_section')
+                ->join('students', 'students.id = fetch_logs.student_id', 'left')
+                ->whereIn('fetch_logs.student_id', $studentIds);
 
             if ($selectedDate) {
-                $query->where('DATE(time_released)', $selectedDate);
+                $query->where('DATE(fetch_logs.time_released)', $selectedDate);
             }
 
             $releases = $query
                 ->orderBy('time_released', 'DESC')
                 ->limit(100)
                 ->findAll();
-            
+
             foreach ($releases as &$release) {
-                $student = $studentModel->find($release['student_id']);
-                if ($student) {
-                    $release['sfname'] = $student['fname'];
-                    $release['smname'] = $student['mname'] ?? '';
-                    $release['slname'] = $student['lname'];
-                    $release['grade_section'] = $student['grade_section'] ?? '';
-                    $release['action'] = 'release';
-                }
+                $release['action'] = 'release';
             }
             $data['releases'] = $releases;
         }
 
-        $data['declined'] = [];
-        if (!empty($studentIds)) {
-            $declinedQuery = $db->table('activity_logs')
-                ->select('activity_logs.*')
-                ->where('action', 'decline')
-                ->where('module', 'scan');
-
-            if ($selectedDate) {
-                $declinedQuery->where('DATE(created_at)', $selectedDate);
-            }
-
-            $declined = $declinedQuery
-                ->orderBy('created_at', 'DESC')
-                ->limit(100)
-                ->get()
-                ->getResultArray();
-            
-            foreach ($declined as &$d) {
-                $desc = $d['description'] ?? '';
-                $studentName = 'Unknown';
-                $studentId = null;
-                
-                if (preg_match('/Student:\s*([^\s]+)\s*([^\s]+)\s*\(ID:\s*(\d+)\)/', $desc, $matches)) {
-                    $studentName = $matches[1] . ' ' . $matches[2];
-                    $studentId = $matches[3];
-                } elseif (preg_match('/Student:\s*([^\s]+)\s*([^\s]+)/', $desc, $matches)) {
-                    $studentName = $matches[1] . ' ' . $matches[2];
-                }
-                
-                if ($studentId && in_array($studentId, $studentIds)) {
-                    $d['sfname'] = $studentName;
-                    $d['slname'] = '';
-                    $d['grade_section'] = '—';
-                    $d['action'] = 'decline';
-                    $d['time_released'] = $d['created_at'];
-                    $d['fetcher_fname'] = $d['user_name'] ?? 'System';
-                    $d['fetcher_lname'] = '';
-                    $d['fetcher_relation'] = $d['role'] ?? 'Staff';
-                    $data['declined'][] = $d;
-                }
-            }
-        }
-
-        $allLogs = array_merge($data['releases'], $data['declined']);
-        usort($allLogs, function($a, $b) {
-            return strtotime($b['time_released']) - strtotime($a['time_released']);
-        });
+        // Only releases (pending/released). Declined state removed per project rule.
+        $allLogs = array_values($data['releases']);
 
         // Search filter
         if ($search !== '') {
@@ -597,19 +547,15 @@ class Parents extends BaseController
         if (!empty($studentIds)) {
             $fetchLogModel = new \App\Models\FetchLogModel();
             $releases = $fetchLogModel
-                ->whereIn('student_id', $studentIds)
+                ->select('fetch_logs.*, students.fname AS sfname, students.mname AS smname, students.lname AS slname, students.grade_section')
+                ->join('students', 'students.id = fetch_logs.student_id', 'left')
+                ->whereIn('fetch_logs.student_id', $studentIds)
                 ->orderBy('time_released', 'DESC')
                 ->limit(50)
                 ->findAll();
-            
+
             foreach ($releases as &$release) {
-                $student = $studentModel->find($release['student_id']);
-                if ($student) {
-                    $release['sfname'] = $student['fname'];
-                    $release['smname'] = $student['mname'] ?? '';
-                    $release['slname'] = $student['lname'];
-                    $release['grade_section'] = $student['grade_section'] ?? '';
-                }
+                $release['action'] = 'release';
             }
             $data['releases'] = $releases;
         }

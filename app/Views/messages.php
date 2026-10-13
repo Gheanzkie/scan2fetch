@@ -167,7 +167,7 @@ html.theme-dark .empty-chat { color: #94a3b8 !important; }
  <div class="messages-card">
  <div class="chat-header">
                              Messages — School Office
- <small class="d-block">Messages are read by the school admin / staff.</small>
+ <small class="d-block">Messages are read by the school admin.</small>
  </div>
  <div id="chatBody">
  <?php if (!empty($thread)): foreach ($thread as $m): ?>

@@ -30,7 +30,13 @@ class Students extends BaseController
     {
         $db = \Config\Database::connect();
 
-        $students = $this->studentModel->orderBy('created_at', 'DESC')->findAll();
+        // Adviser (teacher) name pulled in so the roster can show WHICH
+        // teacher the student belongs to.
+        $students = $this->studentModel
+            ->select('students.*, teachers.fname AS adviser_fname, teachers.lname AS adviser_lname')
+            ->join('teachers', 'teachers.id = students.adviser_id', 'left')
+            ->orderBy('students.created_at', 'DESC')
+            ->findAll();
 
         // Attach every linked parent/guardian to each student so the Student
         // Management table can show a full household instead of nothing.
