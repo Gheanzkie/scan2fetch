@@ -73,26 +73,121 @@ abstract class BaseController extends Controller
     }
 
     /**
-     * Record a locally "sent" SMS in sms_logs without calling any gateway/API.
+     * Send an SMS and record it in sms_logs.
+     *
+     * SMS_SIMULATION = true  -> local log only (no gateway call), status 'sent'.
+     * SMS_SIMULATION = false -> calls TextBee (SMS_GATEWAY = textbee) and logs
+     *                           status 'sent' or 'failed' based on the API reply.
+     * Admin SMS Logs remain the monitoring surface either way.
      *
      * @return array{status: string, success: bool, message: string, phone: string}
      */
     protected function sendLocalSms(string $phone, ?string $logMessage = null): array
     {
+        $message  = $logMessage ?? 'Notification recorded locally (no SMS gateway).';
+        $simulate = (bool) env('SMS_SIMULATION', true);
+        $gateway  = strtolower((string) env('SMS_GATEWAY', 'textbee'));
+        $status   = 'sent';
+        $detail   = 'Recorded locally.';
+
+        if (! $simulate && $gateway === 'textbee') {
+            $result   = $this->sendTextBee($phone, $message);
+            $status   = $result['success'] ? 'sent' : 'failed';
+            $detail   = $result['message'];
+        }
+
         $db = \Config\Database::connect();
         $db->table('sms_logs')->insert([
             'parent_phone' => $phone,
-            'message'      => $logMessage ?? 'Notification recorded locally (no SMS gateway).',
-            'status'       => 'sent',
+            'message'      => $message,
+            'status'       => $status,
             'sent_at'      => date('Y-m-d H:i:s'),
         ]);
 
         return [
-            'status'  => 'sent',
-            'success' => true,
-            'message' => 'Recorded locally.',
+            'status'  => $status,
+            'success' => $status === 'sent',
+            'message' => $detail,
             'phone'   => $phone,
         ];
+    }
+
+    /**
+     * Deliver one SMS through TextBee (Android phone gateway).
+     *
+     * POST https://api.textbee.dev/api/v1/gateway/send-sms
+     * header x-api-key, body {recipients:[E.164], message[, deviceId]}
+     *
+     * @return array{success: bool, message: string}
+     */
+    private function sendTextBee(string $phone, string $message): array
+    {
+        $apiKey = trim((string) env('SMS_TEXTBEE_API_KEY', ''));
+        if ($apiKey === '') {
+            return ['success' => false, 'message' => 'TextBee API key not set in .env.'];
+        }
+
+        $payload = [
+            'recipients' => [$this->toE164($phone)],
+            'message'    => $message,
+        ];
+
+        $deviceId = trim((string) env('SMS_TEXTBEE_DEVICE_ID', ''));
+        if ($deviceId !== '') {
+            $payload['deviceId'] = $deviceId;
+        }
+
+        $ch = curl_init('https://api.textbee.dev/api/v1/gateway/send-sms');
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 15,
+            CURLOPT_HTTPHEADER     => [
+                'x-api-key: ' . $apiKey,
+                'Content-Type: application/json',
+            ],
+            CURLOPT_POSTFIELDS     => json_encode($payload),
+        ]);
+
+        $body = curl_exec($ch);
+        $err  = curl_error($ch);
+        $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($body === false) {
+            return ['success' => false, 'message' => 'cURL error: ' . $err];
+        }
+
+        if ($code === 200) {
+            return ['success' => true, 'message' => 'TextBee accepted (HTTP 200).'];
+        }
+
+        $snippet = trim(preg_replace('/\s+/', ' ', (string) $body));
+        if (strlen($snippet) > 180) {
+            $snippet = substr($snippet, 0, 180) . '...';
+        }
+
+        return ['success' => false, 'message' => "TextBee HTTP {$code}: {$snippet}"];
+    }
+
+    /**
+     * Normalize a Philippine local number (09XXXXXXXXX) to E.164 (+639XXXXXXXXX).
+     * Non-PH numbers that already start with '+' pass through untouched.
+     */
+    private function toE164(string $phone): string
+    {
+        $phone = trim($phone);
+        if ($phone === '') {
+            return $phone;
+        }
+        if ($phone[0] === '+') {
+            return $phone;
+        }
+        if (strncmp($phone, '0', 1) === 0 && strlen($phone) === 11) {
+            return '+63' . substr($phone, 1);
+        }
+
+        return '+' . preg_replace('/\D+/', '', $phone);
     }
 
     /**

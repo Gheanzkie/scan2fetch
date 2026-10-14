@@ -478,14 +478,9 @@ class ScanMonitor extends BaseController
                 $message .= "\n\n" . $customMessage;
             }
             
-            $smsData = [
-                'parent_phone' => $student['parent_phone'],
-                'message'      => $message,
-                'status'       => 'sent',
-                'sent_at'      => date('Y-m-d H:i:s')
-            ];
-            
-            $smsId = $db->table('sms_logs')->insert($smsData);
+            $smsResult = $this->sendLocalSms($student['parent_phone'], $message);
+            $smsId = $smsResult['success'] ? 1 : 0;
+            $smsStatus = $smsResult['status'];
             
             if ($smsId) {
                 $sentCount++;
@@ -499,7 +494,7 @@ class ScanMonitor extends BaseController
                     'student_id' => $student['id'],
                     'parent_id' => $student['parent_id'],
                     'message' => $message,
-                    'status' => 'sent',
+                    'status' => $smsStatus,
                     'sent_by' => session('user_id'),
                     'sent_at' => date('Y-m-d H:i:s')
                 ]);
@@ -528,12 +523,9 @@ class ScanMonitor extends BaseController
                         $teacherMessage .= "\n\n" . $customMessage;
                     }
 
-                    $teacherSmsId = $db->table('sms_logs')->insert([
-                        'parent_phone' => $teacher['phone'],
-                        'message'      => $teacherMessage,
-                        'status'       => 'sent',
-                        'sent_at'      => date('Y-m-d H:i:s')
-                    ]);
+                    $teacherSmsResult = $this->sendLocalSms($teacher['phone'], $teacherMessage);
+                    $teacherSmsId = $teacherSmsResult['success'] ? 1 : 0;
+                    $teacherSmsStatus = $teacherSmsResult['status'];
 
                     if ($teacherSmsId) {
                         $sentCount++;
@@ -547,7 +539,7 @@ class ScanMonitor extends BaseController
                             'student_id' => $student['id'],
                             'parent_id' => $teacher['id'],
                             'message' => $teacherMessage,
-                            'status' => 'sent',
+                            'status' => $teacherSmsStatus,
                             'sent_by' => session('user_id'),
                             'sent_at' => date('Y-m-d H:i:s')
                         ]);

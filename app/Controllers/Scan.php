@@ -311,11 +311,7 @@ class Scan extends BaseController
 
         
         $message = "Your child {$student['fname']} {$student['lname']} has been released at " . date('h:i A') . ". - BCC Scan2Fetch";
-        $db->table('sms_logs')->insert([
-            'parent_phone' => $parent['phone'],
-            'message'      => $message,
-            'status'       => 'sent',
-        ]);
+        $this->sendLocalSms($parent['phone'], $message);
 
         
         $logModel->addLog(
@@ -388,11 +384,7 @@ class Scan extends BaseController
 
         
         $message = "Pickup attempt for {$student['fname']} {$student['lname']} has been DECLINED at " . date('h:i A') . ". - BCC Scan2Fetch";
-        $db->table('sms_logs')->insert([
-            'parent_phone' => $parent['phone'],
-            'message'      => $message,
-            'status'       => 'sent',
-        ]);
+        $this->sendLocalSms($parent['phone'], $message);
 
         
         $logModel->addLog(
