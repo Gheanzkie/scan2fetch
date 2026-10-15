@@ -299,13 +299,18 @@ abstract class BaseController extends Controller
 
     /**
      * Allow only admin and staff roles (used by protected management actions).
-     * Returns true when access is granted, otherwise redirects and returns false.
+     * Returns true when access is granted, otherwise sends a redirect and
+     * STOPS. The old code did `redirect()->send(); return false;` and callers
+     * did `if (!...) return;` — execution then fell through to CI4's own
+     * response, emitting 200 + a stray Location header instead of a 302.
+     * The guard itself always ran (no state change), but the browser got a
+     * broken deny page. exit here guarantees a single, clean 302.
      */
     protected function requireAdminStaff(): bool
     {
         if (session('role') !== 'admin' && session('role') !== 'staff') {
-            redirect()->to('/dashboard')->send();
-            return false;
+            redirect()->to('/dashboard')->with('error', 'Access denied.')->send();
+            exit;
         }
         return true;
     }

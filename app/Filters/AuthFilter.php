@@ -34,6 +34,18 @@ class AuthFilter implements FilterInterface
         // 'students' also carries students-view, which Students::view() hands
         // over to /teachers-student-view for the teacher role.
         'students'         => ['admin', 'teacher'],
+
+        // --- students WRITE/manage endpoints: admin only ---
+        // Teachers keep read access (students / students-view / students-live)
+        // but must never reach the management writes. Longest-prefix matching
+        // makes these override the broader 'students' rule above.
+        'students-edit'        => ['admin'],
+        'students-save'        => ['admin'],
+        'students-update'      => ['admin'],
+        'students-delete'      => ['admin'], // also covers students-delete-all
+        'students-import'      => ['admin'],
+        'students-add-parent'  => ['admin'],
+        'students-remove-parent' => ['admin'],
         'register'         => ['admin'],
         'subfetchers'      => ['admin'],
         'logs'             => ['admin'],

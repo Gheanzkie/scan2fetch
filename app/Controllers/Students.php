@@ -59,6 +59,16 @@ class Students extends BaseController
 
     public function index()
     {
+        // Admin/staff management list. A parent must never see the whole
+        // roster + every parent contact; a teacher works from their own
+        // class at /teachers-view/{id}. (Belt: AuthFilter already blocks
+        // the parent role on 'students' — this guards the teacher role.)
+        if (! in_array(session('role'), ['admin', 'staff'], true)) {
+            // Return the redirect (not bare return): requireAdminStaff()-style
+            // send() + null lets CI4 still render the view body -> 200 with a
+            // Location header, which a browser may ignore.
+            return redirect()->to('/dashboard')->with('error', 'Access denied.');
+        }
         $db = \Config\Database::connect();
 
         // Adviser (teacher) name pulled in so the roster can show WHICH
@@ -137,12 +147,24 @@ class Students extends BaseController
     // ========== ADD FORM ==========
     public function add()
     {
+        if (! in_array(session('role'), ['admin', 'staff'], true)) {
+            // Return the redirect (not bare return): requireAdminStaff()-style
+            // send() + null lets CI4 still render the view body -> 200 with a
+            // Location header, which a browser may ignore.
+            return redirect()->to('/dashboard')->with('error', 'Access denied.');
+        }
         return view('register');
     }
 
     // ========== EDIT FORM ==========
     public function edit($id)
     {
+        if (! in_array(session('role'), ['admin', 'staff'], true)) {
+            // Return the redirect (not bare return): requireAdminStaff()-style
+            // send() + null lets CI4 still render the view body -> 200 with a
+            // Location header, which a browser may ignore.
+            return redirect()->to('/dashboard')->with('error', 'Access denied.');
+        }
         $data['student'] = $this->studentModel->find($id);
         if (!$data['student']) return redirect()->to('/students')->with('error', 'Student not found');
         return view('students_edit', $data);
@@ -151,6 +173,12 @@ class Students extends BaseController
     // ========== SAVE STUDENT + PARENTS + FETCHERS ==========
     public function save()
     {
+        if (! in_array(session('role'), ['admin', 'staff'], true)) {
+            // Return the redirect (not bare return): requireAdminStaff()-style
+            // send() + null lets CI4 still render the view body -> 200 with a
+            // Location header, which a browser may ignore.
+            return redirect()->to('/dashboard')->with('error', 'Access denied.');
+        }
         $db = \Config\Database::connect();
         
         $db->transStart();
@@ -366,6 +394,12 @@ class Students extends BaseController
     // ========== IMPORT STUDENTS + PARENTS FROM XLSX ==========
     public function importExcel()
     {
+        if (! in_array(session('role'), ['admin', 'staff'], true)) {
+            // Return the redirect (not bare return): requireAdminStaff()-style
+            // send() + null lets CI4 still render the view body -> 200 with a
+            // Location header, which a browser may ignore.
+            return redirect()->to('/dashboard')->with('error', 'Access denied.');
+        }
         $db = \Config\Database::connect();
         $file = $this->request->getFile('excel_file');
 
@@ -576,6 +610,12 @@ class Students extends BaseController
     // ========== UPDATE STUDENT ==========
     public function update()
     {
+        if (! in_array(session('role'), ['admin', 'staff'], true)) {
+            // Return the redirect (not bare return): requireAdminStaff()-style
+            // send() + null lets CI4 still render the view body -> 200 with a
+            // Location header, which a browser may ignore.
+            return redirect()->to('/dashboard')->with('error', 'Access denied.');
+        }
         $id = $this->request->getPost('id');
         $data = [
             'fname' => $this->request->getPost('fname'),
@@ -598,6 +638,12 @@ class Students extends BaseController
     // ========== DELETE STUDENT (With Cascade) ==========
     public function delete($id)
     {
+        if (! in_array(session('role'), ['admin', 'staff'], true)) {
+            // Return the redirect (not bare return): requireAdminStaff()-style
+            // send() + null lets CI4 still render the view body -> 200 with a
+            // Location header, which a browser may ignore.
+            return redirect()->to('/dashboard')->with('error', 'Access denied.');
+        }
         $db = \Config\Database::connect();
         $student = $this->studentModel->find($id);
         
@@ -729,6 +775,12 @@ class Students extends BaseController
     // ========== REMOVE PARENT ==========
     public function removeParent($studentId, $parentId)
     {
+        if (! in_array(session('role'), ['admin', 'staff'], true)) {
+            // Return the redirect (not bare return): requireAdminStaff()-style
+            // send() + null lets CI4 still render the view body -> 200 with a
+            // Location header, which a browser may ignore.
+            return redirect()->to('/dashboard')->with('error', 'Access denied.');
+        }
         $db = \Config\Database::connect();
         $db->table('student_parents')->where('student_id', $studentId)->where('parent_id', $parentId)->delete();
 
@@ -751,6 +803,12 @@ class Students extends BaseController
     // ========== ADD PARENT ==========
     public function addParent()
     {
+        if (! in_array(session('role'), ['admin', 'staff'], true)) {
+            // Return the redirect (not bare return): requireAdminStaff()-style
+            // send() + null lets CI4 still render the view body -> 200 with a
+            // Location header, which a browser may ignore.
+            return redirect()->to('/dashboard')->with('error', 'Access denied.');
+        }
         $studentId = $this->request->getPost('student_id');
         $db = \Config\Database::connect();
         if ($db->table('student_parents')->where('student_id', $studentId)->countAllResults() >= 3) {
