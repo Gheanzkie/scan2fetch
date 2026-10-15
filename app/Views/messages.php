@@ -346,13 +346,15 @@ html.theme-dark .empty-chat { color: #94a3b8 !important; }
 
     function render(messages) {
         if (!chatBody) return;
+        // Keep the user's place if they scrolled up to read history.
+        var nearBottom = (chatBody.scrollHeight - chatBody.scrollTop - chatBody.clientHeight) < 120;
         chatBody.innerHTML = '';
         if (!messages || !messages.length) {
             chatBody.innerHTML = '<div class="empty-chat"><i class="fas fa-comments fa-2x mb-2" style="color:rgba(108,140,255,0.30);"></i><p>No messages yet.</p></div>';
             return;
         }
         messages.forEach(function(m) { chatBody.innerHTML += bubbleHtml(m); });
-        scrollBottom();
+        if (nearBottom) scrollBottom();
     }
 
     function setStatus(msg) {
@@ -391,6 +393,7 @@ html.theme-dark .empty-chat { color: #94a3b8 !important; }
         });
     }
 
+    var threadSig = '';
     function refreshThread() {
         var url;
         if (ROLE === 'parent') {
@@ -403,7 +406,12 @@ html.theme-dark .empty-chat { color: #94a3b8 !important; }
         fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(function(r) { return r.json(); })
             .then(function(d) {
-                if (d.success) { render(d.messages); }
+                if (!d.success) return;
+                var msgs = d.messages || [];
+                var sig = msgs.length + ':' + (msgs.length ? (msgs[msgs.length-1].id || msgs[msgs.length-1].sent_at || '') : '');
+                if (sig === threadSig) return; // no change — skip re-render (no flicker/scroll jump)
+                threadSig = sig;
+                render(msgs);
             }).catch(function() {});
     }
 
@@ -432,8 +440,8 @@ html.theme-dark .empty-chat { color: #94a3b8 !important; }
 
     scrollBottom();
     refreshBadges();
-    setInterval(refreshBadges, 20000);
-    setInterval(refreshThread, 12000);
+    setInterval(refreshBadges, 4000);  // unread badge — live
+    setInterval(refreshThread, 2000);  // chat thread — live (2s, same as scanner)
 })();
 </script>
 <?= $this->endSection() ?>
