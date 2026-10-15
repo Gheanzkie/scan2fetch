@@ -24,6 +24,13 @@ class Parents extends BaseController
 
     public function index()
     {
+        // Full parent directory = admin only. The parent role gets the
+        // self-service pages (releases / notifications / logs / children),
+        // never the list of EVERY parent in the school.
+        if (session('role') !== 'admin') {
+            return redirect()->to('/dashboard')->with('error', 'Access denied: parent directory is admin only.');
+        }
+
         $db = \Config\Database::connect();
 
         // One row per parent (a parent may have several children). The old
@@ -67,6 +74,11 @@ class Parents extends BaseController
 
     public function view($id)
     {
+        // Ownership: a logged-in parent may only open their OWN record.
+        if (session('role') === 'parent' && (int) session('user_id') !== (int) $id) {
+            return redirect()->to('/parents-view/' . session('user_id'))->with('error', 'You can only view your own profile.');
+        }
+
         $data['parent'] = $this->parentsModel->find($id);
         if (!$data['parent']) {
             return redirect()->to('/parents')->with('error', 'Parent not found');
@@ -97,6 +109,11 @@ class Parents extends BaseController
 
     public function edit($id)
     {
+        // Profile editing of arbitrary parents = admin only (parents edit
+        // themselves through /update-profile which verifies their password).
+        if (session('role') !== 'admin') {
+            return redirect()->to('/dashboard')->with('error', 'Access denied.');
+        }
         $data['parent'] = $this->parentsModel->find($id);
         if (!$data['parent']) {
             return redirect()->to('/parents')->with('error', 'Parent not found');
@@ -106,6 +123,9 @@ class Parents extends BaseController
 
     public function save()
     {
+        if (session('role') !== 'admin') {
+            return redirect()->to('/dashboard')->with('error', 'Access denied.');
+        }
         $qrValue = $this->generateQR();
 
         $this->parentsModel->save([
@@ -180,14 +200,25 @@ class Parents extends BaseController
 
     public function update()
     {
-        $id = $this->request->getPost('id');
+        $id = (int) $this->request->getPost('id');
+        $role = session('role');
+
+        // IDOR fix: admin may edit anyone; a parent may ONLY edit themself,
+        // and may never set a password here (passwords change via
+        // change-password which re-verifies the current one).
+        if ($role !== 'admin') {
+            if ($role !== 'parent' || $id !== (int) session('user_id')) {
+                return redirect()->to('/dashboard')->with('error', 'Access denied.');
+            }
+        }
+
         $data = [
             'fname' => $this->request->getPost('fname'),
             'mname' => $this->request->getPost('mname'),
             'lname' => $this->request->getPost('lname'),
             'phone' => $this->request->getPost('phone')
         ];
-        if ($this->request->getPost('password')) {
+        if ($role === 'admin' && $this->request->getPost('password')) {
             $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
         }
         $this->parentsModel->update($id, $data);
@@ -253,6 +284,10 @@ class Parents extends BaseController
     // ========== DELETE PARENT (With Student Deletion) ==========
     public function delete($id)
     {
+        // Cascade delete of a parent + their students = admin only.
+        if (session('role') !== 'admin') {
+            return redirect()->to('/dashboard')->with('error', 'Access denied: only admin can delete parents.');
+        }
         $db = \Config\Database::connect();
         $parent = $this->parentsModel->find($id);
         
@@ -337,6 +372,11 @@ class Parents extends BaseController
 
     public function updateFromStudent()
     {
+        // Admin-only: this endpoint rewrites a parent record (incl. password)
+        // from the student form. Parents/teachers must never reach it.
+        if (session('role') !== 'admin') {
+            return redirect()->to('/dashboard')->with('error', 'Access denied.');
+        }
         $id = $this->request->getPost('id');
         $studentId = $this->request->getPost('student_id');
         $data = [
