@@ -398,7 +398,7 @@ function releaseAll(students, pid, qr, who) {
 
 /* ===== LIVE SESSION / GATE POLL =====
  * Date Management changes (open/closed, session switch) show up here within
- * ~10s without reloading the kiosk tab. */
+ * ~2s without reloading the kiosk tab. */
 function pollStatus() {
   fetch(BASE_URL + 'schedule/status')
   .then(function(r){ return r.json(); })
@@ -423,7 +423,7 @@ function pollStatus() {
   })
   .catch(function(){});
 }
-setInterval(pollStatus, 10000);
+setInterval(pollStatus, 2000); // instant refresh: Date Management changes show within ~2s
 pollStatus();
 
 /* boot */
