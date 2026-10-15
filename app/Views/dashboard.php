@@ -259,6 +259,39 @@
  </div>
  </div>
  </div>
+
+ <!-- ===== MY QR CODE (parent can finally see their own QR) ===== -->
+ <div class="row">
+ <div class="col-12 mb-3">
+ <div class="fun-box" style="background:#fff;border:2px dashed #cbd5e1;">
+ <div class="d-flex align-items-center" style="gap:1.25rem;flex-wrap:wrap;padding:.5rem;">
+ <?php $myQr = $parentProfile['qr_code'] ?? null; ?>
+ <?php if (!empty($myQr)): ?>
+ <img src="<?= base_url('uploads/qr/'.$myQr.'.png') ?>"
+ alt="My QR Code"
+ style="width:120px;height:120px;cursor:zoom-in;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"
+ onclick="openQrModal('<?= base_url('uploads/qr/'.$myQr.'.png') ?>','<?= esc(trim(($parentProfile['fname'] ?? '').' '.($parentProfile['lname'] ?? ''))) ?>')">
+ <?php else: ?>
+ <div style="width:120px;height:120px;display:flex;align-items:center;justify-content:center;color:#94a3b8;border:1px solid #e2e8f0;border-radius:10px;">
+ <i class="fas fa-qrcode fa-3x"></i>
+ </div>
+ <?php endif; ?>
+ <div style="flex:1;min-width:220px;">
+ <h6 style="font-weight:700;margin-bottom:.25rem;"><i class="fas fa-id-card mr-1" style="color:#4361ee;"></i> My QR Code</h6>
+ <p style="margin:0;color:#64748b;font-size:13px;">Show this QR code at the school gate when picking up your child. Tap it for a bigger view, then Save to keep a copy on your phone.</p>
+ <?php if (!empty($myQr)): ?>
+ <div style="margin-top:.5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+ <code><?= esc($myQr) ?></code>
+ <a href="<?= base_url('uploads/qr/'.$myQr.'.png') ?>" download="<?= esc($myQr) ?>.png" class="btn btn-sm btn-outline-primary" style="padding:.15rem .5rem;font-size:12px;"><i class="fas fa-download mr-1"></i>Save</a>
+ </div>
+ <?php else: ?>
+ <p style="margin:.5rem 0 0;color:#dc2626;font-size:12px;">No QR code yet — contact the school admin.</p>
+ <?php endif; ?>
+ </div>
+ </div>
+ </div>
+ </div>
+
  <?php endif; ?>
 
  </div>
