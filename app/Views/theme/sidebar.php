@@ -212,7 +212,7 @@
  <li class="nav-item">
  <a href="<?= base_url('messages') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'messages') ? 'active' : '' ?>">
  <i class="fas fa-comments nav-icon"></i>
- <p>Messages</p>
+ <p>Contact Admin</p>
  <span class="right badge badge-danger msg-badge" style="display:none;">0</span>
  </a>
  </li>

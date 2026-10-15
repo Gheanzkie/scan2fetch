@@ -145,12 +145,12 @@ html.theme-dark .empty-chat { color: #94a3b8 !important; }
  <div class="container-fluid">
  <div class="row mb-2">
  <div class="col-sm-6">
- <h1><i class="fas fa-comments mr-2"></i> Messages</h1>
+ <h1><i class="fas fa-comments mr-2"></i> <?= session('role') == 'parent' ? 'Contact Administrator' : 'Messages' ?></h1>
  </div>
  <div class="col-sm-6">
  <ol class="breadcrumb float-sm-right">
  <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">Home</a></li>
- <li class="breadcrumb-item active">Messages</li>
+ <li class="breadcrumb-item active"><?= session('role') == 'parent' ? 'Contact Administrator' : 'Messages' ?></li>
  </ol>
  </div>
  </div>
@@ -166,8 +166,8 @@ html.theme-dark .empty-chat { color: #94a3b8 !important; }
  <div class="col-lg-7 col-md-9">
  <div class="messages-card">
  <div class="chat-header">
-                             Messages — School Office
- <small class="d-block">Messages are read by the school admin.</small>
+ <?= session('role') == 'parent' ? 'Contact the School Administrator' : 'Messages — School Office' ?>
+ <small class="d-block"><?= session('role') == 'parent' ? 'Send a message directly to the school admin. They will reply here.' : 'Messages are read by the school admin.' ?></small>
  </div>
  <div id="chatBody">
  <?php if (!empty($thread)): foreach ($thread as $m): ?>
