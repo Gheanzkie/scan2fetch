@@ -1,6 +1,5 @@
 # BCC Scan2Fetch
 
-Hello! I'm **Ghean De La Cruz**, an Information Technology student at **Kabankalan Catholic College**. I'd like to share my system that is currently working.
 
 admin 
 user admin   
