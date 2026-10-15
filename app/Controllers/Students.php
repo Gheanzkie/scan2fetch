@@ -78,6 +78,19 @@ class Students extends BaseController
         $data['student'] = $this->studentModel->find($id);
         if (!$data['student']) return redirect()->to('/students')->with('error', 'Student not found');
 
+        // Adviser: prefer students.adviser_id, fallback to teacher of same grade/section.
+        $adviser = null;
+        $db = \Config\Database::connect();
+        if (!empty($data['student']['adviser_id'])) {
+            $adviser = $db->table('teachers')->where('id', $data['student']['adviser_id'])->get()->getRowArray();
+        }
+        if (empty($adviser) && !empty($data['student']['grade_section'])) {
+            $adviser = $db->table('teachers')
+                ->where('grade_section', $data['student']['grade_section'])
+                ->get()->getRowArray();
+        }
+        $data['adviser'] = $adviser;
+
         $data['parents'] = $this->parentsModel
             ->select('parents.*, student_parents.relation, parents.id as parent_id')
             ->join('student_parents', 'student_parents.parent_id = parents.id')

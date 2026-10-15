@@ -169,6 +169,13 @@ body {
  <div style="width:130px;height:130px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #e2e8f0;background:#f1f5f9;display:flex;align-items:center;justify-content:center;"><i class="fas fa-child fa-3x" style="color: #94a3b8;"></i></div>
  <h3 class="mt-3 mb-0" style="color: #0f172a;"><?= esc($student['fname']) ?> <?= esc($student['lname']) ?></h3>
  <p class="text-muted mb-0" style="color: #8888aa !important;"><?= esc($student['grade_section']) ?></p>
+ <?php if (!empty($adviser)): ?>
+ <p class="mb-0" style="color: #555577 !important; font-size: 14px;">
+ <i class="fas fa-chalkboard-teacher mr-1" style="color: var(--soft-blue);"></i>
+ <strong>Adviser:</strong> <?= esc(trim(($adviser['fname'] ?? '').' '.($adviser['lname'] ?? ''))) ?>
+ <span style="color:#b0b0c8;">(<?= esc($adviser['grade_section'] ?? '') ?>)</span>
+ </p>
+ <?php endif; ?>
  <p class="text-muted small" style="color: #b0b0c8 !important;"><i class="fas fa-calendar mr-1"></i> <?= date('M d, Y', strtotime($student['created_at'])) ?></p>
  <div class="mt-3">
  <a href="<?= base_url('students-edit/' . $student['id']) ?>" class="btn btn-outline-secondary btn-sm"><i class="fas fa-edit"></i> Edit</a>
