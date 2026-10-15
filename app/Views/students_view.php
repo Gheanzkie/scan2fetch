@@ -176,6 +176,9 @@ body {
  <span style="color:#b0b0c8;">(<?= esc($adviser['grade_section'] ?? '') ?>)</span>
  </p>
  <?php endif; ?>
+ <p class="mb-0" id="liveStatusLine" style="font-size: 13px; color: #64748b;">
+ <i class="fas fa-sync-alt mr-1" style="color: var(--soft-blue);"></i><span id="liveStatusText">Checking release status…</span>
+ </p>
  <p class="text-muted small" style="color: #b0b0c8 !important;"><i class="fas fa-calendar mr-1"></i> <?= date('M d, Y', strtotime($student['created_at'])) ?></p>
  <div class="mt-3">
  <a href="<?= base_url('students-edit/' . $student['id']) ?>" class="btn btn-outline-secondary btn-sm"><i class="fas fa-edit"></i> Edit</a>
@@ -308,5 +311,25 @@ function openQrModal(u) {
     $('#qrDownloadBtn').attr('href', u);
     $('#qrModal').modal('show');
 }
+
+// ===== LIVE RELEASE STATUS (3s poll — updates without page refresh) =====
+var LIVE_SID = <?= (int)$student['id'] ?>;
+function pollLiveStatus(){
+  fetch('<?= base_url('students/live') ?>', {credentials:'same-origin'})
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if(!d || !d.success) return;
+    var t = d.released[String(LIVE_SID)];
+    var el = document.getElementById('liveStatusText');
+    if (!el) return;
+    if (t) {
+      el.innerHTML = '<span class="badge" style="background:#dcfce7;color:#166534;font-size:11px;">&#10003; Released today at ' + t + '</span>';
+    } else {
+      el.innerHTML = '<span class="badge" style="background:#ffedd5;color:#9a3412;font-size:11px;">Not yet picked up</span>';
+    }
+  }).catch(function(){});
+}
+pollLiveStatus();
+setInterval(pollLiveStatus, 3000);
 </script>
 <?= $this->endSection() ?>

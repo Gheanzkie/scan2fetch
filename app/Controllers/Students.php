@@ -26,6 +26,37 @@ class Students extends BaseController
     }
 
     // ========== LIST ==========
+    /**
+     * Live release feed for the Students list + student view.
+     * Returns today's releases as {student_id: "h:i A"} — polled by the UI
+     * every 3s so scan results appear WITHOUT a manual page refresh.
+     */
+    public function liveStatus()
+    {
+        if (!in_array(session('role'), ['admin', 'staff', 'teacher'], true)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Forbidden']);
+        }
+
+        $logs = (new \App\Models\FetchLogModel())
+            ->select('student_id, time_released')
+            ->where('DATE(time_released)', date('Y-m-d'))
+            ->orderBy('time_released', 'ASC')
+            ->findAll();
+
+        $map = [];
+        foreach ($logs as $l) {
+            if (!isset($map[$l['student_id']])) {
+                $map[$l['student_id']] = date('h:i A', strtotime($l['time_released']));
+            }
+        }
+
+        return $this->response->setJSON([
+            'success'  => true,
+            'date'     => date('Y-m-d'),
+            'released' => $map,
+        ]);
+    }
+
     public function index()
     {
         $db = \Config\Database::connect();
