@@ -69,6 +69,18 @@ body {
  </h5>
  </div>
  <div class="card-body">
+
+ <!-- ===== INFO: adding sub-fetchers is done by the school admin ===== -->
+ <div class="alert d-flex align-items-start" style="gap:.75rem;border-radius:14px;border:1px solid #fcd34d;background:#fffbeb;color:#92400e;font-size:13.5px;">
+ <i class="fas fa-info-circle mt-1" style="font-size:1.1rem;color:#f59e0b;"></i>
+ <div>
+ <strong style="display:block;margin-bottom:.15rem;">Want to add a sub-fetcher?</strong>
+ Sub-fetchers can only be added by the school admin. Please go to the school admin office (or use
+ <a href="<?= base_url('messages') ?>" style="color:#b45309;font-weight:700;">Contact Admin</a>)
+ with your name and the person you want to authorize — they will create the account and QR code for you.
+ </div>
+ </div>
+
  <?php if (!empty($subFetchers)): ?>
  <p style="color:#64748b;font-size:13px;margin-top:-.5rem;">
  These people can pick up your child on your behalf. They scan their own QR at the school gate — tap a QR to enlarge or save it.
