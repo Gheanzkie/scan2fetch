@@ -98,7 +98,7 @@ body { display:flex; align-items:center; justify-content:center; }
 #flash.show { display:flex; }
 #flash.already { background:rgba(190,120,20,0.92); }
 #flash .big { font-size:64px; margin-bottom:12px; }
-#flash .nm  { font-size:24px; font-weight:800; }
+#flash .nm  { font-size:36px; font-weight:800; letter-spacing:.3px; }
 #flash .sub { font-size:14px; opacity:.85; margin-top:6px; }
 </style>
 <script src="<?= base_url('html5qrcode/html5-qrcode.min.js') ?>"></script>
@@ -274,13 +274,14 @@ function verify(qr) {
       return;
     }
     if (list.length === 1) {
+      var snm1 = list[0].fname + ' ' + list[0].lname;
       if (list[0].already_released) {
-        flash(who, list[0].fname + ' ' + list[0].lname + ' — ALREADY RELEASED this ' + sessName + ' session.', true);
-        say('Already released — ' + list[0].fname + ' ' + list[0].lname, 'warn');
+        flash(snm1, 'Picked up by ' + who + ' — ALREADY RELEASED this ' + sessName + ' session.', true);
+        say('Already released — ' + snm1, 'warn');
         setTimeout(resume, 2600);
         return;
       }
-      flash(who, list[0].fname + ' ' + list[0].lname);
+      flash(snm1, 'Picked up by ' + who);
       releaseAll(list, p.id, qr, who);
       return;
     }
@@ -348,16 +349,18 @@ function openSheet(who, list, pid, qr, sessName) {
 
 function releaseAll(students, pid, qr, who) {
   var i = 0, ok = 0, already = 0;
+  var names = students.map(function(s){ return s.fname + ' ' + s.lname; }).join(', ');
   function next() {
     if (i >= students.length) {
       document.getElementById('sheet').classList.remove('show');
       if (already && !ok) {
-        flash(who, 'All selected students were ALREADY RELEASED this session.', true);
+        flash(names, 'All were ALREADY RELEASED this session — picked up by ' + who, true);
         say('Already released — nothing new.', 'warn');
       } else if (already) {
         say(who + ' — Released ' + ok + ', already released ' + already + '.', 'ok');
+        flash(names, 'Picked up by ' + who + ' — Released ' + ok + ', already ' + already + '.');
       } else {
-        flash(who, 'Released ' + ok + ' student(s).');
+        flash(names, 'Picked up by ' + who + ' — Released ' + ok + ' student(s).');
         say(who + ' — Released ' + ok + ' student(s).', 'ok');
       }
       setTimeout(resume, already && !ok ? 2800 : 2200);
@@ -412,6 +415,10 @@ function pollStatus() {
       try { scanner.stop().catch(function(){}); } catch(e){}
       scanning = false;
       say(st.message || 'Scanner closed.', 'err');
+    } else if (st.allowed && !scanning && !lockout) {
+      // Date Management reopened/changed the day → resume without manual reload.
+      say('Scanner open — scanning resumed.', 'ok');
+      setTimeout(start, 300);
     }
   })
   .catch(function(){});
