@@ -368,6 +368,7 @@ html.theme-dark .empty-chat { color: #94a3b8 !important; }
         setStatus('<i class="fas fa-spinner fa-spin"></i> Sending...');
 
         var body = new URLSearchParams();
+        body.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
         body.append('message', text);
         if (ROLE !== 'parent' && toParent) {
             body.append('to_parent', toParent);

@@ -69,9 +69,15 @@ class Security extends BaseConfig
      * CSRF Regenerate
      * --------------------------------------------------------------------------
      *
-     * Regenerate CSRF Token on every submission.
+     * Regenerate CSRF token on every submission.
+     *
+     * FALSE: the app is AJAX-heavy (scan verify → release, messages poll,
+     * schedule autosave). With regenerate=true the token minted at page load
+     * goes stale after the FIRST POST, so every later POST on the same page
+     * fails. The token still lives in a session cookie (csrfProtection=
+     * 'cookie') and is re-issued on login/session regenerate.
      */
-    public bool $regenerate = true;
+    public bool $regenerate = false;
 
     /**
      * --------------------------------------------------------------------------

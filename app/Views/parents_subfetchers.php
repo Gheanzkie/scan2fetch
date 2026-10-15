@@ -75,9 +75,7 @@ body {
  <i class="fas fa-info-circle mt-1" style="font-size:1.1rem;color:#f59e0b;"></i>
  <div>
  <strong style="display:block;margin-bottom:.15rem;">Want to add a sub-fetcher?</strong>
- Sub-fetchers can only be added by the school admin. Please go to the school admin office (or use
- <a href="<?= base_url('messages') ?>" style="color:#b45309;font-weight:700;">Contact Admin</a>)
- with your name and the person you want to authorize — they will create the account and QR code for you.
+ Sub-fetchers can only be added by the school admin. Please go to the school admin office.
  </div>
  </div>
 

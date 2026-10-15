@@ -258,6 +258,7 @@
         status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
 
         var body = new URLSearchParams();
+        body.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
         body.append('current_password', current);
         body.append('new_password', np);
         body.append('confirm_password', conf);
