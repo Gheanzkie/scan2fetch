@@ -182,6 +182,20 @@
  <li class="nav-header">MY ACCOUNT</li>
 
  <li class="nav-item">
+ <a href="<?= base_url('parents-children') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'parents-children') ? 'active' : '' ?>">
+ <i class="fas fa-child nav-icon"></i>
+ <p>My Children</p>
+ </a>
+ </li>
+
+ <li class="nav-item">
+ <a href="<?= base_url('parents-children') ?>#subfetchers" class="nav-link <?= (service('uri')->getSegment(1) == 'parents-children') ? 'active' : '' ?>">
+ <i class="fas fa-user-friends nav-icon"></i>
+ <p>Sub-Fetchers</p>
+ </a>
+ </li>
+
+ <li class="nav-item">
  <a href="<?= base_url('parents-releases') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'parents-releases') ? 'active' : '' ?>">
  <i class="fas fa-history nav-icon"></i>
  <p>Release History</p>

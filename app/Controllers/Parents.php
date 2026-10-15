@@ -598,6 +598,78 @@ class Parents extends BaseController
         return view('parents_logs', $data);
     }
 
+    /**
+     * Parent portal page: My Children (all linked students) + Sub-Fetchers with QR.
+     */
+    public function children()
+    {
+        $userId  = session('user_id');
+        $role    = session('role');
+        if ($role !== 'parent') {
+            return redirect()->to('/dashboard')->send();
+        }
+
+        $db = \Config\Database::connect();
+        $studentModel  = new \App\Models\StudentModel();
+        $fetchLogModel = new \App\Models\FetchLogModel();
+        $data = ['title' => 'My Children'];
+        $data['parentProfile'] = $this->parentsModel->find($userId);
+
+        // Linked students (direct link)
+        $studentParents = $db->table('student_parents')
+            ->where('parent_id', $userId)
+            ->get()
+            ->getResultArray();
+
+        $myChildren = [];
+        $studentIds = [];
+        foreach ($studentParents as $sp) {
+            $student = $studentModel->find($sp['student_id']);
+            if ($student) {
+                $student['relation'] = $sp['relation'] ?? '';
+                $myChildren[] = $student;
+            }
+            $studentIds[] = $sp['student_id'];
+        }
+
+        // Adviser per grade/section
+        $teacherMap = [];
+        foreach ($db->table('teachers')->select('grade_section, fname, lname')->get()->getResultArray() as $t) {
+            if (!isset($teacherMap[$t['grade_section']])) {
+                $teacherMap[$t['grade_section']] = $t['fname'] . ' ' . $t['lname'];
+            }
+        }
+
+        // Released-today status per child
+        $todayMap = [];
+        foreach ($myChildren as $c) {
+            $c['teacher'] = $teacherMap[$c['grade_section']] ?? '';
+            $c['release_today'] = null;
+        }
+        if (!empty($studentIds)) {
+            $todayReleases = $fetchLogModel
+                ->select('student_id, time_released')
+                ->whereIn('student_id', $studentIds)
+                ->where('DATE(time_released)', date('Y-m-d'))
+                ->orderBy('time_released', 'ASC')
+                ->findAll();
+            foreach ($todayReleases as $tr) {
+                if (!isset($todayMap[$tr['student_id']])) {
+                    $todayMap[$tr['student_id']] = $tr['time_released'];
+                }
+            }
+            foreach ($myChildren as &$c) {
+                $c['release_today'] = $todayMap[$c['id']] ?? null;
+            }
+            unset($c);
+        }
+
+        $data['myChildren'] = $myChildren;
+        $data['subFetchers'] = $this->subFetcherModel->where('parent_id', $userId)->findAll();
+
+        return view('parents_children', $data);
+    }
+
     private function generateQR()
     {
         // Value first, PNG best-effort. The old copy used CWD-relative
