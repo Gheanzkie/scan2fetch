@@ -292,6 +292,74 @@
  </div>
  </div>
 
+ <!-- ===== MY CHILDREN (list, kahit 2 or more) ===== -->
+ <div class="row">
+ <div class="col-12 mb-3">
+ <h6 style="font-weight:700;"><i class="fas fa-child mr-1" style="color:#4361ee;"></i> My Children <span class="badge badge-primary" style="font-size:11px;"><?= count($myChildren ?? []) ?></span></h6>
+ <?php if (!empty($myChildren)): ?>
+ <div class="row">
+ <?php foreach ($myChildren as $c): ?>
+ <div class="col-md-6 col-lg-4 mb-3">
+ <div class="fun-box" style="background:#fff;height:100%;">
+ <div class="d-flex align-items-start" style="gap:.75rem;">
+ <div style="width:42px;height:42px;border-radius:50%;background:#eef2ff;color:#4338ca;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">
+ <?= strtoupper(mb_substr($c['fname'] ?? '',0,1)) ?><?= strtoupper(mb_substr($c['lname'] ?? '',0,1)) ?>
+ </div>
+ <div style="flex:1;min-width:0;">
+ <strong style="display:block;"><?= esc(trim(($c['fname'] ?? '').' '.($c['lname'] ?? ''))) ?></strong>
+ <small style="color:#64748b;"><i class="fas fa-school mr-1"></i><?= esc($c['grade_section'] ?? '-') ?></small>
+ <?php if (!empty($c['teacher'])): ?>
+ <br><small style="color:#64748b;"><i class="fas fa-chalkboard-teacher mr-1"></i><?= esc($c['teacher']) ?></small>
+ <?php endif; ?>
+ <br>
+ <?php if (!empty($c['release_today'])): ?>
+ <span class="badge" style="background:#dcfce7;color:#166534;font-size:11px;"><i class="fas fa-check mr-1"></i>Released <?= date('h:i A', strtotime($c['release_today'])) ?></span>
+ <?php else: ?>
+ <span class="badge" style="background:#ffedd5;color:#9a3412;font-size:11px;"><i class="fas fa-clock mr-1"></i>Not yet picked up</span>
+ <?php endif; ?>
+ </div>
+ </div>
+ </div>
+ </div>
+ <?php endforeach; ?>
+ </div>
+ <?php else: ?>
+ <p style="color:#94a3b8;font-size:13px;margin:0;">No linked children yet — contact the school admin.</p>
+ <?php endif; ?>
+ </div>
+ </div>
+
+ <!-- ===== SUB-FETCHERS (hidden kapag walang laman) ===== -->
+ <?php if (!empty($subFetchers)): ?>
+ <div class="row">
+ <div class="col-12 mb-3">
+ <h6 style="font-weight:700;"><i class="fas fa-user-friends mr-1" style="color:#f59e0b;"></i> Sub-Fetchers <span class="badge badge-warning" style="font-size:11px;"><?= count($subFetchers) ?></span></h6>
+ <div class="row">
+ <?php foreach ($subFetchers as $sf): ?>
+ <div class="col-md-6 col-lg-4 mb-3">
+ <div class="fun-box d-flex align-items-center" style="background:#fff;gap:.75rem;">
+ <?php if (!empty($sf['qr_code'])): ?>
+ <img src="<?= base_url('uploads/qr/'.$sf['qr_code'].'.png') ?>" alt="QR"
+ style="width:64px;height:64px;border:1px solid #e2e8f0;border-radius:8px;cursor:zoom-in;background:#fff;"
+ onclick="openQrModal('<?= base_url('uploads/qr/'.$sf['qr_code'].'.png') ?>','<?= esc(trim(($sf['fname'] ?? '').' '.($sf['lname'] ?? ''))) ?>')">
+ <?php else: ?>
+ <div style="width:64px;height:64px;display:flex;align-items:center;justify-content:center;color:#cbd5e1;"><i class="fas fa-qrcode fa-2x"></i></div>
+ <?php endif; ?>
+ <div style="flex:1;min-width:0;">
+ <strong style="display:block;"><?= esc(trim(($sf['fname'] ?? '').' '.($sf['lname'] ?? ''))) ?></strong>
+ <small style="color:#64748b;"><i class="fas fa-phone mr-1"></i><?= esc($sf['phone'] ?? '-') ?></small>
+ <?php if (!empty($sf['qr_code'])): ?>
+ <br><small style="color:#94a3b8;"><?= esc($sf['qr_code']) ?></small>
+ <?php endif; ?>
+ </div>
+ </div>
+ </div>
+ <?php endforeach; ?>
+ </div>
+ </div>
+ </div>
+ <?php endif; ?>
+
  <?php endif; ?>
 
  </div>
