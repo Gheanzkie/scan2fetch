@@ -47,6 +47,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('parents-notifications-clear', 'Parents::clearAllNotifications');
     $routes->get('parents-logs', 'Parents::logs');
  $routes->get('parents-children', 'Parents::children');
+ $routes->get('parents-subfetchers', 'Parents::subfetchers');
 
     // ===== SUB-FETCHERS =====
     $routes->post('subfetchers-save', 'SubFetchers::save');

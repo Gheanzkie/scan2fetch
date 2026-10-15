@@ -665,9 +665,25 @@ class Parents extends BaseController
         }
 
         $data['myChildren'] = $myChildren;
-        $data['subFetchers'] = $this->subFetcherModel->where('parent_id', $userId)->findAll();
 
         return view('parents_children', $data);
+    }
+
+    /**
+     * Parent portal page: Sub-Fetchers list with their QR codes.
+     */
+    public function subfetchers()
+    {
+        $userId = session('user_id');
+        if (session('role') !== 'parent') {
+            return redirect()->to('/dashboard')->send();
+        }
+
+        $data = ['title' => 'Sub-Fetchers'];
+        $data['parentProfile'] = $this->parentsModel->find($userId);
+        $data['subFetchers']  = $this->subFetcherModel->where('parent_id', $userId)->findAll();
+
+        return view('parents_subfetchers', $data);
     }
 
     private function generateQR()

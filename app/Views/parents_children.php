@@ -1,4 +1,4 @@
-<?= $this->extend('theme/template') ?>
+﻿<?= $this->extend('theme/template') ?>
 <?= $this->section('content') ?>
 
 <style>
@@ -114,48 +114,7 @@ body {
  <?php endforeach; ?>
  </div>
  <?php else: ?>
- <p class="mb-0" style="color:#94a3b8;">No linked children yet — contact the school admin to link your child.</p>
- <?php endif; ?>
- </div>
- </div>
-
- <!-- ===== SUB-FETCHERS ===== -->
- <div class="card" id="subfetchers">
- <div class="card-header pt-3 pb-2">
- <h5 class="mb-0">
- <i class="fas fa-user-friends mr-2" style="color: var(--soft-amber);"></i>
- Sub-Fetchers
- <span class="badge ml-2" style="background:rgba(245,166,35,0.12);color:#92400e;font-weight:700;">
- <?= count($subFetchers ?? []) ?> fetcher(s)
- </span>
- </h5>
- </div>
- <div class="card-body">
- <?php if (!empty($subFetchers)): ?>
- <div class="row">
- <?php foreach ($subFetchers as $sf): ?>
- <div class="col-md-6 col-xl-4 mb-3">
- <div class="child-card d-flex align-items-center" style="gap:.9rem;">
- <?php if (!empty($sf['qr_code'])): ?>
- <img src="<?= base_url('uploads/qr/'.$sf['qr_code'].'.png') ?>" alt="QR"
- class="qr-thumb"
- onclick="openQrModal('<?= base_url('uploads/qr/'.$sf['qr_code'].'.png') ?>','<?= esc(trim(($sf['fname'] ?? '').' '.($sf['lname'] ?? ''))) ?>')">
- <?php else: ?>
- <div class="qr-thumb d-flex align-items-center justify-content-center" style="color:#cbd5e1;"><i class="fas fa-qrcode fa-2x"></i></div>
- <?php endif; ?>
- <div style="flex:1;min-width:0;">
- <strong style="display:block;"><?= esc(trim(($sf['fname'] ?? '').' '.($sf['mname'] ?? '').' '.($sf['lname'] ?? ''))) ?></strong>
- <small style="color:#64748b;display:block;"><i class="fas fa-phone mr-1"></i><?= esc($sf['phone'] ?? '-') ?></small>
- <?php if (!empty($sf['qr_code'])): ?>
- <small style="color:#94a3b8;display:block;"><?= esc($sf['qr_code']) ?></small>
- <?php endif; ?>
- </div>
- </div>
- </div>
- <?php endforeach; ?>
- </div>
- <?php else: ?>
- <p class="mb-0" style="color:#94a3b8;">No sub-fetchers yet. Ask the school admin to add someone who can pick up on your behalf.</p>
+ <p class="mb-0" style="color:#94a3b8;">No linked children yet â€” contact the school admin to link your child.</p>
  <?php endif; ?>
  </div>
  </div>

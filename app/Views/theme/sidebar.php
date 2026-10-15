@@ -189,7 +189,7 @@
  </li>
 
  <li class="nav-item">
- <a href="<?= base_url('parents-children') ?>#subfetchers" class="nav-link <?= (service('uri')->getSegment(1) == 'parents-children') ? 'active' : '' ?>">
+ <a href="<?= base_url('parents-subfetchers') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'parents-subfetchers') ? 'active' : '' ?>">
  <i class="fas fa-user-friends nav-icon"></i>
  <p>Sub-Fetchers</p>
  </a>
