@@ -47,6 +47,17 @@ body { display:flex; align-items:center; justify-content:center; }
 #topBar .pill { background:rgba(255,255,255,0.15); border-radius:999px; padding:4px 14px; font-size:12.5px; backdrop-filter:blur(6px); }
 #topBar .pill.open { background:rgba(46,204,113,0.35); color:#aaffc3; }
 #topBar .pill.closed { background:rgba(231,76,60,0.4); color:#ffc9c3; }
+#ctrlBtns { margin-left:auto; display:flex; gap:8px; }
+#ctrlBtns button {
+  background:rgba(255,255,255,0.15); color:#fff; border:none;
+  border-radius:999px; padding:5px 16px; font-size:13px; font-weight:700;
+  cursor:pointer; transition:background .15s;
+}
+#ctrlBtns button:hover { background:rgba(255,255,255,0.3); }
+#startBtn { background:rgba(46,204,113,0.35); }
+#startBtn:hover { background:rgba(46,204,113,0.55); }
+#closeBtn { background:rgba(231,76,60,0.4); }
+#closeBtn:hover { background:rgba(231,76,60,0.6); }
 
 /* Status toast (bottom) */
 #status {
@@ -111,6 +122,10 @@ body { display:flex; align-items:center; justify-content:center; }
   <span class="pill" id="sessPill"><?= strtoupper($currentSession ?? 'MORNING') ?></span>
   <span class="pill <?= !empty($gateAllowed) ? 'open' : 'closed' ?>" id="gatePill">
     <?= !empty($gateAllowed) ? '● OPEN' : '● CLOSED' ?>
+  </span>
+  <span id="ctrlBtns">
+    <button type="button" id="startBtn" title="Start / resume the camera scanner">&#9654; Start</button>
+    <button type="button" id="closeBtn" title="Turn off camera and close the scanner">&#10005; Close</button>
   </span>
 </div>
 
@@ -425,6 +440,34 @@ function pollStatus() {
 }
 setInterval(pollStatus, 2000); // instant refresh: Date Management changes show within ~2s
 pollStatus();
+
+/* ===== START / CLOSE BUTTONS ===== */
+function stopScannerNow() {
+  lockout = true; // stops pollStatus from auto-resuming
+  if (scanning) {
+    try { scanner.stop().catch(function(){}); } catch(e){}
+    scanning = false;
+  }
+}
+
+document.getElementById('startBtn').addEventListener('click', function() {
+  if (scanning) { say('Scanner is already running.', 'ok'); return; }
+  if (!GATE_OK) { say('Scanner is closed right now (Date Management).', 'err'); return; }
+  lockout = false;
+  setTimeout(start, 100);
+});
+
+document.getElementById('closeBtn').addEventListener('click', function() {
+  if (!confirm('Close the scanner? The camera will turn off.')) return;
+  stopScannerNow();
+  say('Scanner stopped. Closing…');
+  setTimeout(function() {
+    window.close(); // works if this tab was opened by the Scanner page
+    setTimeout(function() {
+      say('Camera is OFF. Press Start to scan again, or close this tab manually.', 'warn');
+    }, 500);
+  }, 250);
+});
 
 /* boot */
 if (!GATE_OK) {
