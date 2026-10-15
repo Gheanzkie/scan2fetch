@@ -228,11 +228,8 @@ body {
  <br><small style="color: #b0b0c8;">Fetcher | <?= esc($f['phone']) ?></small>
  </div>
  <?php if(!empty($f['qr_code'])): ?>
- <img src="<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>" style="width:45px;height:45px;border:2px solid var(--soft-green);border-radius:8px;cursor:pointer;margin-right:5px;" onclick="openQrModal('<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>')">
+ <img src="<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>" style="width:45px;height:45px;border:2px solid var(--soft-green);border-radius:8px;cursor:pointer;" onclick="openQrModal('<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>')">
  <?php endif; ?>
- <a href="<?= base_url('parents-view/'.$f['parent_id']) ?>" class="btn btn-outline-secondary btn-xs ml-1" title="Go to Fetcher">
- <i class="fas fa-user-friends"></i> Go to Fetcher
- </a>
  </div>
  <?php endforeach; ?>
  <?php else: ?>
