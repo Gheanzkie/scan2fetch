@@ -180,29 +180,10 @@ class ScheduleModel extends Model
 
         $row = $this->forDate($date);
         if (! $row) {
-            // No row yet: create one once the window opens so the calendar
-            // reflects an auto-started day. Before open time, stay absent.
-            $hours = $this->effectiveHours($date);
-            if ($time >= $hours['open'] && $time < $hours['close']) {
-                return $this->upsert($date, [
-                    'status'    => 'open',
-                    'open_time' => $hours['open'],
-                    'close_time'=> $hours['close'],
-                    'opened_at' => $now,
-                    'opened_by' => 'Auto (schedule)',
-                ]);
-            }
-            if ($time >= $hours['close']) {
-                return $this->upsert($date, [
-                    'status'    => 'closed',
-                    'open_time' => $hours['open'],
-                    'close_time'=> $hours['close'],
-                    'opened_at' => $date . ' ' . $hours['open'] . ':00',
-                    'opened_by' => 'Auto (schedule)',
-                    'closed_at' => $now,
-                    'closed_by' => 'Auto (schedule)',
-                ]);
-            }
+            // "Not set" (no row) = the day stays CLOSED. Never auto-create or
+            // auto-open. A day only opens once an admin explicitly sets the
+            // date to Normal (or Open) in Date Management AND the clock has
+            // reached that date's configured start time.
             return null;
         }
 
@@ -335,6 +316,13 @@ class ScheduleModel extends Model
 
         $hours = $this->effectiveHours($date);
         $row   = $hours['row'];
+
+        // No row for this date = "Not set" -> scanner stays CLOSED. A day
+        // only opens when the admin sets it to Normal (auto, follows the
+        // hours below) or Open. This stops untouched dates from auto-opening.
+        if (! $row) {
+            return [false, 'Scanner is closed. This date is not yet configured (Not set) in Date Management. Set it to Normal to enable releases.'];
+        }
 
         if ($row && $row['status'] === 'holiday') {
             return [false, 'No classes today (holiday). Releases are disabled.'];
