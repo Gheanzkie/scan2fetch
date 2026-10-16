@@ -34,21 +34,19 @@ class Schedule extends BaseController
     }
 
     /**
-     * CSRF check for POST endpoints (global csrf filter is disabled in
-     * this app, so schedule writes verify the token manually).
-     * Returns a 403 JSON response when the token is missing/invalid, null otherwise.
+     * CSRF check for POST endpoints.
+     *
+     * The global 'csrf' filter is now ENABLED (Config/Filters.php $globals),
+     * and it validates the token BEFORE the controller runs. This manual
+     * double-check used to run when the filter was off — keeping it caused
+     * false 403s ("Invalid security token (CSRF). Refresh the page and try
+     * again.") because the filter and this check compared against different
+     * values in the same request. It is now a no-op: the filter owns CSRF.
+     *
+     * Returns null always (signature kept so call sites stay unchanged).
      */
     private function csrfGuard()
     {
-        if (strtoupper($this->request->getMethod()) !== 'POST') {
-            return null;
-        }
-        $token = $this->request->getPost(csrf_token());
-        if (! is_string($token) || $token === '' || ! hash_equals(csrf_hash(), $token)) {
-            return $this->response
-                ->setStatusCode(403)
-                ->setJSON(['success' => false, 'message' => 'Invalid security token (CSRF). Refresh the page and try again.']);
-        }
         return null;
     }
 

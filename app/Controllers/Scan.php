@@ -67,13 +67,11 @@ class Scan extends BaseController
         }
 
         
-        $token = $this->request->getPost(csrf_token());
-        if (! is_string($token) || $token === '' || ! hash_equals(csrf_hash(), $token)) {
-            return $this->response->setStatusCode(403)->setJSON([
-                'success' => false,
-                'message' => 'Invalid security token (CSRF). Refresh the page and try again.',
-            ]);
-        }
+        // CSRF: handled by the global 'csrf' filter (Config/Filters.php)
+        // before this controller runs. The old manual hash_equals() here
+        // double-checked against csrf_hash() AFTER the filter had already
+        // validated/rotated the same token, causing false 403 "Invalid
+        // security token" responses on a perfectly valid request.
 
         $picked = strtolower(trim((string) $this->request->getPost('session')));
         if (! in_array($picked, ['morning', 'afternoon', 'auto'], true)) {
