@@ -425,25 +425,6 @@ select.form-control option {
  </div>
  <?php endif; ?>
 
- <!-- REGISTRATION RESULT MODAL -->
-// ===== LIVE RELEASE STATUS (3s poll — scan results appear without refresh) =====
-function pollLiveStatus(){
-  fetch('<?= base_url('students/live') ?>', {credentials:'same-origin'})
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    if(!d || !d.success) return;
-    document.querySelectorAll('.live-status[data-sid]').forEach(function(el){
-      var t = d.released[el.getAttribute('data-sid')];
-      if (t) {
-        el.innerHTML = '<span class="badge badge-success" style="font-size:11px;background:#dcfce7;color:#166534;">&#10003; Released '+t+'</span>';
-      } else {
-        el.innerHTML = '<span class="badge badge-light" style="font-size:11px;color:#94a3b8;background:#f1f5f9;">&#8212;</span>';
-      }
-    });
-  }).catch(function(){});
-}
-pollLiveStatus();
-setInterval(pollLiveStatus, 3000);
 
 <?php if(session()->getFlashdata('registration_success')): ?>
  <div class="modal fade" id="registrationResultModal" tabindex="-1">
@@ -606,7 +587,6 @@ setInterval(pollLiveStatus, 3000);
   <th>Name</th>
   <th>Teacher</th>
   <th>Grade</th>
-  <th class="text-center" style="width:140px;">Status</th>
   <th>Parent / Guardian</th>
   <th>Created</th>
   <th class="text-center" style="width:120px;">Action</th>
@@ -629,7 +609,6 @@ setInterval(pollLiveStatus, 3000);
   <?php endif; ?>
   </td>
   <td><span class="badge badge-soft"><?= esc($s['grade_section']) ?></span></td>
-  <td class="text-center"><span class="live-status" data-sid="<?= (int)$s['id'] ?>"><span class="badge badge-light" style="font-size:11px;color:#94a3b8;">—</span></span></td>
   <td>
   <?php $sparents = $s['parents'] ?? []; ?>
   <?php if (!empty($sparents)): foreach ($sparents as $sp): ?>

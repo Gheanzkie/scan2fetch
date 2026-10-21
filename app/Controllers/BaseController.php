@@ -333,7 +333,7 @@ abstract class BaseController extends Controller
 
         $this->sendLocalSms(
             $record['phone'],
-            "Your new $roleLabel account password is: $password (recorded in SMS logs)."
+            "Your new $roleLabel account password is: $password "
         );
 
         return [
