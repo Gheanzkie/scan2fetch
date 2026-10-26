@@ -53,18 +53,4 @@ class StudentModel extends Model
 
         return (bool) $this->update($id, $data);
     }
-
-    public function getAllWithParent()
-    {
-        return $this->select('students.*, parents.fname as pfname, parents.lname as plname, parents.phone as pphone')
-                    ->join('parents', 'parents.id = students.parent_id', 'left')
-                    ->orderBy('students.created_at', 'DESC')
-                    ->findAll();
-    }
-
-    
-    public function getByParentId($parentId)
-    {
-        return $this->where('parent_id', $parentId)->findAll();
-    }
 }

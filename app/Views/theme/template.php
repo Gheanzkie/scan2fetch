@@ -10,9 +10,9 @@
       explicit type/sizes plus the two fallback URLs most browsers request on
       their own (favicon.ico and the 180px touch icon). -->
  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 76 76'%3E%3Crect width='76' height='76' rx='16' fill='%234361ee'/%3E%3Cg fill='%23fff'%3E%3Crect x='14' y='14' width='20' height='20' rx='3'/%3E%3Crect x='42' y='14' width='20' height='20' rx='3'/%3E%3Crect x='14' y='42' width='20' height='20' rx='3'/%3E%3Crect x='44' y='44' width='6' height='6'/%3E%3Crect x='52' y='52' width='6' height='6'/%3E%3Crect x='44' y='56' width='6' height='6'/%3E%3Crect x='56' y='44' width='6' height='6'/%3E%3C/g%3E%3C/svg%3E">
- <link rel="icon" type="image/png" sizes="76x76" href="<?= base_url('public/image/qr-code-76.png') ?>">
- <link rel="shortcut icon" href="<?= base_url('public/image/qr-code-76.png') ?>">
- <link rel="apple-touch-icon" sizes="180x180" href="<?= base_url('public/image/BCC_LOGO.png') ?>">
+ <link rel="icon" type="image/png" sizes="76x76" href="<?= base_url('image/qr-code-76.png') ?>">
+ <link rel="shortcut icon" href="<?= base_url('image/qr-code-76.png') ?>">
+ <link rel="apple-touch-icon" sizes="180x180" href="<?= base_url('image/BCC_LOGO.png') ?>">
 
  <meta name="csrf-name" content="<?= csrf_token() ?>">
  <meta name="csrf-token" content="<?= csrf_hash() ?>">
@@ -28,14 +28,14 @@
  </script>
 
  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,600,700&display=fallback">
- <link rel="stylesheet" href="<?= base_url('public/assets/plugins/fontawesome-free/css/all.min.css') ?>">
- <link rel="stylesheet" href="<?= base_url('public/assets/dist/css/adminlte.min.css') ?>">
- <link rel="stylesheet" href="<?= base_url('public/assets/plugins/toastr/toastr.min.css') ?>">
+ <link rel="stylesheet" href="<?= base_url('assets/plugins/fontawesome-free/css/all.min.css') ?>">
+ <link rel="stylesheet" href="<?= base_url('assets/dist/css/adminlte.min.css') ?>">
+ <link rel="stylesheet" href="<?= base_url('assets/plugins/toastr/toastr.min.css') ?>">
 
  <!-- DataTables -->
- <link rel="stylesheet" href="<?= base_url('public/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') ?>">
- <link rel="stylesheet" href="<?= base_url('public/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') ?>">
- <link rel="stylesheet" href="<?= base_url('public/assets/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') ?>">
+ <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') ?>">
+ <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') ?>">
+ <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') ?>">
 
  <style>
         /* ============================================================
@@ -675,9 +675,9 @@
  </footer>
 </div>
 
-<script src="<?= base_url('public/assets/plugins/jquery/jquery.min.js') ?>"></script>
-<script src="<?= base_url('public/assets/plugins/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
-<script src="<?= base_url('public/assets/dist/js/adminlte.min.js') ?>"></script>
+<script src="<?= base_url('assets/plugins/jquery/jquery.min.js') ?>"></script>
+<script src="<?= base_url('assets/plugins/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
+<script src="<?= base_url('assets/dist/js/adminlte.min.js') ?>"></script>
 
 <script>
 window.BASE_URL  = '<?= rtrim(base_url(), '/') ?>/';
@@ -686,9 +686,9 @@ window.CSRF_HASH = '<?= csrf_hash() ?>';
 </script>
 
 <!-- DataTables -->
-<script src="<?= base_url('public/assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
-<script src="<?= base_url('public/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') ?>"></script>
-<script src="<?= base_url('public/assets/plugins/toastr/toastr.min.js') ?>"></script>
+<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
+<script src="<?= base_url('assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') ?>"></script>
+<script src="<?= base_url('assets/plugins/toastr/toastr.min.js') ?>"></script>
 
 <!-- ===== THEME SWITCHER LOGIC ===== -->
 <script>

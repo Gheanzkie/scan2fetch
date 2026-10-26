@@ -7,8 +7,8 @@
     
     <!-- AdminLTE & Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&display=fallback">
-    <link rel="stylesheet" href="<?= base_url('public/assets/plugins/fontawesome-free/css/all.min.css') ?>">
-    <link rel="stylesheet" href="<?= base_url('public/assets/dist/css/adminlte.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/plugins/fontawesome-free/css/all.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/dist/css/adminlte.min.css') ?>">
     
     <style>
         :root {

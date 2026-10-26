@@ -124,12 +124,9 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('messages/thread/(:num)', 'Messages::getThread/$1');
     $routes->get('messages/unread', 'Messages::unread');
 
-    // For admin profile update
-    $routes->post('admin/updateProfile', 'Admin::updateProfile');
-
-    // NOTE: 'update-profile' is already registered above in the ACCOUNT
-    // block (line 116). A second identical declaration was removed here -
-    // duplicate route names silently shadow each other in CodeIgniter.
+    // Profile updates are handled by Auth::updateProfile via POST update-profile
+    // (registered above in the ACCOUNT block). The legacy Admin controller and
+    // its non-existent updateProfile method were removed.
 
 });
 

@@ -93,15 +93,41 @@ unknown paths 404, and unauthorized modules redirect to the role home:
 
 ---
 
+## 📁 Project structure
+
+- `app/` — controllers, models, views, filters, config
+- `public/` — **web root**: static assets, uploads, QR images, front controller
+- `system/`, `vendor/` — framework + dependencies (do not edit)
+- `writable/` — logs, sessions, debugbar cache (git-ignored)
+
+> The duplicate `public/public/` AdminLTE tree was removed (≈202 MB). All views
+> reference assets via `base_url('assets/...')`, resolving against the single
+> `public/` root.
+
+## 🧹 Maintenance notes
+
+- Legacy `Admin` controller and its dead `admin/*` routes were removed; profile
+  updates go through `Auth::updateProfile` (`POST update-profile`).
+- Unused `menu_helper` and dead `StudentModel` query methods were removed.
+- `app/Config/WorkerMode.php` and `app/Config/Boot/*.php` are stock CI 4.5 files.
+
+---
+
 ## 🚀 Installation
 
-1. Clone the repository into `htdocs`
+1. Clone the repository:
 ```bash
 git clone https://github.com/Gheanzkie/scan2fetch.git
 ```
 2. Import `scan2fetch.sql` into MySQL
 3. Configure `.env` (database + SMS settings)
-4. Open `/scan2fetch/login`
+4. Serve with the web root set to `public/`
+   - Local: `php spark serve --host 0.0.0.0 --port 8080`
+   - Apache/XAMPP: point `DocumentRoot` at the project's `public/` folder
+5. Open http://localhost:8080/login
+
+> Static assets (`assets/`, `image/`, `uploads/`, `html5qrcode/`, `phpqrcode/`)
+> are referenced root-relative (`base_url('assets/...')`) and served from `public/`.
 
 ---
 
