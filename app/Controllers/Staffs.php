@@ -19,6 +19,7 @@ class Staffs extends BaseController
 
     public function index()
     {
+        helper('photo');
         $model = new StaffsModel();
         $data['staffs'] = $model->orderBy('created_at', 'DESC')->findAll();
         return view('staffs', $data);
@@ -27,14 +28,34 @@ class Staffs extends BaseController
     public function save()
     {
         $model = new StaffsModel();
-        $model->save([
+
+        // Staff ID: use what the registrar typed, otherwise auto-assign S-####.
+        $staffNo = strtoupper(trim((string) $this->request->getPost('staff_no')));
+        if ($staffNo === '') {
+            $staffNo = $model->nextStaffNo();
+        } elseif (! str_starts_with($staffNo, 'S-')) {
+            $staffNo = preg_match('/(\d+)$/', $staffNo, $m) ? 'S-' . $m[1] : 'S-' . $staffNo;
+        }
+        if ($model->where('staff_no', $staffNo)->first()) {
+            return redirect()->to('/staffs')->with('error', 'Staff ID ' . $staffNo . ' is already taken.');
+        }
+
+        $staffId = $model->save([
+            'staff_no' => $staffNo,
             'fname' => $this->request->getPost('fname'), 'mname' => $this->request->getPost('mname'),
             'lname' => $this->request->getPost('lname'), 'phone' => $this->request->getPost('phone'),
             'password' => null,
             'password_sent' => 0,
         ]);
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'create', 'staff', 'Created staff: '.$this->request->getPost('fname').' '.$this->request->getPost('lname'));
-        return redirect()->to('/staffs')->with('msg', 'Staff added');
+
+        // Profile picture captured in the Add Staff modal.
+        helper('photo');
+        $__pic = (string) $this->request->getPost('staff_picture_data');
+        if ($__pic !== '' && $staffId) {
+            photo_save_staff_dataurl($__pic, $staffNo);
+        }
+        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'create', 'staff', 'Created staff: '.$this->request->getPost('fname').' '.$this->request->getPost('lname').' ('.$staffNo.')');
+        return redirect()->to('/staffs')->with('msg', 'Staff added (' . $staffNo . ')');
     }
 
     public function update()
@@ -42,10 +63,25 @@ class Staffs extends BaseController
         $model = new StaffsModel();
         $id = $this->request->getPost('id');
         $data = ['fname' => $this->request->getPost('fname'), 'mname' => $this->request->getPost('mname'), 'lname' => $this->request->getPost('lname'), 'phone' => $this->request->getPost('phone')];
+        $staffNo = strtoupper(trim((string) $this->request->getPost('staff_no')));
+        if ($staffNo !== '') {
+            $data['staff_no'] = $staffNo;
+        }
         if ($this->request->getPost('password')) {
             $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
         }
         $model->update($id, $data);
+
+        // ===== Staff profile picture (add / change / remove) =====
+        helper('photo');
+        $staff = $model->find($id);
+        $sNo   = (string) ($staff['staff_no'] ?? '');
+        $pic   = (string) $this->request->getPost('staff_picture_data');
+        if ($pic !== '' && $sNo !== '') {
+            photo_save_staff_dataurl($pic, $sNo);
+        } elseif ((string) $this->request->getPost('staff_picture_remove') === '1' && $sNo !== '') {
+            staff_photo_delete($sNo);
+        }
         $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'update', 'staff', 'Updated staff: '.$data['fname'].' '.$data['lname'].' (ID: '.$id.')');
         return redirect()->to('/staffs')->with('msg', 'Staff updated');
     }

@@ -455,7 +455,7 @@ select.form-control option {
  <div class="col-md-5">
  <h6 class="mb-1" style="color: var(--ink);">
  <span class="badge badge-success mr-2">#<?= $index + 1 ?></span>
- <?= esc($p['fname']) ?> <?= esc($p['lname']) ?>
+ <?= esc(full_name($p)) ?>
  </h6>
  <div class="muted" style="font-size: 13px;">
  <i class="fas fa-tag mr-1"></i> Relation: <strong style="color: var(--ink);"><?= esc($p['relation']) ?></strong>
@@ -498,7 +498,7 @@ select.form-control option {
  <div class="col-md-5">
  <h6 class="mb-1" style="color: var(--ink);">
  <span class="badge badge-warning mr-2">#<?= $index + 1 ?></span>
- <?= esc($f['fname']) ?> <?= esc($f['lname']) ?>
+ <?= esc(full_name($f)) ?>
  </h6>
  <div class="muted" style="font-size: 13px;">
  <i class="fas fa-qrcode mr-1"></i> QR Code: <code style="color: var(--soft-orange);"><?= esc($f['qr_code']) ?></code>
@@ -583,52 +583,39 @@ select.form-control option {
  <table class="table table-hover">
  <thead>
  <tr>
-  <th style="width:50px;">#</th>
-  <th>Name</th>
-  <th>Teacher</th>
-  <th>Grade</th>
-  <th>Parent / Guardian</th>
-  <th>Created</th>
-  <th class="text-center" style="width:120px;">Action</th>
+ <th style="width:50px;">#</th>
+ <th>Student ID</th>
+ <th>Name</th>
+ <th>Grade</th>
+ <th class="text-center" style="width:120px;">Action</th>
  </tr>
  </thead>
  <tbody>
  <?php if(!empty($students)): $i=1; foreach($students as $s): ?>
- <tr class="student-row" data-name="<?= esc(strtolower($s['fname'].' '.$s['lname'])) ?>" data-grade="<?= esc(strtolower($s['grade_section'])) ?>">
+ <tr class="student-row" data-name="<?= esc(strtolower(full_name($s))) ?>" data-grade="<?= esc(strtolower($s['grade_section'])) ?>">
  <td class="num"><?= $i++ ?></td>
  <td>
+ <?php if (!empty($s['student_no'])): ?>
+ <span class="badge badge-soft" style="font-family: ui-monospace, monospace; font-size:11.5px; letter-spacing:0.02em;"><?= esc($s['student_no']) ?></span>
+ <?php else: ?>
+ <span class="muted" style="font-size:12px;">No ID</span>
+ <?php endif; ?>
+ </td>
+ <td>
+ <?php $__sp = student_photo_url((string) ($s['student_no'] ?? '')); ?>
+ <?php if ($__sp): ?>
+ <img src="<?= esc($__sp) ?>" alt="" class="avatar-round" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid rgba(108,140,255,0.25);margin-right:8px;vertical-align:middle;">
+ <?php else: ?>
+ <span style="display:inline-flex;width:34px;height:34px;border-radius:50%;background:rgba(168,192,255,0.2);color:#5a5280;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-right:8px;vertical-align:middle;"><?= esc(strtoupper(mb_substr($s['fname'] ?? '', 0, 1) . mb_substr($s['lname'] ?? '', 0, 1))) ?></span>
+ <?php endif; ?>
  <a href="<?= base_url('students-view/'.$s['id']) ?>" class="student-name-link">
- <?= esc($s['fname']) ?> <?= esc($s['lname']) ?>
+ <?= esc(full_name($s)) ?>
  </a>
  </td>
-  <td>
-  <?php if (!empty($s['adviser_fname'])): ?>
-    <span style="font-size:13px;"><?= esc($s['adviser_fname']) ?> <?= esc($s['adviser_lname']) ?></span>
-  <?php else: ?>
-    <span class="muted" style="font-size:12px;">—</span>
-  <?php endif; ?>
-  </td>
-  <td><span class="badge badge-soft"><?= esc($s['grade_section']) ?></span></td>
-  <td>
-  <?php $sparents = $s['parents'] ?? []; ?>
-  <?php if (!empty($sparents)): foreach ($sparents as $sp): ?>
-    <div class="parent-name" style="font-size:13px;">
-      <?= esc($sp['fname']) ?> <?= esc($sp['lname']) ?>
-      <span class="badge badge-primary" style="font-size:9px;"><?= esc($sp['relation']) ?></span>
-    </div>
-    <div class="muted" style="font-size:11px;"><code><?= esc($sp['phone']) ?></code></div>
-  <?php endforeach; ?>
-    <div class="muted" style="font-size:11px;">
-      <i class="fas fa-users"></i> <?= count($sparents) ?> guardian<?= count($sparents) > 1 ? 's' : '' ?>
-    </div>
-  <?php else: ?>
-    <span class="muted">No parent linked</span>
-  <?php endif; ?>
-  </td>
-  <td class="muted"><?= date('M d, Y', strtotime($s['created_at'])) ?></td>
+ <td><span class="badge badge-soft"><?= esc($s['grade_section']) ?></span></td>
  <td class="text-center">
  <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
- <a href="<?= base_url('students-view/'.$s['id']) ?>" class="btn-action btn-action-view">
+ <a href="<?= base_url('students-view/'.$s['id']) ?>" class="btn-action btn-action-view" title="View Student">
  <i class="fas fa-eye"></i> View
  </a>
  <div class="dropdown">
@@ -636,12 +623,20 @@ select.form-control option {
  <i class="fas fa-ellipsis-h"></i>
  </button>
  <div class="dropdown-menu dropdown-menu-right">
- <a class="dropdown-item" href="<?= base_url('students-edit/'.$s['id']) ?>">
+ <button type="button" class="dropdown-item edit-student-btn"
+ data-id="<?= $s['id'] ?>"
+ data-no="<?= esc($s['student_no'] ?? '') ?>"
+ data-fname="<?= esc($s['fname']) ?>"
+ data-mname="<?= esc($s['mname'] ?? '') ?>"
+ data-lname="<?= esc($s['lname']) ?>"
+ data-grade="<?= esc($s['grade_section'] ?? '') ?>"
+ data-photo="<?= esc(student_photo_url((string) ($s['student_no'] ?? ''))) ?>"
+ data-toggle="modal" data-target="#editStudentModal">
  <i class="fas fa-edit mr-2" style="color:#b8750a;"></i> Edit
- </a>
+ </button>
  <div class="dropdown-divider"></div>
  <a class="dropdown-item text-danger" href="<?= base_url('students-delete/'.$s['id']) ?>"
- onclick="return confirm('Delete this student?\n\n<?= esc($s['fname']) ?> <?= esc($s['lname']) ?>')">
+ onclick="return confirm('Delete this student?\n\n<?= esc(full_name($s)) ?>')">
  <i class="fas fa-trash mr-2"></i> Delete
  </a>
  </div>
@@ -651,7 +646,7 @@ select.form-control option {
  </tr>
  <?php endforeach; else: ?>
  <tr>
-  <td colspan="7" class="text-center py-5 empty-state">
+   <td colspan="5" class="text-center py-5 empty-state">
  <i class="fas fa-user-graduate fa-3x mb-3 d-block"></i>
  <h5>No students yet</h5>
  <p>Register a student to get started!</p>
@@ -711,6 +706,71 @@ select.form-control option {
  </div>
 </div>
 
+<!-- ===== EDIT STUDENT MODAL (floating, same pattern as teachers/staffs) ===== -->
+<div class="modal fade" id="editStudentModal" tabindex="-1">
+ <div class="modal-dialog modal-dialog-centered">
+ <div class="modal-content">
+ <form action="<?= base_url('students-update') ?>" method="post" enctype="multipart/form-data">
+ <?= csrf_field() ?>
+ <input type="hidden" name="id" id="editStudentId">
+ <div class="modal-header">
+ <h5 class="modal-title"><i class="fas fa-user-edit mr-2" style="color:#4361ee;"></i>Edit Student</h5>
+ <button type="button" class="close" data-dismiss="modal">&times;</button>
+ </div>
+ <div class="modal-body">
+ <div class="text-center mb-3">
+ <div id="editStudentPicBox" title="Click to add or change the picture" style="position:relative;width:96px;height:96px;margin:0 auto;border-radius:50%;overflow:hidden;border:3px solid rgba(108,140,255,0.25);background:#eef2ff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+ <img id="editStudentPicImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
+ <i class="fas fa-camera" id="editStudentPicPh" style="font-size:28px;color:#a5b4fc;"></i>
+ </div>
+ <input type="file" id="editStudentPicFile" accept="image/*" style="display:none;">
+ <input type="hidden" name="student_picture_data" id="editStudentPicData" value="">
+ <input type="hidden" name="student_picture_remove" id="editStudentPicRemove" value="0">
+ <button type="button" id="editStudentPicRemoveBtn" style="display:none;border:none;background:none;color:#b23c4d;font-size:12px;padding:0;margin-top:4px;"><i class="fas fa-trash-alt mr-1"></i>Delete profile picture</button>
+ </div>
+ <div class="form-group">
+ <label>Student ID <span class="text-muted" style="font-weight:400;">(editable)</span></label>
+ <input type="text" name="student_no" id="editStudentNo" class="form-control" placeholder="e.g. 1001">
+ </div>
+<div class="row">
+ <div class="col-4">
+ <div class="form-group">
+ <label>First Name <span class="text-danger">*</span></label>
+ <input type="text" name="fname" id="editStudentFname" class="form-control" required>
+ </div>
+ </div>
+ <div class="col-4">
+ <div class="form-group">
+ <label>Middle Name</label>
+ <input type="text" name="mname" id="editStudentMname" class="form-control">
+ </div>
+ </div>
+ <div class="col-4">
+ <div class="form-group">
+ <label>Last Name <span class="text-danger">*</span></label>
+ <input type="text" name="lname" id="editStudentLname" class="form-control" required>
+ </div>
+ </div>
+ </div>
+ <div class="form-group mb-0">
+ <label>Grade &amp; Section <span class="text-danger">*</span></label>
+ <select name="grade_section" id="editStudentGrade" class="form-control" required>
+ <option value="">-- Select --</option>
+ <?php $__g=['Kindergarten','Grade 1 - A','Grade 1 - B','Grade 2 - A','Grade 2 - B','Grade 3 - A','Grade 3 - B','Grade 4 - A','Grade 4 - B','Grade 5 - A','Grade 5 - B','Grade 6 - A','Grade 6 - B']; foreach($__g as $__x): ?>
+ <option value="<?= $__x ?>"><?= $__x ?></option>
+ <?php endforeach; ?>
+ </select>
+ </div>
+ </div>
+ <div class="modal-footer">
+ <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">Cancel</button>
+ <button type="submit" class="btn btn-primary btn-sm px-4"><i class="fas fa-check mr-1"></i> Update Student</button>
+ </div>
+ </form>
+ </div>
+ </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
@@ -752,6 +812,68 @@ function openQrModal(u,t){
     $('#qrModalTitle').text(t||'QR Code');
     $('#qrModal').modal('show');
 }
+
+    // ===== EDIT STUDENT MODAL (floating) =====
+    var $sBox = $('#editStudentPicBox'), $sImg = $('#editStudentPicImg'), $sPh = $('#editStudentPicPh'),
+        $sFile = $('#editStudentPicFile'), $sData = $('#editStudentPicData'),
+        $sRemove = $('#editStudentPicRemove'), $sRemoveBtn = $('#editStudentPicRemoveBtn');
+
+    function sPaint(src) {
+        if (src) {
+            $sImg.attr('src', src).show();
+            $sPh.hide();
+            $sRemoveBtn.show();
+        } else {
+            $sImg.attr('src', '').hide();
+            $sPh.show();
+            $sRemoveBtn.hide();
+        }
+    }
+
+    $(document).on('click', '.edit-student-btn', function () {
+        var b = $(this);
+        $('#editStudentId').val(b.data('id'));
+        $('#editStudentNo').val(b.data('no'));
+        $('#editStudentNo').val(b.data('no'));
+        $('#editStudentFname').val(b.data('fname'));
+        $('#editStudentMname').val(b.data('mname'));
+        $('#editStudentLname').val(b.data('lname'));
+        $('#editStudentGrade').val(b.data('grade'));
+        $sData.val('');
+        $sRemove.val('0');
+        $sFile.val('');
+        sPaint(b.data('photo') || '');
+    });
+
+    $sBox.on('click', function () { $sFile.trigger('click'); });
+
+    $sFile.on('change', function () {
+        if (!this.files || !this.files[0]) { return; }
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var img = new Image();
+            img.onload = function () {
+                var side = Math.min(img.width, img.height),
+                    sx = (img.width - side) / 2, sy = (img.height - side) / 2,
+                    canvas = document.createElement('canvas');
+                canvas.width = 400; canvas.height = 400;
+                canvas.getContext('2d').drawImage(img, sx, sy, side, side, 0, 0, 400, 400);
+                var dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                $sData.val(dataUrl);
+                $sRemove.val('0');
+                sPaint(dataUrl);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(this.files[0]);
+    });
+
+    $sRemoveBtn.on('click', function () {
+        $sData.val('');
+        $sFile.val('');
+        $sRemove.val('1');
+        sPaint('');
+    });
 
 <?php if(session()->getFlashdata('registration_success')): ?>
 $(document).ready(function() {

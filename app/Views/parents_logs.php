@@ -186,6 +186,19 @@ body {
 
  <section class="content">
  <div class="container-fluid">
+<div class="card mb-3">
+ <div class="card-body py-2">
+ <div class="d-flex align-items-center flex-wrap" style="gap:8px;">
+ <div class="input-group input-group-sm" style="max-width:260px;">
+ <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-search"></i></span></div>
+ <input type="text" class="form-control hist-search" placeholder="Search student, fetcher, relation, method...">
+ </div>
+ <input type="date" class="form-control form-control-sm hist-date" style="max-width:170px;">
+ <button type="button" class="btn btn-sm btn-outline-secondary hist-reset"><i class="fas fa-undo mr-1"></i>Reset</button>
+ <span class="ml-auto small text-muted" id="histCount"></span>
+ </div>
+ </div>
+</div>
             
  <!-- ===== TABS ===== -->
  <div class="card">
@@ -230,7 +243,7 @@ body {
  <td style="color: #b0b0c8; font-weight: 700;"><?= $i++ ?></td>
  <td style="color: #8888aa; font-size: 13px;"><?= date('M d, Y h:i A', strtotime($r['time_released'])) ?><?php if (!empty($r['session_type'])): ?> <span class="badge" style="background:<?= $r['session_type'] === 'morning' ? '#fef3c7' : '#e0e7ff' ?>;color:<?= $r['session_type'] === 'morning' ? '#b45309' : '#3730a3' ?>;"><?= strtoupper($r['session_type']) ?></span><?php endif; ?></td>
  <td><strong style="color: #2d2d4a;"><?= esc($r['sfname'] ?? '') ?> <?= esc($r['smname'] ?? '') ?> <?= esc($r['slname'] ?? '') ?></strong></td>
- <td><?= esc($r['fetcher_fname']) ?> <?= esc($r['fetcher_lname']) ?></td>
+ <td><?= esc(full_name($r, 'fetcher_')) ?></td>
  <td><span class="badge badge-info"><?= esc($r['fetcher_relation'] ?? 'Parent') ?></span></td>
  <td>
  <span class="badge badge-<?= ($r['method'] ?? '') == 'QR' ? 'primary' : 'info' ?>">
@@ -272,7 +285,7 @@ body {
  <td style="color: #8888aa; font-size: 13px;"><?= date('M d, Y h:i A', strtotime($s['sent_at'])) ?></td>
  <td>
  <strong style="color: #2d2d4a;">
- <?= esc($s['student_fname'] ?? '') ?> <?= esc($s['student_lname'] ?? '') ?>
+ <?= esc(full_name($s, 'student_')) ?>
  </strong>
  <br>
  <small style="color: #8888aa; font-size: 12px;">
@@ -316,4 +329,37 @@ body {
  </section>
 </div>
 
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
+$(function () {
+    function filterHist() {
+        var q = $('.hist-search').val().toLowerCase().trim();
+        var d = $('.hist-date').val();
+        var shown = 0;
+        $('table.table tbody tr').each(function () {
+            var $tr = $(this);
+            if ($tr.find('td').length < 2) { return; }
+            var txt = $tr.text().toLowerCase();
+            var okQ = q === '' || txt.indexOf(q) > -1;
+            var okD = true;
+            if (d) {
+                var cell = $tr.find('td').eq(1).text();
+                var parsed = new Date(cell);
+                okD = !isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === d;
+            }
+            $tr.toggle(okQ && okD);
+            if (okQ && okD) { shown++; }
+        });
+        $('#histCount').text(shown + ' row(s) shown');
+    }
+    $(document).on('input', '.hist-search', filterHist);
+    $(document).on('change', '.hist-date', filterHist);
+    $(document).on('click', '.hist-reset', function () {
+        $('.hist-search').val(''); $('.hist-date').val(''); filterHist();
+    });
+    filterHist();
+});
+</script>
 <?= $this->endSection() ?>

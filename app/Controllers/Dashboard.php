@@ -51,7 +51,7 @@ class Dashboard extends BaseController
 
             $db = \Config\Database::connect();
             $data['recentReleases'] = $db->table('fetch_logs')
-                ->select('fetch_logs.student_id, fetch_logs.fetcher_fname, fetch_logs.fetcher_lname, fetch_logs.fetcher_relation, fetch_logs.method, fetch_logs.session_type, fetch_logs.time_released, students.fname AS student_fname, students.lname AS student_lname, students.grade_section, parents.fname AS parent_fname, parents.lname AS parent_lname')
+                ->select('fetch_logs.student_id, fetch_logs.fetcher_fname, fetch_logs.fetcher_lname, fetch_logs.fetcher_relation, fetch_logs.method, fetch_logs.session_type, fetch_logs.time_released, students.fname AS student_fname, students.mname AS student_mname, students.lname AS student_lname, students.grade_section, parents.fname AS parent_fname, parents.mname AS parent_mname, parents.lname AS parent_lname')
                 ->join('students', 'students.id = fetch_logs.student_id', 'left')
                 ->join('parents', 'parents.id = fetch_logs.parent_id', 'left')
                 ->orderBy('fetch_logs.time_released', 'DESC')
@@ -71,7 +71,7 @@ class Dashboard extends BaseController
 
             $db = \Config\Database::connect();
             $data['todayReleases'] = $db->table('fetch_logs')
-                ->select('fetch_logs.student_id, fetch_logs.fetcher_fname, fetch_logs.fetcher_lname, fetch_logs.fetcher_relation, fetch_logs.method, fetch_logs.session_type, fetch_logs.time_released, students.fname AS student_fname, students.lname AS student_lname, students.grade_section, parents.fname AS parent_fname, parents.lname AS parent_lname')
+                ->select('fetch_logs.student_id, fetch_logs.fetcher_fname, fetch_logs.fetcher_lname, fetch_logs.fetcher_relation, fetch_logs.method, fetch_logs.session_type, fetch_logs.time_released, students.fname AS student_fname, students.mname AS student_mname, students.lname AS student_lname, students.grade_section, parents.fname AS parent_fname, parents.mname AS parent_mname, parents.lname AS parent_lname')
                 ->join('students', 'students.id = fetch_logs.student_id', 'left')
                 ->join('parents', 'parents.id = fetch_logs.parent_id', 'left')
                 ->where('fetch_logs.staff_id', $userId)
@@ -165,7 +165,7 @@ class Dashboard extends BaseController
 
                 // Release history with date filter
                 $histQuery = $db->table('fetch_logs')
-                    ->select('fetch_logs.*, students.fname AS student_fname, students.lname AS student_lname')
+                    ->select('fetch_logs.*, students.fname AS student_fname, students.mname AS student_mname, students.lname AS student_lname')
                     ->join('students', 'students.id = fetch_logs.student_id', 'left')
                     ->whereIn('fetch_logs.student_id', $studentIds);
 
@@ -215,9 +215,15 @@ class Dashboard extends BaseController
 
             $myStudents = [];
             $studentIds = [];
-            // Class list = students.adviser_id (same source as TeachersModel::studentCounts
-            // and Teachers::view). Fallback to grade_section only if adviser is unset.
-            $query = $db->table('students')->where('adviser_id', $userId);
+            // Class list = students advised by this teacher OR sitting in the
+            // teacher's grade/section (legacy rows still point at an adviser
+            // from a different section, which used to give a brand-new
+            // section teacher an empty class).
+            $query = $db->table('students')
+                ->groupStart()
+                    ->where('adviser_id', $userId)
+                    ->orWhere('grade_section', $gradeSection)
+                ->groupEnd();
             if ($search !== '') {
                 $query->groupStart()
                     ->like('fname', $search)
@@ -228,22 +234,6 @@ class Dashboard extends BaseController
             $students = $query->orderBy('lname', 'ASC')
                 ->get()
                 ->getResultArray();
-
-            if ($students === [] && !empty($gradeSection)) {
-                $query = $db->table('students')
-                    ->where('grade_section', $gradeSection)
-                    ->where('adviser_id IS NULL', null, false);
-                if ($search !== '') {
-                    $query->groupStart()
-                        ->like('fname', $search)
-                        ->orLike('lname', $search)
-                        ->orLike('mname', $search)
-                        ->groupEnd();
-                }
-                $students = $query->orderBy('lname', 'ASC')
-                    ->get()
-                    ->getResultArray();
-            }
 
             foreach ($students as $st) {
                 $st['parents'] = [];
@@ -266,7 +256,7 @@ class Dashboard extends BaseController
                     ->countAllResults();
 
                 $data['recentReleases'] = $db->table('fetch_logs')
-                    ->select('fetch_logs.*, students.fname AS student_fname, students.lname AS student_lname')
+                    ->select('fetch_logs.*, students.fname AS student_fname, students.mname AS student_mname, students.lname AS student_lname')
                     ->join('students', 'students.id = fetch_logs.student_id', 'left')
                     ->whereIn('fetch_logs.student_id', $studentIds)
                     ->orderBy('fetch_logs.time_released', 'DESC')

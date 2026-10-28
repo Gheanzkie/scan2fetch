@@ -21,9 +21,33 @@
  <div class="user-panel mt-2 pb-3 mb-3 d-flex align-items-center"
              style="border-bottom: 1px solid #32298a; padding-bottom: 14px;">
  <div class="image">
- <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#4361ee,#7c3aed);
-                            display:flex;align-items:center;justify-content:center;">
+ <?php
+   // Logged-in user's own profile picture (teacher / staff / parent).
+   helper('photo');
+   $__mePhoto = '';
+   $__role    = session('role');
+   $__uid     = (int) session('user_id');
+   $__db      = \Config\Database::connect();
+   if ($__uid > 0) {
+       if ($__role === 'teacher') {
+           $__row = $__db->table('teachers')->select('teacher_no')->where('id', $__uid)->get()->getRowArray();
+           if (!empty($__row['teacher_no'])) { $__mePhoto = teacher_photo_url($__row['teacher_no']); }
+       } elseif ($__role === 'staff') {
+           $__row = $__db->table('staffs')->select('staff_no')->where('id', $__uid)->get()->getRowArray();
+           if (!empty($__row['staff_no'])) { $__mePhoto = staff_photo_url($__row['staff_no']); }
+       } elseif ($__role === 'parent') {
+           $__row = $__db->table('parents')->select('parent_no')->where('id', $__uid)->get()->getRowArray();
+           if (!empty($__row['parent_no'])) { $__mePhoto = parent_photo_url($__row['parent_no']); }
+       }
+   }
+ ?>
+ <div style="width:40px;height:40px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#4361ee,#7c3aed);
+                            display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.25);">
+ <?php if ($__mePhoto): ?>
+ <img src="<?= esc($__mePhoto) ?>" alt="Profile picture" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+ <?php else: ?>
  <i class="fas fa-user" style="color:#fff;font-size:15px;"></i>
+ <?php endif; ?>
  </div>
  </div>
  <div class="info ml-3" style="line-height:1.3;">

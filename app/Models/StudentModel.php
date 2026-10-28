@@ -9,7 +9,7 @@ class StudentModel extends Model
     protected $table = 'students';
     protected $primaryKey = 'id';
     protected $allowedFields = [
-        'fname', 'mname', 'lname', 'grade_section', 'parent_id', 'created_by', 'created_at', 'adviser_id'
+        'student_no', 'fname', 'mname', 'lname', 'grade_section', 'parent_id', 'created_by', 'created_at', 'adviser_id'
     ];
 
     /**

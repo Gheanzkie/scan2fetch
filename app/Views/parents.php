@@ -493,62 +493,35 @@ select.form-control option {
  <thead>
  <tr>
  <th style="width:50px;">#</th>
+ <th>Parent ID</th>
  <th>Name</th>
  <th>Phone</th>
- <th>Student / Grade</th>
- <th>Relation</th>
- <th style="width:70px;">QR</th>
  <th class="text-center">Password</th>
- <th>Created</th>
  <th class="text-center" style="width:210px;">Actions</th>
  </tr>
  </thead>
  <tbody>
  <?php if (!empty($parents)): ?>
  <?php $i = 1; foreach ($parents as $p): ?>
- <tr class="parent-row" data-search="<?= esc(strtolower($p['fname'].' '.($p['mname']??'').' '.$p['lname'].' '.$p['phone'])) ?>">
+ <tr class="parent-row" data-search="<?= esc(strtolower($p['fname'].' '.($p['mname']??'').' '.$p['lname'].' '.$p['phone'].' '.($p['parent_no']??''))) ?>">
  <td class="num"><?= $i++ ?></td>
  <td>
- <div class="parent-name"><?= esc($p['fname']) ?> <?= esc($p['lname']) ?></div>
- <?php if(!empty($p['mname'])): ?>
- <div class="muted"><?= esc($p['mname']) ?></div>
+ <?php if (!empty($p['parent_no'])): ?>
+ <span class="badge badge-soft" style="font-family: ui-monospace, monospace; font-size:11.5px; letter-spacing:0.02em;"><?= esc($p['parent_no']) ?></span>
+ <?php else: ?>
+ <span class="muted" style="font-size:12px;">No ID</span>
  <?php endif; ?>
+ </td>
+ <td>
+ <?php $__pp = parent_photo_url((string) ($p['parent_no'] ?? '')); ?>
+ <?php if ($__pp): ?>
+ <img src="<?= esc($__pp) ?>" alt="" class="avatar-round" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid rgba(108,140,255,0.25);margin-right:8px;vertical-align:middle;">
+ <?php else: ?>
+ <span style="display:inline-flex;width:34px;height:34px;border-radius:50%;background:rgba(168,192,255,0.2);color:#5a5280;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-right:8px;vertical-align:middle;"><?= esc(strtoupper(mb_substr($p['fname'] ?? '', 0, 1) . mb_substr($p['lname'] ?? '', 0, 1))) ?></span>
+ <?php endif; ?>
+ <div class="parent-name" style="display:inline-block;vertical-align:middle;"><?= esc(full_name($p)) ?></div>
  </td>
  <td><code><?= esc($p['phone']) ?></code></td>
-  <td>
-  <?php $kids = $p['children'] ?? []; ?>
-  <?php if(!empty($kids)): ?>
-    <?php foreach ($kids as $kid): ?>
-    <div class="parent-name">
-      <?= esc($kid['fname']) ?> <?= esc($kid['lname'] ?? '') ?>
-      <span class="badge badge-soft" style="font-size:10px;"><?= esc($kid['grade_section'] ?? '') ?></span>
-    </div>
-    <?php endforeach; ?>
-    <div class="muted" style="font-size:11px;">
-      <i class="fas fa-child"></i> <?= count($kids) ?> student<?= count($kids) > 1 ? 's' : '' ?>
-    </div>
-  <?php else: ?>
-    <span class="muted">No students</span>
-  <?php endif; ?>
-  </td>
-  <td>
-  <?php $rels = array_values(array_unique(array_filter(array_column($kids, 'relation')))); ?>
-  <?php if(!empty($rels)): foreach ($rels as $rel): ?>
-    <span class="badge badge-primary"><?= esc($rel) ?></span>
-  <?php endforeach; else: ?>
-    <span class="badge badge-soft">Parent</span>
-  <?php endif; ?>
-  </td>
- <td>
- <?php if(!empty($p['qr_code'])): ?>
- <img src="<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>"
-                                                             class="qr-thumb"
-                                                             onclick="openQrModal('<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>')"
-                                                             title="Click to enlarge">
- <?php else: ?>
- <span class="muted" style="font-size:12px;">No QR</span>
- <?php endif; ?>
- </td>
  <td class="text-center">
  <?php if (!empty($p['password_sent'])): ?>
  <span class="badge badge-soft" title="Password already sent" style="color:#2e7d32;"><i class="fas fa-check"></i></span>
@@ -556,7 +529,6 @@ select.form-control option {
  <span class="badge badge-soft" title="Password not yet sent" style="color:#c2185b;"><i class="fas fa-times"></i></span>
  <?php endif; ?>
  </td>
- <td class="muted"><?= date('M d, Y', strtotime($p['created_at'])) ?></td>
  <td class="text-center">
  <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
  <a href="<?= base_url('parents-view/'.$p['id']) ?>" class="btn-action btn-action-view" title="View Parent Details">
@@ -567,24 +539,32 @@ select.form-control option {
  <i class="fas fa-ellipsis-h"></i>
  </button>
  <div class="dropdown-menu dropdown-menu-right">
- <a class="dropdown-item" href="<?= base_url('parents-edit/'.$p['id']) ?>">
+ <button type="button" class="dropdown-item edit-parent-btn"
+ data-id="<?= $p['id'] ?>"
+ data-no="<?= esc($p['parent_no'] ?? '') ?>"
+ data-fname="<?= esc($p['fname']) ?>"
+ data-mname="<?= esc($p['mname'] ?? '') ?>"
+ data-lname="<?= esc($p['lname']) ?>"
+ data-phone="<?= esc($p['phone']) ?>"
+ data-photo="<?= esc(parent_photo_url((string) ($p['parent_no'] ?? ''))) ?>"
+ data-toggle="modal" data-target="#editParentModal">
  <i class="fas fa-edit mr-2" style="color:#b8750a;"></i> Edit
- </a>
+ </button>
  <div class="dropdown-divider"></div>
  <?php if (empty($p['password_sent'])): ?>
  <a class="dropdown-item" href="<?= base_url('parents-send-password/'.$p['id']) ?>"
- onclick="return confirm('Generate and send a password to this parent via SMS?\n\n<?= esc($p['fname']) ?> <?= esc($p['lname']) ?>')">
+ onclick="return confirm('Generate and send a password to this parent via SMS?\n\n<?= esc(full_name($p)) ?>')">
  <i class="fas fa-sms mr-2" style="color:#2e7d32;"></i> Send Password
  </a>
  <?php else: ?>
  <a class="dropdown-item" href="<?= base_url('parents-send-password/'.$p['id']) ?>"
- onclick="return confirm('Reset and send a new password to this parent via SMS?\n\n<?= esc($p['fname']) ?> <?= esc($p['lname']) ?>')">
+ onclick="return confirm('Reset and send a new password to this parent via SMS?\n\n<?= esc(full_name($p)) ?>')">
  <i class="fas fa-key mr-2" style="color:#2e7d32;"></i> Reset Password
  </a>
  <?php endif; ?>
  <div class="dropdown-divider"></div>
  <a class="dropdown-item text-danger" href="<?= base_url('parents-delete/'.$p['id']) ?>"
- onclick="return confirm('Delete this parent?\n\n<?= esc($p['fname']) ?> <?= esc($p['lname']) ?>')">
+ onclick="return confirm('Delete this parent?\n\n<?= esc(full_name($p)) ?>')">
  <i class="fas fa-trash mr-2"></i> Delete
  </a>
  </div>
@@ -595,7 +575,7 @@ select.form-control option {
  <?php endforeach; ?>
  <?php else: ?>
  <tr>
- <td colspan="10" class="text-center py-5 empty-state">
+ <td colspan="6" class="text-center py-5 empty-state">
  <i class="fas fa-user-friends fa-3x mb-3 d-block"></i>
  <h5>No parents registered yet</h5>
  <p>Parents are automatically registered when adding a student. Their password is sent manually via "Send Password" / "Send All Passwords".</p>
@@ -634,6 +614,66 @@ select.form-control option {
  </div>
 </div>
 
+<!-- ===== EDIT PARENT MODAL (floating, same pattern as teachers/staffs) ===== -->
+<div class="modal fade" id="editParentModal" tabindex="-1">
+ <div class="modal-dialog modal-dialog-centered">
+ <div class="modal-content">
+ <form action="<?= base_url('parents-update') ?>" method="post" enctype="multipart/form-data">
+ <?= csrf_field() ?>
+ <input type="hidden" name="id" id="editParentId">
+ <div class="modal-header">
+ <h5 class="modal-title"><i class="fas fa-user-edit mr-2" style="color:#4361ee;"></i>Edit Parent</h5>
+ <button type="button" class="close" data-dismiss="modal">&times;</button>
+ </div>
+ <div class="modal-body">
+ <div class="text-center mb-3">
+ <div id="editParentPicBox" title="Click to add or change the picture" style="position:relative;width:96px;height:96px;margin:0 auto;border-radius:50%;overflow:hidden;border:3px solid rgba(108,140,255,0.25);background:#eef2ff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+ <img id="editParentPicImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
+ <i class="fas fa-camera" id="editParentPicPh" style="font-size:28px;color:#a5b4fc;"></i>
+ </div>
+ <input type="file" id="editParentPicFile" accept="image/*" style="display:none;">
+ <input type="hidden" name="parent_picture_data" id="editParentPicData" value="">
+ <input type="hidden" name="parent_picture_remove" id="editParentPicRemove" value="0">
+ <button type="button" id="editParentPicRemoveBtn" style="display:none;border:none;background:none;color:#b23c4d;font-size:12px;padding:0;margin-top:4px;"><i class="fas fa-trash-alt mr-1"></i>Delete profile picture</button>
+ </div>
+ <div class="form-group">
+ <label>Parent ID <span class="text-muted" style="font-weight:400;">(editable)</span></label>
+ <input type="text" name="parent_no" id="editParentNo" class="form-control" placeholder="e.g. P-1001">
+ </div>
+<div class="row">
+ <div class="col-4">
+ <div class="form-group">
+ <label>First Name <span class="text-danger">*</span></label>
+ <input type="text" name="fname" id="editParentFname" class="form-control" required>
+ </div>
+ </div>
+ <div class="col-4">
+ <div class="form-group">
+ <label>Middle Name</label>
+ <input type="text" name="mname" id="editParentMname" class="form-control">
+ </div>
+ </div>
+ <div class="col-4">
+ <div class="form-group">
+ <label>Last Name <span class="text-danger">*</span></label>
+ <input type="text" name="lname" id="editParentLname" class="form-control" required>
+ </div>
+ </div>
+ </div>
+ <div class="form-group mb-0">
+ <label>Phone Number <span class="text-danger">*</span></label>
+ <input type="text" name="phone" id="editParentPhone" class="form-control" required>
+ </div>
+ </div>
+ <div class="modal-footer">
+ <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">Cancel</button>
+ <button type="submit" class="btn btn-primary btn-sm px-4"><i class="fas fa-check mr-1"></i> Update Parent</button>
+ </div>
+ </form>
+ </div>
+ </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
@@ -646,6 +686,67 @@ $(function(){
             var search = $(this).data('search');
             $(this).toggle(search.indexOf(val) > -1);
         });
+    });
+
+    // ===== EDIT PARENT MODAL (floating) =====
+    var $pBox = $('#editParentPicBox'), $pImg = $('#editParentPicImg'), $pPh = $('#editParentPicPh'),
+        $pFile = $('#editParentPicFile'), $pData = $('#editParentPicData'),
+        $pRemove = $('#editParentPicRemove'), $pRemoveBtn = $('#editParentPicRemoveBtn');
+
+    function pPaint(src) {
+        if (src) {
+            $pImg.attr('src', src).show();
+            $pPh.hide();
+            $pRemoveBtn.show();
+        } else {
+            $pImg.attr('src', '').hide();
+            $pPh.show();
+            $pRemoveBtn.hide();
+        }
+    }
+
+    $(document).on('click', '.edit-parent-btn', function () {
+        var b = $(this);
+        $('#editParentId').val(b.data('id'));
+        $('#editParentNo').val(b.data('no'));
+        $('#editParentFname').val(b.data('fname'));
+        $('#editParentMname').val(b.data('mname'));
+        $('#editParentLname').val(b.data('lname'));
+        $('#editParentPhone').val(b.data('phone'));
+        $pData.val('');
+        $pRemove.val('0');
+        $pFile.val('');
+        pPaint(b.data('photo') || '');
+    });
+
+    $pBox.on('click', function () { $pFile.trigger('click'); });
+
+    $pFile.on('change', function () {
+        if (!this.files || !this.files[0]) { return; }
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var img = new Image();
+            img.onload = function () {
+                var side = Math.min(img.width, img.height),
+                    sx = (img.width - side) / 2, sy = (img.height - side) / 2,
+                    canvas = document.createElement('canvas');
+                canvas.width = 400; canvas.height = 400;
+                canvas.getContext('2d').drawImage(img, sx, sy, side, side, 0, 0, 400, 400);
+                var dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                $pData.val(dataUrl);
+                $pRemove.val('0');
+                pPaint(dataUrl);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(this.files[0]);
+    });
+
+    $pRemoveBtn.on('click', function () {
+        $pData.val('');
+        $pFile.val('');
+        $pRemove.val('1');
+        pPaint('');
     });
 });
 

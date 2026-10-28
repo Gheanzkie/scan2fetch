@@ -771,8 +771,8 @@ function openHistory(date) {
         if (d.releases.length) {
             html += '<div class="table-responsive"><table class="table table-sm" style="font-size:13px;"><thead><tr><th>Time</th><th>Student</th><th>Fetcher</th></tr></thead><tbody>';
             d.releases.forEach(function (r) {
-                var student = (r.student_fname || '') + ' ' + (r.student_lname || '');
-                var fetcher = (r.fetcher_fname || '') + ' ' + (r.fetcher_lname || '') + ' (' + (r.fetcher_relation || 'Parent') + ')';
+                var student = [r.student_fname, r.student_mname, r.student_lname].filter(Boolean).join(' ');
+                var fetcher = [r.fetcher_fname, r.fetcher_mname, r.fetcher_lname].filter(Boolean).join(' ') + ' (' + (r.fetcher_relation || 'Parent') + ')';
                 html += '<tr><td>' + r.time_released.substring(11, 16) + '</td><td>' + $('<span>').text(student.trim()).html() + (r.grade_section ? ' <small class="text-muted">· ' + $('<span>').text(r.grade_section).html() + '</small>' : '') + '</td><td>' + $('<span>').text(fetcher).html() + '</td></tr>';
             });
             html += '</tbody></table></div>';

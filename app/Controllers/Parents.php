@@ -24,6 +24,7 @@ class Parents extends BaseController
 
     public function index()
     {
+        helper('photo');
         // Full parent directory = admin only. The parent role gets the
         // self-service pages (releases / notifications / logs / children),
         // never the list of EVERY parent in the school.
@@ -74,6 +75,7 @@ class Parents extends BaseController
 
     public function view($id)
     {
+        helper('photo');
         // Ownership: a logged-in parent may only open their OWN record.
         if (session('role') === 'parent' && (int) session('user_id') !== (int) $id) {
             return redirect()->to('/parents-view/' . session('user_id'))->with('error', 'You can only view your own profile.');
@@ -105,20 +107,6 @@ class Parents extends BaseController
         $data['subFetchers'] = $this->subFetcherModel->where('parent_id', $id)->findAll();
 
         return view('parents_view', $data);
-    }
-
-    public function edit($id)
-    {
-        // Profile editing of arbitrary parents = admin only (parents edit
-        // themselves through /update-profile which verifies their password).
-        if (session('role') !== 'admin') {
-            return redirect()->to('/dashboard')->with('error', 'Access denied.');
-        }
-        $data['parent'] = $this->parentsModel->find($id);
-        if (!$data['parent']) {
-            return redirect()->to('/parents')->with('error', 'Parent not found');
-        }
-        return view('parents_edit', $data);
     }
 
     public function save()
@@ -221,7 +209,36 @@ class Parents extends BaseController
         if ($role === 'admin' && $this->request->getPost('password')) {
             $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
         }
+        $__newParentNo = strtoupper(trim((string) $this->request->getPost('parent_no')));
+        if ($__newParentNo !== '') {
+            $__oldParent = $this->parentsModel->find($id);
+            if (!$__oldParent || $__newParentNo !== strtoupper((string) ($__oldParent['parent_no'] ?? ''))) {
+                if ($this->parentsModel->where('parent_no', $__newParentNo)->where('id !=', $id)->countAllResults() > 0) {
+                    return redirect()->to('/parents')->with('error', 'Parent ID ' . $__newParentNo . ' is already taken.');
+                }
+                $data['parent_no'] = $__newParentNo;
+            }
+        }
+
         $this->parentsModel->update($id, $data);
+
+        if (!empty($__oldParent) && isset($data['parent_no'])) {
+            $__from = FCPATH . 'uploads/parents/' . strtoupper((string) ($__oldParent['parent_no'] ?? '')) . '.jpg';
+            $__to   = FCPATH . 'uploads/parents/' . strtoupper((string) $data['parent_no']) . '.jpg';
+            if (is_file($__from)) { @copy($__from, $__to); }
+        }
+
+        // Profile picture (edit modal): save new image or remove the old one.
+        $parentNo = (string) ($this->parentsModel->find($id)["parent_no"] ?? "");
+        if ($parentNo !== "") {
+            helper("photo");
+            $pic = (string) $this->request->getPost("parent_picture_data");
+            if ($pic !== "") {
+                photo_save_parent_dataurl($pic, $parentNo);
+            } elseif ($this->request->getPost("parent_picture_remove") === "1") {
+                parent_photo_delete($parentNo);
+            }
+        }
         $this->logModel->addLog(
             session('user_id'),
             session('fname') . ' ' . session('lname'),
@@ -464,9 +481,9 @@ class Parents extends BaseController
             $allLogs = array_filter($allLogs, function($r) use ($search) {
                 $haystack = strtolower(
                     ($r['sfname'] ?? '') . ' ' .
+                    ($r['smname'] ?? '') . ' ' .
                     ($r['slname'] ?? '') . ' ' .
-                    ($r['fetcher_fname'] ?? '') . ' ' .
-                    ($r['fetcher_lname'] ?? '')
+                    full_name($r, 'fetcher_')
                 );
                 return strpos($haystack, strtolower($search)) !== false;
             });
@@ -714,6 +731,7 @@ class Parents extends BaseController
      */
     public function subfetchers()
     {
+        helper('photo');
         $userId = session('user_id');
         if (session('role') !== 'parent') {
             return redirect()->to('/dashboard')->send();

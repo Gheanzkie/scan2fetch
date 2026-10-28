@@ -296,7 +296,9 @@ label .text-danger { color: var(--soft-rose) !important; }
 
 /* ===== AVATAR ===== */
 .avatar-circle {
-    border-radius: 6px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    padding: 0 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -339,7 +341,7 @@ label .text-danger { color: var(--soft-rose) !important; }
 .breadcrumb-item a:hover { color: var(--soft-purple) !important; }
 
 .breadcrumb-item.active { color: var(--ink) !important; font-weight: 700 !important; font-size: 13px !important; }
-.breadcrumb-item + .breadcrumb-item::before { color: var(--faint) !important; content: "›" !important; }
+.breadcrumb-item + .breadcrumb-item::before { color: var(--faint) !important; content: "â€º" !important; }
 
 /* ===== EMPTY STATE ===== */
 .empty-state { color: var(--faint) !important; }
@@ -468,13 +470,14 @@ label .text-danger { color: var(--soft-rose) !important; }
                                     Staff List
  <span class="badge badge-soft ml-2"><?= count($staffs ?? []) ?></span>
  </h5>
- <a href="<?= base_url('staffs-send-all') ?>" class="btn btn-kid-primary btn-sm mr-2"
+ <div class="d-flex align-items-center flex-wrap" style="gap:8px;">
+ <a href="<?= base_url('staffs-send-all') ?>" class="btn btn-kid-primary btn-sm"
                                                 title="Send passwords to staff who haven't received one yet"
                                                 onclick="return confirm('Send passwords to all staff who have not received one yet?')">
  <i class="fas fa-sms mr-1"></i> Send All Passwords
  </a>
  <?php if (session('role') == 'admin'): ?>
- <a href="<?= base_url('staffs-delete-all') ?>" class="btn btn-danger btn-sm mr-2"
+ <a href="<?= base_url('staffs-delete-all') ?>" class="btn btn-danger btn-sm"
                                                 title="Delete ALL staff accounts"
                                                 onclick="return confirm('DELETE ALL STAFF?\n\nThis will permanently delete ALL staff accounts.\n\nThis cannot be undone!')">
  <i class="fas fa-trash-alt mr-1"></i> Delete All
@@ -483,6 +486,7 @@ label .text-danger { color: var(--soft-rose) !important; }
  <button type="button" class="btn btn-kid-primary btn-sm" data-toggle="modal" data-target="#addStaffModal">
  <i class="fas fa-plus mr-1"></i> Add Staff
  </button>
+ </div>
  </div>
  </div>
  <div class="card-body pt-0">
@@ -508,25 +512,37 @@ label .text-danger { color: var(--soft-rose) !important; }
  <thead>
  <tr>
  <th style="width:50px;">#</th>
+ <th>Staff ID</th>
  <th>Full Name</th>
  <th>Phone</th>
  <th class="text-center">Password</th>
- <th>Created</th>
  <th class="text-center" style="width:150px;">Actions</th>
  </tr>
  </thead>
  <tbody>
  <?php if (!empty($staffs)): ?>
  <?php $i = 1; foreach ($staffs as $staff): ?>
- <tr class="staff-row" data-search="<?= esc(strtolower($staff['fname'].' '.($staff['mname']??'').' '.$staff['lname'].' '.$staff['phone'])) ?>">
+ <tr class="staff-row" data-search="<?= esc(strtolower($staff['fname'].' '.($staff['mname']??'').' '.$staff['lname'].' '.$staff['phone'].' '.($staff['staff_no']??''))) ?>">
  <td class="num"><?= $i++ ?></td>
  <td>
+ <?php if (!empty($staff['staff_no'])): ?>
+ <span class="badge badge-soft" style="font-family: ui-monospace, monospace; font-size:11.5px;"><?= esc($staff['staff_no']) ?></span>
+ <?php else: ?>
+ <span class="muted" style="font-size:12px;">No ID</span>
+ <?php endif; ?>
+ </td>
+ <td>
  <div class="d-flex align-items-center">
- <div class="avatar-circle mr-2" style="width:40px;height:40px;min-width:40px;">
+ <div class="avatar-circle mr-2" style="width:40px;height:40px;min-width:40px;overflow:hidden;padding:0;">
+ <?php $__stp = staff_photo_url((string) ($staff['staff_no'] ?? '')); ?>
+ <?php if ($__stp): ?>
+ <img src="<?= esc($__stp) ?>" alt="" style="width:100%;height:100%;object-fit:cover;">
+ <?php else: ?>
  <i class="fas fa-user-tie" style="font-size:17px;"></i>
+ <?php endif; ?>
  </div>
  <div>
- <div class="staff-name"><?= esc($staff['fname']) ?> <?= esc($staff['lname']) ?></div>
+ <div class="staff-name"><?= esc(full_name($staff)) ?></div>
  <?php if(!empty($staff['mname'])): ?>
  <div class="muted"><?= esc($staff['mname']) ?></div>
  <?php endif; ?>
@@ -541,7 +557,6 @@ label .text-danger { color: var(--soft-rose) !important; }
  <span class="badge badge-soft" title="Password not yet sent" style="color:#c2185b;"><i class="fas fa-times"></i></span>
  <?php endif; ?>
  </td>
- <td class="muted"><?= date('M d, Y', strtotime($staff['created_at'])) ?></td>
  <td class="text-center">
  <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
  <div class="dropdown">
@@ -555,24 +570,27 @@ label .text-danger { color: var(--soft-rose) !important; }
  data-fname="<?= esc($staff['fname']) ?>"
  data-mname="<?= esc($staff['mname'] ?? '') ?>"
  data-lname="<?= esc($staff['lname']) ?>"
+ data-staff-no="<?= esc($staff['staff_no'] ?? '') ?>"
+ data-photo="<?= esc(staff_photo_url((string) ($staff['staff_no'] ?? ''))) ?>"
+ data-created="<?= esc($staff['created_at'] ?? '') ?>"
  data-phone="<?= esc($staff['phone']) ?>">
  <i class="fas fa-edit mr-2" style="color:#b8750a;"></i> Edit
  </a>
  <div class="dropdown-divider"></div>
  <?php if (empty($staff['password_sent'])): ?>
  <a class="dropdown-item" href="<?= base_url('staffs-send-password/' . $staff['id']) ?>"
- onclick="return confirm('Generate and send a password to this staff via SMS?\n\n<?= esc($staff['fname']) ?> <?= esc($staff['lname']) ?>')">
+ onclick="return confirm('Generate and send a password to this staff via SMS?\n\n<?= esc(full_name($staff)) ?>')">
  <i class="fas fa-sms mr-2" style="color:#2e7d32;"></i> Send Password
  </a>
  <?php else: ?>
  <a class="dropdown-item" href="<?= base_url('staffs-send-password/' . $staff['id']) ?>"
- onclick="return confirm('Reset and send a new password to this staff via SMS?\n\n<?= esc($staff['fname']) ?> <?= esc($staff['lname']) ?>')">
+ onclick="return confirm('Reset and send a new password to this staff via SMS?\n\n<?= esc(full_name($staff)) ?>')">
  <i class="fas fa-key mr-2" style="color:#2e7d32;"></i> Reset Password
  </a>
  <?php endif; ?>
  <div class="dropdown-divider"></div>
  <a class="dropdown-item text-danger" href="<?= base_url('staffs-delete/' . $staff['id']) ?>"
- onclick="return confirm('Delete this staff member?\n\n<?= esc($staff['fname']) ?> <?= esc($staff['lname']) ?>')">
+ onclick="return confirm('Delete this staff member?\n\n<?= esc(full_name($staff)) ?>')">
  <i class="fas fa-trash mr-2"></i> Delete
  </a>
  </div>
@@ -583,7 +601,7 @@ label .text-danger { color: var(--soft-rose) !important; }
  <?php endforeach; ?>
  <?php else: ?>
  <tr>
- <td colspan="6" class="text-center py-5 empty-state">
+ <td colspan="7" class="text-center py-5 empty-state">
  <i class="fas fa-user-tie fa-3x mb-3 d-block"></i>
  <h5>No staff accounts yet</h5>
  <p>Click "Add Staff" to register a new staff member.</p>
@@ -615,6 +633,16 @@ label .text-danger { color: var(--soft-rose) !important; }
  <button type="button" class="close" data-dismiss="modal" style="color: var(--ink);">&times;</button>
  </div>
  <div class="modal-body">
+ <div class="text-center mb-3">
+ <div id="addStaffPicBox" title="Click to add the picture" style="position:relative;width:96px;height:96px;margin:0 auto;border-radius:50%;overflow:hidden;border:3px solid rgba(108,140,255,0.25);background:#eef2ff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+ <img id="addStaffPicImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
+ <i class="fas fa-camera" id="addStaffPicPh" style="font-size:28px;color:#a5b4fc;"></i>
+ </div>
+ <input type="file" id="addStaffPicFile" accept="image/*" style="display:none;">
+ <input type="hidden" name="staff_picture_data" id="addStaffPicData" value="">
+ <small class="text-muted d-block mt-2" style="font-size:12px;">Profile picture <span style="color:#b23c4d;">(optional)</span></small>
+ <button type="button" id="addStaffPicRemoveBtn" style="display:none;border:none;background:none;color:#b23c4d;font-size:12px;padding:0;margin-top:2px;"><i class="fas fa-trash-alt mr-1"></i>Remove picture</button>
+ </div>
  <div class="row">
  <div class="col-4">
  <div class="form-group">
@@ -636,6 +664,15 @@ label .text-danger { color: var(--soft-rose) !important; }
  </div>
  </div>
  <div class="form-group">
+ <label>Staff ID <span class="text-muted" style="font-weight: 400;">(optional â€” auto-generated as S-####)</span></label>
+ <div class="input-group">
+ <div class="input-group-prepend">
+ <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+ </div>
+ <input type="text" name="staff_no" class="form-control" placeholder="S-1002">
+ </div>
+ </div>
+ <div class="form-group">
  <label>Phone Number <span class="text-danger">*</span></label>
  <div class="input-group">
  <div class="input-group-prepend">
@@ -646,7 +683,7 @@ label .text-danger { color: var(--soft-rose) !important; }
  </div>
  <div class="alert" style="background: rgba(168,192,255,0.12); border: 1.5px dashed rgba(63,43,150,0.18); border-radius: 12px; margin-bottom: 0; padding: 12px 14px; font-size: 13px; color: var(--ink);">
  <i class="fas fa-info-circle mr-1" style="color: var(--soft-blue);"></i>
-                        Passwords are not sent automatically — use "Send Password" / "Send All Passwords" to deliver them.
+                        Passwords are not sent automatically â€” use "Send Password" / "Send All Passwords" to deliver them.
  </div>
  </div>
  <div class="modal-footer">
@@ -667,6 +704,19 @@ label .text-danger { color: var(--soft-rose) !important; }
  <form action="<?= base_url('staffs-update') ?>" method="post" enctype="multipart/form-data">
  <?= csrf_field() ?>
  <input type="hidden" name="id" id="editId">
+
+ <!-- ===== Staff profile picture (add / change / remove) ===== -->
+ <div class="text-center mb-3">
+ <div id="staffPicBox" title="Click to add or change the picture" style="position:relative;width:96px;height:96px;margin:0 auto;border-radius:50%;overflow:hidden;border:3px solid rgba(108,140,255,0.25);background:#eef2ff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+ <img id="staffPicImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
+ <i class="fas fa-camera" id="staffPicPh" style="font-size:28px;color:#a5b4fc;"></i>
+ <span style="position:absolute;left:0;right:0;bottom:0;padding:3px 0;background:rgba(63,43,150,0.72);color:#fff;font-size:10px;font-weight:700;text-align:center;">Change</span>
+ </div>
+ <input type="file" id="staffPicFile" accept="image/*" style="display:none;">
+ <input type="hidden" name="staff_picture_data" id="staffPicData" value="">
+ <input type="hidden" name="staff_picture_remove" id="staffPicRemove" value="0">
+ <div><button type="button" id="staffPicRemoveBtn" style="display:none;border:none;background:none;color:#b23c4d;font-size:12px;padding:0;margin-top:4px;"><i class="fas fa-trash-alt mr-1"></i>Remove picture</button></div>
+ </div>
  <div class="modal-header">
  <h5 class="modal-title">
  <i class="fas fa-user-edit mr-2" style="color: var(--soft-orange);"></i>
@@ -696,6 +746,15 @@ label .text-danger { color: var(--soft-rose) !important; }
  </div>
  </div>
  <div class="form-group">
+ <label>Staff ID</label>
+ <div class="input-group">
+ <div class="input-group-prepend">
+ <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+ </div>
+ <input type="text" name="staff_no" id="editStaffNo" class="form-control">
+ </div>
+ </div>
+ <div class="form-group">
  <label>Phone Number <span class="text-danger">*</span></label>
  <div class="input-group">
  <div class="input-group-prepend">
@@ -704,13 +763,16 @@ label .text-danger { color: var(--soft-rose) !important; }
  <input type="text" name="phone" id="editPhone" class="form-control" required>
  </div>
  </div>
+ <p class="text-muted mb-3" style="font-size:13px;">
+ <i class="fas fa-calendar mr-1"></i> Added: <span id="editStaffCreated">&mdash;</span>
+ </p>
  <div class="form-group mb-0">
  <label>Password <span class="text-muted" style="font-weight: 400;">(leave blank to keep current)</span></label>
  <div class="input-group">
  <div class="input-group-prepend">
  <span class="input-group-text"><i class="fas fa-lock"></i></span>
  </div>
- <input type="password" name="password" class="form-control" placeholder="••••••••" minlength="6">
+ <input type="password" name="password" class="form-control" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" minlength="6">
   </div>
   </div>
  </div>
@@ -744,6 +806,58 @@ $(function(){
         $('#editFname').val(button.data('fname'));
         $('#editMname').val(button.data('mname'));
         $('#editLname').val(button.data('lname'));
+        $('#editStaffNo').val(button.data('staffNo'));
+
+        // Registered date (moved out of the list table)
+        var created = button.data('created') || '';
+        if (created) {
+            var d = new Date(String(created).replace(' ', 'T'));
+            $('#editStaffCreated').text(isNaN(d.getTime()) ? created : d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }));
+        } else {
+            $('#editStaffCreated').text('â€”');
+        }
+
+        // ===== Staff profile picture widget =====
+        var photo = button.data('photo') || '';
+        $('#staffPicImg').attr('src', photo).toggle(!!photo);
+        $('#staffPicPh').toggle(!photo);
+        $('#staffPicData').val('');
+        $('#staffPicRemove').val('0');
+        $('#staffPicRemoveBtn').toggle(!!photo);
+
+        $('#staffPicBox').off('click').on('click', function () { $('#staffPicFile').trigger('click'); });
+
+        $('#staffPicFile').off('change').on('change', function () {
+            if (!this.files || !this.files[0]) return;
+            var reader = new FileReader();
+            reader.onload = function (ev) {
+                var img = new Image();
+                img.onload = function () {
+                    var max = 400, side = Math.min(img.width, img.height);
+                    var cv = document.createElement('canvas'); cv.width = max; cv.height = max;
+                    var ctx = cv.getContext('2d');
+                    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, max, max);
+                    ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, max, max);
+                    var data = cv.toDataURL('image/jpeg', 0.9);
+                    $('#staffPicImg').attr('src', data).show();
+                    $('#staffPicPh').hide();
+                    $('#staffPicData').val(data);
+                    $('#staffPicRemove').val('0');
+                    $('#staffPicRemoveBtn').show();
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(this.files[0]);
+        });
+
+        $('#staffPicRemoveBtn').off('click').on('click', function () {
+            $('#staffPicFile').val('');
+            $('#staffPicImg').attr('src', '').hide();
+            $('#staffPicPh').show();
+            $('#staffPicData').val('');
+            $('#staffPicRemove').val('1');
+            $(this).hide();
+        });
         $('#editPhone').val(button.data('phone'));
     });
 
@@ -753,6 +867,53 @@ $(function(){
 
     $('#editStaffModal').on('shown.bs.modal', function() {
         $(this).find('input[name="fname"]').focus();
+    });
+
+    // ===== ADD STAFF: profile picture (crop to 400x400, store data URL) =====
+    var $addSBox = $('#addStaffPicBox'), $addSImg = $('#addStaffPicImg'),
+        $addSPh = $('#addStaffPicPh'), $addSFile = $('#addStaffPicFile'),
+        $addSData = $('#addStaffPicData'), $addSRemove = $('#addStaffPicRemoveBtn');
+
+    function addSPaint(src) {
+        if (src) {
+            $addSImg.attr('src', src).show();
+            $addSPh.hide();
+            $addSRemove.show();
+        } else {
+            $addSImg.attr('src', '').hide();
+            $addSPh.show();
+            $addSRemove.hide();
+        }
+    }
+    $addSBox.on('click', function () { $addSFile.trigger('click'); });
+    $addSFile.on('change', function () {
+        if (!this.files || !this.files[0]) { return; }
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var img = new Image();
+            img.onload = function () {
+                var side = Math.min(img.width, img.height),
+                    sx = (img.width - side) / 2, sy = (img.height - side) / 2,
+                    canvas = document.createElement('canvas');
+                canvas.width = 400; canvas.height = 400;
+                canvas.getContext('2d').drawImage(img, sx, sy, side, side, 0, 0, 400, 400);
+                var dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                $addSData.val(dataUrl);
+                addSPaint(dataUrl);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(this.files[0]);
+    });
+    $addSRemove.on('click', function () {
+        $addSData.val('');
+        $addSFile.val('');
+        addSPaint('');
+    });
+    $('#addStaffModal').on('hidden.bs.modal', function () {
+        $addSData.val('');
+        $addSFile.val('');
+        addSPaint('');
     });
 });
 </script>

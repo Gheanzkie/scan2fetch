@@ -9,8 +9,25 @@ class TeachersModel extends Model
     protected $table = 'teachers';
     protected $primaryKey = 'id';
     protected $allowedFields = [
-        'fname', 'mname', 'lname', 'phone', 'password', 'password_sent', 'grade_section', 'created_by', 'created_at'
+        'teacher_no', 'fname', 'mname', 'lname', 'phone', 'password', 'password_sent', 'grade_section', 'created_by', 'created_at'
     ];
+
+    /**
+     * Next free teacher ID in the T-#### format (T-1001, T-1002, ...).
+     */
+    public function nextTeacherNo(): string
+    {
+        $db = \Config\Database::connect();
+        $rows = $db->table('teachers')->select('teacher_no')->like('teacher_no', 'T-', 'after')->get()->getResultArray();
+        $max = 1000;
+        foreach ($rows as $r) {
+            $n = (int) preg_replace('/\D+/', '', (string) $r['teacher_no']);
+            if ($n > $max) {
+                $max = $n;
+            }
+        }
+        return 'T-' . ($max + 1);
+    }
 
     public function studentCounts(): array
     {

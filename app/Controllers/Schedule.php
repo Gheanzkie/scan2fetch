@@ -96,7 +96,7 @@ class Schedule extends BaseController
 
         // Releases that day
         $releases = $db->table('fetch_logs')
-            ->select('fetch_logs.*, students.fname AS student_fname, students.lname AS student_lname, students.grade_section, parents.fname AS parent_fname, parents.lname AS parent_lname')
+            ->select('fetch_logs.*, students.fname AS student_fname, students.mname AS student_mname, students.lname AS student_lname, students.grade_section, parents.fname AS parent_fname, parents.mname AS parent_mname, parents.lname AS parent_lname')
             ->join('students', 'students.id = fetch_logs.student_id', 'left')
             ->join('parents', 'parents.id = fetch_logs.parent_id', 'left')
             ->where('DATE(fetch_logs.time_released)', $date)

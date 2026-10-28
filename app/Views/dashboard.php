@@ -7,7 +7,38 @@
  <div class="welcome-banner">
  <div class="row align-items-center">
  <div class="col-md-8">
- <h2>Welcome, <?= ucfirst(session('fname')) ?></h2>
+ <div class="d-flex align-items-center" style="gap:14px;">
+ <?php
+   // Round profile picture for the signed-in user (teacher / staff / parent).
+   helper('photo');
+   $__dashPhoto = '';
+   $__dashRole  = session('role');
+   $__dashUid   = (int) session('user_id');
+   $__dashDb    = \Config\Database::connect();
+   if ($__dashUid > 0) {
+       if ($__dashRole === 'teacher') {
+           $__r = $__dashDb->table('teachers')->select('teacher_no')->where('id', $__dashUid)->get()->getRowArray();
+           if (!empty($__r['teacher_no'])) { $__dashPhoto = teacher_photo_url($__r['teacher_no']); }
+       } elseif ($__dashRole === 'staff') {
+           $__r = $__dashDb->table('staffs')->select('staff_no')->where('id', $__dashUid)->get()->getRowArray();
+           if (!empty($__r['staff_no'])) { $__dashPhoto = staff_photo_url($__r['staff_no']); }
+       } elseif ($__dashRole === 'parent') {
+           $__r = $__dashDb->table('parents')->select('parent_no')->where('id', $__dashUid)->get()->getRowArray();
+           if (!empty($__r['parent_no'])) { $__dashPhoto = parent_photo_url($__r['parent_no']); }
+       }
+   }
+ ?>
+ <div style="width:62px;height:62px;min-width:62px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#4361ee,#7c3aed);display:flex;align-items:center;justify-content:center;border:3px solid rgba(255,255,255,0.55);box-shadow:0 4px 14px rgba(67,97,238,0.25);">
+ <?php if ($__dashPhoto): ?>
+ <img src="<?= esc($__dashPhoto) ?>" alt="Profile picture" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+ <?php else: ?>
+ <i class="fas fa-user" style="color:#fff;font-size:24px;"></i>
+ <?php endif; ?>
+ </div>
+ <div>
+ <h2 class="mb-0">Welcome, <?= ucfirst(session('fname')) ?></h2>
+ </div>
+ </div>
  <p>
  <?php if (session('role') == 'admin'): ?>
                                 Here's your school overview for today.
@@ -152,18 +183,18 @@
  <?php if(!empty($todayReleases)): foreach($todayReleases as $r): ?>
  <tr>
  <td>
- <strong><?= esc($r['student_fname']) ?> <?= esc($r['student_lname']) ?></strong>
+ <strong><?= esc(full_name($r, 'student_')) ?></strong>
  <br><small class="text-muted">#<?= esc($r['student_id']) ?> Â· <?= esc($r['grade_section']) ?></small>
  </td>
  <td>
- <?php $fetcherName = trim((string)($r['fetcher_fname'] ?? '') . ' ' . (string)($r['fetcher_lname'] ?? '')); ?>
+ <?php $fetcherName = full_name($r, 'fetcher_'); ?>
  <?php if (!empty($fetcherName)): ?>
  <?= esc($fetcherName) ?>
  <?php if (!empty($r['fetcher_relation'])): ?>
  <br><small class="text-muted"><?= esc($r['fetcher_relation']) ?></small>
  <?php endif; ?>
  <?php elseif (!empty($r['parent_fname'])): ?>
- <?= esc($r['parent_fname']) ?> <?= esc($r['parent_lname']) ?>
+ <?= esc(full_name($r, 'parent_')) ?>
  <br><small class="text-muted">Parent</small>
  <?php else: ?>
  <span class="text-muted">â€”</span>
@@ -270,7 +301,7 @@
  <img src="<?= base_url('uploads/qr/'.$myQr.'.png') ?>"
  alt="My QR Code"
  style="width:120px;height:120px;cursor:zoom-in;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"
- onclick="openQrModal('<?= base_url('uploads/qr/'.$myQr.'.png') ?>','<?= esc(trim(($parentProfile['fname'] ?? '').' '.($parentProfile['lname'] ?? ''))) ?>')">
+ onclick="openQrModal('<?= base_url('uploads/qr/'.$myQr.'.png') ?>','<?= esc(full_name($parentProfile)) ?>')">
  <?php else: ?>
  <div style="width:120px;height:120px;display:flex;align-items:center;justify-content:center;color:#94a3b8;border:1px solid #e2e8f0;border-radius:10px;">
  <i class="fas fa-qrcode fa-3x"></i>

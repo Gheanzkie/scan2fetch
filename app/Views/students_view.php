@@ -125,6 +125,74 @@ body {
 
 .img-circle { border-radius: 50% !important; transition: all 0.3s ease !important; }
 
+/* ===== PICKUP HISTORY (activity-log layout) ===== */
+.history-filter {
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.85);
+    border-radius: 18px;
+    padding: 16px 18px 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 18px rgba(108,140,255,0.06);
+}
+.history-filter .filter-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+.history-filter .filter-item { flex: 1 1 260px; min-width: 200px; }
+.history-filter .filter-label {
+    display: block; font-size: 11.5px; font-weight: 700; letter-spacing: .03em;
+    text-transform: uppercase; color: #7a7a9a; margin-bottom: 7px;
+}
+.history-filter .form-control {
+    height: 42px !important; border-radius: 11px !important; background: #fff !important;
+    border: 1.5px solid rgba(108,140,255,0.14) !important; font-size: 13.5px !important;
+    color: #2d2d4a !important; padding: 8px 14px !important;
+}
+.history-filter .form-control:focus {
+    border-color: var(--soft-blue) !important;
+    box-shadow: 0 0 0 4px rgba(108,140,255,0.12) !important;
+}
+.history-filter .btn { border-radius: 11px !important; padding: 9px 18px !important; font-size: 13px !important; }
+
+.pickup-table thead th {
+    background: rgba(108,140,255,0.08);
+    color: #5a5280 !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(108,140,255,0.12) !important;
+    border-top: none !important;
+    padding: 12px 14px !important;
+    white-space: nowrap;
+}
+.pickup-table tbody td {
+    padding: 12px 14px !important;
+    font-size: 13px !important;
+    vertical-align: middle !important;
+    border-top: 1px solid rgba(108,140,255,0.06) !important;
+}
+.pickup-table tbody tr:hover { background: rgba(108,140,255,0.04) !important; }
+
+.h-num { color: #b0b0c8 !important; font-weight: 700 !important; font-size: 12px !important; }
+.h-date { font-weight: 700; color: #2d2d4a; white-space: nowrap; font-size: 13px; }
+.h-time { font-size: 11.5px; color: #7a7a9a; font-weight: 500; }
+
+.h-person { display: flex; align-items: center; gap: 12px; }
+.h-avatar {
+    width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--soft-blue), var(--soft-purple));
+    color: #fff; font-weight: 800; font-size: 13px; letter-spacing: .03em;
+    box-shadow: 0 3px 10px rgba(108,140,255,0.25);
+}
+.h-avatar.off { background: rgba(160,160,180,0.18); color: #9a9ab8; box-shadow: none; }
+.h-person-name { font-weight: 700; color: #2d2d4a; font-size: 13.5px; line-height: 1.2; }
+.h-person-name.muted { color: #9a9ab8; font-weight: 600; }
+.h-person-meta {
+    font-size: 11.5px; color: #7a7a9a; margin-top: 3px;
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+}
+.h-person-meta .badge { font-size: 10px !important; padding: 3px 9px !important; border-radius: 50px !important; }
+.h-guardian { font-size: 11px; color: #9a9ab8; margin-top: 2px; }
+
 @media (max-width: 768px) {
     .card-body { padding: 1rem !important; }
     .content-header h1 { font-size: 1.5rem !important; }
@@ -166,24 +234,29 @@ body {
  <div class="col-md-4">
  <div class="card">
  <div class="card-body text-center">
- <div style="width:130px;height:130px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #e2e8f0;background:#f1f5f9;display:flex;align-items:center;justify-content:center;"><i class="fas fa-child fa-3x" style="color: #94a3b8;"></i></div>
- <h3 class="mt-3 mb-0" style="color: #0f172a;"><?= esc($student['fname']) ?> <?= esc($student['lname']) ?></h3>
+ <?php helper('photo'); $__sPhoto = student_photo_url((string) ($student['student_no'] ?? '')); ?>
+ <div style="width:110px;height:110px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #e2e8f0;box-shadow:0 1px 4px rgba(15,23,42,.12);background:#f1f5f9;display:flex;align-items:center;justify-content:center;">
+ <?php if ($__sPhoto): ?>
+ <img src="<?= esc($__sPhoto) ?>" alt="Student picture" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+ <?php else: ?>
+ <i class="fas fa-child fa-3x" style="color: #94a3b8;"></i>
+ <?php endif; ?>
+ </div>
+ <h3 class="mt-3 mb-0" style="color: #0f172a;"><?= esc(full_name($student)) ?></h3>
+ <?php if (!empty($student['student_no'])): ?>
+ <p class="mb-1" style="color: #555577 !important; font-size: 14px; font-weight: 700;">
+ <i class="fas fa-id-card mr-1" style="color: var(--soft-blue);"></i> Student ID: <span style="font-family: ui-monospace, monospace;"><?= esc($student['student_no']) ?></span>
+ </p>
+ <?php endif; ?>
  <p class="text-muted mb-0" style="color: #8888aa !important;"><?= esc($student['grade_section']) ?></p>
  <?php if (!empty($adviser)): ?>
  <p class="mb-0" style="color: #555577 !important; font-size: 14px;">
  <i class="fas fa-chalkboard-teacher mr-1" style="color: var(--soft-blue);"></i>
- <strong>Adviser:</strong> <?= esc(trim(($adviser['fname'] ?? '').' '.($adviser['lname'] ?? ''))) ?>
+ <strong>Adviser:</strong> <?= esc(full_name($adviser)) ?>
  <span style="color:#b0b0c8;">(<?= esc($adviser['grade_section'] ?? '') ?>)</span>
  </p>
  <?php endif; ?>
- <p class="mb-0" id="liveStatusLine" style="font-size: 13px; color: #64748b;">
- <i class="fas fa-sync-alt mr-1" style="color: var(--soft-blue);"></i><span id="liveStatusText">Checking release status…</span>
- </p>
- <p class="text-muted small" style="color: #b0b0c8 !important;"><i class="fas fa-calendar mr-1"></i> <?= date('M d, Y', strtotime($student['created_at'])) ?></p>
- <div class="mt-3">
- <a href="<?= base_url('students-edit/' . $student['id']) ?>" class="btn btn-outline-secondary btn-sm"><i class="fas fa-edit"></i> Edit</a>
- <a href="<?= base_url('students-delete/' . $student['id']) ?>" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this student?')"><i class="fas fa-trash"></i> Delete</a>
- </div>
+ <p class="text-muted small mb-0" style="color: #b0b0c8 !important;"><i class="fas fa-calendar mr-1"></i> <?= date('M d, Y', strtotime($student['created_at'])) ?></p>
  </div>
  </div>
  </div>
@@ -204,7 +277,7 @@ body {
  <div class="img-circle d-flex align-items-center justify-content-center" style="width:55px;height:55px;border:3px solid var(--soft-blue);background:rgba(255,255,255,0.3);"><i class="fas fa-user" style="color: #b0b0c8;"></i></div>
  </div>
  <div class="flex-grow-1">
- <strong style="color: #2d2d4a;"><?= esc($p['fname']) ?> <?= esc($p['lname']) ?></strong>
+ <strong style="color: #2d2d4a;"><?= esc(full_name($p)) ?></strong>
  <br><small style="color: #b0b0c8;"><?= esc($p['relation'] ?? 'Parent') ?> | <?= esc($p['phone']) ?></small>
  </div>
  <?php if(!empty($p['qr_code'])): ?>
@@ -231,10 +304,15 @@ body {
  <?php foreach($subFetchers as $f): ?>
  <div class="d-flex align-items-center border rounded p-3 mb-2" style="border-color: rgba(108,140,255,0.08) !important; border-left: 3px solid var(--soft-green) !important;">
  <div class="mr-3">
+ <?php $__fp = subfetcher_photo_url($f['id'] ?? 0); ?>
+ <?php if ($__fp): ?>
+ <img src="<?= esc($__fp) ?>" alt="" class="img-circle" style="width:50px;height:50px;object-fit:cover;border:2px solid var(--soft-green);">
+ <?php else: ?>
  <div class="img-circle d-flex align-items-center justify-content-center" style="width:50px;height:50px;border:2px solid var(--soft-green);background:rgba(255,255,255,0.3);"><i class="fas fa-user" style="color: #b0b0c8;"></i></div>
+ <?php endif; ?>
  </div>
  <div class="flex-grow-1">
- <strong style="color: #2d2d4a;"><?= esc($f['fname']) ?> <?= esc($f['lname']) ?></strong>
+ <strong style="color: #2d2d4a;"><?= esc(full_name($f)) ?></strong>
  <br><small style="color: #b0b0c8;">Fetcher | <?= esc($f['phone']) ?></small>
  </div>
  <?php if(!empty($f['qr_code'])): ?>
@@ -250,6 +328,130 @@ body {
 
  </div>
  </div>
+
+ <!-- ===== PICKUP HISTORY (activity-log layout) ===== -->
+ <div class="row mt-3">
+ <div class="col-12">
+
+ <div class="history-filter">
+ <form method="get" action="<?= base_url('students-view/'.$student['id']) ?>">
+ <div class="filter-row">
+ <div class="filter-item">
+ <label class="filter-label"><i class="fas fa-search mr-1"></i> Search</label>
+ <input type="text" name="q" class="form-control form-control-sm"
+        placeholder="Search fetcher, guardian, session, method or staff..."
+        value="<?= esc($search ?? '') ?>">
+ </div>
+ <div class="filter-item" style="flex:0 0 230px;">
+ <label class="filter-label"><i class="fas fa-calendar-day mr-1"></i> Date</label>
+ <input type="date" name="date" class="form-control form-control-sm" value="<?= esc($selectedDate ?? '') ?>">
+ </div>
+ <div class="filter-item" style="flex:0 0 auto;">
+ <label class="filter-label">&nbsp;</label>
+ <div style="display:flex; gap:8px;">
+ <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-filter mr-1"></i> Apply</button>
+ <a href="<?= base_url('students-view/'.$student['id']) ?>" class="btn btn-outline-secondary btn-sm"><i class="fas fa-times mr-1"></i> Reset</a>
+ </div>
+ </div>
+ </div>
+ </form>
+ </div>
+
+ <div class="card">
+ <div class="card-header pt-3 pb-2">
+ <div class="d-flex justify-content-between align-items-center flex-wrap">
+ <h5 class="mb-0">
+ <i class="fas fa-history mr-2" style="color: var(--soft-blue);"></i>Pickup History
+ <span class="badge" style="background: rgba(160,160,180,0.1); color: #7a7a9a; margin-left: 8px; font-weight: 600; font-size: 12px; padding: 6px 14px;"><?= count($historyRows ?? []) ?></span>
+ </h5>
+ <?php if (!empty($historyRows)): ?>
+ <div style="font-size: 12px; color: #7a7a9a;">
+ <i class="fas fa-arrow-down"></i> Latest pickup first
+ </div>
+ <?php endif; ?>
+ </div>
+ </div>
+ <div class="card-body p-0">
+ <div class="table-responsive">
+ <table class="table table-hover mb-0 pickup-table">
+ <thead>
+ <tr>
+ <th style="width:45px;">#</th>
+ <th style="width:165px;">Date / Time</th>
+ <th style="width:115px;">Session</th>
+ <th>Fetched By (Profile)</th>
+ <th style="width:105px;">Method</th>
+ <th style="width:150px;">Released By</th>
+ </tr>
+ </thead>
+ <tbody>
+ <?php if (!empty($historyRows)): $hi = 1; foreach ($historyRows as $h): ?>
+ <?php
+   $fetcherName = $h['fetcher'] ?? '';
+   $parts = preg_split('/\s+/', trim((string) $fetcherName));
+   $initials = strtoupper(mb_substr($parts[0] ?? '', 0, 1) . mb_substr($parts[1] ?? '', 0, 1));
+ ?>
+ <tr>
+ <td class="h-num"><?= $hi++ ?></td>
+ <td>
+ <div class="h-date"><?= date('M d, Y', strtotime($h['date'])) ?></div>
+ <div class="h-time"><?= esc($h['time']) ?></div>
+ </td>
+ <td>
+ <?php if (($h['session'] ?? '') === 'morning'): ?>
+ <span class="badge" style="background:rgba(255,183,77,0.22);color:#8a6420;"><i class="fas fa-sun mr-1"></i>Morning</span>
+ <?php elseif (($h['session'] ?? '') === 'afternoon'): ?>
+ <span class="badge" style="background:rgba(108,140,255,0.18);color:#3b4a9e;"><i class="fas fa-cloud-sun mr-1"></i>Afternoon</span>
+ <?php else: ?>
+ <span class="badge" style="background:rgba(160,160,180,0.12);color:#7a7a9a;"><?= esc(ucfirst((string) ($h['session'] ?? 'unspecified'))) ?></span>
+ <?php endif; ?>
+ </td>
+ <td>
+ <div class="h-person">
+ <?php if (!empty($h['fetcher_photo'])): ?>
+ <div class="h-avatar" style="padding:0;overflow:hidden;background:transparent;">
+ <img src="<?= esc($h['fetcher_photo']) ?>" alt="<?= esc($fetcherName) ?>" style="width:100%;height:100%;object-fit:cover;border-radius:50%;cursor:zoom-in;"
+ onclick="openImageViewer('<?= esc($h['fetcher_photo']) ?>','<?= esc($fetcherName) ?>')">
+ </div>
+ <?php else: ?>
+ <div class="h-avatar"><?= esc($initials ?: '?') ?></div>
+ <?php endif; ?>
+ <div>
+ <div class="h-person-name"><?= esc($fetcherName ?: 'Unnamed fetcher') ?></div>
+ <div class="h-person-meta">
+ <span class="badge" style="background:rgba(108,140,255,0.14);color:#3b4a9e;"><?= esc($h['relation'] ?: 'Fetcher') ?></span>
+ <?php if (!empty($h['guardian_phone'])): ?>
+ <span><i class="fas fa-phone" style="color:#9a9ab8;"></i> <?= esc($h['guardian_phone']) ?></span>
+ <?php endif; ?>
+ <?php if (!empty($h['guardian_no'])): ?>
+ <span><i class="fas fa-id-card" style="color:#9a9ab8;"></i> <?= esc($h['guardian_no']) ?></span>
+ <?php endif; ?>
+ </div>
+ <?php if (!empty($h['guardian']) && strcasecmp($h['guardian'], $fetcherName) !== 0): ?>
+ <div class="h-guardian">Guardian account: <?= esc($h['guardian']) ?></div>
+ <?php endif; ?>
+ </div>
+ </div>
+ </td>
+ <td>
+ <?php if (!empty($h['method'])): ?>
+ <span class="badge" style="background:rgba(160,160,180,0.12);color:#5a5a7a;"><?= esc($h['method']) ?></span>
+ <?php else: ?>
+ <span class="h-time">—</span>
+ <?php endif; ?>
+ </td>
+ <td><?= !empty($h['staff']) ? esc($h['staff']) : '<span class="h-time">—</span>' ?></td>
+ </tr>
+ <?php endforeach; ?>
+ <?php endif; ?>
+ </tbody>
+ </table>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
  </div>
  </section>
 </div>
@@ -311,25 +513,5 @@ function openQrModal(u) {
     $('#qrDownloadBtn').attr('href', u);
     $('#qrModal').modal('show');
 }
-
-// ===== LIVE RELEASE STATUS (3s poll — updates without page refresh) =====
-var LIVE_SID = <?= (int)$student['id'] ?>;
-function pollLiveStatus(){
-  fetch('<?= base_url('students/live') ?>', {credentials:'same-origin'})
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    if(!d || !d.success) return;
-    var t = d.released[String(LIVE_SID)];
-    var el = document.getElementById('liveStatusText');
-    if (!el) return;
-    if (t) {
-      el.innerHTML = '<span class="badge" style="background:#dcfce7;color:#166534;font-size:11px;">&#10003; Released today at ' + t + '</span>';
-    } else {
-      el.innerHTML = '<span class="badge" style="background:#ffedd5;color:#9a3412;font-size:11px;">Not yet picked up</span>';
-    }
-  }).catch(function(){});
-}
-pollLiveStatus();
-setInterval(pollLiveStatus, 3000);
 </script>
 <?= $this->endSection() ?>

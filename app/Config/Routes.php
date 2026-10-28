@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use CodeIgniter\Router\RouteCollection;
 
@@ -21,9 +21,9 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
  $routes->get('students/live', 'Students::liveStatus');
     $routes->get('register', 'Students::add');
     $routes->get('students-view/(:num)', 'Students::view/$1');
-    $routes->get('students-edit/(:num)', 'Students::edit/$1');
     $routes->post('students-save', 'Students::save');
     $routes->post('students-import', 'Students::importExcel');
+    $routes->post('students-import-zip', 'Students::importZip');
     $routes->post('students-update', 'Students::update');
     $routes->get('students-delete/(:num)', 'Students::delete/$1');
     $routes->get('students-delete-all', 'Students::deleteAll');
@@ -33,7 +33,6 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     // ===== PARENTS =====
     $routes->get('parents', 'Parents::index');
     $routes->get('parents-view/(:num)', 'Parents::view/$1');
-    $routes->get('parents-edit/(:num)', 'Parents::edit/$1');
     $routes->post('parents-save', 'Parents::save');
     $routes->post('parents-update', 'Parents::update');
     $routes->get('parents-delete/(:num)', 'Parents::delete/$1');
@@ -108,7 +107,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('schedule/save', 'Schedule::save');
     $routes->post('schedule/save-sessions', 'Schedule::saveSessions');
     // Session switch lives here now (admin-only via schedule ACL) since
-    // /scan/* is staff-only — scan/set-session is kept for staff use too.
+    // /scan/* is staff-only â€” scan/set-session is kept for staff use too.
     $routes->post('schedule/set-session', 'Scan::setSession');
 
     // ===== ACTIVITY LOGS =====

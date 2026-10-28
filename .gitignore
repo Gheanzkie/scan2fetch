@@ -1,5 +1,21 @@
 writable/session/*
 writable/debugbar/*
 writable/logs/*
+
+# Runtime uploads — real people's photos and QR images must never be committed
 public/uploads/qr/*
 public/uploads/parents/*
+public/uploads/students/*
+public/uploads/teachers/*
+public/uploads/staffs/*
+public/uploads/subfetchers/*
+!public/uploads/*/.gitkeep
+
+# Root-level uploads junction/symlink used by this XAMPP install
+/uploads/
+
+# Imported archives kept only on disk
+public/uploads/*_source.zip
+
+# Excel/Word lock files
+~$*

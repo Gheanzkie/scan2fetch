@@ -1,4 +1,4 @@
-<?= $this->extend('theme/template') ?>
+﻿<?= $this->extend('theme/template') ?>
 <?= $this->section('content') ?>
 
 <style>
@@ -130,7 +130,7 @@ body {
 
 .breadcrumb-item + .breadcrumb-item::before {
     color: #c0c0d8 !important;
-    content: "›" !important;
+    content: "º" !important;
 }
 
 .content-header h1 {
@@ -460,6 +460,23 @@ label .text-danger { color: #dc2626 !important; }
     .btn { font-size: 12px !important; padding: 8px 16px !important; }
     .action-bar { border-radius: 24px; }
 }
+.reg-step { display:flex; align-items:center; gap:10px; margin-bottom:14px; }\n.reg-step-num { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:#fff; background:linear-gradient(135deg, var(--soft-blue), var(--soft-purple)); box-shadow:0 3px 10px rgba(63,43,150,0.22); }\n.reg-step-txt { font-size:12px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:#5a5280; }\n.reg-step-sub { font-size:11.5px; color:#9a9ab8; font-weight:600; }\n\n/* ===== MINIMAL PROFILE PICTURE PICKER ===== */
+.reg-avatar {
+    position: relative; width: 92px; height: 92px; margin: 0 auto;
+    border-radius: 50%; overflow: hidden; cursor: pointer;
+    background: #eef2ff; border: 3px solid rgba(108,140,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .2s ease, transform .15s ease;
+}
+.reg-avatar:hover { border-color: var(--soft-blue); transform: scale(1.03); }
+.reg-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+.reg-avatar-placeholder { font-size: 30px; color: #a5b4fc; }
+.reg-avatar-overlay {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 4px 0;
+    background: rgba(63,43,150,0.72); color: #fff; font-size: 10.5px;
+    font-weight: 700; text-align: center; opacity: 0; transition: opacity .2s ease;
+}
+.reg-avatar:hover .reg-avatar-overlay { opacity: 1; }
 </style>
 
 <div class="content-wrapper" style="background: transparent;">
@@ -518,6 +535,7 @@ label .text-danger { color: #dc2626 !important; }
  <ul class="small mb-1" style="color: var(--muted);">
  <li>Required columns: Student First Name, Student Last Name, Parent First Name, Parent Last Name, Parent Phone</li>
  <li>Optional: Student Middle Name, Grade & Section, Parent Middle Name, Parent Relation</li>
+ <li>Also required: <strong>Student ID</strong> (col J) and <strong>Parent/Fetcher ID</strong> (col K, must start with P-)</li>
  </ul>
  </div>
  <div class="col-md-5">
@@ -540,7 +558,49 @@ label .text-danger { color: #dc2626 !important; }
  </div>
  </div>
 
- <!-- ===== REGISTRATION FORM ===== -->
+ <!-- ===== ZIP IMPORT (below the Excel import) ===== -->
+ <div class="card mb-3">
+ <div class="card-header pt-3">
+ <h5 class="mb-0">
+ <i class="fas fa-file-zipper mr-2" style="color: var(--soft-blue);"></i>
+                                    ZIP Import
+ </h5>
+ </div>
+ <div class="card-body">
+ <div class="row align-items-center">
+ <div class="col-md-7">
+ <p class="mb-1" style="color: var(--muted); font-size: 13.5px;">
+ <i class="fas fa-info-circle mr-1" style="color: var(--soft-blue);"></i>
+                                        Upload a <strong>.zip</strong> archive and the system extracts it automatically.
+ </p>
+ <ul class="small mb-1" style="color: var(--muted);">
+ <li>Files are extracted to <code>public/uploads/&lt;zip-name&gt;/</code></li>
+ <li>Example: <code>grade1-photos.zip</code> â†’ <code>uploads/grade1-photos/</code></li>
+ <li>Sub-folders inside the ZIP are kept; hidden/system files are skipped.</li>
+ <li>Only images and documents — the archive is never executed.</li>
+ </ul>
+ </div>
+ <div class="col-md-5">
+ <form action="<?= base_url('students-import-zip') ?>" method="post" enctype="multipart/form-data" id="zipForm">
+ <?= csrf_field() ?>
+ <div class="input-group">
+ <div class="custom-file">
+ <input type="file" class="custom-file-input" name="zip_file" id="zipFileInput" accept=".zip,application/zip" required>
+ <label class="custom-file-label" for="zipFileInput" id="zipFileLabel">Choose .zip file</label>
+ </div>
+ <div class="input-group-append">
+  <button type="submit" class="btn btn-kid-primary btn-sm" id="zipBtn">
+  <i class="fas fa-upload mr-1"></i> Import ZIP
+  </button>
+  </div>
+  </div>
+  </form>
+  </div>
+  </div>
+  </div>
+  </div>
+
+  <!-- ===== REGISTRATION FORM ===== -->
  <div id="registrationFormContainer">
  <form action="<?= base_url('students-save') ?>" method="post" enctype="multipart/form-data" id="registrationForm">
  <?= csrf_field() ?>
@@ -558,10 +618,42 @@ label .text-danger { color: #dc2626 !important; }
  </div>
   <div class="card-body">
 
+  <div class="reg-step">
+  <span class="reg-step-num">1</span>
+  <div>
+  <div class="reg-step-txt">Step 1 &mdash; Student</div>
+  <div class="reg-step-sub">Who is being enrolled</div>
+  </div>
+  </div>
+
   <!-- ===== REPEATER: one .student-block per student, all sharing 1 parent + fetchers ===== -->
   <div id="studentBlocks">
 
   <div class="student-block" data-index="0" style="position:relative;">
+
+  <!-- ===== Student profile picture (optional, minimal) ===== -->
+  <div class="reg-avatar-wrap text-center mb-3">
+  <div class="reg-avatar" title="Click to add or change the picture">
+  <img class="reg-avatar-img" src="" alt="" style="display:none;">
+  <span class="reg-avatar-placeholder"><i class="fas fa-camera"></i></span>
+  <span class="reg-avatar-overlay">Add picture</span>
+  </div>
+  <input type="file" class="reg-avatar-file" accept="image/*" style="display:none;">
+  <input type="hidden" name="student_picture_data[]" class="reg-avatar-data" value="">
+  <input type="hidden" name="student_picture_remove[]" class="reg-avatar-remove" value="0">
+  <div>
+  <button type="button" class="btn btn-link btn-sm reg-avatar-remove-btn" style="display:none; color:#b23c4d; padding:0; font-size:12px;">
+  <i class="fas fa-trash-alt mr-1"></i>Remove picture
+  </button>
+  </div>
+  </div>
+
+  <!-- Student ID (manual, not auto-generated) -->
+  <div class="form-group">
+  <label>Student ID <span class="text-danger">*</span></label>
+  <input type="text" name="student_no[]" class="form-control student-no" placeholder="1001" inputmode="numeric" maxlength="20" required>
+  <small class="text-muted" style="font-size:10px;">Number printed on the student's record — used as the photo filename.</small>
+  </div>
 
   <!-- Student Name -->
   <div class="row">
@@ -635,16 +727,24 @@ label .text-danger { color: #dc2626 !important; }
  </div>
  </div>
 
- <!-- ===== RIGHT COLUMN: PARENTS & FETCHERS ===== -->
+ <!-- ===== RIGHT COLUMN: PARENT / GUARDIAN ===== -->
  <div class="col-md-7" id="section-guardians">
  <div class="card">
  <div class="card-header pt-3">
  <h5 class="mb-0">
  <i class="fas fa-users mr-2" style="color: var(--soft-green);"></i>
-                                        Parents & Fetchers
+                                        Parent / Guardian
  </h5>
  </div>
  <div class="card-body">
+
+ <div class="reg-step">
+ <span class="reg-step-num">2</span>
+ <div>
+ <div class="reg-step-txt">Step 2 &mdash; Parent / Guardian</div>
+ <div class="reg-step-sub">Who is allowed to fetch the child</div>
+ </div>
+ </div>
 
  <!-- Parent 1 (Required) -->
  <div class="guardian-box box-parent mb-3">
@@ -652,6 +752,29 @@ label .text-danger { color: #dc2626 !important; }
  <span class="badge badge-success"> Required</span>
  <i class="fas fa-user mr-1"></i> Parent / Guardian
  </h6>
+
+ <!-- ===== Parent profile picture (optional, minimal) ===== -->
+ <div class="reg-avatar-wrap text-center mb-2">
+ <div class="reg-avatar" title="Click to add or change the picture">
+ <img class="reg-avatar-img" src="" alt="" style="display:none;">
+ <span class="reg-avatar-placeholder"><i class="fas fa-camera"></i></span>
+ <span class="reg-avatar-overlay">Add picture</span>
+ </div>
+ <input type="file" class="reg-avatar-file" accept="image/*" style="display:none;">
+ <input type="hidden" name="parent_picture_data[]" class="reg-avatar-data" value="">
+ <input type="hidden" name="parent_picture_remove[]" class="reg-avatar-remove" value="0">
+ <div>
+ <button type="button" class="btn btn-link btn-sm reg-avatar-remove-btn" style="display:none; color:#b23c4d; padding:0; font-size:12px;">
+ <i class="fas fa-trash-alt mr-1"></i>Remove picture
+ </button>
+ </div>
+ </div>
+
+ <div class="form-group mb-2">
+ <label class="small">Parent / Fetcher ID <span class="text-danger">*</span></label>
+ <input type="text" name="parent_no[]" class="form-control form-control-sm parent-no" placeholder="P-1001" maxlength="20" required>
+ <small class="text-muted" style="font-size:10px;">Same number as the student, prefixed with P- (e.g. P-1001).</small>
+ </div>
 
  <div class="row">
  <div class="col-4">
@@ -668,77 +791,28 @@ label .text-danger { color: #dc2626 !important; }
  </div>
  </div>
  <div class="row mt-2">
- <div class="col-12">
+ <div class="col-7">
  <label class="small"> Phone Number <span class="text-danger">*</span></label>
  <div class="input-group input-group-sm">
  <input type="text" name="parent_phone[]" class="form-control" placeholder="09XXXXXXXXX" required>
  </div>
  </div>
- </div>
- <input type="hidden" name="parent_relation[]" value="Parent">
- </div>
-
- <!-- Fetcher 1 (Optional) -->
- <div class="guardian-box box-fetcher mb-3">
- <h6 class="mb-3">
- <span class="badge badge-info"> Optional</span>
- <i class="fas fa-user-friends mr-1"></i> Fetcher 1
- </h6>
-
- <div class="row">
- <div class="col-4">
- <label class="small">First Name</label>
- <input type="text" name="fetcher_fname[]" class="form-control form-control-sm" placeholder="Juan">
- </div>
- <div class="col-4">
- <label class="small">Middle Name</label>
- <input type="text" name="fetcher_mname[]" class="form-control form-control-sm" placeholder="Dela">
- </div>
- <div class="col-4">
- <label class="small">Last Name</label>
- <input type="text" name="fetcher_lname[]" class="form-control form-control-sm" placeholder="Cruz">
+ <div class="col-5">
+ <label class="small">Relation <span class="text-danger">*</span></label>
+ <select name="parent_relation[]" class="form-control form-control-sm" required>
+ <option value="Parent" selected>Parent</option>
+ <option value="Mother">Mother</option>
+ <option value="Father">Father</option>
+ <option value="Guardian">Guardian</option>
+ <option value="Grandparent">Grandparent</option>
+ <option value="Sibling">Sibling</option>
+ <option value="Relative">Relative</option>
+ <option value="Driver">Driver</option>
+ <option value="Nanny">Nanny</option>
+ <option value="Others">Others</option>
+ </select>
  </div>
  </div>
- <div class="row mt-2">
- <div class="col-6">
- <label class="small"> Phone Number</label>
- <div class="input-group input-group-sm">
- <input type="text" name="fetcher_phone[]" class="form-control" placeholder="09XXXXXXXXX">
- </div>
- </div>
- </div>
- </div>
-
- <!-- Fetcher 2 (Optional) -->
- <div class="guardian-box box-fetcher-alt mb-2">
- <h6 class="mb-3">
- <span class="badge badge-warning"> Optional</span>
- <i class="fas fa-user-friends mr-1"></i> Fetcher 2
- </h6>
-
- <div class="row">
- <div class="col-4">
- <label class="small">First Name</label>
- <input type="text" name="fetcher_fname[]" class="form-control form-control-sm" placeholder="Pedro">
- </div>
- <div class="col-4">
- <label class="small">Middle Name</label>
- <input type="text" name="fetcher_mname[]" class="form-control form-control-sm" placeholder="Santos">
- </div>
- <div class="col-4">
- <label class="small">Last Name</label>
- <input type="text" name="fetcher_lname[]" class="form-control form-control-sm" placeholder="Dela Cruz">
- </div>
- </div>
- <div class="row mt-2">
- <div class="col-6">
- <label class="small"> Phone Number</label>
- <div class="input-group input-group-sm">
- <input type="text" name="fetcher_phone[]" class="form-control" placeholder="09XXXXXXXXX">
- </div>
- </div>
- </div>
- <input type="hidden" name="fetcher_picture[]">
  </div>
 
  <div class="alert alert-warning mt-3 mb-0">
@@ -805,7 +879,7 @@ label .text-danger { color: #dc2626 !important; }
  <?php endif; ?>
  </div>
  <div>
- <strong><?= esc($p['fname']) ?> <?= esc($p['lname']) ?></strong>
+ <strong><?= esc(full_name($p)) ?></strong>
  <span class="badge badge-info ml-2"><?= esc($p['relation']) ?></span>
  <br>
  <small><?= esc($p['qr_code'] ?? '') ?></small>
@@ -837,7 +911,7 @@ label .text-danger { color: #dc2626 !important; }
  <?php endif; ?>
  </div>
  <div>
- <strong><?= esc($f['fname']) ?> <?= esc($f['lname']) ?></strong>
+ <strong><?= esc(full_name($f)) ?></strong>
  <br>
  <small><?= esc($f['qr_code'] ?? '') ?></small>
  </div>
@@ -898,6 +972,12 @@ $(function(){
         $clone.find('input[type=text]').val('');
         $clone.find('select').prop('selectedIndex', 0);
         $clone.find('input[type=file]').val('');
+        $clone.find('.reg-avatar-data').val('');
+        $clone.find('.reg-avatar-remove').val('0');
+        $clone.find('.reg-avatar-img').attr('src', '').hide();
+        $clone.find('.reg-avatar-placeholder').show();
+        $clone.find('.reg-avatar-overlay').text('Add picture');
+        $clone.find('.reg-avatar-remove-btn').hide();
 
         // Remove button (never on the first block)
         $clone.find('.remove-student').remove();
@@ -920,6 +1000,20 @@ $(function(){
         if ($('.student-block').length <= 1) return;
         $(this).closest('.student-block').remove();
         refreshStudentBlockLabels();
+    });
+
+    // Manual ID helpers: Student ID digits only, Parent ID always P-<number>.
+    $(document).on('input', 'input.student-no', function(){
+        this.value = this.value.replace(/[^0-9A-Za-z-]/g, '');
+    });
+    $(document).on('blur', 'input.parent-no', function(){
+        var v = (this.value || '').toUpperCase().replace(/\s+/g, '');
+        if (v === '') { return; }
+        var m = v.match(/(\d+)$/);
+        this.value = m ? ('P-' + m[1]) : (v.indexOf('P-') === 0 ? v : 'P-' + v);
+    });
+    $(document).on('blur', 'input.student-no', function(){
+        this.value = (this.value || '').trim();
     });
 
     function refreshStudentBlockLabels(){
@@ -958,7 +1052,7 @@ $(function(){
         var parentPhone = $('input[name="parent_phone[]"]').first().val().trim();
 
         if (!parentFname || !parentLname || !parentPhone) {
-            alert(' Please fill in all required parent/guardian fields. ‍');
+            alert(' Please fill in all required parent/guardian fields. ');
             e.preventDefault();
             return;
         }
@@ -976,6 +1070,62 @@ $(function(){
         $('#importBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Importing...');
     });
 
+    // ===== MINIMAL PROFILE PICTURE (student / parent) =====
+    $(document).on('click', '.reg-avatar', function () {
+        $(this).closest('.reg-avatar-wrap').find('.reg-avatar-file').trigger('click');
+    });
+
+    $(document).on('change', '.reg-avatar-file', function () {
+        var input = this;
+        var $wrap = $(this).closest('.reg-avatar-wrap');
+        if (!input.files || !input.files[0]) return;
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var img = new Image();
+            img.onload = function () {
+                var max = 512;
+                var side = Math.min(img.width, img.height);
+                var canvas = document.createElement('canvas');
+                canvas.width = max; canvas.height = max;
+                var ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, max, max);
+                ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, max, max);
+                var data = canvas.toDataURL('image/jpeg', 0.9);
+
+                $wrap.find('.reg-avatar-img').attr('src', data).show();
+                $wrap.find('.reg-avatar-placeholder').hide();
+                $wrap.find('.reg-avatar-overlay').text('Change');
+                $wrap.find('.reg-avatar-data').val(data);
+                $wrap.find('.reg-avatar-remove').val('0');
+                $wrap.find('.reg-avatar-remove-btn').show();
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    });
+
+    $(document).on('click', '.reg-avatar-remove-btn', function () {
+        var $wrap = $(this).closest('.reg-avatar-wrap');
+        $wrap.find('.reg-avatar-file').val('');
+        $wrap.find('.reg-avatar-img').attr('src', '').hide();
+        $wrap.find('.reg-avatar-placeholder').show();
+        $wrap.find('.reg-avatar-overlay').text('Add picture');
+        $wrap.find('.reg-avatar-data').val('');
+        $wrap.find('.reg-avatar-remove').val('1');
+        $(this).hide();
+    });
+
+    // ===== ZIP IMPORT =====
+    $('#zipFileInput').on('change', function(){
+        var name = this.files && this.files[0] ? this.files[0].name : 'Choose .zip file';
+        $('#zipFileLabel').text(name);
+    });
+
+    $('#zipForm').on('submit', function(){
+        $('#zipBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Extracting...');
+    });
+
     // ===== SHOW SUCCESS MODAL =====
  <?php if(session()->getFlashdata('showResult') && session()->getFlashdata('registration_success')): ?>
     // Modal is already shown with class "show"
@@ -986,7 +1136,7 @@ $(function(){
         $('#resultModal').removeClass('show');
         $('.modal-backdrop').remove();
         $('body').removeClass('modal-open');
-        window.location.href = '<?= base_url('students') ?>';
+        window.location.href = '<?= base_url('register') ?>';
     });
  <?php endif; ?>
 });

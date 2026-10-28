@@ -680,14 +680,14 @@ $(function() {
                 $('#qrResult').html('<span style="color: var(--soft-green); font-weight: bold;"><i class="fas fa-check-circle mr-1"></i> Auto-releasing...</span>');
 
                 var p = res.parent, f = res.fetcher;
-                var fetcherName = p.fname + ' ' + p.lname;
+                var fetcherName = [p.fname, p.mname, p.lname].filter(Boolean).join(' ');
                 if (f && f.type === 'Sub-Fetcher') {
-                    fetcherName = f.fname + ' ' + f.lname;
+                    fetcherName = [f.fname, f.mname, f.lname].filter(Boolean).join(' ');
                 }
 
                 // Update fetcher / parent profile
                 if (f && f.type === 'Sub-Fetcher') {
-                    $('#parentName').text(f.fname + ' ' + f.lname);
+                    $('#parentName').text([f.fname, f.mname, f.lname].filter(Boolean).join(' '));
                     $('#parentPhone').html('<i class="fas fa-phone mr-1"></i> ' + f.phone);
                     $('#fetcherType').text('Sub-Fetcher').removeClass('badge-info badge-success').addClass('badge-warning').show();
                     if (f.picture) {
@@ -698,7 +698,7 @@ $(function() {
                         $('#parentNoPic').show();
                     }
                 } else {
-                    $('#parentName').text(p.fname + ' ' + p.lname);
+                    $('#parentName').text([p.fname, p.mname, p.lname].filter(Boolean).join(' '));
                     $('#parentPhone').html('<i class="fas fa-phone mr-1"></i> ' + p.phone);
                     $('#fetcherType').text('Main Parent').removeClass('badge-warning badge-success').addClass('badge-info').show();
                     if (p.picture) {
@@ -729,16 +729,16 @@ $(function() {
                         html += '<div class="mr-3">';
                         html += '<div class="img-circle d-flex align-items-center justify-content-center" style="width:56px;height:56px;border:3px solid rgba(129,199,132,0.35);background:rgba(129,199,132,0.10);"><i class="fas fa-child" style="color: var(--soft-green); font-size:22px;"></i></div>';
                         html += '</div>';
-                        html += '<div class="flex-grow-1"><strong style="font-size:1.05rem; color: var(--ink);">' + s.fname + ' ' + s.lname + '</strong><br><span class="badge badge-light" style="font-size:12px; padding:5px 12px;">' + (s.grade_section || 'N/A') + '</span></div>';
+                        html += '<div class="flex-grow-1"><strong style="font-size:1.05rem; color: var(--ink);">' + [s.fname, s.mname, s.lname].filter(Boolean).join(' ') + '</strong><br><span class="badge badge-light" style="font-size:12px; padding:5px 12px;">' + (s.grade_section || 'N/A') + '</span></div>';
 
                         if (isMulti) {
                             html += '<div class="text-right mr-3">';
                             html += '<input type="checkbox" class="student-check" id="chk_' + sid + '" value="' + sid + '" checked style="width:22px;height:22px;cursor:pointer;">';
                             html += '<label for="chk_' + sid + '" style="display:block;font-size:11px;margin-top:4px;cursor:pointer;color:var(--muted);">Select</label>';
                             html += '</div>';
-                            html += '<span class="badge badge-secondary released-badge" data-student-id="' + sid + '" data-name="' + s.fname + ' ' + s.lname + '" style="background:#90a4ae;"><i class="fas fa-clock mr-1"></i>Pending</span>';
+                            html += '<span class="badge badge-secondary released-badge" data-student-id="' + sid + '" data-name="' + [s.fname, s.mname, s.lname].filter(Boolean).join(' ') + '" style="background:#90a4ae;"><i class="fas fa-clock mr-1"></i>Pending</span>';
                         } else {
-                            html += '<span class="badge badge-success released-badge" data-student-id="' + sid + '" data-name="' + s.fname + ' ' + s.lname + '"><i class="fas fa-check-circle mr-1"></i>Released</span>';
+                            html += '<span class="badge badge-success released-badge" data-student-id="' + sid + '" data-name="' + [s.fname, s.mname, s.lname].filter(Boolean).join(' ') + '"><i class="fas fa-check-circle mr-1"></i>Released</span>';
                         }
                         html += '</div>';
                     });

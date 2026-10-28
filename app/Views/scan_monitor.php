@@ -714,16 +714,35 @@ html.theme-dark .sms-mode-panel { background: #1e293b; border-color: #334155; }
   <?php $i = 1; foreach($releasedStudents as $r): ?>
   <tr>
   <td style="color:var(--faint);"><?= $i++ ?></td>
-  <td>
-  <strong>
-  <?= esc($r['student_fname']) ?> <?= esc($r['student_lname']) ?>
-  </strong>
-  </td>
+ <td>
+ <?php helper('photo'); $__rp = student_photo_url((string) ($r['student_no'] ?? '')); ?>
+ <div class="d-flex align-items-center" style="gap:8px;">
+ <?php if ($__rp): ?>
+ <img src="<?= esc($__rp) ?>" alt="" class="avatar-round" style="width:32px;height:32px;min-width:32px;border-radius:50%;object-fit:cover;border:2px solid rgba(108,140,255,.25);">
+ <?php else: ?>
+ <span style="display:inline-flex;width:32px;height:32px;min-width:32px;border-radius:50%;background:rgba(168,192,255,.2);color:#5a5280;align-items:center;justify-content:center;font-size:11px;font-weight:700;"><?= esc(strtoupper(mb_substr($r['student_fname'] ?? '', 0, 1) . mb_substr($r['student_lname'] ?? '', 0, 1))) ?></span>
+ <?php endif; ?>
+ <strong>
+ <?= esc(full_name($r, 'student_')) ?>
+ </strong>
+ </div>
+ </td>
   <td><span class="badge badge-light"><?= esc($r['grade_section']) ?></span></td>
-  <td style="font-size:12px;">
-  <?= esc($r['fetcher_fname']) ?> <?= esc($r['fetcher_lname']) ?>
-  <br><small style="color:var(--muted);"><?= esc($r['fetcher_relation'] ?? 'Parent') ?></small>
-  </td>
+ <td style="font-size:12px;">
+ <div class="d-flex align-items-center" style="gap:8px;">
+ <?php if (!empty($r['fetcher_photo'])): ?>
+ <img src="<?= esc($r['fetcher_photo']) ?>" alt="<?= esc(full_name($r, 'fetcher_')) ?>" class="avatar-round"
+ style="width:28px;height:28px;min-width:28px;border-radius:50%;object-fit:cover;border:2px solid rgba(108,140,255,.25);cursor:zoom-in;"
+ onclick="showPhoto('<?= esc($r['fetcher_photo']) ?>','<?= esc(full_name($r, 'fetcher_')) ?>')">
+ <?php else: ?>
+ <span style="display:inline-flex;width:28px;height:28px;min-width:28px;border-radius:50%;background:rgba(168,192,255,.2);color:#5a5280;align-items:center;justify-content:center;font-size:10px;font-weight:700;"><?= esc(strtoupper(mb_substr($r['fetcher_fname'] ?? '', 0, 1) . mb_substr($r['fetcher_lname'] ?? '', 0, 1))) ?></span>
+ <?php endif; ?>
+ <div>
+ <?= esc(full_name($r, 'fetcher_')) ?>
+ <br><small style="color:var(--muted);"><?= esc($r['fetcher_relation'] ?? 'Parent') ?></small>
+ </div>
+ </div>
+ </td>
   <td>
   <?php if (!empty($r['session_type'])): ?>
    <span class="badge <?= $r['session_type'] === 'morning' ? 'badge-warning' : 'badge-primary' ?>">
@@ -896,9 +915,17 @@ html.theme-dark .sms-mode-panel { background: #1e293b; border-color: #334155; }
  <tr>
  <td style="color:var(--faint);"><?= $i++ ?></td>
  <td>
+ <?php helper('photo'); $__pp = student_photo_url((string) ($s['student_no'] ?? '')); ?>
+ <div class="d-flex align-items-center" style="gap:8px;">
+ <?php if ($__pp): ?>
+ <img src="<?= esc($__pp) ?>" alt="" class="avatar-round" style="width:32px;height:32px;min-width:32px;border-radius:50%;object-fit:cover;border:2px solid rgba(108,140,255,.25);">
+ <?php else: ?>
+ <span style="display:inline-flex;width:32px;height:32px;min-width:32px;border-radius:50%;background:rgba(168,192,255,.2);color:#5a5280;align-items:center;justify-content:center;font-size:11px;font-weight:700;"><?= esc(strtoupper(mb_substr($s['fname'] ?? '', 0, 1) . mb_substr($s['lname'] ?? '', 0, 1))) ?></span>
+ <?php endif; ?>
  <strong>
  <?= esc($s['fname']) ?> <?= esc($s['lname']) ?>
  </strong>
+ </div>
  </td>
  <td><span class="badge badge-light"><?= esc($s['grade_section']) ?></span></td>
  <td style="font-size:12px;">
@@ -1004,6 +1031,23 @@ html.theme-dark .sms-mode-panel { background: #1e293b; border-color: #334155; }
  </div>
 </div>
 
+<!-- Photo viewer (fetcher / parent pictures) -->
+<div class="modal fade" id="photoViewModal" tabindex="-1">
+ <div class="modal-dialog modal-dialog-centered">
+ <div class="modal-content">
+ <div class="modal-header">
+ <h5 class="modal-title"><i class="fas fa-image mr-2"></i><span id="photoViewTitle">Photo</span></h5>
+ <button type="button" class="close" data-dismiss="modal">&times;</button>
+ </div>
+ <div class="modal-body text-center">
+ <img id="photoViewImg" src="" alt="" style="max-width:100%;max-height:65vh;border-radius:12px;">
+ </div>
+ <div class="modal-footer">
+ <button type="button" class="btn btn-sm btn-outline-secondary" data-dismiss="modal">Close</button>
+ </div>
+ </div>
+ </div>
+</div>
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
@@ -1055,7 +1099,7 @@ $(document).ready(function() {
                     response.students.forEach(function(s) {
                         html += '<li class="list-group-item d-flex justify-content-between align-items-center">';
                         html += '<div><strong>' + s.fname + ' ' + s.lname + '</strong><br><small style="color: var(--muted);">' + s.grade_section + '</small></div>';
-                        html += '<div style="text-align:right;"><span class="badge badge-info">' + s.parent_fname + ' ' + s.parent_lname + '</span><br><small style="color: var(--muted);"><i class="fas fa-phone mr-1"></i>' + s.parent_phone + '</small></div>';
+                        html += '<div style="text-align:right;"><span class="badge badge-info">' + [s.parent_fname, s.parent_mname, s.parent_lname].filter(Boolean).join(' ') + '</span><br><small style="color: var(--muted);"><i class="fas fa-phone mr-1"></i>' + s.parent_phone + '</small></div>';
                         html += '</li>';
                     });
                     html += '</ul>';
@@ -1252,5 +1296,13 @@ $('#sendSmsConfirm').click(function() {
 $('#smsConfirmModal').on('hidden.bs.modal', function() {
     $('#smsCustomMessage').val('');
 });
+
+// Click-to-zoom for fetcher / parent profile pictures in the released table.
+function showPhoto(u, t) {
+    if (!u) { return; }
+    $('#photoViewImg').attr('src', u);
+    $('#photoViewTitle').text(t || 'Photo');
+    $('#photoViewModal').modal('show');
+}
 </script>
 <?= $this->endSection() ?>

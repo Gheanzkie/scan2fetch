@@ -1,4 +1,4 @@
-<?= $this->extend('theme/template') ?>
+﻿<?= $this->extend('theme/template') ?>
 <?= $this->section('content') ?>
 
 <style>
@@ -161,7 +161,7 @@ body {
 .breadcrumb-item a { color: #8888aa !important; font-weight: 600 !important; font-size: 15px !important; }
 .breadcrumb-item a:hover { color: var(--soft-purple) !important; }
 .breadcrumb-item.active { color: #2d2d4a !important; font-weight: 700 !important; font-size: 15px !important; }
-.breadcrumb-item + .breadcrumb-item::before { color: #c0c0d8 !important; content: "›" !important; }
+.breadcrumb-item + .breadcrumb-item::before { color: #c0c0d8 !important; content: "â€º" !important; }
 
 /* ===== CONTENT HEADER ===== */
 .content-header h1 {
@@ -316,12 +316,31 @@ body {
  <!-- ===== PARENT PROFILE WITH PHOTO UPLOAD ===== -->
  <div class="card">
  <div class="card-body text-center">
-                            
+
+ <?php $__pPhoto = parent_photo_url((string) ($parent['parent_no'] ?? '')); ?>
+ <div id="parentPhotoContainer" style="width:110px;height:110px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #e2e8f0;box-shadow:0 1px 4px rgba(15,23,42,.12);background:#f1f5f9;display:flex;align-items:center;justify-content:center;">
+ <?php if ($__pPhoto): ?>
+ <img src="<?= esc($__pPhoto) ?>" alt="<?= esc(full_name($parent)) ?> profile picture" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+ <?php else: ?>
+ <i class="fas fa-user" style="font-size:42px;color:#94a3b8;"></i>
+ <?php endif; ?>
+ </div>
+
  <!-- Parent Info -->
- <h3 class="mt-3 mb-0" style="color: #2d2d4a;"><?= esc($parent['fname']) ?> <?= esc($parent['lname']) ?></h3>
+ <h3 class="mt-3 mb-0" style="color: #2d2d4a;"><?= esc(full_name($parent)) ?></h3>
+ <?php if (!empty($parent['parent_no'])): ?>
+ <p class="mb-1" style="color: #5a5280 !important; font-weight: 700; font-size: 14px;">
+ <i class="fas fa-id-card mr-1" style="color: var(--soft-blue);"></i> Parent ID: <span style="font-family: ui-monospace, monospace;"><?= esc($parent['parent_no']) ?></span>
+ </p>
+ <?php endif; ?>
  <p class="text-muted mb-2" style="color: #8888aa !important;">
  <i class="fas fa-phone mr-1"></i> <?= esc($parent['phone']) ?>
  </p>
+ <?php if (!empty($parent['created_at'])): ?>
+ <p class="text-muted mb-2" style="color: #8888aa !important; font-size: 13px;">
+ <i class="fas fa-calendar mr-1"></i> Registered <?= date('M d, Y', strtotime($parent['created_at'])) ?>
+ </p>
+ <?php endif; ?>
                             
  <!-- QR Code -->
  <?php if(!empty($parent['qr_code'])): ?>
@@ -353,12 +372,18 @@ body {
  <?php if(!empty($subFetchers)): foreach($subFetchers as $f): ?>
  <div class="d-flex align-items-center border rounded p-2 mb-2" style="border-color: rgba(108,140,255,0.08) !important;">
  <div class="mr-2">
- <div class="img-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;border:2px solid var(--soft-green);background:rgba(255,255,255,0.3);">
+ <?php $__sfPhoto = subfetcher_photo_url($f['id']); ?>
+ <div class="img-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;border:2px solid var(--soft-green);background:rgba(255,255,255,0.3);overflow:hidden;">
+ <?php if ($__sfPhoto): ?>
+ <img src="<?= esc($__sfPhoto) ?>" alt="<?= esc(full_name($f)) ?>" style="width:100%;height:100%;object-fit:cover;border-radius:50%;cursor:zoom-in;"
+ onclick="openQrModal('<?= esc($__sfPhoto) ?>','<?= esc(full_name($f)) ?>')">
+ <?php else: ?>
  <i class="fas fa-user" style="color: #b0b0c8;"></i>
+ <?php endif; ?>
  </div>
  </div>
  <div class="flex-grow-1">
- <strong style="color: #2d2d4a;"><?= esc($f['fname']) ?> <?= esc($f['lname']) ?></strong>
+ <strong style="color: #2d2d4a;"><?= esc(full_name($f)) ?></strong>
  <br><small style="color: #b0b0c8;"><?= esc($f['phone']) ?></small>
  </div>
  <?php if(!empty($f['qr_code'])): ?>
@@ -372,6 +397,7 @@ body {
                                         data-mname="<?= esc($f['mname']??'') ?>" 
                                         data-lname="<?= esc($f['lname']) ?>" 
                                         data-phone="<?= esc($f['phone']) ?>" 
+                                        data-photo="<?= esc($__sfPhoto) ?>"
                                         data-toggle="modal" data-target="#editSubFetcherModal">
  <i class="fas fa-pencil-alt"></i>
  </button>
@@ -398,7 +424,7 @@ body {
  <h5 class="mb-0">
  <a href="<?= base_url('students-view/'.$s['student_id']) ?>" style="color: #2d2d4a; text-decoration:none;">
  <i class="fas fa-user-graduate mr-2" style="color: var(--soft-blue);"></i>
- <?= esc($s['fname']) ?> <?= esc($s['lname']) ?>
+ <?= esc(full_name($s)) ?>
  <small style="color: #b0b0c8; font-size: 13px;">(<?= esc($s['grade_section']) ?>)</small>
  </a>
  </h5>
@@ -411,7 +437,7 @@ body {
  <div class="col-md-6">
  <p class="mb-1"><strong style="color: #2d2d4a;">Student:</strong>
  <a href="<?= base_url('students-view/'.$s['student_id']) ?>" style="color: var(--soft-purple); font-weight:700; text-decoration:none;">
- <?= esc($s['fname']) ?> <?= esc($s['lname']) ?>
+ <?= esc(full_name($s)) ?>
  </a>
  </p>
  <p class="mb-1"><strong style="color: #2d2d4a;">Grade:</strong> <?= esc($s['grade_section']) ?></p>
@@ -461,11 +487,20 @@ body {
  <button type="button" class="close" data-dismiss="modal" style="color: #2d2d4a;">&times;</button>
  </div>
  <div class="modal-body">
+ <div class="text-center mb-3">
+ <div id="addSubFetcherPreview" title="Click to add the picture" style="width:96px;height:96px;min-width:96px;margin:0 auto;border-radius:50%;overflow:hidden;border:3px solid rgba(108,140,255,0.25);background:#eef2ff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+ <i class="fas fa-camera" style="color:#a5b4fc;font-size:28px;"></i>
+ </div>
+ <input type="file" accept="image/*" class="subfetcher-photo-input" id="addSubFetcherPhotoFile" data-preview="#addSubFetcherPreview" style="display:none;">
+ <input type="hidden" name="subfetcher_picture_data" id="addSubFetcherPhotoData">
+ <small class="text-muted d-block mt-2" style="font-size:12px;">Profile picture <span style="color:#b23c4d;">(optional)</span></small>
+ <button type="button" class="btn btn-link btn-sm p-0 mt-1 text-danger subfetcher-photo-clear" data-preview="#addSubFetcherPreview" data-target="#addSubFetcherPhotoData" style="display:none;font-size:12px;"><i class="fas fa-trash-alt mr-1"></i>Remove picture</button>
+ </div>
  <div class="alert alert-info mb-3" style="font-size:13px;padding:10px 14px;">
  <i class="fas fa-info-circle mr-1"></i> 
-                        Sub-fetcher will be linked to <strong><?= esc($parent['fname']) ?> <?= esc($parent['lname']) ?></strong>'s account.
+                        Sub-fetcher will be linked to <strong><?= esc(full_name($parent)) ?></strong>'s account.
  <?php if(!empty($students)): ?>
- <br>Authorized to pick up: <strong><?= esc($students[0]['fname']) ?> <?= esc($students[0]['lname']) ?></strong>
+ <br>Authorized to pick up: <strong><?= esc(full_name($students[0])) ?></strong>
  <?php endif; ?>
  </div>
                     
@@ -512,6 +547,16 @@ body {
  <button type="button" class="close" data-dismiss="modal" style="color: #2d2d4a;">&times;</button>
  </div>
  <div class="modal-body">
+ <div class="text-center mb-3">
+ <div id="editSubFetcherPreview" title="Click to add or change the picture" style="width:96px;height:96px;min-width:96px;margin:0 auto;border-radius:50%;overflow:hidden;border:3px solid rgba(108,140,255,0.25);background:#eef2ff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+ <i class="fas fa-camera" style="color:#a5b4fc;font-size:28px;"></i>
+ </div>
+ <input type="file" accept="image/*" class="subfetcher-photo-input" id="editSubFetcherPhotoFile" data-preview="#editSubFetcherPreview" style="display:none;">
+ <input type="hidden" name="subfetcher_picture_data" id="editSubFetcherPhotoData">
+ <input type="hidden" name="subfetcher_picture_remove" id="editSubFetcherPhotoRemove" value="0">
+ <small class="text-muted d-block mt-2" style="font-size:12px;">Profile picture <span style="color:#b23c4d;">(optional)</span></small>
+ <button type="button" class="btn btn-link btn-sm p-0 mt-1 text-danger subfetcher-photo-clear" data-preview="#editSubFetcherPreview" data-target="#editSubFetcherPhotoData" style="display:none;font-size:12px;"><i class="fas fa-trash-alt mr-1"></i>Remove picture</button>
+ </div>
  <div class="row">
  <div class="col-4">
  <label>First Name <span class="text-danger">*</span></label>
@@ -575,10 +620,71 @@ $(function(){
         $('#editSubFetcherMname').val($(this).data('mname'));
         $('#editSubFetcherLname').val($(this).data('lname'));
         $('#editSubFetcherPhone').val($(this).data('phone'));
+
+        // ===== SUB-FETCHER PICTURE (edit modal) =====
+        $('#editSubFetcherPhotoData').val('');
+        $('#editSubFetcherPhotoRemove').val('0');
+        $('.subfetcher-photo-input[data-preview="#editSubFetcherPreview"]').val('');
+        setSubFetcherPreview('#editSubFetcherPreview', $(this).data('photo') || '');
+    });
+
+    // ===== SUB-FETCHER PICTURE HELPERS =====
+    function setSubFetcherPreview(sel, src) {
+        var $p = $(sel);
+        if (src) {
+            $p.html('<img src="' + src + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">');
+            $p.closest('.modal-body').find('.subfetcher-photo-clear').show();
+        } else {
+            $p.html('<i class="fas fa-camera" style="color:#a5b4fc;font-size:28px;"></i>');
+            $p.closest('.modal-body').find('.subfetcher-photo-clear').hide();
+        }
+    }
+
+    // Click the round preview to pick a file (same behaviour as teachers/staffs).
+    $(document).on('click', '#addSubFetcherPreview', function () {
+        $('#addSubFetcherPhotoFile').trigger('click');
+    });
+    $(document).on('click', '#editSubFetcherPreview', function () {
+        $('#editSubFetcherPhotoFile').trigger('click');
+    });
+
+    // Read the chosen file, crop to a 400x400 square, store as data URL.
+    $(document).on('change', '.subfetcher-photo-input', function () {
+        var input = this, preview = $(this).data('preview');
+        var hidden = preview === '#addSubFetcherPreview' ? '#addSubFetcherPhotoData' : '#editSubFetcherPhotoData';
+        if (!input.files || !input.files[0]) { return; }
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var img = new Image();
+            img.onload = function () {
+                var size = 400;
+                var side = Math.min(img.width, img.height);
+                var sx = (img.width - side) / 2;
+                var sy = (img.height - side) / 2;
+                var canvas = document.createElement('canvas');
+                canvas.width = size; canvas.height = size;
+                canvas.getContext('2d').drawImage(img, sx, sy, side, side, 0, 0, size, size);
+                var dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                $(hidden).val(dataUrl);
+                setSubFetcherPreview(preview, dataUrl);
+                if (hidden === '#editSubFetcherPhotoData') { $('#editSubFetcherPhotoRemove').val('0'); }
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    });
+
+    // Clear / remove the picture.
+    $(document).on('click', '.subfetcher-photo-clear', function () {
+        var preview = $(this).data('preview');
+        $(this).data('target') && $($(this).data('target')).val('');
+        if (preview === '#editSubFetcherPreview') { $('#editSubFetcherPhotoData').val(''); $('#editSubFetcherPhotoRemove').val('1'); }
+        $('.subfetcher-photo-input[data-preview="' + preview + '"]').val('');
+        setSubFetcherPreview(preview, '');
     });
 
     // ===== OPEN QR MODAL =====
-    function openQrModal(u) {
+    window.openQrModal = function (u, t) {
         if (!u) { 
             alert(' No QR code available. '); 
             return; 
@@ -586,7 +692,7 @@ $(function(){
         $('#qrFullImage').attr('src', u);
         $('#qrDownloadBtn').attr('href', u);
         $('#qrModal').modal('show');
-    }
+    };
 });
 </script>
 <?= $this->endSection() ?>

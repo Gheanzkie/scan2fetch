@@ -180,7 +180,7 @@ class Scan extends BaseController
 
         $db = \Config\Database::connect();
         $students = $db->table('student_parents')
-            ->select('student_parents.student_id, students.fname, students.lname, students.grade_section')
+            ->select('student_parents.student_id, student_parents.relation, students.student_no, students.fname, students.mname, students.lname, students.grade_section')
             ->join('students', 'students.id = student_parents.student_id')
             ->where('student_parents.parent_id', $parentId)
             ->get()
@@ -197,6 +197,17 @@ class Scan extends BaseController
                 ->countAllResults() > 0;
         }
         unset($s);
+
+        helper('photo');
+        $fetcherPhoto = ($fetcherType === 'Sub-Fetcher')
+            ? subfetcher_photo_url((int) ($fetcher['id'] ?? 0))
+            : parent_photo_url((string) ($parent['parent_no'] ?? ''));
+        $fetcher['photo'] = $fetcherPhoto;
+        $fetcher['relation'] = $fetcher['type'] ?? $fetcherType;
+        foreach ($students as &$st) {
+            $st['photo'] = student_photo_url((string) ($st['student_no'] ?? ''));
+        }
+        unset($st);
 
         return $this->response->setJSON([
             'success' => true,
@@ -276,6 +287,7 @@ class Scan extends BaseController
 
         
         $fetcherFname = $parent['fname'];
+        $fetcherMname = $parent['mname'] ?? '';
         $fetcherLname = $parent['lname'];
         $fetcherRelation = 'Parent';
         
@@ -285,6 +297,7 @@ class Scan extends BaseController
             $subFetcher = $subFetcherModel->where('qr_code', $qrCode)->first();
             if ($subFetcher) {
                 $fetcherFname = $subFetcher['fname'];
+                $fetcherMname = $subFetcher['mname'] ?? '';
                 $fetcherLname = $subFetcher['lname'];
                 $fetcherRelation = 'Sub-Fetcher';
             }
@@ -299,11 +312,12 @@ class Scan extends BaseController
             'student_id'       => $studentId,
             'parent_id'        => $parentId,
             'fetcher_fname'    => $fetcherFname,
-            'fetcher_mname'    => '',
+            'fetcher_mname'    => $fetcherMname ?? '',
             'fetcher_lname'    => $fetcherLname,
             'fetcher_relation' => $fetcherRelation,
             'method'           => 'QR',
             'session_type'     => $session,
+            'staff_id'         => $userId,
             'time_released'    => date('Y-m-d H:i:s'),
         ]);
 
@@ -318,7 +332,7 @@ class Scan extends BaseController
             $userRole,
             'release',
             'scan',
-            "QR Release | Student: {$student['fname']} {$student['lname']} (ID: {$studentId}) | {$fetcherRelation}: {$fetcherFname} {$fetcherLname} | Session: " . strtoupper($session) . ($override ? ' (manual switch)' : '') . " | SMS sent"
+            "QR Release | Student: {$student['fname']} {$student['lname']} (ID: {$studentId}) | {$fetcherRelation}: {$fetcherFname} {$fetcherMname} {$fetcherLname} | Session: " . strtoupper($session) . ($override ? ' (manual switch)' : '') . " | SMS sent"
         );
 
         return $this->response->setJSON(['success' => true, 'message' => 'Student released successfully']);
@@ -362,6 +376,7 @@ class Scan extends BaseController
 
         
         $fetcherFname = $parent['fname'];
+        $fetcherMname = $parent['mname'] ?? '';
         $fetcherLname = $parent['lname'];
         $fetcherRelation = 'Parent';
         
@@ -371,6 +386,7 @@ class Scan extends BaseController
             $subFetcher = $subFetcherModel->where('qr_code', $qrCode)->first();
             if ($subFetcher) {
                 $fetcherFname = $subFetcher['fname'];
+                $fetcherMname = $subFetcher['mname'] ?? '';
                 $fetcherLname = $subFetcher['lname'];
                 $fetcherRelation = 'Sub-Fetcher';
             }
@@ -391,7 +407,7 @@ class Scan extends BaseController
             $userRole,
             'decline',
             'scan',
-            "DECLINED | Student: {$student['fname']} {$student['lname']} (ID: {$studentId}) | {$fetcherRelation}: {$fetcherFname} {$fetcherLname} | SMS sent"
+            "DECLINED | Student: {$student['fname']} {$student['lname']} (ID: {$studentId}) | {$fetcherRelation}: {$fetcherFname} {$fetcherMname} {$fetcherLname} | SMS sent"
         );
 
         return $this->response->setJSON(['success' => true, 'message' => 'Pickup declined. SMS sent.']);

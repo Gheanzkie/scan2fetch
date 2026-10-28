@@ -221,7 +221,7 @@ html.theme-dark .empty-chat { color: #94a3b8 !important; }
  </div>
  <div class="flex-grow-1" style="min-width: 0;">
  <div class="d-flex justify-content-between align-items-center">
- <strong style="color: var(--ink);"><?= esc($t['fname']) ?> <?= esc($t['lname']) ?></strong>
+ <strong style="color: var(--ink);"><?= esc(full_name($t)) ?></strong>
  <?php if ($t['unread'] > 0): ?>
  <span class="unread-dot"><?= $t['unread'] ?> new</span>
  <?php endif; ?>
@@ -248,7 +248,7 @@ html.theme-dark .empty-chat { color: #94a3b8 !important; }
  <div class="col-md-8 mb-3">
  <div class="messages-card">
  <div class="chat-header">
- <span id="chatTitle"><?= isset($selected) ? esc($selected['fname'] . ' ' . $selected['lname']) : 'Conversation' ?></span>
+ <span id="chatTitle"><?= isset($selected) ? esc(full_name($selected)) : 'Conversation' ?></span>
  <small class="d-block" id="chatSubtitle">
  <?= isset($selected) ? ' ' . esc($selected['phone']) : 'Select a conversation to read and reply.' ?>
  </small>

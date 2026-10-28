@@ -251,25 +251,33 @@ body {
  <div class="card">
  <div class="card-body text-center">
  <div style="width:110px;height:110px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #e2e8f0;box-shadow:0 1px 4px rgba(15,23,42,.12);background:#f1f5f9;display:flex;align-items:center;justify-content:center;">
+ <?php $__tPhoto = teacher_photo_url($teacher['teacher_no'] ?? ''); ?>
+ <?php if ($__tPhoto): ?>
+ <img src="<?= esc($__tPhoto) ?>" alt="<?= esc(full_name($teacher)) ?> profile picture" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+ <?php else: ?>
  <i class="fas fa-chalkboard-teacher" style="font-size:42px;color:#94a3b8;"></i>
+ <?php endif; ?>
  </div>
 
- <h3 class="mt-3 mb-0" style="color: #0f172a;"><?= esc($teacher['fname']) ?> <?= esc($teacher['lname']) ?></h3>
+ <h3 class="mt-3 mb-0" style="color: #0f172a;"><?= esc(full_name($teacher)) ?></h3>
  <?php if(!empty($teacher['mname'])): ?>
  <p class="mb-0" style="color: var(--muted);"><?= esc($teacher['mname']) ?></p>
  <?php endif; ?>
+ <p class="mb-1" style="color: var(--muted);"><i class="fas fa-id-badge mr-1"></i><?= esc($teacher['teacher_no'] ?? '') ?></p>
  <p class="mb-2" style="color: var(--muted);">
  <i class="fas fa-phone mr-1"></i> <?= esc($teacher['phone']) ?>
  </p>
+ <?php if (!empty($teacher['created_at'])): ?>
+ <p class="mb-2" style="color: var(--faint); font-size: 13px;">
+ <i class="fas fa-calendar mr-1"></i> Added <?= date('M d, Y', strtotime($teacher['created_at'])) ?>
+ </p>
+ <?php endif; ?>
  <span class="badge badge-grade">
  <i class="fas fa-book mr-1"></i><?= esc($teacher['grade_section']) ?>
  </span>
 
  <?php if (session('role') == 'teacher'): ?>
  <div class="mt-4">
- <a href="<?= base_url('teachers-notifications') ?>" class="btn btn-kid-success btn-sm px-4">
- <i class="fas fa-sms mr-1"></i> SMS Notifications
- </a>
  </div>
  <?php else: ?>
  <div class="mt-4">
@@ -356,7 +364,7 @@ body {
  </thead>
  <tbody>
  <?php $mi = 1; foreach($rows as $r): ?>
- <?php $s = $r['student']; ?>
+ <?php $s = $r['student']; helper('photo'); $__sp = student_photo_url((string) ($s['student_no'] ?? '')); ?>
  <?php
   $rs = $s['released_sessions'] ?? [];
   $amReleased = $rs['morning'] ?? null;
@@ -365,7 +373,17 @@ body {
  <tr>
  <td style="color:var(--faint);font-weight:700;"><?= $mi++ ?></td>
  <td>
+ <?php if ($__sp): ?>
+ <img src="<?= esc($__sp) ?>" alt="<?= esc(full_name($s)) ?>" class="avatar-round"
+ style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid rgba(108,140,255,0.25);margin-right:8px;vertical-align:middle;cursor:zoom-in;"
+ onclick="openGlobalPhoto && openGlobalPhoto('<?= esc($__sp) ?>','<?= esc(full_name($s)) ?>')">
+ <?php else: ?>
+ <span style="display:inline-flex;width:34px;height:34px;border-radius:50%;background:rgba(168,192,255,0.2);color:#5a5280;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-right:8px;vertical-align:middle;"><?= esc(strtoupper(mb_substr($s['fname'] ?? '', 0, 1) . mb_substr($s['lname'] ?? '', 0, 1))) ?></span>
+ <?php endif; ?>
  <strong style="color:var(--ink);font-size:13.5px;"><?= esc($s['fname']) ?> <?= esc(($s['mname']??'')) ?> <?= esc($s['lname']) ?></strong>
+ <?php if (!empty($s['student_no'])): ?>
+ <span class="badge badge-soft ml-2" style="font-family: ui-monospace, monospace; font-size:10.5px;"><?= esc($s['student_no']) ?></span>
+ <?php endif; ?>
  </td>
  <td><span class="badge badge-soft"><?= esc($s['grade_section']) ?></span></td>
  <td class="text-center session-strip">

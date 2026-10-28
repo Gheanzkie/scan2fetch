@@ -1,6 +1,6 @@
-<?php
+﻿<?php
 /**
- * Fullscreen kiosk scanner — standalone page, no template/sidebar/nav.
+ * Fullscreen kiosk scanner â€” standalone page, no template/sidebar/nav.
  * Opens in a new tab. Exit = close the browser tab (browser's own X / Alt+F4).
  */
 ?>
@@ -31,7 +31,7 @@ body { display:flex; align-items:center; justify-content:center; }
 #reader video {
   width:100% !important;
   height:100% !important;
-  object-fit:contain !important;   /* full frame visible — no crop, no stretch */
+  object-fit:contain !important;   /* full frame visible â€” no crop, no stretch */
   border-radius:18px !important;
   background:#000;
 }
@@ -100,6 +100,21 @@ body { display:flex; align-items:center; justify-content:center; }
 #flash .big { font-size:64px; margin-bottom:12px; }
 #flash .nm  { font-size:36px; font-weight:800; letter-spacing:.3px; }
 #flash .sub { font-size:14px; opacity:.85; margin-top:6px; }
+
+/* ===== PICKUP CONFIRMATION PANEL (5s freeze) ===== */
+#pickupPanel{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
+ gap:6vw;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);padding:4vw;}
+#pickupPanel.show{display:flex;}
+.pp-side{text-align:center;flex:1;max-width:38vw;}
+.pp-photo{width:min(30vw,320px);height:min(30vw,320px);margin:0 auto;border-radius:50%;overflow:hidden;
+ background:#1e293b;border:6px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:clamp(28px,6vw,64px);}
+.pp-photo img{width:100%;height:100%;object-fit:cover;}
+.pp-name{margin-top:18px;color:#fff;font-weight:800;font-size:clamp(18px,2.6vw,34px);line-height:1.2;}
+.pp-meta{margin-top:6px;color:#94a3b8;font-size:clamp(13px,1.6vw,20px);text-transform:uppercase;letter-spacing:.08em;}
+.pp-mid{text-align:center;color:#4ade80;}
+.pp-check{font-size:clamp(40px,8vw,96px);line-height:1;}
+.pp-released{font-weight:900;letter-spacing:.14em;font-size:clamp(14px,1.8vw,24px);}
+.pp-timer{margin-top:14px;color:#64748b;font-size:clamp(12px,1.4vw,18px);}
 </style>
 <script src="<?= base_url('html5qrcode/html5-qrcode.min.js') ?>"></script>
 </head>
@@ -110,14 +125,33 @@ body { display:flex; align-items:center; justify-content:center; }
 <div id="topBar">
   <span class="pill" id="sessPill"><?= strtoupper($currentSession ?? 'MORNING') ?></span>
   <span class="pill <?= !empty($gateAllowed) ? 'open' : 'closed' ?>" id="gatePill">
-    <?= !empty($gateAllowed) ? '● OPEN' : '● CLOSED' ?>
+    <?= !empty($gateAllowed) ? 'â— OPEN' : 'â— CLOSED' ?>
   </span>
 </div>
 
-<div id="status">Starting camera…</div>
+<div id="status">Starting cameraâ€¦</div>
 
 <div id="flash">
-  <div class="big">✓</div>
+  <div class="big">âœ“</div>
+
+<div id="pickupPanel">
+ <div class="pp-side">
+  <div class="pp-photo" id="ppFetcherPhoto"><i class="fas fa-user"></i></div>
+  <div class="pp-name" id="ppFetcherName"></div>
+  <div class="pp-meta" id="ppFetcherRel"></div>
+ </div>
+ <div class="pp-mid">
+  <div class="pp-check">âœ”</div>
+  <div class="pp-released">RELEASED</div>
+  <div class="pp-timer"><span id="ppCount">10</span>s</div>
+ </div>
+ <div class="pp-side">
+  <div class="pp-photo" id="ppStudentPhoto"><i class="fas fa-user-graduate"></i></div>
+  <div class="pp-name" id="ppStudentName"></div>
+  <div class="pp-meta" id="ppStudentGrade"></div>
+ </div>
+</div>
+
   <div class="nm" id="flashName"></div>
   <div class="sub" id="flashSub"></div>
 </div>
@@ -145,17 +179,17 @@ function say(msg, cls) {
 function hideSay() { document.getElementById('status').className = ''; }
 
 /* ===== FAST SCANNER =====
- * BUGFIX: start() was called as start(cfg, cfg) — the FIRST arg must be the
+ * BUGFIX: start() was called as start(cfg, cfg) â€” the FIRST arg must be the
  * CAMERA identifier ({facingMode} or deviceId), the SECOND is the scan config.
  * Passing the config object (which contains a qrbox FUNCTION) as the camera
- * arg makes getUserMedia reject garbage constraints → never decodes.
- * Also: NO qrbox — the decoder scans the FULL frame, so the QR can be any
+ * arg makes getUserMedia reject garbage constraints â†’ never decodes.
+ * Also: NO qrbox â€” the decoder scans the FULL frame, so the QR can be any
  * size / anywhere in view (no crop, no fake zoom). Native BarcodeDetector
  * (useBarCodeDetectorIfSupported) handles blur/low-light on Chrome/Edge/Android;
  * jsQR is the fallback. */
 function buildScanner() {
   if (scanner) { try { scanner.clear(); } catch(e){} }
-  // NO formatsToSupport filter — this library build numbers QR_CODE as 11,
+  // NO formatsToSupport filter â€” this library build numbers QR_CODE as 11,
   // not 0 (0 = AZTEC). The old "[0]" filter made it decode AZTEC only, so it
   // could NEVER read a QR code. Unfiltered = scans QR + everything else.
   scanner = new Html5Qrcode('reader', { verbose: false });
@@ -165,7 +199,7 @@ function start() {
   if (scanning) return;
   if (!GATE_OK) { say('Scanner is closed right now.', 'err'); return; }
   scanning = true; lockout = false;
-  say('Starting camera…');
+  say('Starting cameraâ€¦');
   buildScanner();
 
   var camera    = { facingMode: 'environment' };
@@ -181,7 +215,7 @@ function start() {
     settled = true;
     try { scanner.stop().catch(function(){}); } catch(e){}
     scanning = false;
-    say('Camera slow — retrying with lower resolution…', 'warn');
+    say('Camera slow â€” retrying with lower resolutionâ€¦', 'warn');
     setTimeout(startLowRes, 600);
   }, 8000);
 
@@ -192,7 +226,7 @@ function start() {
       if (!text || lockout) return;
       settled = true; clearTimeout(watchdog);
       lockout = true; scanning = false;
-      say('QR found ✓');
+      say('QR found âœ“');
       try { scanner.stop().catch(function(){}); } catch(e){}
       verify(text);
     },
@@ -200,7 +234,7 @@ function start() {
   ).then(function() {
     if (settled) return;
     settled = true; clearTimeout(watchdog);
-    say('Point at the QR code — full frame, any size');
+    say('Point at the QR code â€” full frame, any size');
   }).catch(function(err) {
     if (settled) return;
     settled = true; clearTimeout(watchdog);
@@ -211,11 +245,11 @@ function start() {
   });
 }
 
-/* Fallback: tiny 640x480 stream — easiest for potato cameras to decode. */
+/* Fallback: tiny 640x480 stream â€” easiest for potato cameras to decode. */
 function startLowRes() {
   if (scanning) return;
   scanning = true; lockout = false;
-  say('Starting camera (low-res mode)…');
+  say('Starting camera (low-res mode)â€¦');
   buildScanner();
 
   var camera  = { facingMode: 'environment' };
@@ -233,14 +267,14 @@ function startLowRes() {
   scanner.start(camera, scanCfg, function(text) {
     if (!text || lockout) return;
     lockout = true; scanning = false;
-    say('QR found ✓');
+    say('QR found âœ“');
     try { scanner.stop().catch(function(){}); } catch(e){}
     verify(text);
   }, function(){}).then(function() {
     say('Point at the QR code (low-res mode)');
   }).catch(function(err) {
     scanning = false;
-    say('Camera failed: ' + ((err&&err.message)||err) + ' — close this tab and reopen from the Scanner page.', 'err');
+    say('Camera failed: ' + ((err&&err.message)||err) + ' â€” close this tab and reopen from the Scanner page.', 'err');
   });
 }
 
@@ -250,8 +284,13 @@ function resume() {
 }
 
 /* ===== VERIFY + AUTO-RELEASE ===== */
+/* ===== TIMINGS (edit these to balance the overlays) ===== */
+var PICKUP_MS  = 10;   // seconds the pickup panel (photos) stays up
+var FLASH_MS   = 10000; // ms the green check flash stays up (normal)
+var FLASH_ALREADY_MS = 2000; // ms the flash stays up (already released)
+
 function verify(qr) {
-  say('Verifying…');
+  say('Verifyingâ€¦');
   var fd = new FormData();
   fd.append('qr_code', qr);
   fd.append(CSRF_NAME, CSRF_HASH);
@@ -264,21 +303,26 @@ function verify(qr) {
       return;
     }
     var p = res.parent, f = res.fetcher;
+    window.lastFetcher = {
+      name: (f && f.type === 'Sub-Fetcher') ? ([f.fname, f.mname, f.lname].filter(Boolean).join(' ')) : ([p.fname, p.mname, p.lname].filter(Boolean).join(' ')),
+      photo: (f && f.photo) || '',
+      relation: (f && f.relation) || (f && f.type) || 'Parent'
+    };
     var who = (f && f.type === 'Sub-Fetcher') ? (f.fname+' '+f.lname) : (p.fname+' '+p.lname);
     var list = res.students || [];
     var sessName = (res.session || '').toUpperCase();
 
     if (list.length === 0) {
-      say(who + ' — no students linked', 'warn');
+      say(who + ' â€” no students linked', 'warn');
       setTimeout(resume, 2500);
       return;
     }
     if (list.length === 1) {
-      var snm1 = list[0].fname + ' ' + list[0].lname;
+      var snm1 = [list[0].fname, list[0].mname, list[0].lname].filter(Boolean).join(' ');
       if (list[0].already_released) {
-        flash(snm1, 'Picked up by ' + who + ' — ALREADY RELEASED this ' + sessName + ' session.', true);
-        say('Already released — ' + snm1, 'warn');
-        setTimeout(resume, 2600);
+        flash(snm1, 'Picked up by ' + who + ' â€” ALREADY RELEASED this ' + sessName + ' session.', true);
+        say('Already released â€” ' + snm1, 'warn');
+        setTimeout(resume, FLASH_ALREADY_MS + 200);
         return;
       }
       flash(snm1, 'Picked up by ' + who);
@@ -299,7 +343,7 @@ function flash(main, sub, already) {
   var el = document.getElementById('flash');
   el.classList.toggle('already', !!already);
   el.classList.add('show');
-  setTimeout(function(){ el.classList.remove('show'); }, already ? 2800 : 2200);
+  setTimeout(function(){ el.classList.remove('show'); }, already ? FLASH_ALREADY_MS : FLASH_MS);
 }
 
 function openSheet(who, list, pid, qr, sessName) {
@@ -307,8 +351,8 @@ function openSheet(who, list, pid, qr, sessName) {
   document.getElementById('sheetTitle').textContent = who;
   document.getElementById('sheetSub').textContent =
     list.length + ' students' +
-    (alreadyN ? ' · ' + alreadyN + ' already released this ' + (sessName||'') + ' session' : '') +
-    ' — tick who is being picked up.';
+    (alreadyN ? ' Â· ' + alreadyN + ' already released this ' + (sessName||'') + ' session' : '') +
+    ' â€” tick who is being picked up.';
   var box = document.getElementById('sheetList');
   box.innerHTML = '';
   list.forEach(function(s) {
@@ -341,29 +385,69 @@ function openSheet(who, list, pid, qr, sessName) {
     });
     if (!picked.length) { say('Select at least one student.', 'warn'); return; }
     btn.disabled = true;
-    btn.textContent = 'Releasing…';
+    btn.textContent = 'Releasingâ€¦';
     releaseAll(picked, pid, qr, who);
   };
   document.getElementById('sheet').classList.add('show');
 }
 
+var __ppTimer = null, __ppTick = null;
+function showPickup(fetcher, relation, student, seconds) {
+  function fill(imgId, url) {
+    var box = document.getElementById(imgId);
+    box.innerHTML = url ? '<img src="' + url + '" alt="">' : '<i class="fas fa-user"></i>';
+  }
+  document.getElementById('ppFetcherName').textContent = fetcher.name || '';
+  document.getElementById('ppFetcherRel').textContent = relation || '';
+  document.getElementById('ppStudentName').textContent = student.name || '';
+  document.getElementById('ppStudentGrade').textContent = student.grade || '';
+  fill('ppFetcherPhoto', fetcher.photo);
+  fill('ppStudentPhoto', student.photo);
+  var panel = document.getElementById('pickupPanel');
+  panel.classList.add('show');
+  var left = seconds;
+  document.getElementById('ppCount').textContent = left;
+  var tick = setInterval(function () {
+    left--; if (left < 0) { left = 0; }
+    document.getElementById('ppCount').textContent = left;
+    if (left <= 0) { clearInterval(tick); }
+  }, 1000);
+  __ppTimer = setTimeout(function () {
+    if (__ppTick) { clearInterval(__ppTick); __ppTick = null; }
+    __ppTimer = null;
+    panel.classList.remove('show');
+    resume();
+  }, seconds * 1000);
+}
+
 function releaseAll(students, pid, qr, who) {
   var i = 0, ok = 0, already = 0;
-  var names = students.map(function(s){ return s.fname + ' ' + s.lname; }).join(', ');
+  var names = students.map(function(s){ return [s.fname, s.mname, s.lname].filter(Boolean).join(' '); }).join(', ');
   function next() {
     if (i >= students.length) {
       document.getElementById('sheet').classList.remove('show');
-      if (already && !ok) {
-        flash(names, 'All were ALREADY RELEASED this session — picked up by ' + who, true);
-        say('Already released — nothing new.', 'warn');
-      } else if (already) {
-        say(who + ' — Released ' + ok + ', already released ' + already + '.', 'ok');
-        flash(names, 'Picked up by ' + who + ' — Released ' + ok + ', already ' + already + '.');
-      } else {
-        flash(names, 'Picked up by ' + who + ' — Released ' + ok + ' student(s).');
-        say(who + ' — Released ' + ok + ' student(s).', 'ok');
+      if (ok > 0) {
+        var first = students.filter(function (x) { return !x.already_released; })[0] || students[0];
+        showPickup(
+          { name: (window.lastFetcher && window.lastFetcher.name) || who, photo: (window.lastFetcher && window.lastFetcher.photo) || '' },
+          (window.lastFetcher && window.lastFetcher.relation) || '',
+          { name: [first.fname, first.mname, first.lname].filter(Boolean).join(' '), grade: first.grade_section || '', photo: first.photo || '' },
+          PICKUP_MS
+        );
+        say(who + ' - Released ' + ok + ' student(s).', 'ok');
+        return;
       }
-      setTimeout(resume, already && !ok ? 2800 : 2200);
+      if (already && !ok) {
+        flash(names, 'All were ALREADY RELEASED this session â€” picked up by ' + who, true);
+        say('Already released â€” nothing new.', 'warn');
+      } else if (already) {
+        say(who + ' â€” Released ' + ok + ', already released ' + already + '.', 'ok');
+        flash(names, 'Picked up by ' + who + ' â€” Released ' + ok + ', already ' + already + '.');
+      } else {
+        flash(names, 'Picked up by ' + who + ' â€” Released ' + ok + ' student(s).');
+        say(who + ' â€” Released ' + ok + ' student(s).', 'ok');
+      }
+      setTimeout(resume, (already && !ok ? FLASH_ALREADY_MS : FLASH_MS) + 200);
       return;
     }
     var s = students[i++];
@@ -379,7 +463,7 @@ function releaseAll(students, pid, qr, who) {
         say(res.message || 'System closed.', 'err');
         GATE_OK = false;
         document.getElementById('gatePill').className = 'pill closed';
-        document.getElementById('gatePill').textContent = '● CLOSED';
+        document.getElementById('gatePill').textContent = 'â— CLOSED';
         return;
       }
       if (res.already_released) {
@@ -406,18 +490,18 @@ function pollStatus() {
     GATE_OK = !!st.allowed;
     var gp = document.getElementById('gatePill');
     gp.className = 'pill ' + (st.allowed ? 'open' : 'closed');
-    gp.textContent = st.allowed ? '● OPEN' : '● CLOSED';
+    gp.textContent = st.allowed ? 'â— OPEN' : 'â— CLOSED';
     var sp = document.getElementById('sessPill');
     var label = (st.session || '').toUpperCase();
-    if (st.override) label += ' · MANUAL';
+    if (st.override) label += ' Â· MANUAL';
     sp.textContent = label;
     if (!st.allowed && scanning) {
       try { scanner.stop().catch(function(){}); } catch(e){}
       scanning = false;
       say(st.message || 'Scanner closed.', 'err');
     } else if (st.allowed && !scanning && !lockout) {
-      // Date Management reopened/changed the day → resume without manual reload.
-      say('Scanner open — scanning resumed.', 'ok');
+      // Date Management reopened/changed the day â†’ resume without manual reload.
+      say('Scanner open â€” scanning resumed.', 'ok');
       setTimeout(start, 300);
     }
   })

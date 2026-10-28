@@ -86,11 +86,15 @@ body {
  <div class="card-body">
  <?php if (!empty($myChildren)): ?>
  <div class="row">
- <?php foreach ($myChildren as $c): ?>
+ <?php foreach ($myChildren as $c): helper('photo'); $__cp = student_photo_url((string) ($c['student_no'] ?? '')); ?>
  <div class="col-md-6 col-xl-4 mb-3">
  <div class="child-card d-flex" style="gap:.9rem;">
- <div class="child-avatar">
+ <div class="child-avatar"<?= $__cp ? ' style="overflow:hidden;padding:0;"' : '' ?>>
+ <?php if ($__cp): ?>
+ <img src="<?= esc($__cp) ?>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+ <?php else: ?>
  <?= strtoupper(mb_substr($c['fname'] ?? '',0,1)) ?><?= strtoupper(mb_substr($c['lname'] ?? '',0,1)) ?>
+ <?php endif; ?>
  </div>
  <div style="flex:1;min-width:0;">
  <strong style="display:block;font-size:1rem;"><?= esc(trim(($c['fname'] ?? '').' '.($c['mname'] ?? '').' '.($c['lname'] ?? ''))) ?></strong>
@@ -101,13 +105,6 @@ body {
  <?php if (!empty($c['relation'])): ?>
  <small style="color:#94a3b8;display:block;"><i class="fas fa-link mr-1"></i><?= esc($c['relation']) ?></small>
  <?php endif; ?>
- <div style="margin-top:.5rem;">
- <?php if (!empty($c['release_today'])): ?>
- <span class="badge badge-released px-2 py-1"><i class="fas fa-check mr-1"></i>Released <?= date('h:i A', strtotime($c['release_today'])) ?></span>
- <?php else: ?>
- <span class="badge badge-pending px-2 py-1"><i class="fas fa-clock mr-1"></i>Not yet picked up</span>
- <?php endif; ?>
- </div>
  </div>
  </div>
  </div>

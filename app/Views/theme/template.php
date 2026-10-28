@@ -402,6 +402,46 @@
         html body .qr-card, html body .qr-thumb { background: #fff !important; border-color: #e2e8f0 !important; }
         html body .qr-thumb:hover { border-color: #4361ee !important; }
         html body .photo-cell img, html body .img-circle { border: 2px solid #e2e8f0 !important; }
+
+        /* ===== ROUND PROFILE PICTURES (students / parents / staffs / teachers) ===== */
+        html body .avatar-circle,
+        html body .avatar-circle img,
+        html body .avatar-round,
+        html body img.avatar-round {
+            border-radius: 50% !important;
+        }
+        html body .avatar-circle { overflow: hidden !important; padding: 0 !important; }
+        html body .avatar-circle img {
+            object-fit: cover !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+        html body table td img.avatar-round {
+            border-radius: 50% !important;
+            object-fit: cover !important;
+        }
+
+        /* ===== MANAGEMENT TABLES: consistent spacing (students/parents/teachers/staffs) ===== */
+        html body .table { margin-bottom: 0 !important; }
+        html body .table > thead > tr > th {
+            padding: 12px 14px !important;
+            vertical-align: middle !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            letter-spacing: .03em !important;
+            white-space: nowrap !important;
+            border-bottom: 1px solid #e8ecf7 !important;
+            border-top: none !important;
+        }
+        html body .table > tbody > tr > td {
+            padding: 12px 14px !important;
+            vertical-align: middle !important;
+            border-top: 1px solid #f1f4fb !important;
+        }
+        html body .table > tbody > tr:first-child > td { border-top: none !important; }
+        html body .table td .btn-action,
+        html body .table td .btn { margin: 0 !important; }
+        html body .table td > code { font-size: 12.5px !important; }
         html body .live-pulse { color: #dc2626 !important; }
         html body .info-box.active { border-color: #4361ee !important; box-shadow: 0 2px 10px rgba(67, 97, 238, .15) !important; }
         html body .card:hover { border-color: #cbd5e1 !important; box-shadow: 0 2px 12px rgba(15, 23, 42, .08) !important; }
@@ -741,6 +781,65 @@ function autoSubmitForm(form) {
 </script>
 
 <?= $this->renderSection('scripts') ?>
+
+<!-- ===== GLOBAL PHOTO LIGHTBOX (any profile picture, any module) ===== -->
+<div class="modal fade" id="globalPhotoModal" tabindex="-1">
+ <div class="modal-dialog modal-dialog-centered modal-lg">
+ <div class="modal-content">
+ <div class="modal-header">
+ <h5 class="modal-title"><i class="fas fa-image mr-2"></i><span id="globalPhotoTitle">Photo</span></h5>
+ <button type="button" class="close" data-dismiss="modal">&times;</button>
+ </div>
+ <div class="modal-body text-center" style="background:#0f172a;">
+ <img id="globalPhotoImg" src="" alt="" style="max-width:100%;max-height:72vh;border-radius:10px;background:#fff;">
+ </div>
+ <div class="modal-footer">
+ <a id="globalPhotoDownload" href="" download="photo.jpg" class="btn btn-sm btn-primary"><i class="fas fa-download mr-1"></i>Download</a>
+ <button type="button" class="btn btn-sm btn-outline-secondary" data-dismiss="modal">Close</button>
+ </div>
+ </div>
+ </div>
+</div>
+
+<style>
+/* every avatar thumbnail is clickable */
+img.avatar-round,
+.avatar-circle img,
+.h-avatar img,
+.child-avatar img,
+.img-circle img,
+.qr-thumb,
+.photo-cell img,
+td img.avatar-round,
+.table td img {
+    cursor: zoom-in;
+}
+</style>
+
+<script>
+(function () {
+    function openGlobalPhoto(src, title) {
+        if (!src) { return; }
+        if (typeof jQuery === 'undefined') { window.open(src, '_blank'); return; }
+        jQuery('#globalPhotoImg').attr('src', src);
+        jQuery('#globalPhotoTitle').text(title || 'Photo');
+        jQuery('#globalPhotoDownload').attr('href', src);
+        jQuery('#globalPhotoModal').modal('show');
+    }
+    window.openGlobalPhoto = openGlobalPhoto;
+
+    if (typeof jQuery === 'undefined') { return; }
+    jQuery(document).on('click', 'img.avatar-round, .avatar-circle img, .h-avatar img, .child-avatar img, .img-circle img, .qr-thumb, .photo-cell img', function (e) {
+        var $img = jQuery(this);
+        var src = $img.attr('src');
+        if (!src) { return; }
+        // If the image already has its own zoom handler, let it run and skip ours.
+        if ($img.attr('onclick')) { return; }
+        e.preventDefault();
+        openGlobalPhoto(src, $img.attr('alt') || $img.closest('tr, .child-card, .sf-card, .parent-row').find('strong, .parent-name, .student-name-link, .h-person-name').first().text().trim());
+    });
+})();
+</script>
 
 </body>
 </html>

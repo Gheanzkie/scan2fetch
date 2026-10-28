@@ -157,7 +157,7 @@ class ScanMonitor extends BaseController
 
         // ===== RELEASED STUDENTS =====
         $releasedBuilder = $db->table('fetch_logs');
-        $releasedBuilder->select('fetch_logs.*, students.fname as student_fname, students.lname as student_lname, students.grade_section');
+        $releasedBuilder->select('fetch_logs.*, students.fname as student_fname, students.mname as student_mname, students.lname as student_lname, students.grade_section, students.student_no');
         $releasedBuilder->join('students', 'students.id = fetch_logs.student_id', 'left');
         $releasedBuilder->where('DATE(fetch_logs.time_released)', $selectedDate);
         
@@ -178,6 +178,29 @@ class ScanMonitor extends BaseController
         $releasedBuilder->orderBy('fetch_logs.time_released', 'DESC');
         $data['releasedStudents'] = $releasedBuilder->get()->getResultArray();
 
+        // Fetcher / parent profile picture for each released row.
+        helper('photo');
+        $sfMap = [];
+        foreach ($db->table('sub_fetchers')->select('id, fname, lname')->get()->getResultArray() as $sf) {
+            $k = strtolower(trim(($sf['fname'] ?? '') . ' ' . ($sf['lname'] ?? '')));
+            if ($k !== '') { $sfMap[$k] = subfetcher_photo_url($sf['id']); }
+        }
+        $parentPhotoCache = [];
+        foreach ($data['releasedStudents'] as &$row) {
+            $name = strtolower(trim(($row['fetcher_fname'] ?? '') . ' ' . ($row['fetcher_lname'] ?? '')));
+            $photo = $sfMap[$name] ?? '';
+            if ($photo === '' && !empty($row['parent_id'])) {
+                $pid = (int) $row['parent_id'];
+                if (!array_key_exists($pid, $parentPhotoCache)) {
+                    $pr = $db->table('parents')->select('parent_no')->where('id', $pid)->get()->getRowArray();
+                    $parentPhotoCache[$pid] = !empty($pr['parent_no']) ? parent_photo_url((string) $pr['parent_no']) : '';
+                }
+                $photo = $parentPhotoCache[$pid];
+            }
+            $row['fetcher_photo'] = $photo;
+        }
+        unset($row);
+
         // ===== GET ALL GRADES FOR FILTER =====
         $data['grades'] = $db->table('students')
             ->select('grade_section')
@@ -188,7 +211,7 @@ class ScanMonitor extends BaseController
 
         // ===== ACTIVITY LOGS (Merged) =====
         $releases = $db->table('fetch_logs')
-            ->select('fetch_logs.*, students.fname as student_fname, students.lname as student_lname, students.grade_section')
+            ->select('fetch_logs.*, students.fname as student_fname, students.mname as student_mname, students.lname as student_lname, students.grade_section')
             ->join('students', 'students.id = fetch_logs.student_id', 'left')
             ->where('DATE(fetch_logs.time_released)', $selectedDate)
             ->orderBy('fetch_logs.time_released', 'DESC')
@@ -250,7 +273,7 @@ class ScanMonitor extends BaseController
         $releasedIdArray = array_column($releasedIds, 'student_id');
         
         $pendingBuilder = $db->table('students');
-        $pendingBuilder->select('students.*, parents.id as parent_id, parents.fname as parent_fname, parents.lname as parent_lname, parents.phone as parent_phone');
+        $pendingBuilder->select('students.*, parents.id as parent_id, parents.fname as parent_fname, parents.mname as parent_mname, parents.lname as parent_lname, parents.phone as parent_phone');
         $pendingBuilder->join('student_parents', 'student_parents.student_id = students.id', 'left');
         $pendingBuilder->join('parents', 'parents.id = student_parents.parent_id', 'left');
         
@@ -451,7 +474,7 @@ class ScanMonitor extends BaseController
         $releasedIdArray = array_column($releasedIds, 'student_id');
         
         $pendingBuilder = $db->table('students');
-        $pendingBuilder->select('students.*, parents.id as parent_id, parents.fname as parent_fname, parents.lname as parent_lname, parents.phone as parent_phone');
+        $pendingBuilder->select('students.*, parents.id as parent_id, parents.fname as parent_fname, parents.mname as parent_mname, parents.lname as parent_lname, parents.phone as parent_phone');
         $pendingBuilder->join('student_parents', 'student_parents.student_id = students.id', 'left');
         $pendingBuilder->join('parents', 'parents.id = student_parents.parent_id', 'left');
         
@@ -486,7 +509,7 @@ class ScanMonitor extends BaseController
                 $sentCount++;
                 $messages[] = [
                     'student' => $student['fname'] . ' ' . $student['lname'],
-                    'parent' => $student['parent_fname'] . ' ' . $student['parent_lname'],
+                    'parent' => full_name($student, 'parent_'),
                     'phone' => $student['parent_phone']
                 ];
                 
@@ -509,7 +532,7 @@ class ScanMonitor extends BaseController
                     session('role'),
                     'notify',
                     'scan',
-                    "SMS notification sent to {$student['parent_fname']} {$student['parent_lname']} for student {$student['fname']} {$student['lname']}"
+                    "SMS notification sent to " . full_name($student, 'parent_') . " for student " . full_name($student)
                 );
 
                 // ===== Also notify the teacher of this student's grade/section =====

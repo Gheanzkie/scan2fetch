@@ -87,10 +87,15 @@ body {
  <?php foreach ($subFetchers as $sf): ?>
  <div class="col-md-6 col-xl-4 mb-3">
  <div class="sf-card d-flex align-items-center" style="gap:.9rem;">
- <?php if (!empty($sf['qr_code'])): ?>
+ <?php $__sfp = subfetcher_photo_url($sf['id'] ?? 0); ?>
+ <?php if ($__sfp): ?>
+ <img src="<?= esc($__sfp) ?>" alt="<?= esc(full_name($sf)) ?>"
+ class="qr-thumb" style="object-fit:cover;cursor:zoom-in;"
+ onclick="openQrModal('<?= esc($__sfp) ?>','<?= esc(full_name($sf)) ?>')">
+ <?php elseif (!empty($sf['qr_code'])): ?>
  <img src="<?= base_url('uploads/qr/'.$sf['qr_code'].'.png') ?>" alt="QR"
  class="qr-thumb"
- onclick="openQrModal('<?= base_url('uploads/qr/'.$sf['qr_code'].'.png') ?>','<?= esc(trim(($sf['fname'] ?? '').' '.($sf['lname'] ?? ''))) ?>')">
+ onclick="openQrModal('<?= base_url('uploads/qr/'.$sf['qr_code'].'.png') ?>','<?= esc(full_name($sf)) ?>')">
  <?php else: ?>
  <div class="qr-thumb d-flex align-items-center justify-content-center" style="color:#cbd5e1;"><i class="fas fa-qrcode fa-2x"></i></div>
  <?php endif; ?>

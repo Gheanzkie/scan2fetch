@@ -1,0 +1,576 @@
+================================================================================
+ SCAN2FETCH
+ QR-Based Student Release & Pickup Monitoring System
+================================================================================
+
+Version      : 1.0
+Framework    : CodeIgniter 4 (PHP 8.x)
+Database     : MySQL / MariaDB (database name: scan2fetch)
+Server stack : XAMPP (Apache + PHP + MySQL)
+UI           : AdminLTE 3 / Bootstrap 4, custom pastel theme
+Companion app: /photo-station  (standalone ID picture station)
+
+--------------------------------------------------------------------------------
+TABLE OF CONTENTS
+--------------------------------------------------------------------------------
+ 1. What the system does
+ 2. Requirements
+ 3. Installation and setup
+ 4. Folder structure
+ 5. User roles and permissions
+ 6. ID formats
+ 7. Module reference (every function)
+ 8. Daily workflow
+ 9. Sessions and release rules
+10. SMS and notifications
+11. Database tables
+12. Configuration files
+13. Picture station (photo-station)
+14. Notes and troubleshooting
+15. Recent changes in this build
+
+================================================================================
+1. WHAT THE SYSTEM DOES
+================================================================================
+
+Scan2Fetch is the gate-side release and pickup monitoring system for the school.
+Every learner has a record, every guardian (and sub-fetcher) carries a QR code,
+and every hand-over is written to a log containing:
+
+  - the student
+  - the person who fetched the child (name + relation)
+  - the guardian account behind that QR code (Parent ID + phone)
+  - the staff member who released the child
+  - the exact date and time
+  - the session: MORNING or AFTERNOON
+  - the method (QR)
+
+The system answers four questions at any moment:
+
+  1. Who is still inside the campus?        -> Scan Monitor
+  2. Who picked up the child?               -> Pickup History
+  3. When was the child released?           -> Pickup History / Teacher roster
+  4. Who released the child?                -> Pickup History / Activity Logs
+
+Parents receive an SMS the moment a child is released. Every action (login,
+create, update, delete, release, decline) is stored in the Activity Logs so any
+record can be audited later.
+
+================================================================================
+2. REQUIREMENTS
+================================================================================
+
+  - PHP 8.1 or newer (tested on PHP 8.2.12, XAMPP build)
+  - MySQL 5.7+ / MariaDB 10.4+
+  - Apache with mod_rewrite enabled (or `php spark serve` for development)
+  - PHP extensions: intl, mbstring, mysqli/pdo_mysql, json, curl
+  - Composer (only needed to reinstall dependencies)
+  - A camera-capable device for the gate scanner (tablet or laptop)
+  - SMS gateway configured on the server (local SMS bridge / HTTP gateway)
+
+================================================================================
+3. INSTALLATION AND SETUP
+================================================================================
+
+  1) Copy the project into the web root, e.g. C:\xampp\htdocs\scan2fetch
+  2) Create the database:
+         CREATE DATABASE scan2fetch CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+  3) Import the schema (students, parents, student_parents, sub_fetchers,
+     teachers, staffs, fetch_logs, activity_logs, sms_logs, schedule, ...)
+  4) Copy .env.example to .env and set:
+
+         CI_ENVIRONMENT = development      (use "production" on the live server)
+
+         database.default.hostname = localhost
+         database.default.database = scan2fetch
+         database.default.username = root
+         database.default.password =
+         database.default.DBDriver = MySQLi
+
+         app.baseURL = 'http://localhost/scan2fetch/'
+
+  5) Make sure these folders are writable:
+         writable/
+         writable/session/
+         writable/cache/
+         writable/logs/
+         public/uploads/qr/
+         public/uploads/students/
+         public/uploads/parents/
+
+  6) Open the base URL. Log in with the administrator account created during
+     seeding (default seed: phone "admin", password set in the seeder).
+
+  7) Enrol the first students (form or Excel import), then open the gate.
+
+Apache shortcut:
+    http://localhost/scan2fetch/         (document root = htdocs)
+
+Development shortcut:
+    php spark serve --port 8080
+
+================================================================================
+4. FOLDER STRUCTURE
+================================================================================
+
+app/
+  Config/
+    Routes.php              all URL routes
+    Database.php            DB connection
+    Filters.php / AuthFilter role guard
+  Controllers/
+    Auth.php                login, logout, change password, update profile
+    Dashboard.php           role-aware dashboard
+    Students.php            students CRUD, Excel import, pickup history
+    Parents.php             guardians, releases, notifications, password SMS
+    SubFetchers.php         additional authorised pickers
+    Teachers.php            teacher accounts, class roster, notifications
+    Staffs.php              staff accounts
+    Scan.php                scanner: verify / release / decline / set session
+    ScanMonitor.php         live pending board + reminder SMS
+    Sms.php                 SMS log viewer
+    Schedule.php            open/close day, session windows
+    Logs.php                activity log viewer
+    Messages.php            parent <-> office chat
+    Photo.php               student picture endpoint (student station)
+  Models/
+    StudentModel, ParentsModel, TeachersModel, StaffsModel, SubFetcherModel,
+    FetchLogModel, ActivityLogModel, ScheduleModel, ...
+  Views/
+    dashboard.php, students.php, students_view.php, register.php,
+    parents.php, parents_view.php, parents_children.php, ...
+    teachers.php, teachers_view.php, teachers_student_view.php,
+    staffs.php, scan.php, scan_kiosk.php, scan_monitor.php,
+    schedule.php, logs.php, sms_logs.php, messages.php,
+    theme/template.php + theme/sidebar.php
+public/
+  index.php                 front controller
+  assets/                   AdminLTE, plugins
+  uploads/qr/               generated QR PNGs
+  uploads/students/         student pictures
+  uploads/parents/          guardian pictures
+writable/                   cache, logs, session
+
+================================================================================
+5. USER ROLES AND PERMISSIONS
+================================================================================
+
+ADMIN
+  - Full access: students, parents, teachers, staff, scanning, monitor,
+    schedule, logs, SMS logs, messages
+  - Can open/close the day and switch sessions
+  - Can delete records and "delete all" a module
+
+STAFF
+  - Operates the gate: scan, release, decline, kiosk
+  - Students and parents management (add, edit, import, view)
+  - Scan monitor and reminder SMS
+  - Activity logs and SMS logs
+  - Cannot manage the schedule
+
+TEACHER
+  - "My Students" roster for their own grade/section
+  - Morning/Afternoon release status per student, per selected date
+  - Pickup notifications for the class
+
+PARENT
+  - Own children, their pickup history and release records
+  - Sub-fetchers management
+  - Notifications
+  - Chat with the office (Messages)
+
+Role is enforced server-side on every request (AuthFilter + per-method checks).
+The sidebar shows only the modules the account may open.
+
+================================================================================
+6. ID FORMATS
+================================================================================
+
+  Record           Format        Example     Entered at
+  ---------------  ------------  ----------  ----------------------------------
+  Student          number        1001        Excel import (col J) or form
+  Parent / Guardian P-####       P-1001      Excel import (col K) or form
+  Teacher          T-####        T-1001      form (blank = auto next)
+  Staff            S-####        S-1002      form (blank = auto next)
+
+Rules:
+  - IDs are unique. A duplicate is rejected with an error message.
+  - Left blank, the Teacher / Staff form assigns the next free number
+    (T-1001, T-1002 ... / S-1001, S-1002 ...).
+  - The ID is what gets printed on the QR code and typed at the counter.
+
+================================================================================
+7. MODULE REFERENCE
+================================================================================
+
+--------------------------------------------------------------------------------
+7.1 DASHBOARD                                         (all roles)
+--------------------------------------------------------------------------------
+  - Total students, releases today, pending pickups
+  - Active session indicator
+  - Recent releases list
+  - Teachers get class-scoped statistics instead of school-wide numbers
+
+--------------------------------------------------------------------------------
+7.2 STUDENTS                                          (admin, staff)
+--------------------------------------------------------------------------------
+  Student list
+    - Columns: #, Student ID, Name, Teacher (adviser), Grade/Section,
+      Parent/Guardian(s), Created, Actions
+    - Search by name, grade or student ID
+
+  Register / Add student
+    - Student details + guardian (name, phone, relation, Parent ID)
+    - Optional sub-fetchers
+    - On save: QR codes are generated and shown for download/printing
+
+  Import Excel
+    - Required columns:
+        1 First name       2 Middle name      3 Last name
+        4 Grade & Section  5 Parent first     6 Parent middle
+        7 Parent last      8 Parent phone     9 Relation
+       10 Student ID      11 Parent ID (P-####)
+    - Duplicate parent phone reuses the existing guardian instead of
+      creating a second record
+    - Each row is validated separately; bad rows are skipped and explained
+
+  View student
+    - Profile: name, Student ID, grade/section, adviser, created date
+    - Edit / Delete buttons
+    - Main parent / guardian cards (QR thumbnail, "Go to Parent")
+    - Sub-fetchers list
+    - PICKUP HISTORY (see below)
+
+  PICKUP HISTORY (on the student view)
+    - Built ONLY from real release logs (no invented "not fetched" rows)
+    - Columns: #, Date/Time, Session, Fetched By (Profile), Method,
+      Released By
+    - "Fetched By" shows an avatar with initials, the full name, the
+      relation badge, the guardian phone and the Parent ID; when a
+      sub-fetcher did the pickup, the guardian account is shown too
+    - Filters:
+        * Date picker  - show one day only
+        * Search box   - matches date, session, time, fetcher name,
+                         relation, method and releasing staff
+    - Empty table = no release recorded (or no match for the filter)
+
+  Edit / Delete / Delete all
+    - Edit updates the student record
+    - Delete removes the student, their guardian links and their logs
+    - Delete all wipes the roster (admin only, confirmation required)
+
+--------------------------------------------------------------------------------
+7.3 PARENTS / GUARDIANS                               (admin, staff)
+--------------------------------------------------------------------------------
+  Directory
+    - Columns: #, Parent ID, Name, Phone, Student/Grade, Relation, QR,
+      Password status, Created, Actions
+    - Search by name, phone or Parent ID
+
+  View parent
+    - Profile with Parent ID, phone, QR code
+    - Linked children
+    - Sub-fetchers
+
+  Send password / Reset password
+    - Generates a password and delivers it by SMS
+    - "Send all" serves every account that has not received one
+    - Every message is recorded in SMS Logs
+
+  Releases     - release history of that guardian's children
+  Notifications- pickup notices received, delete one or clear all
+  Picture      - guardian photo used by the photo station
+
+--------------------------------------------------------------------------------
+7.4 SUB-FETCHERS                                      (admin, staff, parent)
+--------------------------------------------------------------------------------
+  - Extra authorised pickers per family (driver, relative, helper)
+  - Each has its own QR code and is linked to one student + one guardian
+  - Create / edit / delete from the student or parent screen
+
+--------------------------------------------------------------------------------
+7.5 TEACHERS                                          (admin, staff)
+--------------------------------------------------------------------------------
+  Directory
+    - Columns: #, Teacher ID, Full Name, Phone, Grade/Section,
+      Students (class size), Password status, Created, Actions
+    - Class size = students whose adviser is this teacher OR whose
+      grade/section matches the teacher's section
+
+  Register teacher
+    - First / middle / last name, Teacher ID (optional, auto T-####),
+      phone (unique), grade/section
+
+  Teacher view  (also used by the teacher's own "My Students")
+    - Profile card: name, Teacher ID, phone, section
+    - Students counter card:
+        * Picked up on <selected date>  (green count)
+        * Still waiting                 (orange count)
+    - Class Roster for the selected date:
+        #, Student (name + Student ID), Grade, MORNING, AFTERNOON
+        - green check + release time when released
+        - red X when not yet picked up in that session
+    - Date picker changes the monitored day
+    - Search filters the roster
+
+  Notifications       - pickup notices for the class
+  Send / reset password via SMS
+
+--------------------------------------------------------------------------------
+7.6 STAFF                                             (admin, staff)
+--------------------------------------------------------------------------------
+  Directory
+    - Columns: #, Staff ID, Full Name, Phone, Password status,
+      Created, Actions
+  Add / edit staff
+    - Staff ID optional (auto S-####), name, phone
+  Send / reset password via SMS
+  Delete / delete all
+
+--------------------------------------------------------------------------------
+7.7 QR SCAN (GATE)                                    (admin, staff)
+--------------------------------------------------------------------------------
+  Scan       - camera screen, reads guardian/sub-fetcher QR codes
+  Kiosk      - full-screen scanner for the gate tablet
+  Verify     - confirms a code belongs to a registered guardian and shows
+               the student card with the guardians allowed to fetch
+  Release    - writes the release (student, guardian, fetcher, relation,
+               method, session, staff, timestamp), sends the parent SMS and
+               blocks a second release in the same session
+  Decline    - records a refused pickup and notifies the guardian
+  Set session- manual morning/afternoon switch (admin/staff)
+
+--------------------------------------------------------------------------------
+7.8 SCAN MONITOR                                      (admin, staff)
+--------------------------------------------------------------------------------
+  - Live list of students still inside for the current date/session
+  - Select students and send pickup reminders in bulk
+  - Choose SMS mode (automatic / manual)
+  - Trigger the automatic reminder run
+
+--------------------------------------------------------------------------------
+7.9 SMS LOGS                                          (admin, staff)
+--------------------------------------------------------------------------------
+  - Every SMS produced by the system: recipient, phone, body, timestamp,
+    status
+  - View details of one message, delete one, or clear all
+
+--------------------------------------------------------------------------------
+7.10 SCHEDULE                                         (admin)
+--------------------------------------------------------------------------------
+  - Open or close the day for releases
+  - Define the morning and afternoon windows (cut-off times)
+  - Switch the active session
+  - Outside the window, releases are refused until the day is opened
+
+--------------------------------------------------------------------------------
+7.11 ACTIVITY LOGS                                    (admin, staff)
+--------------------------------------------------------------------------------
+  - Audit trail of the whole system
+  - Columns: #, Date/Time, User, Role, Action, Module, Description
+  - Filters: action, module, date, free-text search
+  - Records logins, creates, updates, deletes, releases and declines
+
+--------------------------------------------------------------------------------
+7.12 MESSAGES                                         (admin, staff, parent)
+--------------------------------------------------------------------------------
+  - Parent <-> office chat
+  - Unread badge in the sidebar
+
+--------------------------------------------------------------------------------
+7.13 ACCOUNT                                          (all roles)
+--------------------------------------------------------------------------------
+  - Change password
+  - Update profile (name, phone)
+
+================================================================================
+8. DAILY WORKFLOW
+================================================================================
+
+  1. Admin opens the day        -> Schedule: open day, confirm both windows
+  2. Gate staff open the scanner-> Scan or Kiosk, logged in with their account
+  3. Guardian presents QR code  -> scanner resolves the child and guardians
+  4. Staff confirm the release  -> system stamps date/time/session/staff,
+                                   writes the log, sends the SMS
+  5. Monitoring                 -> Scan Monitor shows who is still inside;
+                                   teacher roster shows MORNING / AFTERNOON
+                                   status per student for the chosen date
+  6. End of day                 -> Admin closes the day; records, SMS and
+                                   activity logs stay available for audit
+
+================================================================================
+9. SESSIONS AND RELEASE RULES
+================================================================================
+
+  - Two sessions per day: MORNING and AFTERNOON
+  - Every release is tagged with the session active at scan time
+  - One release per session: a child cannot be released twice in the same
+    session; the second attempt is blocked with a message
+  - Time windows: releases are only allowed inside the configured window;
+    outside it the scanner refuses until an admin opens the day or switches
+    the session manually
+  - The pickup history reports the session exactly as recorded in the log
+    (e.g. a 12:41 PM scan that the scanner resolved as MORNING stays MORNING)
+
+================================================================================
+10. SMS AND NOTIFICATIONS
+================================================================================
+
+  - Release SMS   : "Your child <name> has been released at <time>."
+  - Decline SMS   : the guardian is told the pickup attempt was refused
+  - Pickup reminder: sent from Scan Monitor to the guardians of students
+                    still inside (single or bulk, manual or automatic)
+  - Passwords     : parents, teachers and staff receive their password by SMS
+  - In-app notifications are also shown to parents and teachers
+
+================================================================================
+11. DATABASE TABLES
+================================================================================
+
+  students             student_no, name, grade_section, adviser_id, timestamps
+  parents              parent_no, name, phone, password, qr_code, picture
+  student_parents      student_id, parent_id, relation
+  sub_fetchers         student_id, parent_id, name, phone, qr_code
+  teachers             teacher_no, name, phone, grade_section, password
+  staffs               staff_no, name, phone, password
+  fetch_logs           student_id, parent_id, fetcher name/relation, method,
+                       session_type, staff_id, time_released
+  activity_logs        user, role, action, module, description, created_at
+  sms_logs             recipient, phone, message, status, created_at
+  sms_notification_logs reminder records
+  schedule             day status, session windows, active session
+  messages             parent <-> office chat threads
+
+  Deletions cascade: removing a student removes their guardian links and
+  release logs; removing a parent removes the links to their children. The
+  activity log still records that the deletion happened and by whom.
+
+================================================================================
+12. CONFIGURATION FILES
+================================================================================
+
+  .env                     environment, base URL, database credentials
+  app/Config/Routes.php    URL routing (all modules)
+  app/Config/Database.php  database connection settings
+  app/Config/Filters.php   auth filter registration
+  app/Config/App.php       base URL, timezone
+  photo-station/config.php PIN, saved folders, labels, image size/quality
+
+================================================================================
+13. PICTURE STATION (photo-station)
+================================================================================
+
+  A separate small tool for taking ID pictures at enrolment.
+
+  URL          : http://localhost/photo-station/
+  Unlock       : PIN (default 1234, change it in photo-station/config.php)
+  Save folders : students, parents/fetchers
+                 (teacher and staff picture categories were removed)
+  Usage        : open camera -> type the ID -> capture -> retake if needed ->
+                 save. The file is named after the ID so the main system
+                 picks it up without an import step.
+  Recent list  : shows the latest pictures; a wrong shot can be deleted and
+                 retaken.
+
+================================================================================
+14. NOTES AND TROUBLESHOOTING
+================================================================================
+
+  Blank pickup history
+      No release has been scanned for that child, or the selected date /
+      search has no matching record. The history never invents rows.
+
+  Teacher sees no students
+      A teacher's class = students whose adviser is that teacher OR whose
+      grade/section matches the teacher's section. Re-saving the teacher
+      re-links students of that section to them.
+
+  Guardian cannot be scanned
+      Check the QR code is registered under that parent or sub-fetcher and
+      that the guardian exists in the Parents list.
+
+  No SMS received
+      Confirm the guardian's phone number, then check SMS Logs for the entry
+      and its result.
+
+  Release refused
+      The day is closed, the time window has passed, or the child was already
+      released in the current session.
+
+  Forgot password
+      Admin or staff can send a new password by SMS from the Parents,
+      Teachers or Staff list.
+
+  Duplicate ID
+      Student / Parent / Teacher / Staff IDs must be unique. Leave the
+      Teacher or Staff ID field blank to accept the next free number.
+
+  Session expired
+      Log in again; sessions expire after the configured lifetime.
+
+  Camera not opening at the gate
+      Browsers only expose the camera on https or localhost. Use
+      http://localhost/... or serve the app over HTTPS.
+
+================================================================================
+15. RECENT CHANGES IN THIS BUILD
+================================================================================
+
+  - Parent ID column added to the Parents directory and parent profile
+  - Student ID column added to the Students directory and student profile
+  - Pickup History added to the student view, activity-log layout, built
+    strictly from release logs, with date filter and search
+  - Student profile: live status widget removed, Edit / Delete buttons
+    promoted
+  - Teacher class list and class-size counters now match on adviser OR
+    grade/section (fixes "new section teacher sees no students")
+  - claimUnassignedStudents() re-links students whose adviser belongs to a
+    different section
+  - Releases now store staff_id so history can name the releasing staff
+  - Teacher roster: MORNING / AFTERNOON monitoring restored
+  - Teacher ID (T-####) and Staff ID (S-####) columns, forms and auto
+    numbering added
+  - Photo station: teacher and staff picture categories removed
+    (students and parents only)
+
+================================================================================
+ END OF FILE
+ Scan2Fetch - QR-Based Student Release & Pickup Monitoring System
+================================================================================
+
+================================================================================
+ PROFILE PICTURES, QR FILES AND UPLOADS
+================================================================================
+
+Storage folders (all under public/uploads, mirrored to <project>/uploads):
+    uploads/students/      {student_no}.jpg        e.g. 1234.jpg
+    uploads/parents/       {parent_no}.jpg         e.g. P-1234.jpg
+    uploads/teachers/      {teacher_no}.jpg        e.g. T-1001.jpg
+    uploads/staffs/        {staff_no}.jpg          e.g. S-1002.jpg
+    uploads/subfetchers/   {subfetcher_id}.jpg     e.g. 12.jpg
+    uploads/qr/            {qr_code}.png           e.g. QR-KFJNY.png
+
+Rules
+ - Photos are square-cropped in the browser to 400x400 JPEG (q=0.9) before POST.
+ - Saved server-side by app/Helpers/photo_helper.php (FCPATH . 'uploads/...').
+ - Only JPG/JPEG/PNG/WEBP accepted; max upload guard applies.
+ - A missing file is not an error: the UI falls back to an initials chip.
+
+Where pictures can be set
+ - Register page: student + parent avatars (Step 1 / Step 2).
+ - Students list  -> 3-dot menu -> Edit (floating modal, picture + Delete picture)
+ - Parents list   -> 3-dot menu -> Edit (floating modal, picture + Delete picture)
+ - Teachers list  -> Edit modal (picture + Delete picture)
+ - Staffs list    -> Edit modal (picture + Delete picture)
+ - Sub-fetchers   -> add/edit modals inside the parent profile page.
+
+Deployment note
+ - If DocumentRoot is the PROJECT ROOT (not /public), the folder
+   <project>/uploads must exist and resolve to public/uploads, e.g.
+       mklink /J C:\xampp\htdocs\scan2fetch\uploads C:\xampp\htdocs\scan2fetch\public\uploads
+   Without this link every /uploads/... URL returns 404 and QR codes /
+   profile pictures do not display.
+
+================================================================================
+ END OF PICTURE SECTION
+================================================================================

@@ -46,7 +46,7 @@ class SubFetchers extends BaseController
 
         $qrValue = $this->generateQR();
 
-        $this->subFetcherModel->insert([
+        $newId = $this->subFetcherModel->insert([
             'parent_id'  => $parentId,
             'student_id' => $studentId,
             'fname'      => $this->request->getPost('fname'),
@@ -56,6 +56,13 @@ class SubFetchers extends BaseController
             'qr_code'    => $qrValue,
             'created_by' => session('user_id'),
         ]);
+
+        // Sub-fetcher profile picture (optional) -> uploads/subfetchers/{id}.jpg
+        helper('photo');
+        $__pic = (string) $this->request->getPost('subfetcher_picture_data');
+        if ($__pic !== '' && $newId) {
+            photo_save_subfetcher_dataurl($__pic, $newId);
+        }
 
         $this->logModel->addLog(
             session('user_id'), 
@@ -82,6 +89,15 @@ class SubFetchers extends BaseController
         ];
 
         $this->subFetcherModel->update($id, $data);
+
+        // Sub-fetcher profile picture (add / change / remove).
+        helper('photo');
+        $__pic = (string) $this->request->getPost('subfetcher_picture_data');
+        if ($__pic !== '' && $id) {
+            photo_save_subfetcher_dataurl($__pic, $id);
+        } elseif ((string) $this->request->getPost('subfetcher_picture_remove') === '1' && $id) {
+            subfetcher_photo_delete($id);
+        }
         $this->logModel->addLog(
             session('user_id'), 
             session('fname').' '.session('lname'), 

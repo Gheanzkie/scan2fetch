@@ -282,7 +282,7 @@ body {
  <td style="color: #8888aa; font-size: 13px;"><?= date('M d, Y h:i A', strtotime($s['sent_at'])) ?></td>
  <td>
  <strong style="color: #2d2d4a;">
- <?= esc($s['student_fname'] ?? 'Unknown') ?> <?= esc($s['student_lname'] ?? '') ?>
+ <?= esc(full_name($s, 'student_') ?: 'Unknown') ?>
  </strong>
  <br>
  <small style="color: #8888aa; font-size: 12px;">

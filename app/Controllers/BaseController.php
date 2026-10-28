@@ -37,6 +37,7 @@ abstract class BaseController extends Controller
         // $this->helpers = ['form', 'url'];
 
         // Caution: Do not edit this line.
+        helper('name');
         parent::initController($request, $response, $logger);
 
         // Preload any models, libraries, etc, here.

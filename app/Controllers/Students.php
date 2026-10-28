@@ -59,6 +59,7 @@ class Students extends BaseController
 
     public function index()
     {
+        helper('photo');
         // Admin/staff management list. A parent must never see the whole
         // roster + every parent contact; a teacher works from their own
         // class at /teachers-view/{id}. (Belt: AuthFilter already blocks
@@ -141,7 +142,116 @@ class Students extends BaseController
         $data['parentCount'] = count($data['parents']);
         $data['subFetchers'] = $this->subFetcherModel->where('student_id', $id)->findAll();
 
+        // ===== FETCH HISTORY (date / session / who / what time) =====
+        // Date selection: empty = every recorded day (plus today), otherwise
+        // only that day. Invalid input is ignored instead of throwing.
+        $selectedDate = (string) ($this->request->getGet('date') ?? '');
+        if ($selectedDate !== '' && ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDate)) {
+            $selectedDate = '';
+        }
+        $search = trim((string) ($this->request->getGet('q') ?? ''));
+
+        $logs = $db->table('fetch_logs')
+            ->where('student_id', $id)
+            ->orderBy('time_released', 'ASC')
+            ->limit(2000)
+            ->get()
+            ->getResultArray();
+
+        // Resolve the staff account behind staff_id. It may live in staffs,
+        // teachers or admin depending on who was logged in at the scanner.
+        $staffIds = array_values(array_unique(array_filter(array_column($logs, 'staff_id'))));
+        $staffMap  = [];
+        if (!empty($staffIds)) {
+            foreach (['staffs', 'teachers', 'admin'] as $table) {
+                foreach ($db->table($table)->select('id, fname, lname')->whereIn('id', $staffIds)->get()->getResultArray() as $row) {
+                    $staffMap[$row['id']] = trim($row['fname'] . ' ' . $row['lname']);
+                }
+            }
+        }
+
+        // Guardian account behind each release, so the history can show the
+        // profile block of the person who actually did the pickup.
+        $parentIds = array_values(array_unique(array_filter(array_column($logs, 'parent_id'))));
+        $parentMap = [];
+        if (!empty($parentIds)) {
+            foreach ($db->table('parents')
+                ->select('id, parent_no, fname, mname, lname, phone, qr_code')
+                ->whereIn('id', $parentIds)->get()->getResultArray() as $p) {
+                $parentMap[$p['id']] = $p;
+            }
+        }
+
+        // One row per REAL fetch log — nothing is synthesised. A session or a
+        // day with no record never appears, so a morning scan can no longer
+        // produce a phantom "afternoon not fetched" row.
+        $historyRows = [];
+        // Lookup: fetcher name -> profile picture URL (sub-fetchers assigned to this student).
+        helper('photo');
+        $fetcherPhotoMap = [];
+        foreach (($data['subFetchers'] ?? []) as $sf) {
+            $nm = strtolower(trim(($sf['fname'] ?? '') . ' ' . ($sf['lname'] ?? '')));
+            if ($nm !== '') {
+                $fetcherPhotoMap[$nm] = subfetcher_photo_url($sf['id'] ?? 0);
+            }
+        }
+        foreach ($logs as $l) {
+            $guardian = !empty($l['parent_id']) ? ($parentMap[$l['parent_id']] ?? null) : null;
+
+            $row = [
+                'ts'       => $l['time_released'],
+                'date'     => substr($l['time_released'], 0, 10),
+                'session'  => $l['session_type'] ?: 'unspecified',
+                'time'     => date('h:i A', strtotime($l['time_released'])),
+                'fetcher'  => trim(($l['fetcher_fname'] ?? '') . ' ' . ($l['fetcher_lname'] ?? '')),
+                'fetcher_photo' => $fetcherPhotoMap[strtolower(trim(($l['fetcher_fname'] ?? '') . ' ' . ($l['fetcher_lname'] ?? '')))] ?? null,
+                'relation' => $l['fetcher_relation'] ?? null,
+                'method'   => $l['method'] ?? null,
+                'staff'    => $staffMap[$l['staff_id']] ?? null,
+                'guardian' => $guardian ? trim(($guardian['fname'] ?? '') . ' ' . ($guardian['lname'] ?? '')) : null,
+                'guardian_no'    => $guardian['parent_no'] ?? null,
+                'guardian_phone' => $guardian['phone'] ?? null,
+            ];
+
+            if ($selectedDate !== '' && $row['date'] !== $selectedDate) {
+                continue;
+            }
+            if ($search !== '' && ! $this->historyRowMatches($row, $search)) {
+                continue;
+            }
+            $historyRows[] = $row;
+        }
+
+        // Newest pickup first.
+        usort($historyRows, static fn ($a, $b) => strcmp($b['ts'], $a['ts']));
+
+
+        $data['history']      = $logs;
+        $data['historyRows']  = $historyRows;
+        $data['staffMap']     = $staffMap;
+        $data['selectedDate'] = $selectedDate;
+        $data['search']       = $search;
+
         return view('students_view', $data);
+    }
+
+    /**
+     * Does a single history row match the free-text search box?
+     * Matches date, session, fetcher, relation, method and releasing staff.
+     */
+    private function historyRowMatches(array $row, string $search): bool
+    {
+        $haystack = strtolower(implode(' ', array_filter([
+            $row['date']     ?? '',
+            $row['session']  ?? '',
+            $row['time']     ?? '',
+            $row['fetcher']  ?? '',
+            $row['relation'] ?? '',
+            $row['method']   ?? '',
+            $row['staff']    ?? '',
+        ], static fn ($v) => $v !== null && $v !== '')));
+
+        return strpos($haystack, strtolower($search)) !== false;
     }
 
     // ========== ADD FORM ==========
@@ -154,20 +264,6 @@ class Students extends BaseController
             return redirect()->to('/dashboard')->with('error', 'Access denied.');
         }
         return view('register');
-    }
-
-    // ========== EDIT FORM ==========
-    public function edit($id)
-    {
-        if (! in_array(session('role'), ['admin', 'staff'], true)) {
-            // Return the redirect (not bare return): requireAdminStaff()-style
-            // send() + null lets CI4 still render the view body -> 200 with a
-            // Location header, which a browser may ignore.
-            return redirect()->to('/dashboard')->with('error', 'Access denied.');
-        }
-        $data['student'] = $this->studentModel->find($id);
-        if (!$data['student']) return redirect()->to('/students')->with('error', 'Student not found');
-        return view('students_edit', $data);
     }
 
     // ========== SAVE STUDENT + PARENTS + FETCHERS ==========
@@ -192,6 +288,7 @@ class Students extends BaseController
             $sMnames = $this->asArray($this->request->getPost('mname'));
             $sLnames = $this->asArray($this->request->getPost('lname'));
             $sGrades = $this->asArray($this->request->getPost('grade_section'));
+            $sNumbers = $this->asArray($this->request->getPost('student_no'));
 
             if ($sFnames === []) {
                 throw new \Exception('No student details provided');
@@ -209,7 +306,17 @@ class Students extends BaseController
                     throw new \Exception('Student surname is required');
                 }
 
+                // Manual Student ID — typed by the registrar, never generated.
+                $sNumber = trim((string) ($sNumbers[$i] ?? ''));
+                if ($sNumber === '') {
+                    throw new \Exception('Student ID is required for every student.');
+                }
+                if ($this->studentModel->where('student_no', $sNumber)->first()) {
+                    throw new \Exception("Student ID {$sNumber} is already registered.");
+                }
+
                 $sid = $this->studentModel->insertWithAdviser([
+                    'student_no'    => $sNumber,
                     'fname'         => $sFname,
                     'mname'         => $sMnames[$i] ?? null,
                     'lname'         => $sLname,
@@ -219,6 +326,20 @@ class Students extends BaseController
 
                 if (!$sid) {
                     throw new \Exception('Failed to save student');
+                }
+
+                // ===== Student profile picture (optional) =====
+                // A data-URL posted from the register avatar. Stored as
+                // uploads/students/{student_no}.jpg so the rest of the system
+                // picks it up automatically.
+                helper('photo');
+                $sPic   = $this->asArray($this->request->getPost('student_picture_data'));
+                $sPicRm = $this->asArray($this->request->getPost('student_picture_remove'));
+                $picData = (string) ($sPic[$i] ?? '');
+                if ($picData !== '') {
+                    photo_save_dataurl($picData, $sNumber);
+                } elseif ((string) ($sPicRm[$i] ?? '0') === '1') {
+                    student_photo_delete($sNumber);
                 }
 
                 $studentIds[] = $sid;
@@ -245,12 +366,22 @@ class Students extends BaseController
                 $parentLnames    = $this->asArray($this->request->getPost('parent_lname'));
                 $parentPhones    = $this->asArray($this->request->getPost('parent_phone'));
                 $parentRelations = $this->asArray($this->request->getPost('parent_relation'));
+                $parentNos       = $this->asArray($this->request->getPost('parent_no'));
 
                 foreach ($parentFnames as $i => $fname) {
                     if (empty($fname) || $i >= 3) continue;
 
                     $phone   = trim((string) ($parentPhones[$i] ?? ''));
                     $relation = $parentRelations[$i] ?? 'Parent';
+
+                    // Manual Parent/Fetcher ID — must be P-<number>.
+                    $parentNo = strtoupper(trim((string) ($parentNos[$i] ?? '')));
+                    if ($parentNo === '') {
+                        throw new \Exception('Parent/Fetcher ID is required.');
+                    }
+                    if (! str_starts_with($parentNo, 'P-')) {
+                        $parentNo = preg_match('/(\d+)$/', $parentNo, $m) ? 'P-' . $m[1] : 'P-' . $parentNo;
+                    }
 
                     // ===== ONE PARENT, MANY CHILDREN =====
                     // parents.phone is UNIQUE. If the phone already belongs to a
@@ -265,9 +396,16 @@ class Students extends BaseController
                     if ($existingParent) {
                         $parentId = $existingParent['id'];
                         $qrValue  = $existingParent['qr_code'];
+                        if (empty($existingParent['parent_no'])) {
+                            $this->parentsModel->update($parentId, ['parent_no' => $parentNo]);
+                        }
                     } else {
+                        if ($this->parentsModel->where('parent_no', $parentNo)->first()) {
+                            throw new \Exception("Parent ID {$parentNo} is already registered.");
+                        }
                         $qrValue  = $this->generateQR();
                         $parentId = $this->parentsModel->insert([
+                            'parent_no'    => $parentNo,
                             'fname'        => $fname,
                             'mname'        => $parentMnames[$i] ?? null,
                             'lname'        => $parentLnames[$i] ?? '',
@@ -285,6 +423,19 @@ class Students extends BaseController
 
                     if ($firstParentId === null) {
                         $firstParentId = $parentId;
+                    }
+
+                    // ===== Parent profile picture (optional) =====
+                    // Same data-URL mechanism, stored as
+                    // uploads/parents/{parent_no}.jpg.
+                    helper('photo');
+                    $pPic   = $this->asArray($this->request->getPost('parent_picture_data'));
+                    $pPicRm = $this->asArray($this->request->getPost('parent_picture_remove'));
+                    $pPicData = (string) ($pPic[$i] ?? '');
+                    if ($pPicData !== '') {
+                        photo_save_parent_dataurl($pPicData, $parentNo);
+                    } elseif ((string) ($pPicRm[$i] ?? '0') === '1') {
+                        parent_photo_delete($parentNo);
                     }
 
                     $registeredParents[] = [
@@ -481,12 +632,31 @@ class Students extends BaseController
             $plname = trim((string) ($vals[6] ?? ''));
             $pphone = trim((string) ($vals[7] ?? ''));
             $rel    = trim((string) ($vals[8] ?? '')) ?: 'Parent';
+            // Manual IDs — typed by the registrar in Excel, never generated.
+            $studentNo = trim((string) ($vals[9] ?? ''));
+            $parentNo  = strtoupper(trim((string) ($vals[10] ?? '')));
 
             $excelRow = $rowIndex + 1;
 
             if ($sfname === '' || $slname === '' || $pfname === '' || $plname === '' || $pphone === '') {
                 $skipped++;
                 $skipReasons[] = "row $excelRow: missing required field(s)";
+                continue;
+            }
+
+            if ($studentNo === '') {
+                $skipped++;
+                $skipReasons[] = "row $excelRow: missing Student ID (column J)";
+                continue;
+            }
+            if ($parentNo === '') {
+                $skipped++;
+                $skipReasons[] = "row $excelRow: missing Parent/Fetcher ID (column K)";
+                continue;
+            }
+            if (!str_starts_with($parentNo, 'P-')) {
+                $skipReasons[] = "row $excelRow: Parent ID must start with P- (got $parentNo)";
+                $skipped++;
                 continue;
             }
 
@@ -499,6 +669,7 @@ class Students extends BaseController
             $db->transStart();
             try {
                 $studentId = $this->studentModel->insertWithAdviser([
+                    'student_no'    => $studentNo,
                     'fname'         => $sfname,
                     'mname'         => $smname ?: null,
                     'lname'         => $slname,
@@ -512,9 +683,14 @@ class Students extends BaseController
                 if ($existingParent) {
                     $parentId = $existingParent['id'];
                     $reused++;
+                    // Fill the manual parent ID if the existing record has none.
+                    if (empty($existingParent['parent_no'])) {
+                        $this->parentsModel->update($parentId, ['parent_no' => $parentNo]);
+                    }
                 } else {
                     $qrValue  = $this->generateQR();
                     $parentId = $this->parentsModel->insert([
+                        'parent_no'     => $parentNo,
                         'fname'         => $pfname,
                         'mname'         => $pmname ?: null,
                         'lname'         => $plname,
@@ -588,6 +764,166 @@ class Students extends BaseController
     }
 
     /**
+     * ZIP import — bulk photos / attachments.
+     *
+     * The archive is extracted into public/uploads/<zip-name>/ so the files
+     * land next to the student pictures. Entry paths are sanitised, so a
+     * crafted archive cannot write outside that folder.
+     */
+    public function importZip()
+    {
+        if (! in_array(session('role'), ['admin', 'staff'], true)) {
+            return redirect()->to('/dashboard')->with('error', 'Access denied.');
+        }
+
+        $file = $this->request->getFile('zip_file');
+
+        if (! $file) {
+            return redirect()->to('/register')->with('error', 'No ZIP file was selected.');
+        }
+        if (! $file->isValid()) {
+            return redirect()->to('/register')->with('error', 'Upload failed: ' . $file->getErrorString());
+        }
+
+        $original = (string) $file->getClientName();
+        $ext      = strtolower(pathinfo($original, PATHINFO_EXTENSION));
+        if ($ext !== 'zip') {
+            return redirect()->to('/register')->with('error', 'Only .zip archives are accepted.');
+        }
+
+        // Folder name = the archive name without .zip, made filesystem-safe.
+        $folder = pathinfo($original, PATHINFO_FILENAME);
+        $folder = preg_replace('/[^A-Za-z0-9 _\-\.]/', '', $folder);
+        $folder = trim(str_replace(['..', ' ', '\\', '/'], ['', '_', '', ''], $folder), '._');
+        if ($folder === '') {
+            $folder = 'zip_' . date('Ymd_His');
+        }
+
+        $base = FCPATH . 'uploads';
+
+        if (! is_dir($base) && ! @mkdir($base, 0775, true) && ! is_dir($base)) {
+            return redirect()->to('/register')->with('error', 'Could not create the uploads folder.');
+        }
+
+        if (! class_exists('ZipArchive')) {
+            return redirect()->to('/register')->with('error', 'The PHP zip extension is not enabled on this server.');
+        }
+
+        $zip = new \ZipArchive();
+        if ($zip->open($file->getTempName()) !== true) {
+            return redirect()->to('/register')->with('error', 'The ZIP file could not be opened — it may be corrupted.');
+        }
+
+        // Known photo folders under uploads/. A ZIP entry like
+        // "parents/P-1001.jpg" goes straight to uploads/parents/P-1001.jpg
+        // with no extra folder level.
+        $photoFolders = ['students', 'parents', 'teachers', 'staffs', 'subfetchers', 'qr'];
+
+        $extracted = 0;
+        $skipped   = 0;
+        $placed    = [];
+        $realBase  = realpath($base);
+
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $entry = (string) $zip->getNameIndex($i);
+            if ($entry === '' || $entry === false) {
+                continue;
+            }
+
+            $clean = str_replace('\\', '/', $entry);
+
+            // Skip macOS resource forks and other hidden noise.
+            if (str_starts_with($clean, '__MACOSX/') || preg_match('#(^|/)\.#', $clean)) {
+                $skipped++;
+                continue;
+            }
+
+            // Directory entries: nothing to create — files land flat.
+            if (str_ends_with($clean, '/')) {
+                continue;
+            }
+
+            $segments = array_values(array_filter(explode('/', $clean), static fn ($s) => $s !== ''));
+            if ($segments === []) {
+                $skipped++;
+                continue;
+            }
+
+            $fileName = array_pop($segments);              // base name only
+            $subDir   = null;
+
+            foreach ($segments as $seg) {                  // first known folder wins
+                $lower = strtolower($seg);
+                if (in_array($lower, $photoFolders, true)) {
+                    $subDir = $lower;
+                    break;
+                }
+            }
+            if ($subDir === null && in_array(strtolower($folder), $photoFolders, true)) {
+                $subDir = strtolower($folder);             // archive named "parents.zip"
+            }
+
+            $destDir = $subDir !== null
+                ? $base . DIRECTORY_SEPARATOR . $subDir
+                : $base . DIRECTORY_SEPARATOR . $folder;
+
+            if (! is_dir($destDir) && ! @mkdir($destDir, 0775, true) && ! is_dir($destDir)) {
+                $skipped++;
+                continue;
+            }
+
+            $dest = $destDir . DIRECTORY_SEPARATOR . $fileName;
+
+            // Zip-slip guard: the resolved destination must stay inside uploads/.
+            $realDir = realpath($destDir);
+            if ($realBase === false || $realDir === false
+                || ! str_starts_with(str_replace('\\', '/', $realDir . '/'), str_replace('\\', '/', $realBase . '/'))) {
+                $skipped++;
+                continue;
+            }
+
+            $stream = $zip->getStream($entry);
+            if ($stream === false) {
+                $skipped++;
+                continue;
+            }
+
+            $out = @fopen($dest, 'wb');
+            if ($out === false) {
+                fclose($stream);
+                $skipped++;
+                continue;
+            }
+            stream_copy_to_stream($stream, $out);
+            fclose($stream);
+            fclose($out);
+            $extracted++;
+            $placed[$subDir ?? $folder] = ($placed[$subDir ?? $folder] ?? 0) + 1;
+        }
+
+        $zip->close();
+        $file->move($base, $folder . '_source.zip', true);
+
+        $this->logModel->addLog(
+            session('user_id'),
+            session('fname') . ' ' . session('lname'),
+            session('role'),
+            'create',
+            'import',
+            "Imported ZIP \"$original\" -> uploads/$folder/ ($extracted file(s), $skipped skipped)"
+        );
+
+        $destText = []; foreach ($placed as $d => $n) { $destText[] = "uploads/" . $d . "/ (" . $n . ")"; }
+        $msg = "ZIP import complete! <strong>$extracted</strong> file(s) extracted to "
+            . '<code>' . esc(implode(', ', $destText)) . '</code>';
+        if ($skipped > 0) {
+            $msg .= " — <strong>$skipped</strong> entry(ies) skipped.";
+        }
+
+        return redirect()->to('/register')->with('msg', $msg);
+    }
+
+    /**
      * True when the first cell(s) of a row are column titles rather than data.
      *
      * IMPORTANT: toArray(..., $returnCellRef = true) keys each row by cell
@@ -616,14 +952,40 @@ class Students extends BaseController
             // Location header, which a browser may ignore.
             return redirect()->to('/dashboard')->with('error', 'Access denied.');
         }
-        $id = $this->request->getPost('id');
+                $id = $this->request->getPost('id');
+        $newStudentNo = strtoupper(trim((string) $this->request->getPost('student_no')));
+        $oldStudent   = $this->studentModel->find($id);
         $data = [
             'fname' => $this->request->getPost('fname'),
             'mname' => $this->request->getPost('mname'),
             'lname' => $this->request->getPost('lname'),
             'grade_section' => $this->request->getPost('grade_section'),
         ];
+        if ($newStudentNo !== '' && (!$oldStudent || $newStudentNo !== strtoupper((string) ($oldStudent['student_no'] ?? '')))) {
+            if ($this->studentModel->where('student_no', $newStudentNo)->where('id !=', $id)->countAllResults() > 0) {
+                return redirect()->to('/students')->with('error', 'Student ID ' . $newStudentNo . ' is already taken.');
+            }
+            $data['student_no'] = $newStudentNo;
+        }
+
         $this->studentModel->updateWithAdviser($id, $data);
+
+        // Profile picture (edit modal): save new image or remove the old one.
+        $studentNo = (string) ($this->studentModel->find($id)['student_no'] ?? '');
+        $oldNo = strtoupper((string) ($oldStudent['student_no'] ?? ''));
+        if ($oldNo !== '' && $studentNo !== '' && $oldNo !== strtoupper($studentNo)) {
+            $oldFile = FCPATH . 'uploads/students/' . $oldNo . '.jpg';
+            if (is_file($oldFile)) { @copy($oldFile, FCPATH . 'uploads/students/' . $studentNo . '.jpg'); }
+        }
+        if ($studentNo !== '') {
+            helper('photo');
+            $pic = (string) $this->request->getPost('student_picture_data');
+            if ($pic !== '') {
+                photo_save_dataurl($pic, $studentNo);
+            } elseif ($this->request->getPost('student_picture_remove') === '1') {
+                student_photo_delete($studentNo);
+            }
+        }
         $this->logModel->addLog(
             session('user_id'), 
             session('fname').' '.session('lname'), 

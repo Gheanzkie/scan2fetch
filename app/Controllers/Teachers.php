@@ -20,15 +20,27 @@ class Teachers extends BaseController
     // Admin/staff only. A teacher (or parent) must not enter management pages.
     public function index()
     {
+        helper('photo');
         if (session('role') != 'admin' && session('role') != 'staff') {
             return redirect()->to('/dashboard');
         }
         $model = new TeachersModel();
         $teachers = $model->orderBy('created_at', 'DESC')->findAll();
 
+        // Class size = students whose adviser is this teacher OR who sit in
+        // the teacher's grade/section. Counting adviser_id alone made a
+        // freshly created "Grade 2 - B" teacher show 0 students, because the
+        // section's students still carried the adviser_id of an older
+        // teacher from a different section.
+        $db = \Config\Database::connect();
         $counts = [];
-        foreach ($model->studentCounts() as $row) {
-            $counts[$row['adviser_id']] = (int) $row['total'];
+        foreach ($teachers as $t) {
+            $counts[$t['id']] = $db->table('students')
+                ->groupStart()
+                    ->where('adviser_id', $t['id'])
+                    ->orWhere('grade_section', $t['grade_section'])
+                ->groupEnd()
+                ->countAllResults();
         }
 
         $data['teachers'] = $teachers;
@@ -39,6 +51,7 @@ class Teachers extends BaseController
 
     public function view($id)
     {
+        helper('photo');
         // A teacher may only open their own classroom; admin/staff may view any.
         if (session('role') == 'teacher' && (int) session('user_id') !== (int) $id) {
             return redirect()->to('/dashboard')->with('error', 'You can only view your own class.');
@@ -66,7 +79,14 @@ class Teachers extends BaseController
 
         $query = $db->table('students')
             ->select('students.*')
-            ->where('students.adviser_id', $id);
+            ->groupStart()
+                ->where('students.adviser_id', $id)
+                // Also pull the students of this teacher's section. A student
+                // can still point at an adviser from another grade (legacy
+                // rows created before the adviser existed), which is why a
+                // newly added "Grade 2 - B" teacher used to see an empty class.
+                ->orWhere('students.grade_section', $teacher['grade_section'])
+            ->groupEnd();
         if ($search !== '') {
             $query->groupStart()
                 ->like('students.fname', $search)
@@ -107,7 +127,7 @@ class Teachers extends BaseController
 
             // Recent pickup history per student (last 30 days)
             $historyLogs = $db->table('fetch_logs')
-                ->select('student_id, time_released, session_type, fetcher_fname, fetcher_lname, method')
+                ->select('student_id, time_released, session_type, fetcher_fname, fetcher_mname, fetcher_lname, method')
                 ->where('DATE(time_released) >=', date('Y-m-d', strtotime('-30 days')))
                 ->whereIn('student_id', $studentIds)
                 ->orderBy('time_released', 'DESC')
@@ -163,11 +183,13 @@ class Teachers extends BaseController
             return redirect()->to('/teachers-view/' . session('user_id'))->with('error', 'Student not found');
         }
 
-        // Teachers can only view their own students (adviser_id). Fallback:
-        // same grade_section when adviser is still unset (legacy rows).
+        // Teachers can only view their own students. A student belongs to the
+        // teacher when they are the adviser, or when the student sits in the
+        // teacher's grade/section (covers legacy rows whose adviser_id still
+        // points at an unrelated teacher).
         $isOwn = ((int) ($student['adviser_id'] ?? 0)) === (int) session('user_id');
-        if (!$isOwn && (empty($student['adviser_id']) || $student['adviser_id'] === null)) {
-            $isOwn = $student['grade_section'] === $gradeSection;
+        if (!$isOwn && $gradeSection !== null && $student['grade_section'] === $gradeSection) {
+            $isOwn = true;
         }
         if (!$isOwn) {
             return redirect()->to('/teachers-view/' . session('user_id'))->with('error', 'You can only view students in your class.');
@@ -289,7 +311,19 @@ class Teachers extends BaseController
             return redirect()->to('/teachers')->with('error', 'A teacher with that phone number already exists');
         }
 
+        // Teacher ID: use what the registrar typed, otherwise auto-assign T-####.
+        $teacherNo = strtoupper(trim((string) $this->request->getPost('teacher_no')));
+        if ($teacherNo === '') {
+            $teacherNo = $model->nextTeacherNo();
+        } elseif (! str_starts_with($teacherNo, 'T-')) {
+            $teacherNo = preg_match('/(\d+)$/', $teacherNo, $m) ? 'T-' . $m[1] : 'T-' . $teacherNo;
+        }
+        if ($model->where('teacher_no', $teacherNo)->first()) {
+            return redirect()->to('/teachers')->with('error', 'Teacher ID ' . $teacherNo . ' is already taken.');
+        }
+
         $teacherId = $model->save([
+            'teacher_no' => $teacherNo,
             'fname' => $this->request->getPost('fname'),
             'mname' => $this->request->getPost('mname'),
             'lname' => $this->request->getPost('lname'),
@@ -301,6 +335,13 @@ class Teachers extends BaseController
         ]);
         // Absorb any existing students in this grade that had no adviser.
         $claimed = $this->claimUnassignedStudents((int) $teacherId, $this->request->getPost('grade_section'));
+
+        // Profile picture captured in the Add Teacher modal.
+        helper('photo');
+        $__pic = (string) $this->request->getPost('teacher_picture_data');
+        if ($__pic !== '' && $teacherId) {
+            photo_save_teacher_dataurl($__pic, $teacherNo);
+        }
         $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'create', 'teacher', 'Created teacher: '.$this->request->getPost('fname').' '.$this->request->getPost('lname').' ('.trim($this->request->getPost('grade_section')).')'.$claimed);
         return redirect()->to('/teachers')->with('msg', 'Teacher added'.$claimed);
     }
@@ -319,7 +360,22 @@ class Teachers extends BaseController
             'phone' => $this->request->getPost('phone'),
             'grade_section' => $this->request->getPost('grade_section'),
         ];
+        $teacherNo = strtoupper(trim((string) $this->request->getPost('teacher_no')));
+        if ($teacherNo !== '') {
+            $data['teacher_no'] = $teacherNo;
+        }
         $model->update($id, $data);
+
+        // ===== Teacher profile picture (add / change / remove) =====
+        helper('photo');
+        $teacher = $model->find($id);
+        $tNo     = (string) ($teacher['teacher_no'] ?? '');
+        $pic     = (string) $this->request->getPost('teacher_picture_data');
+        if ($pic !== '' && $tNo !== '') {
+            photo_save_teacher_dataurl($pic, $tNo);
+        } elseif ((string) $this->request->getPost('teacher_picture_remove') === '1' && $tNo !== '') {
+            teacher_photo_delete($tNo);
+        }
         // Re-link unassigned students if grade_section changed.
         $claimed = $this->claimUnassignedStudents((int) $id, $data['grade_section']);
         $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'update', 'teacher', 'Updated teacher: '.$data['fname'].' '.$data['lname'].' (ID: '.$id.')'.$claimed);
@@ -327,7 +383,14 @@ class Teachers extends BaseController
     }
 
     /**
-     * Attach students in $gradeSection that still have adviser_id NULL.
+     * Attach the students of $gradeSection to $teacherId.
+     *
+     * Only "adviser_id IS NULL" was adopted before, so a section whose
+     * students had been stamped with some other teacher's id (the usual
+     * state of a brand-new section) never moved over. Students are now
+     * re-stamped when their current adviser does not actually handle this
+     * grade/section.
+     *
      * Returns a short suffix for flash/log, e.g. " (+12 students linked)".
      */
     private function claimUnassignedStudents(int $teacherId, ?string $gradeSection): string
@@ -338,10 +401,23 @@ class Teachers extends BaseController
         }
 
         $db = \Config\Database::connect();
-        $db->table('students')
-            ->where('grade_section', $gradeSection)
-            ->where('adviser_id IS NULL', null, false)
-            ->update(['adviser_id' => $teacherId]);
+
+        // Teachers that legitimately own this grade/section keep their
+        // students. Any other adviser id on a student of this section is
+        // considered stale and is replaced.
+        $validAdvisers = array_map('intval', array_column(
+            $db->table('teachers')->select('id')->where('grade_section', $gradeSection)->get()->getResultArray(),
+            'id'
+        ));
+        $validAdvisers[] = $teacherId;
+        $validAdvisers = array_values(array_unique($validAdvisers));
+
+        $builder = $db->table('students')->where('grade_section', $gradeSection);
+        $builder->groupStart()->where('adviser_id IS NULL', null, false);
+        if (!empty($validAdvisers)) {
+            $builder->orWhereNotIn('adviser_id', $validAdvisers);
+        }
+        $builder->groupEnd()->update(['adviser_id' => $teacherId]);
 
         $n = $db->affectedRows();
         return $n > 0 ? " (+$n student(s) linked)" : '';

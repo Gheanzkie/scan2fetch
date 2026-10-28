@@ -347,13 +347,14 @@ body {
                                     Teacher List
  <span class="badge badge-soft ml-2"><?= count($teachers ?? []) ?></span>
  </h5>
- <a href="<?= base_url('teachers-send-all') ?>" class="btn btn-kid-primary btn-sm mr-2"
+ <div class="d-flex align-items-center flex-wrap" style="gap:8px;">
+ <a href="<?= base_url('teachers-send-all') ?>" class="btn btn-kid-primary btn-sm"
                                                 title="Send passwords to teachers who haven't received one yet"
                                                 onclick="return confirm('Send passwords to all teachers who have not received one yet?')">
  <i class="fas fa-sms mr-1"></i> Send All Passwords
  </a>
  <?php if (session('role') == 'admin'): ?>
- <a href="<?= base_url('teachers-delete-all') ?>" class="btn btn-danger btn-sm mr-2"
+ <a href="<?= base_url('teachers-delete-all') ?>" class="btn btn-danger btn-sm"
                                                 title="Delete ALL teacher accounts"
                                                 onclick="return confirm('DELETE ALL TEACHERS?\n\nThis will permanently delete ALL teacher accounts.\n\nThis cannot be undone!')">
  <i class="fas fa-trash-alt mr-1"></i> Delete All
@@ -362,6 +363,7 @@ body {
  <button type="button" class="btn btn-kid-primary btn-sm" data-toggle="modal" data-target="#addTeacherModal">
  <i class="fas fa-plus mr-1"></i> Add Teacher
  </button>
+ </div>
  </div>
  </div>
  <div class="card-body pt-0">
@@ -387,27 +389,39 @@ body {
  <thead>
  <tr>
  <th style="width:50px;">#</th>
+ <th>Teacher ID</th>
  <th>Full Name</th>
  <th>Phone</th>
  <th>Grade / Section</th>
  <th class="text-center">Students</th>
  <th class="text-center">Password</th>
- <th>Created</th>
  <th class="text-center" style="width:160px;">Actions</th>
  </tr>
  </thead>
  <tbody>
  <?php if (!empty($teachers)): ?>
  <?php $i = 1; foreach ($teachers as $teacher): ?>
- <tr class="teacher-row" data-search="<?= esc(strtolower($teacher['fname'].' '.($teacher['mname']??'').' '.$teacher['lname'].' '.$teacher['phone'].' '.$teacher['grade_section'])) ?>">
+ <tr class="teacher-row" data-search="<?= esc(strtolower($teacher['fname'].' '.($teacher['mname']??'').' '.$teacher['lname'].' '.$teacher['phone'].' '.$teacher['grade_section'].' '.($teacher['teacher_no']??''))) ?>">
  <td class="num"><?= $i++ ?></td>
  <td>
+ <?php if (!empty($teacher['teacher_no'])): ?>
+ <span class="badge badge-soft" style="font-family: ui-monospace, monospace; font-size:11.5px;"><?= esc($teacher['teacher_no']) ?></span>
+ <?php else: ?>
+ <span class="muted" style="font-size:12px;">No ID</span>
+ <?php endif; ?>
+ </td>
+ <td>
  <div class="d-flex align-items-center">
- <div class="avatar-circle mr-2" style="width:40px;height:40px;min-width:40px;">
+ <div class="avatar-circle mr-2" style="width:40px;height:40px;min-width:40px;overflow:hidden;padding:0;border-radius:50%;">
+ <?php $__tp = teacher_photo_url((string) ($teacher['teacher_no'] ?? '')); ?>
+ <?php if ($__tp): ?>
+ <img src="<?= esc($__tp) ?>" alt="" style="width:100%;height:100%;object-fit:cover;">
+ <?php else: ?>
  <i class="fas fa-chalkboard-teacher" style="font-size:17px;"></i>
+ <?php endif; ?>
  </div>
  <div>
- <div class="teacher-name"><?= esc($teacher['fname']) ?> <?= esc($teacher['lname']) ?></div>
+ <div class="teacher-name"><?= esc(full_name($teacher)) ?></div>
  <?php if(!empty($teacher['mname'])): ?>
  <div class="muted"><?= esc($teacher['mname']) ?></div>
  <?php endif; ?>
@@ -428,7 +442,6 @@ body {
  <span class="badge badge-soft" title="Password not yet sent" style="color:#c2185b;"><i class="fas fa-times"></i></span>
  <?php endif; ?>
  </td>
- <td class="muted"><?= date('M d, Y', strtotime($teacher['created_at'])) ?></td>
  <td class="text-center">
  <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
  <a href="<?= base_url('teachers-view/' . $teacher['id']) ?>"
@@ -450,25 +463,27 @@ body {
                                                                    data-fname="<?= esc($teacher['fname']) ?>"
                                                                    data-mname="<?= esc($teacher['mname'] ?? '') ?>"
                                                                    data-lname="<?= esc($teacher['lname']) ?>"
-data-phone="<?= esc($teacher['phone']) ?>"
+ data-phone="<?= esc($teacher['phone']) ?>"
+ data-teacher-no="<?= esc($teacher['teacher_no'] ?? '') ?>"
+ data-photo="<?= esc(teacher_photo_url((string) ($teacher['teacher_no'] ?? ''))) ?>"
  data-grade="<?= esc($teacher['grade_section']) ?>">
  <i class="fas fa-edit mr-2" style="color:#b8750a;"></i> Edit
  </a>
  <div class="dropdown-divider"></div>
  <?php if (empty($teacher['password_sent'])): ?>
  <a class="dropdown-item" href="<?= base_url('teachers-send-password/' . $teacher['id']) ?>"
- onclick="return confirm('Generate and send a password to this teacher via SMS?\n\n<?= esc($teacher['fname']) ?> <?= esc($teacher['lname']) ?>')">
+ onclick="return confirm('Generate and send a password to this teacher via SMS?\n\n<?= esc(full_name($teacher)) ?>')">
  <i class="fas fa-sms mr-2" style="color:#2e7d32;"></i> Send Password
  </a>
  <?php else: ?>
  <a class="dropdown-item" href="<?= base_url('teachers-send-password/' . $teacher['id']) ?>"
- onclick="return confirm('Send a new password to this teacher via SMS?\n\n<?= esc($teacher['fname']) ?> <?= esc($teacher['lname']) ?>')">
+ onclick="return confirm('Send a new password to this teacher via SMS?\n\n<?= esc(full_name($teacher)) ?>')">
  <i class="fas fa-key mr-2" style="color:#2e7d32;"></i> Reset Password
  </a>
  <?php endif; ?>
  <div class="dropdown-divider"></div>
  <a class="dropdown-item text-danger" href="<?= base_url('teachers-delete/' . $teacher['id']) ?>"
-                                                                   onclick="return confirm('Delete this teacher?\n\n<?= esc($teacher['fname']) ?> <?= esc($teacher['lname']) ?>')">
+                                                                   onclick="return confirm('Delete this teacher?\n\n<?= esc(full_name($teacher)) ?>')">
  <i class="fas fa-trash mr-2"></i> Delete
  </a>
  </div>
@@ -511,6 +526,16 @@ data-phone="<?= esc($teacher['phone']) ?>"
  <button type="button" class="close" data-dismiss="modal" style="color: var(--ink);">&times;</button>
  </div>
  <div class="modal-body">
+ <div class="text-center mb-3">
+ <div id="addTeacherPicBox" title="Click to add the picture" style="position:relative;width:96px;height:96px;margin:0 auto;border-radius:50%;overflow:hidden;border:3px solid rgba(108,140,255,0.25);background:#eef2ff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+ <img id="addTeacherPicImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
+ <i class="fas fa-camera" id="addTeacherPicPh" style="font-size:28px;color:#a5b4fc;"></i>
+ </div>
+ <input type="file" id="addTeacherPicFile" accept="image/*" style="display:none;">
+ <input type="hidden" name="teacher_picture_data" id="addTeacherPicData" value="">
+ <small class="text-muted d-block mt-2" style="font-size:12px;">Profile picture <span style="color:#b23c4d;">(optional)</span></small>
+ <button type="button" id="addTeacherPicRemoveBtn" style="display:none;border:none;background:none;color:#b23c4d;font-size:12px;padding:0;margin-top:2px;"><i class="fas fa-trash-alt mr-1"></i>Remove picture</button>
+ </div>
  <div class="row">
  <div class="col-4">
  <div class="form-group">
@@ -532,6 +557,17 @@ data-phone="<?= esc($teacher['phone']) ?>"
  </div>
  </div>
  <div class="row">
+ <div class="col-6">
+ <div class="form-group">
+ <label>Teacher ID <span class="text-muted" style="font-weight:400;">(optional — auto T-####)</span></label>
+ <div class="input-group">
+ <div class="input-group-prepend">
+ <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+ </div>
+ <input type="text" name="teacher_no" class="form-control" placeholder="T-1002">
+ </div>
+ </div>
+ </div>
  <div class="col-6">
  <div class="form-group">
  <label>Phone Number <span class="text-danger">*</span></label>
@@ -604,6 +640,19 @@ data-phone="<?= esc($teacher['phone']) ?>"
  <form action="<?= base_url('teachers-update') ?>" method="post" enctype="multipart/form-data">
  <?= csrf_field() ?>
  <input type="hidden" name="id" id="editId">
+
+ <!-- ===== Teacher profile picture (add / change / remove) ===== -->
+ <div class="text-center mb-3">
+ <div id="teacherPicBox" title="Click to add or change the picture" style="position:relative;width:96px;height:96px;margin:0 auto;border-radius:50%;overflow:hidden;border:3px solid rgba(108,140,255,0.25);background:#eef2ff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+ <img id="teacherPicImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
+ <i class="fas fa-camera" id="teacherPicPh" style="font-size:28px;color:#a5b4fc;"></i>
+ <span style="position:absolute;left:0;right:0;bottom:0;padding:3px 0;background:rgba(63,43,150,0.72);color:#fff;font-size:10px;font-weight:700;text-align:center;">Change</span>
+ </div>
+ <input type="file" id="teacherPicFile" accept="image/*" style="display:none;">
+ <input type="hidden" name="teacher_picture_data" id="teacherPicData" value="">
+ <input type="hidden" name="teacher_picture_remove" id="teacherPicRemove" value="0">
+ <div><button type="button" id="teacherPicRemoveBtn" style="display:none;border:none;background:none;color:#b23c4d;font-size:12px;padding:0;margin-top:4px;"><i class="fas fa-trash-alt mr-1"></i>Remove picture</button></div>
+ </div>
  <div class="modal-header">
  <h5 class="modal-title">
  <i class="fas fa-user-edit mr-2" style="color: var(--soft-orange);"></i>
@@ -633,6 +682,17 @@ data-phone="<?= esc($teacher['phone']) ?>"
  </div>
  </div>
  <div class="row">
+ <div class="col-6">
+ <div class="form-group">
+ <label>Teacher ID</label>
+ <div class="input-group">
+ <div class="input-group-prepend">
+ <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+ </div>
+ <input type="text" name="teacher_no" id="editTeacherNo" class="form-control">
+ </div>
+ </div>
+ </div>
  <div class="col-6">
  <div class="form-group">
  <label>Phone Number <span class="text-danger">*</span></label>
@@ -713,6 +773,49 @@ $(function(){
         $('#editMname').val(button.data('mname'));
         $('#editLname').val(button.data('lname'));
         $('#editPhone').val(button.data('phone'));
+        $('#editTeacherNo').val(button.data('teacherNo'));
+
+        // ===== Teacher profile picture widget =====
+        var photo = button.data('photo') || '';
+        $('#teacherPicImg').attr('src', photo).toggle(!!photo);
+        $('#teacherPicPh').toggle(!photo);
+        $('#teacherPicData').val('');
+        $('#teacherPicRemove').val('0');
+        $('#teacherPicRemoveBtn').toggle(!!photo);
+
+        $('#teacherPicBox').off('click').on('click', function () { $('#teacherPicFile').trigger('click'); });
+
+        $('#teacherPicFile').off('change').on('change', function () {
+            if (!this.files || !this.files[0]) return;
+            var reader = new FileReader();
+            reader.onload = function (ev) {
+                var img = new Image();
+                img.onload = function () {
+                    var max = 400, side = Math.min(img.width, img.height);
+                    var cv = document.createElement('canvas'); cv.width = max; cv.height = max;
+                    var ctx = cv.getContext('2d');
+                    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, max, max);
+                    ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, max, max);
+                    var data = cv.toDataURL('image/jpeg', 0.9);
+                    $('#teacherPicImg').attr('src', data).show();
+                    $('#teacherPicPh').hide();
+                    $('#teacherPicData').val(data);
+                    $('#teacherPicRemove').val('0');
+                    $('#teacherPicRemoveBtn').show();
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(this.files[0]);
+        });
+
+        $('#teacherPicRemoveBtn').off('click').on('click', function () {
+            $('#teacherPicFile').val('');
+            $('#teacherPicImg').attr('src', '').hide();
+            $('#teacherPicPh').show();
+            $('#teacherPicData').val('');
+            $('#teacherPicRemove').val('1');
+            $(this).hide();
+        });
         $('#editGrade').val(button.data('grade'));
     });
 
@@ -722,6 +825,54 @@ $(function(){
 
     $('#editTeacherModal').on('shown.bs.modal', function() {
         $(this).find('input[name="fname"]').focus();
+    });
+
+    // ===== ADD TEACHER: profile picture (crop to 400x400, store data URL) =====
+    var $addTBox = $('#addTeacherPicBox'), $addTImg = $('#addTeacherPicImg'),
+        $addTPh = $('#addTeacherPicPh'), $addTFile = $('#addTeacherPicFile'),
+        $addTData = $('#addTeacherPicData'), $addTRemove = $('#addTeacherPicRemoveBtn');
+
+    function addTPaint(src) {
+        if (src) {
+            $addTImg.attr('src', src).show();
+            $addTPh.hide();
+            $addTRemove.show();
+        } else {
+            $addTImg.attr('src', '').hide();
+            $addTPh.show();
+            $addTRemove.hide();
+        }
+    }
+    $addTBox.on('click', function () { $addTFile.trigger('click'); });
+    $addTFile.on('change', function () {
+        if (!this.files || !this.files[0]) { return; }
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var img = new Image();
+            img.onload = function () {
+                var side = Math.min(img.width, img.height),
+                    sx = (img.width - side) / 2, sy = (img.height - side) / 2,
+                    canvas = document.createElement('canvas');
+                canvas.width = 400; canvas.height = 400;
+                canvas.getContext('2d').drawImage(img, sx, sy, side, side, 0, 0, 400, 400);
+                var dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                $addTData.val(dataUrl);
+                addTPaint(dataUrl);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(this.files[0]);
+    });
+    $addTRemove.on('click', function () {
+        $addTData.val('');
+        $addTFile.val('');
+        addTPaint('');
+    });
+    $('#addTeacherModal').on('hidden.bs.modal', function () {
+        $addTData.val('');
+        $addTFile.val('');
+        addTPaint('');
+        this.reset && this.reset();
     });
 });
 </script>
