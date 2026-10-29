@@ -223,8 +223,8 @@ class Parents extends BaseController
         $this->parentsModel->update($id, $data);
 
         if (!empty($__oldParent) && isset($data['parent_no'])) {
-            $__from = FCPATH . 'uploads/parents/' . strtoupper((string) ($__oldParent['parent_no'] ?? '')) . '.jpg';
-            $__to   = FCPATH . 'uploads/parents/' . strtoupper((string) $data['parent_no']) . '.jpg';
+            $__from = uploads_path('parents') . strtoupper((string) ($__oldParent['parent_no'] ?? '')) . '.jpg';
+            $__to   = uploads_path('parents') . strtoupper((string) $data['parent_no']) . '.jpg';
             if (is_file($__from)) { @copy($__from, $__to); }
         }
 

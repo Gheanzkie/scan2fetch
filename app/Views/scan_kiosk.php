@@ -1,6 +1,6 @@
-﻿<?php
+<?php
 /**
- * Fullscreen kiosk scanner — standalone page, no template/sidebar/nav.
+ * Fullscreen kiosk scanner - standalone page, no template/sidebar/nav.
  * Opens in a new tab. Exit = close the browser tab (browser's own X / Alt+F4).
  */
 ?>
@@ -12,6 +12,8 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 76 76'%3E%3Crect width='76' height='76' rx='16' fill='%234361ee'/%3E%3Cg fill='%23fff'%3E%3Crect x='14' y='14' width='20' height='20' rx='3'/%3E%3Crect x='42' y='14' width='20' height='20' rx='3'/%3E%3Crect x='14' y='42' width='20' height='20' rx='3'/%3E%3Crect x='44' y='44' width='6' height='6'/%3E%3Crect x='52' y='52' width='6' height='6'/%3E%3Crect x='44' y='56' width='6' height='6'/%3E%3Crect x='56' y='44' width='6' height='6'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="icon" type="image/png" sizes="76x76" href="<?= base_url('image/qr-code-76.png') ?>">
 <link rel="shortcut icon" href="<?= base_url('favicon.ico') ?>">
+<!-- Icon font used by the photo placeholders (<i class="fas fa-user">) -->
+<link rel="stylesheet" href="<?= base_url('assets/vendor/fontawesome/css/all.min.css') ?>">
 <title>Scanner - Scan2Fetch</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -31,7 +33,7 @@ body { display:flex; align-items:center; justify-content:center; }
 #reader video {
   width:100% !important;
   height:100% !important;
-  object-fit:contain !important;   /* full frame visible — no crop, no stretch */
+  object-fit:contain !important;   /* full frame visible - no crop, no stretch */
   border-radius:18px !important;
   background:#000;
 }
@@ -97,7 +99,7 @@ body { display:flex; align-items:center; justify-content:center; }
 }
 #flash.show { display:flex; }
 #flash.already { background:rgba(190,120,20,0.92); }
-#flash .big { font-size:64px; margin-bottom:12px; }
+#flash .big { font-size:64px; margin-bottom:12px; font-family:'Segoe UI Symbol','Segoe UI Emoji',system-ui,sans-serif; line-height:1; }
 #flash .nm  { font-size:36px; font-weight:800; letter-spacing:.3px; }
 #flash .sub { font-size:14px; opacity:.85; margin-top:6px; }
 
@@ -115,6 +117,8 @@ body { display:flex; align-items:center; justify-content:center; }
 .pp-check{font-size:clamp(40px,8vw,96px);line-height:1;}
 .pp-released{font-weight:900;letter-spacing:.14em;font-size:clamp(14px,1.8vw,24px);}
 .pp-timer{margin-top:14px;color:#64748b;font-size:clamp(12px,1.4vw,18px);}
+.ck{display:inline-block;width:.9em;height:.45em;border-left:.16em solid currentColor;border-bottom:.16em solid currentColor;transform:rotate(-45deg);vertical-align:middle;}
+#topBar .pill::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:currentColor;vertical-align:middle;}
 </style>
 <script src="<?= base_url('html5qrcode/html5-qrcode.min.js') ?>"></script>
 </head>
@@ -129,10 +133,13 @@ body { display:flex; align-items:center; justify-content:center; }
   </span>
 </div>
 
-<div id="status">Starting camera…</div>
+<div id="status">Starting camera...</div>
 
 <div id="flash">
-  <div class="big">✓</div>
+  <div class="big"><span class="ck"></span></div>
+  <div class="nm" id="flashName"></div>
+  <div class="sub" id="flashSub"></div>
+</div>
 
 <div id="pickupPanel">
  <div class="pp-side">
@@ -141,7 +148,7 @@ body { display:flex; align-items:center; justify-content:center; }
   <div class="pp-meta" id="ppFetcherRel"></div>
  </div>
  <div class="pp-mid">
-  <div class="pp-check">✔</div>
+  <div class="pp-check"><span class="ck"></span></div>
   <div class="pp-released">RELEASED</div>
   <div class="pp-timer"><span id="ppCount">10</span>s</div>
  </div>
@@ -150,10 +157,6 @@ body { display:flex; align-items:center; justify-content:center; }
   <div class="pp-name" id="ppStudentName"></div>
   <div class="pp-meta" id="ppStudentGrade"></div>
  </div>
-</div>
-
-  <div class="nm" id="flashName"></div>
-  <div class="sub" id="flashSub"></div>
 </div>
 
 <div id="sheet">
@@ -179,17 +182,17 @@ function say(msg, cls) {
 function hideSay() { document.getElementById('status').className = ''; }
 
 /* ===== FAST SCANNER =====
- * BUGFIX: start() was called as start(cfg, cfg) — the FIRST arg must be the
+ * BUGFIX: start() was called as start(cfg, cfg) - the FIRST arg must be the
  * CAMERA identifier ({facingMode} or deviceId), the SECOND is the scan config.
  * Passing the config object (which contains a qrbox FUNCTION) as the camera
- * arg makes getUserMedia reject garbage constraints → never decodes.
- * Also: NO qrbox — the decoder scans the FULL frame, so the QR can be any
+ * arg makes getUserMedia reject garbage constraints -> never decodes.
+ * Also: NO qrbox - the decoder scans the FULL frame, so the QR can be any
  * size / anywhere in view (no crop, no fake zoom). Native BarcodeDetector
  * (useBarCodeDetectorIfSupported) handles blur/low-light on Chrome/Edge/Android;
  * jsQR is the fallback. */
 function buildScanner() {
   if (scanner) { try { scanner.clear(); } catch(e){} }
-  // NO formatsToSupport filter — this library build numbers QR_CODE as 11,
+  // NO formatsToSupport filter - this library build numbers QR_CODE as 11,
   // not 0 (0 = AZTEC). The old "[0]" filter made it decode AZTEC only, so it
   // could NEVER read a QR code. Unfiltered = scans QR + everything else.
   scanner = new Html5Qrcode('reader', { verbose: false });
@@ -199,7 +202,7 @@ function start() {
   if (scanning) return;
   if (!GATE_OK) { say('Scanner is closed right now.', 'err'); return; }
   scanning = true; lockout = false;
-  say('Starting camera…');
+  say('Starting camera...');
   buildScanner();
 
   var camera    = { facingMode: 'environment' };
@@ -215,7 +218,7 @@ function start() {
     settled = true;
     try { scanner.stop().catch(function(){}); } catch(e){}
     scanning = false;
-    say('Camera slow — retrying with lower resolution…', 'warn');
+    say('Camera slow - retrying with lower resolution...', 'warn');
     setTimeout(startLowRes, 600);
   }, 8000);
 
@@ -226,7 +229,7 @@ function start() {
       if (!text || lockout) return;
       settled = true; clearTimeout(watchdog);
       lockout = true; scanning = false;
-      say('QR found ✓');
+      say('QR found');
       try { scanner.stop().catch(function(){}); } catch(e){}
       verify(text);
     },
@@ -234,7 +237,7 @@ function start() {
   ).then(function() {
     if (settled) return;
     settled = true; clearTimeout(watchdog);
-    say('Point at the QR code — full frame, any size');
+    say('Point at the QR code - full frame, any size');
   }).catch(function(err) {
     if (settled) return;
     settled = true; clearTimeout(watchdog);
@@ -245,11 +248,11 @@ function start() {
   });
 }
 
-/* Fallback: tiny 640x480 stream — easiest for potato cameras to decode. */
+/* Fallback: tiny 640x480 stream - easiest for potato cameras to decode. */
 function startLowRes() {
   if (scanning) return;
   scanning = true; lockout = false;
-  say('Starting camera (low-res mode)…');
+  say('Starting camera (low-res mode)...');
   buildScanner();
 
   var camera  = { facingMode: 'environment' };
@@ -267,14 +270,14 @@ function startLowRes() {
   scanner.start(camera, scanCfg, function(text) {
     if (!text || lockout) return;
     lockout = true; scanning = false;
-    say('QR found ✓');
+    say('QR found');
     try { scanner.stop().catch(function(){}); } catch(e){}
     verify(text);
   }, function(){}).then(function() {
     say('Point at the QR code (low-res mode)');
   }).catch(function(err) {
     scanning = false;
-    say('Camera failed: ' + ((err&&err.message)||err) + ' — close this tab and reopen from the Scanner page.', 'err');
+    say('Camera failed: ' + ((err&&err.message)||err) + ' - close this tab and reopen from the Scanner page.', 'err');
   });
 }
 
@@ -290,7 +293,7 @@ var FLASH_MS   = 10000; // ms the green check flash stays up (normal)
 var FLASH_ALREADY_MS = 2000; // ms the flash stays up (already released)
 
 function verify(qr) {
-  say('Verifying…');
+  say('Verifying...');
   var fd = new FormData();
   fd.append('qr_code', qr);
   fd.append(CSRF_NAME, CSRF_HASH);
@@ -313,15 +316,15 @@ function verify(qr) {
     var sessName = (res.session || '').toUpperCase();
 
     if (list.length === 0) {
-      say(who + ' — no students linked', 'warn');
+      say(who + ' - no students linked', 'warn');
       setTimeout(resume, 2500);
       return;
     }
     if (list.length === 1) {
       var snm1 = [list[0].fname, list[0].mname, list[0].lname].filter(Boolean).join(' ');
       if (list[0].already_released) {
-        flash(snm1, 'Picked up by ' + who + ' — ALREADY RELEASED this ' + sessName + ' session.', true);
-        say('Already released — ' + snm1, 'warn');
+        flash(snm1, 'Picked up by ' + who + ' - ALREADY RELEASED this ' + sessName + ' session.', true);
+        say('Already released - ' + snm1, 'warn');
         setTimeout(resume, FLASH_ALREADY_MS + 200);
         return;
       }
@@ -351,8 +354,8 @@ function openSheet(who, list, pid, qr, sessName) {
   document.getElementById('sheetTitle').textContent = who;
   document.getElementById('sheetSub').textContent =
     list.length + ' students' +
-    (alreadyN ? ' · ' + alreadyN + ' already released this ' + (sessName||'') + ' session' : '') +
-    ' — tick who is being picked up.';
+    (alreadyN ? ' - ' + alreadyN + ' already released this ' + (sessName||'') + ' session' : '') +
+    ' - tick who is being picked up.';
   var box = document.getElementById('sheetList');
   box.innerHTML = '';
   list.forEach(function(s) {
@@ -385,7 +388,7 @@ function openSheet(who, list, pid, qr, sessName) {
     });
     if (!picked.length) { say('Select at least one student.', 'warn'); return; }
     btn.disabled = true;
-    btn.textContent = 'Releasing…';
+    btn.textContent = 'Releasing...';
     releaseAll(picked, pid, qr, who);
   };
   document.getElementById('sheet').classList.add('show');
@@ -438,14 +441,14 @@ function releaseAll(students, pid, qr, who) {
         return;
       }
       if (already && !ok) {
-        flash(names, 'All were ALREADY RELEASED this session — picked up by ' + who, true);
-        say('Already released — nothing new.', 'warn');
+        flash(names, 'All were ALREADY RELEASED this session - picked up by ' + who, true);
+        say('Already released - nothing new.', 'warn');
       } else if (already) {
-        say(who + ' — Released ' + ok + ', already released ' + already + '.', 'ok');
-        flash(names, 'Picked up by ' + who + ' — Released ' + ok + ', already ' + already + '.');
+        say(who + ' - Released ' + ok + ', already released ' + already + '.', 'ok');
+        flash(names, 'Picked up by ' + who + ' - Released ' + ok + ', already ' + already + '.');
       } else {
-        flash(names, 'Picked up by ' + who + ' — Released ' + ok + ' student(s).');
-        say(who + ' — Released ' + ok + ' student(s).', 'ok');
+        flash(names, 'Picked up by ' + who + ' - Released ' + ok + ' student(s).');
+        say(who + ' - Released ' + ok + ' student(s).', 'ok');
       }
       setTimeout(resume, (already && !ok ? FLASH_ALREADY_MS : FLASH_MS) + 200);
       return;
@@ -463,7 +466,7 @@ function releaseAll(students, pid, qr, who) {
         say(res.message || 'System closed.', 'err');
         GATE_OK = false;
         document.getElementById('gatePill').className = 'pill closed';
-        document.getElementById('gatePill').textContent = '● CLOSED';
+        document.getElementById('gatePill').textContent = 'CLOSED';
         return;
       }
       if (res.already_released) {
@@ -490,18 +493,18 @@ function pollStatus() {
     GATE_OK = !!st.allowed;
     var gp = document.getElementById('gatePill');
     gp.className = 'pill ' + (st.allowed ? 'open' : 'closed');
-    gp.textContent = st.allowed ? '● OPEN' : '● CLOSED';
+    gp.textContent = st.allowed ? 'OPEN' : 'CLOSED';
     var sp = document.getElementById('sessPill');
     var label = (st.session || '').toUpperCase();
-    if (st.override) label += ' · MANUAL';
+    if (st.override) label += ' (MANUAL)';
     sp.textContent = label;
     if (!st.allowed && scanning) {
       try { scanner.stop().catch(function(){}); } catch(e){}
       scanning = false;
       say(st.message || 'Scanner closed.', 'err');
     } else if (st.allowed && !scanning && !lockout) {
-      // Date Management reopened/changed the day → resume without manual reload.
-      say('Scanner open — scanning resumed.', 'ok');
+      // Date Management reopened/changed the day -> resume without manual reload.
+      say('Scanner open - scanning resumed.', 'ok');
       setTimeout(start, 300);
     }
   })

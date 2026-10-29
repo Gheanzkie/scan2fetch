@@ -38,6 +38,7 @@ abstract class BaseController extends Controller
 
         // Caution: Do not edit this line.
         helper('name');
+        helper('paths');
         parent::initController($request, $response, $logger);
 
         // Preload any models, libraries, etc, here.
@@ -207,7 +208,7 @@ abstract class BaseController extends Controller
      */
     protected function generateQrFile(string $qrValue, int $textHeight = 40): string
     {
-        $qrDir = FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'qr';
+        $qrDir = uploads_path('qr');
 
         if (! is_dir($qrDir)) {
             @mkdir($qrDir, 0775, true);
@@ -302,7 +303,7 @@ abstract class BaseController extends Controller
      * Allow only admin and staff roles (used by protected management actions).
      * Returns true when access is granted, otherwise sends a redirect and
      * STOPS. The old code did `redirect()->send(); return false;` and callers
-     * did `if (!...) return;` — execution then fell through to CI4's own
+     * did `if (!...) return;` â€” execution then fell through to CI4's own
      * response, emitting 200 + a stray Location header instead of a 302.
      * The guard itself always ran (no state change), but the browser got a
      * broken deny page. exit here guarantees a single, clean 302.

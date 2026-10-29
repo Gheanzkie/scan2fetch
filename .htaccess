@@ -17,7 +17,15 @@
     # RewriteCond %{HTTP:X-Forwarded-Proto} !https
     # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
-    # Serve existing files/dirs as-is (css, js, images, uploads, phpqrcode…)
+    # ---- Static assets live in public/ but are served from the app root ----
+    # Keeps the project root clean (no copied folders / junctions needed).
+    RewriteRule ^assets/(.*)$ public/assets/$1 [L]
+    RewriteRule ^image/(.*)$ public/image/$1 [L]
+    RewriteRule ^uploads/(.*)$ public/uploads/$1 [L]
+    RewriteRule ^html5qrcode/(.*)$ public/html5qrcode/$1 [L]
+    RewriteRule ^phpqrcode/(.*)$ public/phpqrcode/$1 [L]
+    RewriteRule ^favicon\.ico$ public/favicon.ico [L]
+    # Serve existing files/dirs as-is (css, js, images, uploads, phpqrcodeâ€¦)
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
 

@@ -321,7 +321,7 @@ body {
  <?php if (empty($gateAllowed)): ?>
  <div class="alert alert-danger mb-3" style="border-radius:12px;" id="gateClosedBanner">
   <i class="fas fa-lock mr-1"></i>
-  <strong>System CLOSED</strong> — <?= esc($gateMessage) ?>
+  <strong>System CLOSED</strong> - <?= esc($gateMessage) ?>
   <br><small>Releases and declines are disabled until the day is opened (Date Management).</small>
  </div>
  <?php endif; ?>
@@ -365,7 +365,7 @@ body {
  </div>
  <h4 style="color: var(--ink); font-weight:800; margin-bottom:6px;">Open the live camera scanner</h4>
  <p style="color: var(--muted); font-size:14px; max-width:440px; margin:0 auto 26px; line-height:1.6;">
- Fullscreen camera in a new tab — no sidebar, no menus. Detects QR codes anywhere in view,
+ Fullscreen camera in a new tab - no sidebar, no menus. Detects QR codes anywhere in view,
  any size, any angle. Results appear here automatically. Exit = close that tab.
  </p>
  <a href="<?= base_url('scan-kiosk') ?>" target="_blank" rel="noopener"
@@ -374,7 +374,7 @@ body {
  </a>
  <div class="mt-4" style="font-size:12.5px; color: var(--faint);">
  <i class="fas fa-lightbulb mr-1"></i>
-                                    Keep this tab open — scanned results show in the panel below.
+                                    Keep this tab open - scanned results show in the panel below.
  </div>
  </div>
  </div>
@@ -391,7 +391,7 @@ body {
  </div>
  <div class="card-body d-flex flex-column justify-content-center" style="min-height:420px;">
  <p style="color: var(--muted); font-size:13px; margin-bottom:16px;">
- Backup mode — type the QR code printed on the parent/fetcher card if the camera is unavailable.
+ Backup mode - type the QR code printed on the parent/fetcher card if the camera is unavailable.
  </p>
  <div class="input-group mb-3">
  <div class="input-group-prepend">
@@ -543,7 +543,7 @@ $(function() {
             $('#alertArea').before(
                 '<div class="alert alert-danger mb-3" style="border-radius:12px;" id="gateClosedBanner">' +
                 '<i class="fas fa-lock mr-1"></i>' +
-                '<strong>System CLOSED</strong> — Scanner is not available this time.' +
+                '<strong>System CLOSED</strong> - Scanner is not available this time.' +
                 (message ? ' ' + $('<span>').text(message).html() : '') +
                 '<br><small>Releases and declines are disabled until the day is opened (Date Management).</small>' +
                 '</div>'
@@ -616,7 +616,7 @@ $(function() {
     }
 
     // Poll the schedule so the page auto-closes (and flashes the message)
-    // the moment the closing time is reached — and so the MORNING -> AFTERNOON
+    // the moment the closing time is reached - and so the MORNING -> AFTERNOON
     // switch at 12:00 updates the banner live (server clock is authoritative).
     // An admin's manual switch (st.override) wins over the clock.
     setInterval(function() {
@@ -786,7 +786,7 @@ $(function() {
                             return picked.some(function (x) { return String(x.student_id) === sid; });
                         });
                         $(this).prop('disabled', true)
-                               .html('<i class="fas fa-spinner fa-spin mr-1"></i>Releasing…');
+                               .html('<i class="fas fa-spinner fa-spin mr-1"></i>Releasing...');
                         autoReleaseAll(onlyPicked, ctx.parentId, ctx.qrCode, ctx.fetcherName);
                     });
                 } else {
@@ -800,7 +800,7 @@ $(function() {
                 }
             } else {
                 if (res.blocked_by_schedule) {
-                    // Day closed / outside hours — kill the scanner and flash it.
+                    // Day closed / outside hours - kill the scanner and flash it.
                     stopCamera(true);
                     $('#qrResult').html('<span style="color: var(--soft-rose); font-weight: bold;"><i class="fas fa-lock mr-1"></i> Scanner is not available this time.</span>');
                     showAlert(res.message || 'Scanner is not available this time.', 'danger');
@@ -863,7 +863,7 @@ $(function() {
             .then(response => response.json())
             .then(res => {
                 if (res.blocked_by_schedule) {
-                    // Day closed / outside hours — stop the whole release loop and show why.
+                    // Day closed / outside hours - stop the whole release loop and show why.
                     $('#alertArea').show().html(
                         '<div class="alert alert-danger" style="border-radius:12px;">' +
                         '<i class="fas fa-lock mr-1"></i><strong>Blocked:</strong> ' +

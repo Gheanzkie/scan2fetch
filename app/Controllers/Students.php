@@ -799,7 +799,7 @@ class Students extends BaseController
             $folder = 'zip_' . date('Ymd_His');
         }
 
-        $base = FCPATH . 'uploads';
+        $base = public_path('uploads');
 
         if (! is_dir($base) && ! @mkdir($base, 0775, true) && ! is_dir($base)) {
             return redirect()->to('/register')->with('error', 'Could not create the uploads folder.');
@@ -974,8 +974,8 @@ class Students extends BaseController
         $studentNo = (string) ($this->studentModel->find($id)['student_no'] ?? '');
         $oldNo = strtoupper((string) ($oldStudent['student_no'] ?? ''));
         if ($oldNo !== '' && $studentNo !== '' && $oldNo !== strtoupper($studentNo)) {
-            $oldFile = FCPATH . 'uploads/students/' . $oldNo . '.jpg';
-            if (is_file($oldFile)) { @copy($oldFile, FCPATH . 'uploads/students/' . $studentNo . '.jpg'); }
+            $oldFile = uploads_path('students') . $oldNo . '.jpg';
+            if (is_file($oldFile)) { @copy($oldFile, uploads_path('students') . $studentNo . '.jpg'); }
         }
         if ($studentNo !== '') {
             helper('photo');

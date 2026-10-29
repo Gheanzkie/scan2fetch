@@ -35,7 +35,7 @@ if (! function_exists('student_photo_path')) {
             return null;
         }
 
-        $dir = FCPATH . 'uploads/students/';
+        $dir = uploads_path('students');
         foreach (student_photo_exts() as $ext) {
             $path = $dir . $no . '.' . $ext;
             if (is_file($path)) {
@@ -83,7 +83,7 @@ if (! function_exists('student_photo_delete')) {
         }
 
         $removed = 0;
-        $dir     = FCPATH . 'uploads/students/';
+        $dir     = uploads_path('students');
         foreach (student_photo_exts() as $ext) {
             $path = $dir . $no . '.' . $ext;
             if (is_file($path) && @unlink($path)) {
@@ -137,7 +137,7 @@ if (! function_exists('photo_save_dataurl')) {
         imagefill($dst, 0, 0, imagecolorallocate($dst, 255, 255, 255));
         imagecopyresampled($dst, $src, 0, 0, $sx, $sy, $max, $max, $side, $side);
 
-        $dir = FCPATH . 'uploads/students/';
+        $dir = uploads_path('students');
         if (! is_dir($dir) && ! @mkdir($dir, 0775, true) && ! is_dir($dir)) {
             imagedestroy($src);
             imagedestroy($dst);
@@ -170,7 +170,7 @@ if (! function_exists('parent_photo_delete')) {
         }
 
         $removed = 0;
-        $dir     = FCPATH . 'uploads/parents/';
+        $dir     = uploads_path('parents');
         foreach (student_photo_exts() as $ext) {
             $path = $dir . $no . '.' . $ext;
             if (is_file($path) && @unlink($path)) {
@@ -194,7 +194,7 @@ if (! function_exists('parent_photo_path')) {
             $no = 'P-' . $no;
         }
 
-        $dir = FCPATH . 'uploads/parents/';
+        $dir = uploads_path('parents');
         foreach (student_photo_exts() as $ext) {
             $path = $dir . $no . '.' . $ext;
             if (is_file($path)) {
@@ -259,7 +259,7 @@ if (! function_exists('photo_save_parent_dataurl')) {
         imagefill($dst, 0, 0, imagecolorallocate($dst, 255, 255, 255));
         imagecopyresampled($dst, $src, 0, 0, $sx, $sy, $max, $max, $side, $side);
 
-        $dir = FCPATH . 'uploads/parents/';
+        $dir = uploads_path('parents');
         if (! is_dir($dir) && ! @mkdir($dir, 0775, true) && ! is_dir($dir)) {
             imagedestroy($src);
             imagedestroy($dst);
@@ -285,7 +285,7 @@ if (! function_exists('teacher_photo_delete')) {
         if (! str_starts_with($no, 'T-')) $no = 'T-' . $no;
         $removed = 0;
         foreach (student_photo_exts() as $ext) {
-            $p = FCPATH . 'uploads/teachers/' . $no . '.' . $ext;
+            $p = uploads_path('teachers') . $no . '.' . $ext;
             if (is_file($p) && @unlink($p)) $removed++;
         }
         return $removed;
@@ -299,7 +299,7 @@ if (! function_exists('teacher_photo_url')) {
         if ($no === '') return '';
         if (! str_starts_with($no, 'T-')) $no = 'T-' . $no;
         foreach (student_photo_exts() as $ext) {
-            $p = FCPATH . 'uploads/teachers/' . $no . '.' . $ext;
+            $p = uploads_path('teachers') . $no . '.' . $ext;
             if (is_file($p)) return base_url('uploads/teachers/' . basename($p)) . '?v=' . filemtime($p);
         }
         return '';
@@ -321,7 +321,7 @@ if (! function_exists('staff_photo_delete')) {
         if (! str_starts_with($no, 'S-')) $no = 'S-' . $no;
         $removed = 0;
         foreach (student_photo_exts() as $ext) {
-            $p = FCPATH . 'uploads/staffs/' . $no . '.' . $ext;
+            $p = uploads_path('staffs') . $no . '.' . $ext;
             if (is_file($p) && @unlink($p)) $removed++;
         }
         return $removed;
@@ -335,7 +335,7 @@ if (! function_exists('staff_photo_url')) {
         if ($no === '') return '';
         if (! str_starts_with($no, 'S-')) $no = 'S-' . $no;
         foreach (student_photo_exts() as $ext) {
-            $p = FCPATH . 'uploads/staffs/' . $no . '.' . $ext;
+            $p = uploads_path('staffs') . $no . '.' . $ext;
             if (is_file($p)) return base_url('uploads/staffs/' . basename($p)) . '?v=' . filemtime($p);
         }
         return '';
@@ -389,7 +389,7 @@ if (! function_exists('subfetcher_photo_delete')) {
         if ($id <= 0) return 0;
         $removed = 0;
         foreach (student_photo_exts() as $ext) {
-            $p = FCPATH . 'uploads/subfetchers/' . $id . '.' . $ext;
+            $p = uploads_path('subfetchers') . $id . '.' . $ext;
             if (is_file($p) && @unlink($p)) $removed++;
         }
         return $removed;
@@ -403,7 +403,7 @@ if (! function_exists('subfetcher_photo_url')) {
         $id = (int) $id;
         if ($id <= 0) return '';
         foreach (student_photo_exts() as $ext) {
-            $p = FCPATH . 'uploads/subfetchers/' . $id . '.' . $ext;
+            $p = uploads_path('subfetchers') . $id . '.' . $ext;
             if (is_file($p)) return base_url('uploads/subfetchers/' . basename($p)) . '?v=' . filemtime($p);
         }
         return '';
@@ -427,7 +427,7 @@ if (! function_exists('photo_save_subfetcher_dataurl')) {
         $dst = imagecreatetruecolor($max, $max);
         imagefill($dst, 0, 0, imagecolorallocate($dst, 255, 255, 255));
         imagecopyresampled($dst, $src, 0, 0, (int) (($w - $side) / 2), (int) (($h - $side) / 2), $max, $max, $side, $side);
-        $dir = FCPATH . 'uploads/subfetchers/';
+        $dir = uploads_path('subfetchers');
         if (! is_dir($dir) && ! @mkdir($dir, 0775, true) && ! is_dir($dir)) { imagedestroy($src); imagedestroy($dst); return false; }
         subfetcher_photo_delete($id);
         $ok = imagejpeg($dst, $dir . $id . '.jpg', 90);
