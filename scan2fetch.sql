@@ -85,7 +85,7 @@ CREATE TABLE `admin` (
 
 LOCK TABLES `admin` WRITE;
 /*!40000 ALTER TABLE `admin` DISABLE KEYS */;
-INSERT INTO `admin` VALUES (1,'Admin','','','admin','$2y$10$6IVidIV8Q1QWzRk9BtA98ePVzErVOQaSk72cyOjxbHyRVAPIbRhQ2','2026-05-28 16:23:06'),(6,'CyberStrike','','Operator','09999999999','$2y$10$7SKSWWixY8c63VCcgmsReulMbOdvQgkkPmv.DkYP4wJ5/Eer17P5.','2026-10-10 23:42:31'),(8,'Ghea','','Admin','ghea123','$2y$10$K.W6Pjeh9iqUFVTh5aCCpuHFgTiXVLm/SGg0J.8RDOmygmT30Ao9y','2026-10-11 07:47:54');
+INSERT INTO `admin` VALUES (1,'Admin','','','admin','$2y$10$XemZ.e82riss56g/C.Eh1.MBDFpBTbq6pj3XCivy0uqzC6g8N7Avq','2026-05-28 16:23:06');
 /*!40000 ALTER TABLE `admin` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -519,4 +519,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-10-30  2:13:28
+-- Dump completed on 2026-10-30  2:18:05
