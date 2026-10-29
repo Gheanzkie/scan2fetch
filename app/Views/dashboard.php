@@ -51,9 +51,6 @@
  <?php endif; ?>
  </p>
  </div>
- <div class="col-md-4 text-right d-none d-md-block">
- <i class="fas fa-tachometer-alt" style="font-size: 3rem; color: #dbe4f0;"></i>
- </div>
  </div>
  </div>
  </div>
@@ -184,7 +181,7 @@
  <tr>
  <td>
  <strong><?= esc(full_name($r, 'student_')) ?></strong>
- <br><small class="text-muted">#<?= esc($r['student_id']) ?> Â· <?= esc($r['grade_section']) ?></small>
+ <br><small class="text-muted">#<?= esc($r['student_id']) ?> · <?= esc($r['grade_section']) ?></small>
  </td>
  <td>
  <?php $fetcherName = full_name($r, 'fetcher_'); ?>
@@ -197,10 +194,10 @@
  <?= esc(full_name($r, 'parent_')) ?>
  <br><small class="text-muted">Parent</small>
  <?php else: ?>
- <span class="text-muted">â€”</span>
+ <span class="text-muted">—</span>
  <?php endif; ?>
  </td>
- <td><span class="badge badge-primary" style="<?= ($r['method']??'')=='QR' ? '' : 'background-color:#eef2ff;color:#4338ca;' ?>"><?= $r['method']??'â€”' ?></span></td>
+ <td><span class="badge badge-primary" style="<?= ($r['method']??'')=='QR' ? '' : 'background-color:#eef2ff;color:#4338ca;' ?>"><?= $r['method']??'—' ?></span></td>
  <td class="small text-muted"><i class="fas fa-calendar-alt mr-1"></i><?= date('M d, Y', strtotime($r['time_released'])) ?><br><small><?= date('h:i A', strtotime($r['time_released'])) ?></small></td>
  </tr>
  <?php endforeach; else: ?>
@@ -255,6 +252,43 @@
  </div>
  </div>
  </div>
+
+ <!-- ===== MY PROFILE (teacher dashboard) ===== -->
+ <?php if (!empty($teacherProfile)): ?>
+ <?php $__tp = teacher_photo_url((string) ($teacherProfile['teacher_no'] ?? '')); ?>
+ <div class="row">
+ <div class="col-12 mb-3">
+ <div class="card" style="border-radius:14px;">
+ <div class="card-body d-flex align-items-center" style="gap:1rem;flex-wrap:wrap;padding:1rem 1.25rem;">
+ <?php if ($__tp): ?>
+ <img src="<?= $__tp ?>" alt="My photo"
+      style="width:72px;height:72px;min-width:72px;border-radius:50%;object-fit:cover;border:3px solid rgba(108,140,255,.25);">
+ <?php else: ?>
+ <div style="width:72px;height:72px;min-width:72px;border-radius:50%;background:#eef2ff;display:flex;align-items:center;justify-content:center;color:#93a3d8;font-size:26px;"><i class="fas fa-user"></i></div>
+ <?php endif; ?>
+ <div style="flex:1;min-width:220px;">
+ <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8;font-weight:700;">My Profile</div>
+ <div style="font-weight:800;font-size:16px;color:#1e293b;"><?= esc(full_name($teacherProfile)) ?></div>
+ <div style="margin-top:.35rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+ <?php if (!empty($teacherProfile['teacher_no'])): ?>
+ <span class="badge badge-soft" style="font-family:ui-monospace,monospace;font-size:11.5px;"><?= esc($teacherProfile['teacher_no']) ?></span>
+ <?php endif; ?>
+ <?php if (!empty($teacherProfile['grade_section'])): ?>
+ <span class="badge badge-soft"><?= esc($teacherProfile['grade_section']) ?></span>
+ <?php endif; ?>
+ <?php if (!empty($teacherProfile['phone'])): ?>
+ <span style="font-size:12.5px;color:#64748b;"><i class="fas fa-phone mr-1"></i><?= esc($teacherProfile['phone']) ?></span>
+ <?php endif; ?>
+ </div>
+ </div>
+ <a href="<?= base_url('teachers-view/' . session('user_id')) ?>" class="btn btn-kid-primary btn-sm">
+ <i class="fas fa-users mr-1"></i> My Students
+ </a>
+ </div>
+ </div>
+ </div>
+ </div>
+ <?php endif; ?>
  <?php endif; ?>
 
   <!-- ==================== PARENT DASHBOARD ==================== -->
@@ -291,6 +325,40 @@
  </div>
  </div>
 
+ <!-- ===== MY PROFILE (parent dashboard) ===== -->
+ <?php if (!empty($parentProfile)): ?>
+ <?php $__pphoto = parent_photo_url((string) ($parentProfile['parent_no'] ?? '')); ?>
+ <div class="row">
+ <div class="col-12 mb-3">
+ <div class="card" style="border-radius:14px;">
+ <div class="card-body d-flex align-items-center" style="gap:1rem;flex-wrap:wrap;padding:1rem 1.25rem;">
+ <?php if ($__pphoto): ?>
+ <img src="<?= $__pphoto ?>" alt="My photo"
+      style="width:72px;height:72px;min-width:72px;border-radius:50%;object-fit:cover;border:3px solid rgba(108,140,255,.25);">
+ <?php else: ?>
+ <div style="width:72px;height:72px;min-width:72px;border-radius:50%;background:#eef2ff;display:flex;align-items:center;justify-content:center;color:#93a3d8;font-size:26px;"><i class="fas fa-user"></i></div>
+ <?php endif; ?>
+ <div style="flex:1;min-width:220px;">
+ <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8;font-weight:700;">My Profile</div>
+ <div style="font-weight:800;font-size:16px;color:#1e293b;"><?= esc(full_name($parentProfile)) ?></div>
+ <div style="margin-top:.35rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+ <?php if (!empty($parentProfile['parent_no'])): ?>
+ <span class="badge badge-soft" style="font-family:ui-monospace,monospace;font-size:11.5px;"><?= esc($parentProfile['parent_no']) ?></span>
+ <?php endif; ?>
+ <?php if (!empty($parentProfile['phone'])): ?>
+ <span style="font-size:12.5px;color:#64748b;"><i class="fas fa-phone mr-1"></i><?= esc($parentProfile['phone']) ?></span>
+ <?php endif; ?>
+ <?php if (!empty($parentProfile['qr_code'])): ?>
+ <span style="font-size:12.5px;color:#64748b;"><i class="fas fa-qrcode mr-1"></i><?= esc($parentProfile['qr_code']) ?></span>
+ <?php endif; ?>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ <?php endif; ?>
+
  <!-- ===== MY QR CODE (parent can finally see their own QR) ===== -->
  <div class="row">
  <div class="col-12 mb-3">
@@ -303,9 +371,6 @@
  style="width:120px;height:120px;cursor:zoom-in;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"
  onclick="openQrModal('<?= base_url('uploads/qr/'.$myQr.'.png') ?>','<?= esc(full_name($parentProfile)) ?>')">
  <?php else: ?>
- <div style="width:120px;height:120px;display:flex;align-items:center;justify-content:center;color:#94a3b8;border:1px solid #e2e8f0;border-radius:10px;">
- <i class="fas fa-qrcode fa-3x"></i>
- </div>
  <?php endif; ?>
  <div style="flex:1;min-width:220px;">
  <h6 style="font-weight:700;margin-bottom:.25rem;"><i class="fas fa-id-card mr-1" style="color:#4361ee;"></i> My QR Code</h6>
@@ -316,8 +381,9 @@
  <a href="<?= base_url('uploads/qr/'.$myQr.'.png') ?>" download="<?= esc($myQr) ?>.png" class="btn btn-sm btn-outline-primary" style="padding:.15rem .5rem;font-size:12px;"><i class="fas fa-download mr-1"></i>Save</a>
  </div>
  <?php else: ?>
- <p style="margin:.5rem 0 0;color:#dc2626;font-size:12px;">No QR code yet â€” contact the school admin.</p>
+ <p style="margin:.5rem 0 0;color:#dc2626;font-size:12px;">No QR code yet — contact the school admin.</p>
  <?php endif; ?>
+ </div>
  </div>
  </div>
  </div>

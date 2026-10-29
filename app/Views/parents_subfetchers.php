@@ -97,7 +97,6 @@ body {
  class="qr-thumb"
  onclick="openQrModal('<?= base_url('uploads/qr/'.$sf['qr_code'].'.png') ?>','<?= esc(full_name($sf)) ?>')">
  <?php else: ?>
- <div class="qr-thumb d-flex align-items-center justify-content-center" style="color:#cbd5e1;"><i class="fas fa-qrcode fa-2x"></i></div>
  <?php endif; ?>
  <div style="flex:1;min-width:0;">
  <strong style="display:block;font-size:1rem;"><?= esc(trim(($sf['fname'] ?? '').' '.($sf['mname'] ?? '').' '.($sf['lname'] ?? ''))) ?></strong>

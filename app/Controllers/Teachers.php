@@ -353,6 +353,7 @@ class Teachers extends BaseController
         }
         $model = new TeachersModel();
         $id = $this->request->getPost('id');
+        $__oldTeacher = $model->find($id);
         $data = [
             'fname' => $this->request->getPost('fname'),
             'mname' => $this->request->getPost('mname'),
@@ -362,9 +363,22 @@ class Teachers extends BaseController
         ];
         $teacherNo = strtoupper(trim((string) $this->request->getPost('teacher_no')));
         if ($teacherNo !== '') {
+            if (! str_starts_with($teacherNo, 'T-')) {
+                $teacherNo = preg_match('/(\d+)$/', $teacherNo, $__tm) ? 'T-' . $__tm[1] : 'T-' . $teacherNo;
+            }
+            if ($model->where('teacher_no', $teacherNo)->where('id !=', $id)->countAllResults() > 0) {
+                return redirect()->to('/teachers')->with('error', 'Teacher ID ' . $teacherNo . ' is already taken.');
+            }
             $data['teacher_no'] = $teacherNo;
         }
         $model->update($id, $data);
+
+        // ===== ID changed: carry the profile picture over to the new file name =====
+        helper('photo');
+        if (! empty($__oldTeacher['teacher_no']) && isset($data['teacher_no'])
+            && strtoupper((string) $__oldTeacher['teacher_no']) !== strtoupper((string) $data['teacher_no'])) {
+            photo_carry_over_id('teachers', (string) $__oldTeacher['teacher_no'], (string) $data['teacher_no'], 'T-');
+        }
 
         // ===== Teacher profile picture (add / change / remove) =====
         helper('photo');
@@ -435,18 +449,6 @@ class Teachers extends BaseController
         return redirect()->to('/teachers')->with('msg', 'Teacher deleted');
     }
 
-    // ========== DELETE ALL TEACHERS (ADMIN ONLY) ==========
-    public function deleteAll()
-    {
-        if (session('role') != 'admin') {
-            return redirect()->to('/teachers')->with('error', 'Admin only.');
-        }
-        $model = new TeachersModel();
-        $count = $model->countAllResults();
-        $model->truncate();
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'delete', 'teacher', "DELETED ALL teachers ($count accounts)");
-        return redirect()->to('/teachers')->with('msg', "All $count teacher(s) deleted.");
-    }
 
     public function sendPassword($id)
     {

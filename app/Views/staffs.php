@@ -341,7 +341,7 @@ label .text-danger { color: var(--soft-rose) !important; }
 .breadcrumb-item a:hover { color: var(--soft-purple) !important; }
 
 .breadcrumb-item.active { color: var(--ink) !important; font-weight: 700 !important; font-size: 13px !important; }
-.breadcrumb-item + .breadcrumb-item::before { color: var(--faint) !important; content: "â€º" !important; }
+.breadcrumb-item + .breadcrumb-item::before { color: var(--faint) !important; content: "›" !important; }
 
 /* ===== EMPTY STATE ===== */
 .empty-state { color: var(--faint) !important; }
@@ -419,6 +419,60 @@ label .text-danger { color: var(--soft-rose) !important; }
 @media (max-width: 480px) {
     .card { border-radius: 16px !important; }
 }
+
+/* ===== UNIFIED EDIT MODAL (register look) ===== */
+
+.reg-avatar {
+    position: relative; width: 92px; height: 92px; margin: 0 auto;
+    border-radius: 50%; overflow: hidden; cursor: pointer;
+    background: #eef2ff; border: 3px solid rgba(108,140,255,.25);
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .2s ease, transform .15s ease;
+}
+.reg-avatar:hover { border-color: var(--soft-blue); transform: scale(1.03); }
+.reg-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+.reg-avatar-placeholder { font-size: 30px; color: #a5b4fc; }
+.reg-avatar-overlay {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 4px 0;
+    background: rgba(63,43,150,.72); color: #fff; font-size: 10.5px;
+    font-weight: 700; text-align: center; opacity: 0; transition: opacity .2s ease;
+}
+.reg-avatar:hover .reg-avatar-overlay { opacity: 1; }
+
+    display: flex; gap: 10px; align-items: flex-start;
+    background: rgba(108,140,255,.08);
+    border: 1px solid rgba(108,140,255,.20);
+    border-radius: 12px; padding: 11px 13px;
+    font-size: 12.5px; color: #4a4a68; line-height: 1.45;
+}
+/* fields inside editStaffModal match the register page */
+#editStaffModal .modal-body { padding: 1.35rem 1.5rem 0.5rem !important; }
+#editStaffModal .row { margin-left: -7px; margin-right: -7px; }
+#editStaffModal .row > [class*="col-"] { padding-left: 7px; padding-right: 7px; }
+#editStaffModal .form-group { margin-bottom: 14px; }
+#editStaffModal label {
+    display: block; font-size: 12.5px; font-weight: 700;
+    color: #4a4a68 !important; margin-bottom: 6px !important;
+}
+#editStaffModal label i { color: var(--soft-blue); margin-right: 5px; font-size: 11.5px; }
+#editStaffModal .form-control {
+    border: 1px solid rgba(108,140,255,.28) !important;
+    border-radius: 11px !important;
+    padding: 9px 13px !important;
+    font-size: 13.5px !important;
+    color: #2d2d4a !important;
+    background: #fff !important;
+    transition: border-color .16s ease, box-shadow .16s ease;
+}
+#editStaffModal .form-control:focus {
+    border-color: var(--soft-blue) !important;
+    box-shadow: 0 0 0 3px rgba(108,140,255,.16) !important;
+}
+#editStaffModal small.text-muted {
+    display: block; margin-top: 5px; font-size: 10.5px !important; color: #9a9ab8 !important;
+}
+#editStaffModal .modal-footer { border-top: 1px solid rgba(108,140,255,.14); padding: 14px 1.5rem; }
+#editStaffModal .modal-footer .btn { border-radius: 11px !important; font-weight: 700; }
 </style>
 
 <div class="content-wrapper" style="background: transparent;">
@@ -475,15 +529,9 @@ label .text-danger { color: var(--soft-rose) !important; }
                                                 title="Send passwords to staff who haven't received one yet"
                                                 onclick="return confirm('Send passwords to all staff who have not received one yet?')">
  <i class="fas fa-sms mr-1"></i> Send All Passwords
- </a>
- <?php if (session('role') == 'admin'): ?>
- <a href="<?= base_url('staffs-delete-all') ?>" class="btn btn-danger btn-sm"
-                                                title="Delete ALL staff accounts"
-                                                onclick="return confirm('DELETE ALL STAFF?\n\nThis will permanently delete ALL staff accounts.\n\nThis cannot be undone!')">
- <i class="fas fa-trash-alt mr-1"></i> Delete All
- </a>
- <?php endif; ?>
+                                </a>
  <button type="button" class="btn btn-kid-primary btn-sm" data-toggle="modal" data-target="#addStaffModal">
+
  <i class="fas fa-plus mr-1"></i> Add Staff
  </button>
  </div>
@@ -498,7 +546,6 @@ label .text-danger { color: var(--soft-rose) !important; }
  <label class="filter-label">Search Staff</label>
  <div class="input-group input-group-sm">
  <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-search"></i></span>
  </div>
  <input type="text" id="searchStaff" class="form-control form-control-sm" placeholder="Search name or phone...">
  </div>
@@ -551,11 +598,11 @@ label .text-danger { color: var(--soft-rose) !important; }
  </td>
  <td><code><?= esc($staff['phone']) ?></code></td>
  <td class="text-center">
- <?php if (!empty($staff['password_sent'])): ?>
- <span class="badge badge-soft" title="Password already sent" style="color:#2e7d32;"><i class="fas fa-check"></i></span>
- <?php else: ?>
- <span class="badge badge-soft" title="Password not yet sent" style="color:#c2185b;"><i class="fas fa-times"></i></span>
- <?php endif; ?>
+  <?php if (!empty($staff['password_sent'])): ?>
+  <span class="badge" style="background:var(--soft-green);color:#fff;font-weight:600;"><i class="fas fa-check-circle mr-1"></i>Sent</span>
+  <?php else: ?>
+  <span class="badge" style="background:var(--soft-orange);color:#fff;font-weight:600;"><i class="fas fa-clock mr-1"></i>Not sent</span>
+  <?php endif; ?>
  </td>
  <td class="text-center">
  <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
@@ -604,7 +651,6 @@ label .text-danger { color: var(--soft-rose) !important; }
  <td colspan="7" class="text-center py-5 empty-state">
  <i class="fas fa-user-tie fa-3x mb-3 d-block"></i>
  <h5>No staff accounts yet</h5>
- <p>Click "Add Staff" to register a new staff member.</p>
  </td>
  </tr>
  <?php endif; ?>
@@ -664,26 +710,21 @@ label .text-danger { color: var(--soft-rose) !important; }
  </div>
  </div>
  <div class="form-group">
- <label>Staff ID <span class="text-muted" style="font-weight: 400;">(optional â€” auto-generated as S-####)</span></label>
+ <label>Staff ID <span class="text-muted" style="font-weight: 400;">(optional — auto-generated as S-####)</span></label>
  <div class="input-group">
  <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
  </div>
  <input type="text" name="staff_no" class="form-control" placeholder="S-1002">
  </div>
  </div>
  <div class="form-group">
  <label>Phone Number <span class="text-danger">*</span></label>
+ <i class="fas fa-calendar mr-1"></i> Added: <span id="editStaffCreated">&mdash;</span>
  <div class="input-group">
  <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-phone"></i></span>
  </div>
  <input type="text" name="phone" class="form-control" placeholder="09XXXXXXXXX" required>
  </div>
- </div>
- <div class="alert" style="background: rgba(168,192,255,0.12); border: 1.5px dashed rgba(63,43,150,0.18); border-radius: 12px; margin-bottom: 0; padding: 12px 14px; font-size: 13px; color: var(--ink);">
- <i class="fas fa-info-circle mr-1" style="color: var(--soft-blue);"></i>
-                        Passwords are not sent automatically â€” use "Send Password" / "Send All Passwords" to deliver them.
  </div>
  </div>
  <div class="modal-footer">
@@ -697,96 +738,81 @@ label .text-danger { color: var(--soft-rose) !important; }
  </div>
 </div>
 
-<!-- ===== EDIT STAFF MODAL ===== -->
+<!-- ===== EDIT Staff MODAL (unified layout) ===== -->
 <div class="modal fade" id="editStaffModal" tabindex="-1">
- <div class="modal-dialog modal-dialog-centered">
- <div class="modal-content">
- <form action="<?= base_url('staffs-update') ?>" method="post" enctype="multipart/form-data">
- <?= csrf_field() ?>
- <input type="hidden" name="id" id="editId">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="<?= base_url('staffs-update') ?>" method="post" enctype="multipart/form-data">
+                <?= csrf_field() ?>
+                <input type="hidden" name="id" id="editId">
 
- <!-- ===== Staff profile picture (add / change / remove) ===== -->
- <div class="text-center mb-3">
- <div id="staffPicBox" title="Click to add or change the picture" style="position:relative;width:96px;height:96px;margin:0 auto;border-radius:50%;overflow:hidden;border:3px solid rgba(108,140,255,0.25);background:#eef2ff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
- <img id="staffPicImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-tie mr-2" style="color: var(--soft-blue);"></i>Edit Staff
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="reg-avatar-wrap text-center mb-3">
+                        <div class="reg-avatar" id="staffPicBox" title="Click to add or change the picture">
+                            <img class="reg-avatar-img" id="staffPicImg" src="" alt="" style="display:none;">
+                            <span class="reg-avatar-overlay">Add picture</span>
+                        </div>
+                        <input type="file" class="reg-avatar-file" id="staffPicFile" accept="image/*" style="display:none;">
+                        <input type="hidden" name="staff_picture_data" id="staffPicData" value="">
+                        <input type="hidden" name="staff_picture_remove" id="staffPicRemove" value="0">
+                        <div>
+                            <button type="button" class="btn btn-link btn-sm reg-avatar-remove-btn" id="staffPicRemoveBtn"
+                                    style="display:none; color:#b23c4d; padding:0; font-size:12px;">
+                                <i class="fas fa-trash-alt mr-1"></i>Remove picture
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editStaffNo"><i class="fas fa-id-badge"></i>Staff ID <span class="text-danger">*</span></label>
+                        <input type="text" name="staff_no" id="editStaffNo" class="form-control" placeholder="S-0001" maxlength="20" required>
+                        <small class="text-muted">Format S-#### - also used as the photo filename.</small>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="editFname"><i class="fas fa-user"></i>First Name <span class="text-danger">*</span></label>
+                                <input type="text" name="fname" id="editFname" class="form-control" placeholder="Ghean" required>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="editMname"><i class="fas fa-user"></i>Middle Name</label>
+                                <input type="text" name="mname" id="editMname" class="form-control" placeholder="Reyes">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="editLname"><i class="fas fa-user"></i>Last Name <span class="text-danger">*</span></label>
+                                <input type="text" name="lname" id="editLname" class="form-control" placeholder="Staff" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPhone"><i class="fas fa-phone"></i>Phone Number <span class="text-danger">*</span></label>
+                        <input type="text" name="phone" id="editPhone" class="form-control" placeholder="09XXXXXXXXX" required>
+                        <small class="text-muted">Used for the staff login and SMS notifications.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn btn-kid-warning btn-sm px-4">
+                        <i class="fas fa-check mr-1"></i>Update Staff
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
  <i class="fas fa-camera" id="staffPicPh" style="font-size:28px;color:#a5b4fc;"></i>
- <span style="position:absolute;left:0;right:0;bottom:0;padding:3px 0;background:rgba(63,43,150,0.72);color:#fff;font-size:10px;font-weight:700;text-align:center;">Change</span>
- </div>
- <input type="file" id="staffPicFile" accept="image/*" style="display:none;">
- <input type="hidden" name="staff_picture_data" id="staffPicData" value="">
- <input type="hidden" name="staff_picture_remove" id="staffPicRemove" value="0">
- <div><button type="button" id="staffPicRemoveBtn" style="display:none;border:none;background:none;color:#b23c4d;font-size:12px;padding:0;margin-top:4px;"><i class="fas fa-trash-alt mr-1"></i>Remove picture</button></div>
- </div>
- <div class="modal-header">
- <h5 class="modal-title">
- <i class="fas fa-user-edit mr-2" style="color: var(--soft-orange);"></i>
-                        Edit Staff
- </h5>
- <button type="button" class="close" data-dismiss="modal" style="color: var(--ink);">&times;</button>
- </div>
- <div class="modal-body">
- <div class="row">
- <div class="col-4">
- <div class="form-group">
- <label>First Name <span class="text-danger">*</span></label>
- <input type="text" name="fname" id="editFname" class="form-control" required>
- </div>
- </div>
- <div class="col-4">
- <div class="form-group">
- <label>Middle Name</label>
- <input type="text" name="mname" id="editMname" class="form-control">
- </div>
- </div>
- <div class="col-4">
- <div class="form-group">
- <label>Last Name <span class="text-danger">*</span></label>
- <input type="text" name="lname" id="editLname" class="form-control" required>
- </div>
- </div>
- </div>
- <div class="form-group">
- <label>Staff ID</label>
- <div class="input-group">
- <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
- </div>
- <input type="text" name="staff_no" id="editStaffNo" class="form-control">
- </div>
- </div>
- <div class="form-group">
- <label>Phone Number <span class="text-danger">*</span></label>
- <div class="input-group">
- <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-phone"></i></span>
- </div>
- <input type="text" name="phone" id="editPhone" class="form-control" required>
- </div>
- </div>
- <p class="text-muted mb-3" style="font-size:13px;">
- <i class="fas fa-calendar mr-1"></i> Added: <span id="editStaffCreated">&mdash;</span>
- </p>
- <div class="form-group mb-0">
- <label>Password <span class="text-muted" style="font-weight: 400;">(leave blank to keep current)</span></label>
- <div class="input-group">
- <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-lock"></i></span>
- </div>
- <input type="password" name="password" class="form-control" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" minlength="6">
-  </div>
-  </div>
- </div>
- <div class="modal-footer">
- <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">Cancel</button>
- <button type="submit" class="btn btn-kid-warning btn-sm px-4">
- <i class="fas fa-check mr-1"></i> Update Staff
- </button>
- </div>
- </form>
- </div>
- </div>
 </div>
-
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
@@ -814,7 +840,7 @@ $(function(){
             var d = new Date(String(created).replace(' ', 'T'));
             $('#editStaffCreated').text(isNaN(d.getTime()) ? created : d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }));
         } else {
-            $('#editStaffCreated').text('â€”');
+            $('#editStaffCreated').text('—');
         }
 
         // ===== Staff profile picture widget =====

@@ -402,6 +402,54 @@ select.form-control option {
 @media (max-width: 480px) {
     .card { border-radius: 16px !important; }
 }
+
+/* ===== UNIFIED EDIT MODAL (register look) ===== */
+
+.reg-avatar {
+    position: relative; width: 92px; height: 92px; margin: 0 auto;
+    border-radius: 50%; overflow: hidden; cursor: pointer;
+    background: #eef2ff; border: 3px solid rgba(108,140,255,.25);
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .2s ease, transform .15s ease;
+}
+.reg-avatar:hover { border-color: var(--soft-blue); transform: scale(1.03); }
+.reg-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+.reg-avatar-placeholder { font-size: 30px; color: #a5b4fc; }
+.reg-avatar-overlay {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 4px 0;
+    background: rgba(63,43,150,.72); color: #fff; font-size: 10.5px;
+    font-weight: 700; text-align: center; opacity: 0; transition: opacity .2s ease;
+}
+.reg-avatar:hover .reg-avatar-overlay { opacity: 1; }
+
+/* fields inside editParentModal match the register page */
+#editParentModal .modal-body { padding: 1.35rem 1.5rem 0.5rem !important; }
+#editParentModal .row { margin-left: -7px; margin-right: -7px; }
+#editParentModal .row > [class*="col-"] { padding-left: 7px; padding-right: 7px; }
+#editParentModal .form-group { margin-bottom: 14px; }
+#editParentModal label {
+    display: block; font-size: 12.5px; font-weight: 700;
+    color: #4a4a68 !important; margin-bottom: 6px !important;
+}
+#editParentModal label i { color: var(--soft-blue); margin-right: 5px; font-size: 11.5px; }
+#editParentModal .form-control {
+    border: 1px solid rgba(108,140,255,.28) !important;
+    border-radius: 11px !important;
+    padding: 9px 13px !important;
+    font-size: 13.5px !important;
+    color: #2d2d4a !important;
+    background: #fff !important;
+    transition: border-color .16s ease, box-shadow .16s ease;
+}
+#editParentModal .form-control:focus {
+    border-color: var(--soft-blue) !important;
+    box-shadow: 0 0 0 3px rgba(108,140,255,.16) !important;
+}
+#editParentModal small.text-muted {
+    display: block; margin-top: 5px; font-size: 10.5px !important; color: #9a9ab8 !important;
+}
+#editParentModal .modal-footer { border-top: 1px solid rgba(108,140,255,.14); padding: 14px 1.5rem; }
+#editParentModal .modal-footer .btn { border-radius: 11px !important; font-weight: 700; }
 </style>
 
 <div class="content-wrapper" style="background: transparent;">
@@ -443,31 +491,21 @@ select.form-control option {
  <?php endif; ?>
 
  <!-- MAIN CARD -->
- <div class="row">
- <div class="col-12">
  <div class="card">
- <div class="card-header">
+ <div class="card-header" style="border-bottom:1px solid rgba(108,140,255,.14);">
  <div class="d-flex justify-content-between align-items-center flex-wrap">
  <h5 class="mb-0">
  <i class="fas fa-list-ul mr-2" style="color: var(--soft-blue);"></i>
-                                    Parent List
+                        Parents List
  <span class="badge badge-soft ml-2"><?= count($parents ?? []) ?></span>
  </h5>
- <span style="color: var(--faint); font-size: 12.5px;">
- <i class="fas fa-info-circle mr-1"></i>Passwords are sent manually via "Send Password" or "Send All Passwords" below
- </span>
- <a href="<?= base_url('parents-send-all') ?>" class="btn btn-kid-primary btn-sm mr-2"
+ <div class="d-flex align-items-center flex-wrap" style="gap:8px;">
+ <a href="<?= base_url('parents-send-all') ?>" class="btn btn-kid-primary btn-sm"
                                                 title="Send passwords to parents who haven't received one yet"
                                                 onclick="return confirm('Send passwords to all parents who have not received one yet?')">
  <i class="fas fa-sms mr-1"></i> Send All Passwords
  </a>
- <?php if (session('role') == 'admin'): ?>
- <a href="<?= base_url('parents-delete-all') ?>" class="btn btn-danger btn-sm mr-2"
-                                                title="Delete ALL parents (and orphaned students)"
-                                                onclick="return confirm('DELETE ALL PARENTS?\n\nThis will permanently delete ALL parent accounts, their sub-fetchers, and any students left without parents.\n\nThis cannot be undone!')">
- <i class="fas fa-trash-alt mr-1"></i> Delete All
- </a>
- <?php endif; ?>
+ </div>
  </div>
  </div>
  <div class="card-body pt-0">
@@ -479,7 +517,6 @@ select.form-control option {
  <label class="filter-label">Search Parent</label>
  <div class="input-group input-group-sm">
  <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-search"></i></span>
  </div>
  <input type="text" id="searchParent" class="form-control form-control-sm" placeholder="Search name or phone...">
  </div>
@@ -523,11 +560,11 @@ select.form-control option {
  </td>
  <td><code><?= esc($p['phone']) ?></code></td>
  <td class="text-center">
- <?php if (!empty($p['password_sent'])): ?>
- <span class="badge badge-soft" title="Password already sent" style="color:#2e7d32;"><i class="fas fa-check"></i></span>
- <?php else: ?>
- <span class="badge badge-soft" title="Password not yet sent" style="color:#c2185b;"><i class="fas fa-times"></i></span>
- <?php endif; ?>
+  <?php if (!empty($p['password_sent'])): ?>
+  <span class="badge" style="background:var(--soft-green);color:#fff;font-weight:600;"><i class="fas fa-check-circle mr-1"></i>Sent</span>
+  <?php else: ?>
+  <span class="badge" style="background:var(--soft-orange);color:#fff;font-weight:600;"><i class="fas fa-clock mr-1"></i>Not sent</span>
+  <?php endif; ?>
  </td>
  <td class="text-center">
  <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
@@ -578,14 +615,11 @@ select.form-control option {
  <td colspan="6" class="text-center py-5 empty-state">
  <i class="fas fa-user-friends fa-3x mb-3 d-block"></i>
  <h5>No parents registered yet</h5>
- <p>Parents are automatically registered when adding a student. Their password is sent manually via "Send Password" / "Send All Passwords".</p>
  </td>
  </tr>
  <?php endif; ?>
  </tbody>
  </table>
- </div>
- </div>
  </div>
  </div>
  </div>
@@ -614,66 +648,81 @@ select.form-control option {
  </div>
 </div>
 
-<!-- ===== EDIT PARENT MODAL (floating, same pattern as teachers/staffs) ===== -->
+<!-- ===== EDIT Parent MODAL (unified layout) ===== -->
 <div class="modal fade" id="editParentModal" tabindex="-1">
- <div class="modal-dialog modal-dialog-centered">
- <div class="modal-content">
- <form action="<?= base_url('parents-update') ?>" method="post" enctype="multipart/form-data">
- <?= csrf_field() ?>
- <input type="hidden" name="id" id="editParentId">
- <div class="modal-header">
- <h5 class="modal-title"><i class="fas fa-user-edit mr-2" style="color:#4361ee;"></i>Edit Parent</h5>
- <button type="button" class="close" data-dismiss="modal">&times;</button>
- </div>
- <div class="modal-body">
- <div class="text-center mb-3">
- <div id="editParentPicBox" title="Click to add or change the picture" style="position:relative;width:96px;height:96px;margin:0 auto;border-radius:50%;overflow:hidden;border:3px solid rgba(108,140,255,0.25);background:#eef2ff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
- <img id="editParentPicImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
- <i class="fas fa-camera" id="editParentPicPh" style="font-size:28px;color:#a5b4fc;"></i>
- </div>
- <input type="file" id="editParentPicFile" accept="image/*" style="display:none;">
- <input type="hidden" name="parent_picture_data" id="editParentPicData" value="">
- <input type="hidden" name="parent_picture_remove" id="editParentPicRemove" value="0">
- <button type="button" id="editParentPicRemoveBtn" style="display:none;border:none;background:none;color:#b23c4d;font-size:12px;padding:0;margin-top:4px;"><i class="fas fa-trash-alt mr-1"></i>Delete profile picture</button>
- </div>
- <div class="form-group">
- <label>Parent ID <span class="text-muted" style="font-weight:400;">(editable)</span></label>
- <input type="text" name="parent_no" id="editParentNo" class="form-control" placeholder="e.g. P-1001">
- </div>
-<div class="row">
- <div class="col-4">
- <div class="form-group">
- <label>First Name <span class="text-danger">*</span></label>
- <input type="text" name="fname" id="editParentFname" class="form-control" required>
- </div>
- </div>
- <div class="col-4">
- <div class="form-group">
- <label>Middle Name</label>
- <input type="text" name="mname" id="editParentMname" class="form-control">
- </div>
- </div>
- <div class="col-4">
- <div class="form-group">
- <label>Last Name <span class="text-danger">*</span></label>
- <input type="text" name="lname" id="editParentLname" class="form-control" required>
- </div>
- </div>
- </div>
- <div class="form-group mb-0">
- <label>Phone Number <span class="text-danger">*</span></label>
- <input type="text" name="phone" id="editParentPhone" class="form-control" required>
- </div>
- </div>
- <div class="modal-footer">
- <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">Cancel</button>
- <button type="submit" class="btn btn-primary btn-sm px-4"><i class="fas fa-check mr-1"></i> Update Parent</button>
- </div>
- </form>
- </div>
- </div>
-</div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="<?= base_url('parents-update') ?>" method="post" enctype="multipart/form-data">
+                <?= csrf_field() ?>
+                <input type="hidden" name="id" id="editParentId">
 
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-edit mr-2" style="color: var(--soft-blue);"></i>Edit Parent
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="reg-avatar-wrap text-center mb-3">
+                        <div class="reg-avatar" id="editParentPicBox" title="Click to add or change the picture">
+                            <img class="reg-avatar-img" id="editParentPicImg" src="" alt="" style="display:none;">
+                            <span class="reg-avatar-overlay">Add picture</span>
+                        </div>
+                        <input type="file" class="reg-avatar-file" id="editParentPicFile" accept="image/*" style="display:none;">
+                        <input type="hidden" name="parent_picture_data" id="editParentPicData" value="">
+                        <input type="hidden" name="parent_picture_remove" id="editParentPicRemove" value="0">
+                        <div>
+                            <button type="button" class="btn btn-link btn-sm reg-avatar-remove-btn" id="editParentPicRemoveBtn"
+                                    style="display:none; color:#b23c4d; padding:0; font-size:12px;">
+                                <i class="fas fa-trash-alt mr-1"></i>Remove picture
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editParentNo"><i class="fas fa-id-card"></i>Parent / Fetcher ID <span class="text-danger">*</span></label>
+                        <input type="text" name="parent_no" id="editParentNo" class="form-control" placeholder="P-1001" maxlength="20" required>
+                        <small class="text-muted">Same number as the student, prefixed with P- (e.g. P-1001).</small>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="editParentFname"><i class="fas fa-user"></i>First Name <span class="text-danger">*</span></label>
+                                <input type="text" name="fname" id="editParentFname" class="form-control" placeholder="Maria" required>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="editParentMname"><i class="fas fa-user"></i>Middle Name</label>
+                                <input type="text" name="mname" id="editParentMname" class="form-control" placeholder="Santos">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="editParentLname"><i class="fas fa-user"></i>Last Name <span class="text-danger">*</span></label>
+                                <input type="text" name="lname" id="editParentLname" class="form-control" placeholder="Dela Cruz" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editParentPhone"><i class="fas fa-phone"></i>Phone Number <span class="text-danger">*</span></label>
+                        <input type="text" name="phone" id="editParentPhone" class="form-control" placeholder="09XXXXXXXXX" required>
+                        <small class="text-muted">Used for the parent login and SMS notifications.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn btn-kid-primary btn-sm px-4">
+                        <i class="fas fa-check mr-1"></i>Update Parent
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+ <i class="fas fa-camera" id="editParentPicPh" style="font-size:28px;color:#a5b4fc;"></i>
+</div>
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>

@@ -85,7 +85,7 @@
  <li class="nav-header">MANAGEMENT</li>
 
  <li class="nav-item">
- <a href="<?= base_url('register') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'students-add') ? 'active' : '' ?>">
+ <a href="<?= base_url('register') ?>" class="nav-link <?= (service('uri')->getSegment(1) == 'register') ? 'active' : '' ?>">
  <i class="nav-icon fas fa-user-plus" style="color: #4ade80;"></i>
  <p>Register</p>
  </a>

@@ -238,6 +238,9 @@
             border-radius: 50px;
             background: var(--input-bg);
             transition: border-color .2s ease, box-shadow .2s ease;
+            overflow: hidden;      /* keep rounded pill: nothing may poke out */
+            width: 100%;
+            max-width: 100%;
         }
 
         .input-wrapper:focus-within {
@@ -246,12 +249,17 @@
         }
 
         .input-icon {
-            padding: 0 12px;
+            flex: 0 0 auto;
+            padding: 0 10px 0 14px;
             color: var(--muted);
             font-size: 14px;
         }
 
         .input-field {
+            /* flex:1 + min-width:0 is what stops the field overrunning the pill
+               when an icon and the eye toggle sit beside it */
+            flex: 1 1 auto;
+            min-width: 0;
             width: 100%;
             padding: 11px 12px 11px 0;
             border: none;
@@ -265,9 +273,11 @@
         .input-field::placeholder { color: var(--input-placeholder); opacity: 1; }
 
         .toggle-password {
-            padding: 0 12px;
+            flex: 0 0 auto;
+            padding: 0 14px 0 8px;
             cursor: pointer;
             color: var(--muted);
+            line-height: 1;
         }
 
         .toggle-password:hover { color: var(--primary); }
@@ -379,7 +389,6 @@
  <nav class="navbar">
  <div class="navbar-inner">
  <a href="<?= base_url() ?>" class="navbar-left">
- <div class="nav-icon"><i class="fas fa-qrcode"></i></div>
  <div class="brand-text">SCAN2FETCH</div>
  </a>
  <div style="display:flex; align-items:center; gap:10px;">
@@ -396,7 +405,6 @@
  <!-- ===== LOGIN CARD ===== -->
  <div class="login-card">
  <div class="brand-section">
- <div class="brand-icon"><i class="fas fa-qrcode"></i></div>
  <h1 class="brand-name">SCAN2FETCH</h1>
  <p class="brand-subtitle">School pick-up &amp; drop-off system</p>
  </div>
@@ -413,22 +421,19 @@
  <div class="form-group">
  <label class="form-label">Phone Number</label>
  <div class="input-wrapper">
- <span class="input-icon"><i class="fas fa-phone"></i></span>
  <input type="text" name="phone" class="input-field" placeholder="0917xxxxxxx" required autofocus>
  </div>
  </div>
  <div class="form-group">
  <label class="form-label">Password</label>
  <div class="input-wrapper">
- <span class="input-icon"><i class="fas fa-lock"></i></span>
  <input type="password" name="password" class="input-field" id="password" placeholder="Enter your password" required>
- <span class="toggle-password" onclick="togglePassword()"><i class="fas fa-eye" id="toggleIcon"></i></span>
  </div>
  </div>
  <button type="submit" class="btn-signin"><i class="fas fa-sign-in-alt"></i> Sign In</button>
  </form>
 
- <div class="divider"><span class="divider-line"></span><span class="divider-text">Secure Access</span><span class="divider-line"></span></div>
+ <div class="divider"><span class="divider-text">Secure Access</span></div>
 
  <div class="features">
  <span class="feature-badge"><i class="fas fa-shield-alt"></i> Safe</span>
@@ -437,6 +442,7 @@
  </div>
 
  <div class="footer-note">&copy; <?= date('Y') ?> Scan2Fetch</div>
+ <span class="toggle-password" onclick="togglePassword()"><i class="fas fa-eye" id="toggleIcon"></i></span>
  </div>
 
  <script>

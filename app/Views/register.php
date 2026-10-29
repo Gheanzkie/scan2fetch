@@ -460,7 +460,26 @@ label .text-danger { color: #dc2626 !important; }
     .btn { font-size: 12px !important; padding: 8px 16px !important; }
     .action-bar { border-radius: 24px; }
 }
-.reg-step { display:flex; align-items:center; gap:10px; margin-bottom:14px; }\n.reg-step-num { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:#fff; background:linear-gradient(135deg, var(--soft-blue), var(--soft-purple)); box-shadow:0 3px 10px rgba(63,43,150,0.22); }\n.reg-step-txt { font-size:12px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:#5a5280; }\n.reg-step-sub { font-size:11.5px; color:#9a9ab8; font-weight:600; }\n\n/* ===== MINIMAL PROFILE PICTURE PICKER ===== */
+/* ===== STEP HEADERS ===== */
+.reg-step {
+    display: flex; align-items: center; gap: 10px;
+    margin: 0 0 16px; padding-bottom: 12px;
+    border-bottom: 1px dashed rgba(108,140,255,.22);
+}
+.reg-step-num {
+    width: 30px; height: 30px; flex: 0 0 auto;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 13px; color: #fff;
+    background: linear-gradient(135deg, var(--soft-blue), var(--soft-purple));
+    box-shadow: 0 3px 10px rgba(63,43,150,.22);
+}
+.reg-step-txt {
+    font-size: 12px; font-weight: 800; letter-spacing: .04em;
+    text-transform: uppercase; color: #5a5280; line-height: 1.2;
+}
+.reg-step-sub { font-size: 11.5px; color: #9a9ab8; font-weight: 600; line-height: 1.3; }
+
+/* ===== MINIMAL PROFILE PICTURE PICKER ===== */
 .reg-avatar {
     position: relative; width: 92px; height: 92px; margin: 0 auto;
     border-radius: 50%; overflow: hidden; cursor: pointer;
@@ -477,6 +496,179 @@ label .text-danger { color: #dc2626 !important; }
     font-weight: 700; text-align: center; opacity: 0; transition: opacity .2s ease;
 }
 .reg-avatar:hover .reg-avatar-overlay { opacity: 1; }
+/* ================= IMPORT CARDS (Excel / ZIP) ================= */
+.import-card{
+    border:1px solid rgba(108,140,255,.18) !important;
+    border-radius:14px !important;
+    overflow:hidden;
+    box-shadow:0 6px 16px rgba(63,43,150,.06);
+    transition:box-shadow .2s ease, transform .2s ease;
+}
+.import-card:hover{box-shadow:0 10px 22px rgba(63,43,150,.10);transform:translateY(-1px);}
+.import-card--excel{border-left:4px solid #1d9e4b !important;}
+.import-card--zip{border-left:4px solid #6C8CFF !important;}
+
+.import-card__head{
+    background:linear-gradient(135deg, rgba(108,140,255,.10) 0%, rgba(124,108,255,.06) 100%) !important;
+    border-bottom:1px solid rgba(108,140,255,.14) !important;
+    padding:8px 12px !important;
+}
+.import-card--excel .import-card__head{
+    background:linear-gradient(135deg, rgba(29,158,75,.12) 0%, rgba(29,158,75,.04) 100%) !important;
+    border-bottom:1px solid rgba(29,158,75,.16) !important;
+}
+.import-card__title{font-weight:800;color:#2d2d4a;font-size:.92rem;letter-spacing:.2px;margin:0;}
+.import-card .card-body{padding:12px 12px 10px !important;}
+
+.import-badge{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:44px;height:44px;border-radius:13px;margin-right:12px;
+    color:#fff;font-size:19px;flex:0 0 auto;
+    box-shadow:0 6px 16px rgba(63,43,150,.18);
+}
+.import-badge--excel{background:linear-gradient(135deg,#22c55e 0%,#15803d 100%);}
+.import-badge--zip{background:linear-gradient(135deg,#6C8CFF 0%,#7C6CFF 100%);}
+
+.import-chip{
+    background:rgba(255,255,255,.85);
+    border:1px solid rgba(108,140,255,.25);
+    color:#5a5280;font-size:10px;font-weight:700;letter-spacing:.3px;
+    padding:2px 8px;border-radius:999px;white-space:nowrap;
+}
+
+.import-lead{color:#5a5a7a;font-size:13.5px;line-height:1.55;}
+.import-lead i{color:#6C8CFF;}
+
+.import-tags{display:flex;flex-wrap:wrap;gap:8px;}
+.import-tag{
+    display:inline-flex;align-items:center;gap:6px;
+    background:rgba(108,140,255,.10);
+    border:1px solid rgba(108,140,255,.18);
+    color:#3b4a9e;font-size:12px;font-weight:600;
+    padding:6px 11px;border-radius:10px;
+}
+.import-tag i{font-size:11px;opacity:.85;}
+.import-tag--muted{background:rgba(160,160,180,.10);border-color:rgba(160,160,180,.22);color:#6b6b8a;}
+
+.import-note{color:#7a7a9a;font-size:12.5px;}
+.import-note i{color:#22c55e;}
+
+/* --- dropzone (compact) --- */
+.import-drop{
+    display:flex;flex-direction:row;align-items:center;justify-content:center;
+    gap:8px;text-align:center;cursor:pointer;
+    padding:10px 12px;margin-bottom:8px;
+    border:2px dashed rgba(108,140,255,.45);
+    border-radius:11px;
+    background:rgba(108,140,255,.05);
+    transition:border-color .18s ease, background .18s ease, transform .18s ease;
+    flex-wrap:wrap;
+}
+.import-drop:hover,.import-drop.is-dragover{
+    border-color:#6C8CFF;background:rgba(108,140,255,.10);transform:translateY(-1px);
+}
+.import-card--excel .import-drop{border-color:rgba(29,158,75,.45);background:rgba(29,158,75,.05);}
+.import-card--excel .import-drop:hover{border-color:#1d9e4b;background:rgba(29,158,75,.10);}
+.import-drop__icon{font-size:17px;color:#6C8CFF;margin:0;}
+.import-card--excel .import-drop__icon{color:#1d9e4b;}
+.import-drop__title{font-size:12px;font-weight:700;color:#2d2d4a;}
+.import-drop__hint{font-size:11px;color:#8888aa;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-basis:100%;}
+.import-drop__hint.is-set{color:#15803d;font-weight:700;}
+.import-drop__input{display:none;}
+
+.import-submit{
+    border-radius:10px !important;
+    font-weight:800 !important;
+    font-size:12.5px !important;
+    padding:7px 12px !important;
+    letter-spacing:.2px;
+    box-shadow:0 4px 12px rgba(108,140,255,.22);
+    transition:transform .15s ease, box-shadow .15s ease;
+}
+.import-submit:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(108,140,255,.30);}
+
+/* ================= FORM POLISH (register) ================= */
+#registrationFormContainer .card-body { padding: 18px 18px 16px !important; }
+
+#registrationFormContainer .row { margin-left: -7px; margin-right: -7px; }
+#registrationFormContainer .row > [class*="col-"] { padding-left: 7px; padding-right: 7px; }
+
+#registrationFormContainer .form-group { margin-bottom: 14px; }
+#registrationFormContainer label {
+    display: block; font-size: 12.5px; font-weight: 700;
+    color: #4a4a68 !important; margin-bottom: 6px !important;
+}
+#registrationFormContainer label i { color: var(--soft-blue); margin-right: 5px; font-size: 11.5px; }
+
+#registrationFormContainer .form-control {
+    border: 1px solid rgba(108,140,255,.28) !important;
+    border-radius: 11px !important;
+    padding: 9px 13px !important;
+    font-size: 13.5px !important;
+    color: #2d2d4a !important;
+    transition: border-color .16s ease, box-shadow .16s ease;
+}
+#registrationFormContainer .form-control:focus {
+    border-color: var(--soft-blue) !important;
+    box-shadow: 0 0 0 3px rgba(108,140,255,.16) !important;
+}
+#registrationFormContainer small.text-muted {
+    display: block; margin-top: 5px; font-size: 10.5px !important; color: #9a9ab8 !important;
+}
+
+/* each student repeater block reads as its own panel */
+#studentBlocks .student-block {
+    border: 1px solid rgba(108,140,255,.16);
+    border-radius: 16px;
+    padding: 16px 16px 6px;
+    background: rgba(255,255,255,.55);
+    box-shadow: 0 6px 20px rgba(63,43,150,.05);
+    margin-bottom: 14px;
+}
+#studentBlocks .student-block + .student-block { margin-top: 0; }
+
+.guardian-box { padding: 16px 18px 12px !important; margin-bottom: 16px !important; }
+.guardian-box h6 {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px !important; letter-spacing: .2px;
+    margin-bottom: 14px !important; padding-bottom: 10px;
+    border-bottom: 1px dashed rgba(63,43,150,.14);
+}
+.guardian-box h6 .badge { margin-left: auto; }
+
+/* consistent buttons */
+#registrationFormContainer .btn { border-radius: 11px !important; font-weight: 700; letter-spacing: .2px; }
+#registrationFormContainer .btn-sm { padding: 8px 16px !important; font-size: 12.5px !important; }
+#registrationFormContainer .btn-lg { padding: 12px 26px !important; font-size: 14.5px !important; }
+#registrationFormContainer .btn i { font-size: 12px; }
+
+/* alerts inside the form read cleaner */
+#registrationFormContainer .alert {
+    border-radius: 13px; border: 1px solid rgba(79,172,254,.28);
+    background: rgba(79,172,254,.08); color: #2f4a6d; font-size: 12.5px;
+    padding: 12px 15px;
+}
+#registrationFormContainer .alert i { color: var(--soft-teal); margin-right: 6px; }
+
+/* the "add another student" dashed button */
+#addStudentBtn {
+    border-radius: 12px !important; border-width: 2px !important;
+    border-style: dashed !important; font-weight: 700 !important;
+    padding: 10px 14px !important; color: #4a4a9e !important;
+    background: rgba(108,140,255,.06) !important; transition: background .18s ease, border-color .18s ease;
+}
+#addStudentBtn:hover {
+    background: rgba(108,140,255,.13) !important;
+    border-color: var(--soft-blue) !important; color: #3b3b8f !important;
+}
+
+@media (max-width: 768px) {
+    #studentBlocks .student-block { padding: 13px 13px 4px; }
+    .guardian-box { padding: 14px 14px 10px !important; }
+}
+
+/* keep empty numbering badges invisible */
+.block-label:empty { display: none !important; }
 </style>
 
 <div class="content-wrapper" style="background: transparent;">
@@ -503,103 +695,118 @@ label .text-danger { color: #dc2626 !important; }
  <section class="content">
  <div class="container-fluid">
 
- <!-- FLASH MESSAGES -->
- <?php if(session()->getFlashdata('msg')): ?>
+ <!-- FLASH MESSAGES (only for flows that are not the importers) -->
+ <?php $__kind = session()->getFlashdata('import_kind'); ?>
+ <?php if(session()->getFlashdata('msg') && !in_array($__kind, ['excel', 'zip'], true)): ?>
  <div class="alert alert-success alert-dismissible fade show">
  <i class="fas fa-check-circle mr-2"></i> <?= session()->getFlashdata('msg') ?>
  <button type="button" class="close" data-dismiss="alert" style="color: var(--ink);">&times;</button>
  </div>
  <?php endif; ?>
- <?php if(session()->getFlashdata('error')): ?>
+ <?php if(session()->getFlashdata('error') && !in_array($__kind, ['excel', 'zip'], true)): ?>
  <div class="alert alert-danger alert-dismissible fade show">
  <i class="fas fa-exclamation-circle mr-2"></i> <?= session()->getFlashdata('error') ?>
  <button type="button" class="close" data-dismiss="alert" style="color: var(--ink);">&times;</button>
  </div>
  <?php endif; ?>
 
- <!-- ===== EXCEL IMPORT ===== -->
- <div class="card mb-4">
- <div class="card-header">
- <h5 class="mb-0">
- <i class="fas fa-file-excel mr-2" style="color: #1d9e4b;"></i>
-                                 Import from Excel
- </h5>
+ <!-- ===== IMPORTERS (compact, side by side) ===== -->
+ <div class="row">
+ <div class="col-lg-6">
+ <div class="card mb-3 import-card import-card--excel">
+ <div class="card-header import-card__head">
+ <div class="d-flex align-items-center">
+ <div>
+ <h5 class="mb-0 import-card__title">Import from Excel</h5>
+ </div>
+ <span class="import-chip ml-auto"><i class="fas fa-file-lines mr-1"></i>.xlsx</span>
+ </div>
  </div>
  <div class="card-body">
- <div class="row align-items-center">
- <div class="col-md-7">
- <p class="mb-1" style="color: var(--muted); font-size: 13.5px;">
- <i class="fas fa-info-circle mr-1" style="color: var(--soft-blue);"></i>
-                                        Import many students + parents at once using an Excel (.xlsx) file.
- </p>
- <ul class="small mb-1" style="color: var(--muted);">
- <li>Required columns: Student First Name, Student Last Name, Parent First Name, Parent Last Name, Parent Phone</li>
- <li>Optional: Student Middle Name, Grade & Section, Parent Middle Name, Parent Relation</li>
- <li>Also required: <strong>Student ID</strong> (col J) and <strong>Parent/Fetcher ID</strong> (col K, must start with P-)</li>
- </ul>
- </div>
- <div class="col-md-5">
+ <div class="row">
+  <div class="col-12">
  <form action="<?= base_url('students-import') ?>" method="post" enctype="multipart/form-data" id="importForm">
  <?= csrf_field() ?>
- <div class="input-group">
- <div class="custom-file">
- <input type="file" class="custom-file-input" name="excel_file" id="excelFileInput" accept=".xlsx" required>
- <label class="custom-file-label" for="excelFileInput">Choose .xlsx file</label>
- </div>
- <div class="input-group-append">
-  <button type="submit" class="btn btn-kid-primary btn-sm" id="importBtn">
-  <i class="fas fa-upload mr-1"></i> Import
-  </button>
- </div>
- </div>
+ <label class="import-drop" for="excelFileInput">
+ <i class="fas fa-file-excel import-drop__icon"></i>
+ <span class="import-drop__title">Drop your .xlsx here or click to browse</span>
+ <span class="import-drop__hint" id="excelFileName">No file selected</span>
+ <input type="file" class="import-drop__input" name="excel_file" id="excelFileInput" accept=".xlsx" required>
+ </label>
+ <button type="submit" class="btn btn-kid-primary btn-block import-submit" id="importBtn">
+ <i class="fas fa-upload mr-2"></i> Start Excel Import
+ </button>
  </form>
+<?php if (session()->getFlashdata('import_kind') === 'excel'): ?>
+ <div class="mt-3">
+ <?php if (session()->getFlashdata('msg')): ?>
+ <div class="alert alert-success alert-dismissible fade show mb-2">
+ <i class="fas fa-check-circle mr-2"></i> <?= session()->getFlashdata('msg') ?>
+ <button type="button" class="close" data-dismiss="alert" style="color: var(--ink);">&times;</button>
+ </div>
+ <?php endif; ?>
+ <?php if (session()->getFlashdata('error')): ?>
+ <div class="alert alert-danger alert-dismissible fade show mb-0">
+ <i class="fas fa-exclamation-circle mr-2"></i> <?= session()->getFlashdata('error') ?>
+ <button type="button" class="close" data-dismiss="alert" style="color: var(--ink);">&times;</button>
+ </div>
+ <?php endif; ?>
+ </div>
+ <?php endif; ?>
  </div>
  </div>
  </div>
  </div>
 
- <!-- ===== ZIP IMPORT (below the Excel import) ===== -->
- <div class="card mb-3">
- <div class="card-header pt-3">
- <h5 class="mb-0">
- <i class="fas fa-file-zipper mr-2" style="color: var(--soft-blue);"></i>
-                                    ZIP Import
- </h5>
+ </div><!-- /col-lg-6 -->
+ <div class="col-lg-6">
+ <!-- ===== ZIP IMPORT ===== -->
+ <div class="card mb-3 import-card import-card--zip">
+ <div class="card-header import-card__head">
+ <div class="d-flex align-items-center">
+ <div>
+ <h5 class="mb-0 import-card__title">ZIP Import</h5>
+ </div>
+ <span class="import-chip ml-auto"><i class="fas fa-file-zipper mr-1"></i>.zip</span>
+ </div>
  </div>
  <div class="card-body">
  <div class="row align-items-center">
- <div class="col-md-7">
- <p class="mb-1" style="color: var(--muted); font-size: 13.5px;">
- <i class="fas fa-info-circle mr-1" style="color: var(--soft-blue);"></i>
-                                        Upload a <strong>.zip</strong> archive and the system extracts it automatically.
- </p>
- <ul class="small mb-1" style="color: var(--muted);">
- <li>Files are extracted to <code>public/uploads/&lt;zip-name&gt;/</code></li>
- <li>Example: <code>grade1-photos.zip</code> â†’ <code>uploads/grade1-photos/</code></li>
- <li>Sub-folders inside the ZIP are kept; hidden/system files are skipped.</li>
- <li>Only images and documents — the archive is never executed.</li>
- </ul>
- </div>
- <div class="col-md-5">
+ <div class="col-12">
  <form action="<?= base_url('students-import-zip') ?>" method="post" enctype="multipart/form-data" id="zipForm">
  <?= csrf_field() ?>
- <div class="input-group">
- <div class="custom-file">
- <input type="file" class="custom-file-input" name="zip_file" id="zipFileInput" accept=".zip,application/zip" required>
- <label class="custom-file-label" for="zipFileInput" id="zipFileLabel">Choose .zip file</label>
+ <label class="import-drop import-drop--zip" for="zipFileInput">
+ <i class="fas fa-file-zipper import-drop__icon"></i>
+ <span class="import-drop__title">Drop your .zip here or click to browse</span>
+ <span class="import-drop__hint" id="zipFileName">No file selected</span>
+ <input type="file" class="import-drop__input" name="zip_file" id="zipFileInput" accept=".zip,application/zip" required>
+ </label>
+ <button type="submit" class="btn btn-kid-primary btn-block import-submit" id="zipBtn">
+ <i class="fas fa-upload mr-2"></i> Start ZIP Import
+ </button>
+ </form>
+<?php if (session()->getFlashdata('import_kind') === 'zip'): ?>
+ <div class="mt-3">
+ <?php if (session()->getFlashdata('msg')): ?>
+ <div class="alert alert-success alert-dismissible fade show mb-2">
+ <i class="fas fa-check-circle mr-2"></i> <?= session()->getFlashdata('msg') ?>
+ <button type="button" class="close" data-dismiss="alert" style="color: var(--ink);">&times;</button>
  </div>
- <div class="input-group-append">
-  <button type="submit" class="btn btn-kid-primary btn-sm" id="zipBtn">
-  <i class="fas fa-upload mr-1"></i> Import ZIP
-  </button>
-  </div>
-  </div>
-  </form>
-  </div>
-  </div>
-  </div>
-  </div>
-
+ <?php endif; ?>
+ <?php if (session()->getFlashdata('error')): ?>
+ <div class="alert alert-danger alert-dismissible fade show mb-0">
+ <i class="fas fa-exclamation-circle mr-2"></i> <?= session()->getFlashdata('error') ?>
+ <button type="button" class="close" data-dismiss="alert" style="color: var(--ink);">&times;</button>
+ </div>
+ <?php endif; ?>
+ </div>
+ <?php endif; ?>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div><!-- /col-lg-6 -->
+ </div><!-- /row -->
   <!-- ===== REGISTRATION FORM ===== -->
  <div id="registrationFormContainer">
  <form action="<?= base_url('students-save') ?>" method="post" enctype="multipart/form-data" id="registrationForm">
@@ -618,13 +825,6 @@ label .text-danger { color: #dc2626 !important; }
  </div>
   <div class="card-body">
 
-  <div class="reg-step">
-  <span class="reg-step-num">1</span>
-  <div>
-  <div class="reg-step-txt">Step 1 &mdash; Student</div>
-  <div class="reg-step-sub">Who is being enrolled</div>
-  </div>
-  </div>
 
   <!-- ===== REPEATER: one .student-block per student, all sharing 1 parent + fetchers ===== -->
   <div id="studentBlocks">
@@ -635,7 +835,6 @@ label .text-danger { color: #dc2626 !important; }
   <div class="reg-avatar-wrap text-center mb-3">
   <div class="reg-avatar" title="Click to add or change the picture">
   <img class="reg-avatar-img" src="" alt="" style="display:none;">
-  <span class="reg-avatar-placeholder"><i class="fas fa-camera"></i></span>
   <span class="reg-avatar-overlay">Add picture</span>
   </div>
   <input type="file" class="reg-avatar-file" accept="image/*" style="display:none;">
@@ -652,7 +851,6 @@ label .text-danger { color: #dc2626 !important; }
   <div class="form-group">
   <label>Student ID <span class="text-danger">*</span></label>
   <input type="text" name="student_no[]" class="form-control student-no" placeholder="1001" inputmode="numeric" maxlength="20" required>
-  <small class="text-muted" style="font-size:10px;">Number printed on the student's record — used as the photo filename.</small>
   </div>
 
   <!-- Student Name -->
@@ -675,7 +873,7 @@ label .text-danger { color: #dc2626 !important; }
   <div class="form-group mt-3">
   <label> Grade & Section <span class="text-danger">*</span></label>
   <select name="grade_section[]" class="form-control student-grade" required>
-  <option value="">— Select Grade & Section —</option>
+  <option value="">Select Grade & Section</option>
   <optgroup label="Kindergarten">
   <option>Kindergarten - A</option>
   <option>Kindergarten - B</option>
@@ -715,14 +913,7 @@ label .text-danger { color: #dc2626 !important; }
           style="border-radius:12px; border-style:dashed; font-weight:600;">
   <i class="fas fa-plus-circle mr-1"></i> Add another student
   </button>
-  <small class="text-muted d-block mt-1" style="font-size:11px;">
-  Add every child in this family here — they all share the same parent and fetchers on the right.
-  </small>
 
-  <div class="alert alert-info mt-3 mb-0">
-  <i class="fas fa-info-circle"></i>
-  <small>Fill in student details first, then add parents and fetchers on the right!</small>
-  </div>
  </div>
  </div>
  </div>
@@ -738,13 +929,6 @@ label .text-danger { color: #dc2626 !important; }
  </div>
  <div class="card-body">
 
- <div class="reg-step">
- <span class="reg-step-num">2</span>
- <div>
- <div class="reg-step-txt">Step 2 &mdash; Parent / Guardian</div>
- <div class="reg-step-sub">Who is allowed to fetch the child</div>
- </div>
- </div>
 
  <!-- Parent 1 (Required) -->
  <div class="guardian-box box-parent mb-3">
@@ -757,7 +941,6 @@ label .text-danger { color: #dc2626 !important; }
  <div class="reg-avatar-wrap text-center mb-2">
  <div class="reg-avatar" title="Click to add or change the picture">
  <img class="reg-avatar-img" src="" alt="" style="display:none;">
- <span class="reg-avatar-placeholder"><i class="fas fa-camera"></i></span>
  <span class="reg-avatar-overlay">Add picture</span>
  </div>
  <input type="file" class="reg-avatar-file" accept="image/*" style="display:none;">
@@ -773,7 +956,6 @@ label .text-danger { color: #dc2626 !important; }
  <div class="form-group mb-2">
  <label class="small">Parent / Fetcher ID <span class="text-danger">*</span></label>
  <input type="text" name="parent_no[]" class="form-control form-control-sm parent-no" placeholder="P-1001" maxlength="20" required>
- <small class="text-muted" style="font-size:10px;">Same number as the student, prefixed with P- (e.g. P-1001).</small>
  </div>
 
  <div class="row">
@@ -815,10 +997,6 @@ label .text-danger { color: #dc2626 !important; }
  </div>
  </div>
 
- <div class="alert alert-warning mt-3 mb-0">
- <i class="fas fa-lightbulb"></i>
- <small>QR codes will be automatically generated for all registered parents. Passwords are NOT sent automatically — send them manually later using "Send Password" or "Send All Passwords" on the Parents page.</small>
- </div>
  </div>
  </div>
  </div>
@@ -928,15 +1106,7 @@ label .text-danger { color: #dc2626 !important; }
  </div>
 
  <?php if(session()->getFlashdata('password_sms_failed')): ?>
- <div class="alert alert-warning mt-2 mb-0">
- <i class="fas fa-exclamation-triangle mr-1"></i>
- <small>One or more SMS with the generated password could not be sent. You can resend it from the parent's page.</small>
- </div>
  <?php else: ?>
- <div class="alert alert-info mt-2 mb-0">
- <i class="fas fa-sms mr-1"></i>
- <small>Passwords were not sent automatically. Send them when ready using "Send Password" / "Send All Passwords" on the Parents page.</small>
- </div>
  <?php endif; ?>
  </div>
  <div class="modal-footer" style="border-top: 2px solid rgba(129,199,132,0.12);">
@@ -951,10 +1121,52 @@ label .text-danger { color: #dc2626 !important; }
 
  </div>
 </section>
+ <label class="custom-file-label" for="zipFileInput" id="zipFileLabel">Choose .zip file</label>
 </div>
 
 
- <?= $this->endSection() ?>
+ 
+<script>
+/* Import dropzones: show the chosen file name + drag highlight */
+(function () {
+    function bind(inputId, hintId) {
+        var input = document.getElementById(inputId);
+        var hint  = document.getElementById(hintId);
+        if (!input || !hint) { return; }
+
+        var drop = input.closest('.import-drop');
+
+        input.addEventListener('change', function () {
+            if (this.files && this.files.length) {
+                hint.textContent = this.files[0].name + ' (' + Math.round(this.files[0].size / 1024) + ' KB)';
+                hint.classList.add('is-set');
+            } else {
+                hint.textContent = 'No file selected';
+                hint.classList.remove('is-set');
+            }
+        });
+
+        if (!drop) { return; }
+
+        ['dragenter', 'dragover'].forEach(function (ev) {
+            drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('is-dragover'); });
+        });
+        ['dragleave', 'drop'].forEach(function (ev) {
+            drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('is-dragover'); });
+        });
+        drop.addEventListener('drop', function (e) {
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+                input.files = e.dataTransfer.files;
+                input.dispatchEvent(new Event('change'));
+            }
+        });
+    }
+
+    bind('excelFileInput', 'excelFileName');
+    bind('zipFileInput', 'zipFileName');
+})();
+</script>
+<?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
@@ -1010,7 +1222,7 @@ $(function(){
         var v = (this.value || '').toUpperCase().replace(/\s+/g, '');
         if (v === '') { return; }
         var m = v.match(/(\d+)$/);
-        this.value = m ? ('P-' + m[1]) : (v.indexOf('P-') === 0 ? v : 'P-' + v);
+        this.value = m &mdash; ('P-' + m[1]) : (v.indexOf('P-') === 0 &mdash; v : 'P-' + v);
     });
     $(document).on('blur', 'input.student-no', function(){
         this.value = (this.value || '').trim();
@@ -1019,10 +1231,8 @@ $(function(){
     function refreshStudentBlockLabels(){
         $('.student-block').each(function(i){
             var $b = $(this);
-            if (!$b.find('.block-label').length) {
-                $b.prepend('<div class="block-label badge badge-primary mb-2"></div>');
-            }
-            $b.find('.block-label').text('Student ' + (i + 1));
+            $b.find('.block-label').remove();
+            $b.prepend('<div class="block-label badge badge-primary mb-2">Student ' + (i + 1) + '</div>');
             // Keep the remove affordance on every block except the first.
             if (i === 0) { $b.find('.remove-student').remove(); }
             else if (!$b.find('.remove-student').length) {
@@ -1042,7 +1252,7 @@ $(function(){
             var fname = $b.find('.student-fname').val().trim();
             var lname = $b.find('.student-lname').val().trim();
             var grade = $b.find('.student-grade').val();
-            if (!fname || !lname) { badIndex = i; e.preventDefault(); alert(' Oops! Please fill in student ' + (i+1) + ' first name and last name. '); return false; }
+            if (!fname || !lname) { badIndex = i; e.preventDefault(); alert('Please fill in student ' + (i+1) + ' first name and last name.'); return false; }
             if (!grade) { badIndex = i; e.preventDefault(); alert(' Please select grade & section for student ' + (i+1) + '. '); return false; }
         });
         if (badIndex > -1) { $('.student-block').eq(badIndex).find('.student-fname').focus(); return; }
@@ -1052,7 +1262,7 @@ $(function(){
         var parentPhone = $('input[name="parent_phone[]"]').first().val().trim();
 
         if (!parentFname || !parentLname || !parentPhone) {
-            alert(' Please fill in all required parent/guardian fields. ');
+            alert('Please fill in all required parent/guardian fields.');
             e.preventDefault();
             return;
         }
@@ -1062,7 +1272,7 @@ $(function(){
 
     // ===== IMPORT FORM FILE LABEL =====
     $('#excelFileInput').on('change', function(){
-        var name = this.files && this.files[0] ? this.files[0].name : 'Choose .xlsx file';
+        var name = this.files && this.files[0] &mdash; this.files[0].name : 'Choose .xlsx file';
         $('.custom-file-label').text(name);
     });
 
@@ -1118,7 +1328,7 @@ $(function(){
 
     // ===== ZIP IMPORT =====
     $('#zipFileInput').on('change', function(){
-        var name = this.files && this.files[0] ? this.files[0].name : 'Choose .zip file';
+        var name = this.files && this.files[0] &mdash; this.files[0].name : 'Choose .zip file';
         $('#zipFileLabel').text(name);
     });
 
@@ -1140,5 +1350,46 @@ $(function(){
     });
  <?php endif; ?>
 });
+</script>
+
+<script>
+/* Import dropzones: show the chosen file name + drag highlight */
+(function () {
+    function bind(inputId, hintId) {
+        var input = document.getElementById(inputId);
+        var hint  = document.getElementById(hintId);
+        if (!input || !hint) { return; }
+
+        var drop = input.closest('.import-drop');
+
+        input.addEventListener('change', function () {
+            if (this.files && this.files.length) {
+                hint.textContent = this.files[0].name + ' (' + Math.round(this.files[0].size / 1024) + ' KB)';
+                hint.classList.add('is-set');
+            } else {
+                hint.textContent = 'No file selected';
+                hint.classList.remove('is-set');
+            }
+        });
+
+        if (!drop) { return; }
+
+        ['dragenter', 'dragover'].forEach(function (ev) {
+            drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('is-dragover'); });
+        });
+        ['dragleave', 'drop'].forEach(function (ev) {
+            drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('is-dragover'); });
+        });
+        drop.addEventListener('drop', function (e) {
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+                input.files = e.dataTransfer.files;
+                input.dispatchEvent(new Event('change'));
+            }
+        });
+    }
+
+    bind('excelFileInput', 'excelFileName');
+    bind('zipFileInput', 'zipFileName');
+})();
 </script>
 <?= $this->endSection() ?>

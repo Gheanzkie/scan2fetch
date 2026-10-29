@@ -191,8 +191,11 @@ class Students extends BaseController
         $fetcherPhotoMap = [];
         foreach (($data['subFetchers'] ?? []) as $sf) {
             $nm = strtolower(trim(($sf['fname'] ?? '') . ' ' . ($sf['lname'] ?? '')));
-            if ($nm !== '') {
-                $fetcherPhotoMap[$nm] = subfetcher_photo_url($sf['id'] ?? 0);
+            $nmFull = strtolower(trim(($sf['fname'] ?? '') . ' ' . ($sf['mname'] ?? '') . ' ' . ($sf['lname'] ?? '')));
+            foreach ([$nm, $nmFull] as $nmKey) {
+                if ($nmKey !== '') {
+                    $fetcherPhotoMap[$nmKey] = subfetcher_photo_url($sf['id'] ?? 0);
+                }
             }
         }
         foreach ($logs as $l) {
@@ -203,8 +206,8 @@ class Students extends BaseController
                 'date'     => substr($l['time_released'], 0, 10),
                 'session'  => $l['session_type'] ?: 'unspecified',
                 'time'     => date('h:i A', strtotime($l['time_released'])),
-                'fetcher'  => trim(($l['fetcher_fname'] ?? '') . ' ' . ($l['fetcher_lname'] ?? '')),
-                'fetcher_photo' => $fetcherPhotoMap[strtolower(trim(($l['fetcher_fname'] ?? '') . ' ' . ($l['fetcher_lname'] ?? '')))] ?? null,
+                'fetcher'  => trim(($l['fetcher_fname'] ?? '') . ' ' . ($l['fetcher_mname'] ?? '') . ' ' . ($l['fetcher_lname'] ?? '')),
+                'fetcher_photo' => $this->historyFetcherPhoto($l, $fetcherPhotoMap, $guardian),
                 'relation' => $l['fetcher_relation'] ?? null,
                 'method'   => $l['method'] ?? null,
                 'staff'    => $staffMap[$l['staff_id']] ?? null,
@@ -371,7 +374,7 @@ class Students extends BaseController
                 foreach ($parentFnames as $i => $fname) {
                     if (empty($fname) || $i >= 3) continue;
 
-                    $phone   = trim((string) ($parentPhones[$i] ?? ''));
+                    $phone   = $this->normalizePhone($parentPhones[$i] ?? '');
                     $relation = $parentRelations[$i] ?? 'Parent';
 
                     // Manual Parent/Fetcher ID — must be P-<number>.
@@ -490,7 +493,7 @@ class Students extends BaseController
                         'fname'      => $fname,
                         'mname'      => $fetcherMnames[$i] ?? null,
                         'lname'      => $fetcherLnames[$i] ?? '',
-                        'phone'      => $fetcherPhones[$i] ?? '',
+                        'phone'      => $this->normalizePhone($fetcherPhones[$i] ?? ''),
                         'qr_code'    => $qrValue,
                         'created_by' => session('user_id'),
                     ]);
@@ -545,6 +548,7 @@ class Students extends BaseController
     // ========== IMPORT STUDENTS + PARENTS FROM XLSX ==========
     public function importExcel()
     {
+        session()->setFlashdata('import_kind', 'excel');
         if (! in_array(session('role'), ['admin', 'staff'], true)) {
             // Return the redirect (not bare return): requireAdminStaff()-style
             // send() + null lets CI4 still render the view body -> 200 with a
@@ -630,7 +634,7 @@ class Students extends BaseController
             $pfname = trim((string) ($vals[4] ?? ''));
             $pmname = trim((string) ($vals[5] ?? ''));
             $plname = trim((string) ($vals[6] ?? ''));
-            $pphone = trim((string) ($vals[7] ?? ''));
+            $pphone = $this->normalizePhone($vals[7] ?? '');
             $rel    = trim((string) ($vals[8] ?? '')) ?: 'Parent';
             // Manual IDs — typed by the registrar in Excel, never generated.
             $studentNo = trim((string) ($vals[9] ?? ''));
@@ -772,6 +776,7 @@ class Students extends BaseController
      */
     public function importZip()
     {
+        session()->setFlashdata('import_kind', 'zip');
         if (! in_array(session('role'), ['admin', 'staff'], true)) {
             return redirect()->to('/dashboard')->with('error', 'Access denied.');
         }
@@ -1086,54 +1091,6 @@ class Students extends BaseController
         }
     }
 
-    // ========== DELETE ALL STUDENTS (ADMIN ONLY) ==========
-    public function deleteAll()
-    {
-        if (session('role') != 'admin') {
-            return redirect()->to('/students')->with('error', 'Admin only.');
-        }
-
-        $db = \Config\Database::connect();
-        $db->transStart();
-
-        try {
-            $count = $this->studentModel->countAllResults();
-
-            // DELETE, never TRUNCATE: MySQL refuses to TRUNCATE a table that
-            // is referenced by a foreign key (fk_fetchlogs_student etc.),
-            // which made this method roll back every time.
-            // Children first, then students, then parents; wipeTable() runs a
-            // bare DELETE FROM so the ON DELETE CASCADE / SET NULL clauses
-            // handle the rest (TRUNCATE is refused by MySQL on FK'd tables).
-            $this->wipeTable('fetch_logs');
-            $this->wipeTable('sub_fetchers');
-            $this->wipeTable('student_parents');
-
-            $parentCount = $this->parentsModel->countAllResults();
-
-            $this->wipeTable('students');
-            $this->wipeTable('parents');
-
-            $db->transComplete();
-
-            if ($db->transStatus() === false) {
-                throw new \Exception('Transaction failed');
-            }
-
-            $this->logModel->addLog(
-                session('user_id'), session('fname').' '.session('lname'), session('role'),
-                'delete', 'student',
-                "DELETED ALL students ($count), parents ($parentCount), sub-fetchers and logs"
-            );
-
-            return redirect()->to('/students')->with('msg', "All $count student(s) deleted. $parentCount orphaned parent(s) also removed.");
-        } catch (\Exception $e) {
-            $db->transRollback();
-            log_message('error', 'Delete all students failed: ' . $e->getMessage());
-            return redirect()->to('/students')->with('error', 'Delete all failed: ' . $e->getMessage());
-        }
-    }
-
     // ========== REMOVE PARENT ==========
     public function removeParent($studentId, $parentId)
     {
@@ -1234,4 +1191,47 @@ class Students extends BaseController
         $this->generateQrFile($qrValue, 35);
         return $qrValue;
     }
+
+    /**
+     * Profile picture for a pickup-history row: sub-fetcher photo first,
+     * otherwise the guardian's parent photo. Null when neither exists.
+     */
+    private function historyFetcherPhoto(array $log, array $photoMap, ?array $guardian): ?string
+    {
+        $plain = strtolower(trim(($log['fetcher_fname'] ?? '') . ' ' . ($log['fetcher_lname'] ?? '')));
+        $full  = strtolower(trim(($log['fetcher_fname'] ?? '') . ' ' . ($log['fetcher_mname'] ?? '') . ' ' . ($log['fetcher_lname'] ?? '')));
+
+        $photo = $photoMap[$plain] ?? $photoMap[$full] ?? '';
+        if ($photo === '' && $guardian) {
+            $photo = parent_photo_url((string) ($guardian['parent_no'] ?? ''));
+        }
+
+        return $photo !== '' ? $photo : null;
+    }
+
+    /**
+     * Excel drops the leading 0 from 09xxx phone numbers, leaving 10 digits.
+     * Normalise every phone to the 11-digit local format (09XXXXXXXXX).
+     */
+    private function normalizePhone($raw): string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $raw);
+
+        if ($digits === '') {
+            return '';
+        }
+
+        // 639xxxxxxxxx -> 09xxxxxxxxx
+        if (strlen($digits) === 12 && str_starts_with($digits, '63')) {
+            $digits = '0' . substr($digits, 2);
+        }
+
+        // 9xxxxxxxxx (leading 0 lost in Excel) -> 09xxxxxxxxx
+        if (strlen($digits) === 10 && $digits[0] === '9') {
+            $digits = '0' . $digits;
+        }
+
+        return $digits;
+    }
+
 }

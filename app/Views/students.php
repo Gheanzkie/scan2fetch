@@ -392,6 +392,54 @@ select.form-control option {
 @media (max-width: 480px) {
     .card { border-radius: 16px !important; }
 }
+
+/* ===== EDIT MODAL (register look) ===== */
+
+.reg-avatar {
+    position: relative; width: 92px; height: 92px; margin: 0 auto;
+    border-radius: 50%; overflow: hidden; cursor: pointer;
+    background: #eef2ff; border: 3px solid rgba(108,140,255,.25);
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .2s ease, transform .15s ease;
+}
+.reg-avatar:hover { border-color: var(--soft-blue); transform: scale(1.03); }
+.reg-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+.reg-avatar-placeholder { font-size: 30px; color: #a5b4fc; }
+.reg-avatar-overlay {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 4px 0;
+    background: rgba(63,43,150,.72); color: #fff; font-size: 10.5px;
+    font-weight: 700; text-align: center; opacity: 0; transition: opacity .2s ease;
+}
+.reg-avatar:hover .reg-avatar-overlay { opacity: 1; }
+
+/* modal form fields match the register page */
+#editStudentModal .modal-body { padding: 1.35rem 1.5rem 0.5rem !important; }
+#editStudentModal .row { margin-left: -7px; margin-right: -7px; }
+#editStudentModal .row > [class*="col-"] { padding-left: 7px; padding-right: 7px; }
+#editStudentModal .form-group { margin-bottom: 14px; }
+#editStudentModal label {
+    display: block; font-size: 12.5px; font-weight: 700;
+    color: #4a4a68 !important; margin-bottom: 6px !important;
+}
+#editStudentModal label i { color: var(--soft-blue); margin-right: 5px; font-size: 11.5px; }
+#editStudentModal .form-control {
+    border: 1px solid rgba(108,140,255,.28) !important;
+    border-radius: 11px !important;
+    padding: 9px 13px !important;
+    font-size: 13.5px !important;
+    color: #2d2d4a !important;
+    background: #fff !important;
+    transition: border-color .16s ease, box-shadow .16s ease;
+}
+#editStudentModal .form-control:focus {
+    border-color: var(--soft-blue) !important;
+    box-shadow: 0 0 0 3px rgba(108,140,255,.16) !important;
+}
+#editStudentModal small.text-muted {
+    display: block; margin-top: 5px; font-size: 10.5px !important; color: #9a9ab8 !important;
+}
+#editStudentModal .modal-footer { border-top: 1px solid rgba(108,140,255,.14); padding: 14px 1.5rem; }
+#editStudentModal .modal-footer .btn { border-radius: 11px !important; font-weight: 700; }
 </style>
 
 <div class="content-wrapper" style="background: transparent;">
@@ -526,14 +574,9 @@ select.form-control option {
  <?php endforeach; ?>
  <?php endif; ?>
 
- <div class="alert alert-info mb-0 mt-2">
- <i class="fas fa-info-circle mr-1"></i>
- <strong>Important:</strong> QR codes have been generated with text labels. Parents can scan the QR code or manually type the code number for student pickup.
- </div>
  </div>
  <div class="modal-footer">
  <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">Close</button>
- <a href="<?= base_url('students-add') ?>" class="btn btn-kid-success btn-sm">Register Another</a>
  <a href="<?= base_url('students') ?>" class="btn btn-kid-primary btn-sm">View All</a>
  </div>
  </div>
@@ -551,14 +594,8 @@ select.form-control option {
  <i class="fas fa-list-ul mr-2" style="color: var(--soft-blue);"></i>
                                     All Students
  <span class="badge badge-soft ml-2"><?= count($students ?? []) ?></span>
- </h5>
- <?php if (session('role') == 'admin'): ?>
- <a href="<?= base_url('students-delete-all') ?>" class="btn btn-danger btn-sm mr-2"
-                                                title="Delete ALL students and orphaned parents"
-                                                onclick="return confirm('DELETE ALL STUDENTS?\n\nThis will permanently delete ALL students, their parents, sub-fetchers and logs.\n\nThis cannot be undone!')">
- <i class="fas fa-trash-alt mr-1"></i> Delete All
- </a>
- <?php endif; ?>
+                                </h5>
+
  </div>
  </div>
  <div class="card-body pt-0">
@@ -570,7 +607,6 @@ select.form-control option {
   <label class="filter-label">Search Student</label>
   <div class="input-group input-group-sm">
   <div class="input-group-prepend">
-  <span class="input-group-text"><i class="fas fa-search"></i></span>
   </div>
   <input type="text" id="searchStudent" class="form-control form-control-sm" placeholder="Search name or grade...">
   </div>
@@ -706,71 +742,118 @@ select.form-control option {
  </div>
 </div>
 
-<!-- ===== EDIT STUDENT MODAL (floating, same pattern as teachers/staffs) ===== -->
+<!-- ===== EDIT STUDENT MODAL (same look as the Register page) ===== -->
 <div class="modal fade" id="editStudentModal" tabindex="-1">
- <div class="modal-dialog modal-dialog-centered">
- <div class="modal-content">
- <form action="<?= base_url('students-update') ?>" method="post" enctype="multipart/form-data">
- <?= csrf_field() ?>
- <input type="hidden" name="id" id="editStudentId">
- <div class="modal-header">
- <h5 class="modal-title"><i class="fas fa-user-edit mr-2" style="color:#4361ee;"></i>Edit Student</h5>
- <button type="button" class="close" data-dismiss="modal">&times;</button>
- </div>
- <div class="modal-body">
- <div class="text-center mb-3">
- <div id="editStudentPicBox" title="Click to add or change the picture" style="position:relative;width:96px;height:96px;margin:0 auto;border-radius:50%;overflow:hidden;border:3px solid rgba(108,140,255,0.25);background:#eef2ff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
- <img id="editStudentPicImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
- <i class="fas fa-camera" id="editStudentPicPh" style="font-size:28px;color:#a5b4fc;"></i>
- </div>
- <input type="file" id="editStudentPicFile" accept="image/*" style="display:none;">
- <input type="hidden" name="student_picture_data" id="editStudentPicData" value="">
- <input type="hidden" name="student_picture_remove" id="editStudentPicRemove" value="0">
- <button type="button" id="editStudentPicRemoveBtn" style="display:none;border:none;background:none;color:#b23c4d;font-size:12px;padding:0;margin-top:4px;"><i class="fas fa-trash-alt mr-1"></i>Delete profile picture</button>
- </div>
- <div class="form-group">
- <label>Student ID <span class="text-muted" style="font-weight:400;">(editable)</span></label>
- <input type="text" name="student_no" id="editStudentNo" class="form-control" placeholder="e.g. 1001">
- </div>
-<div class="row">
- <div class="col-4">
- <div class="form-group">
- <label>First Name <span class="text-danger">*</span></label>
- <input type="text" name="fname" id="editStudentFname" class="form-control" required>
- </div>
- </div>
- <div class="col-4">
- <div class="form-group">
- <label>Middle Name</label>
- <input type="text" name="mname" id="editStudentMname" class="form-control">
- </div>
- </div>
- <div class="col-4">
- <div class="form-group">
- <label>Last Name <span class="text-danger">*</span></label>
- <input type="text" name="lname" id="editStudentLname" class="form-control" required>
- </div>
- </div>
- </div>
- <div class="form-group mb-0">
- <label>Grade &amp; Section <span class="text-danger">*</span></label>
- <select name="grade_section" id="editStudentGrade" class="form-control" required>
- <option value="">-- Select --</option>
- <?php $__g=['Kindergarten','Grade 1 - A','Grade 1 - B','Grade 2 - A','Grade 2 - B','Grade 3 - A','Grade 3 - B','Grade 4 - A','Grade 4 - B','Grade 5 - A','Grade 5 - B','Grade 6 - A','Grade 6 - B']; foreach($__g as $__x): ?>
- <option value="<?= $__x ?>"><?= $__x ?></option>
- <?php endforeach; ?>
- </select>
- </div>
- </div>
- <div class="modal-footer">
- <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">Cancel</button>
- <button type="submit" class="btn btn-primary btn-sm px-4"><i class="fas fa-check mr-1"></i> Update Student</button>
- </div>
- </form>
- </div>
- </div>
-</div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="<?= base_url('students-update') ?>" method="post" enctype="multipart/form-data">
+                <?= csrf_field() ?>
+                <input type="hidden" name="id" id="editStudentId">
 
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-graduate mr-2" style="color: var(--soft-blue);"></i>Edit Student
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+
+
+                    <!-- Profile picture (same picker as the register page) -->
+                    <div class="reg-avatar-wrap text-center mb-3">
+                        <div class="reg-avatar" id="editStudentPicBox" title="Click to add or change the picture">
+                            <img class="reg-avatar-img" id="editStudentPicImg" src="" alt="" style="display:none;">
+                            <span class="reg-avatar-overlay">Add picture</span>
+                        </div>
+                        <input type="file" class="reg-avatar-file" id="editStudentPicFile" accept="image/*" style="display:none;">
+                        <input type="hidden" name="student_picture_data" id="editStudentPicData" value="">
+                        <input type="hidden" name="student_picture_remove" id="editStudentPicRemove" value="0">
+                        <div>
+                            <button type="button" class="btn btn-link btn-sm reg-avatar-remove-btn" id="editStudentPicRemoveBtn"
+                                    style="display:none; color:#b23c4d; padding:0; font-size:12px;">
+                                <i class="fas fa-trash-alt mr-1"></i>Remove picture
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editStudentNo"><i class="fas fa-hashtag"></i>Student ID <span class="text-danger">*</span></label>
+                        <input type="text" name="student_no" id="editStudentNo" class="form-control" placeholder="1001" inputmode="numeric" maxlength="20" required>
+                        <small class="text-muted">Number printed on the student's record - used as the photo filename.</small>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="editStudentFname"><i class="fas fa-user"></i>First Name <span class="text-danger">*</span></label>
+                                <input type="text" name="fname" id="editStudentFname" class="form-control" placeholder="Juan" required>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="editStudentMname"><i class="fas fa-user"></i>Middle Name</label>
+                                <input type="text" name="mname" id="editStudentMname" class="form-control" placeholder="Dela">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="editStudentLname"><i class="fas fa-user"></i>Last Name <span class="text-danger">*</span></label>
+                                <input type="text" name="lname" id="editStudentLname" class="form-control" placeholder="Cruz" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-0">
+                        <label for="editStudentGrade"><i class="fas fa-graduation-cap"></i>Grade &amp; Section <span class="text-danger">*</span></label>
+                        <select name="grade_section" id="editStudentGrade" class="form-control" required>
+                            <option value=""> Select Grade &amp; Section </option>
+                            <optgroup label="Kindergarten">
+                                <option>Kindergarten - A</option>
+                                <option>Kindergarten - B</option>
+                            </optgroup>
+                            <optgroup label="Grade 1">
+                                <option>Grade 1 - A</option>
+                                <option>Grade 1 - B</option>
+                            </optgroup>
+                            <optgroup label="Grade 2">
+                                <option>Grade 2 - A</option>
+                                <option>Grade 2 - B</option>
+                            </optgroup>
+                            <optgroup label="Grade 3">
+                                <option>Grade 3 - A</option>
+                                <option>Grade 3 - B</option>
+                            </optgroup>
+                            <optgroup label="Grade 4">
+                                <option>Grade 4 - A</option>
+                                <option>Grade 4 - B</option>
+                            </optgroup>
+                            <optgroup label="Grade 5">
+                                <option>Grade 5 - A</option>
+                                <option>Grade 5 - B</option>
+                            </optgroup>
+                            <optgroup label="Grade 6">
+                                <option>Grade 6 - A</option>
+                                <option>Grade 6 - B</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn btn-kid-primary btn-sm px-4">
+                        <i class="fas fa-check mr-1"></i>Update Student
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+ <i class="fas fa-camera" id="editStudentPicPh" style="font-size:28px;color:#a5b4fc;"></i>
+</div>
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>

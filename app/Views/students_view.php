@@ -197,6 +197,29 @@ body {
     .card-body { padding: 1rem !important; }
     .content-header h1 { font-size: 1.5rem !important; }
 }
+/* ===== Avatars + Go to buttons (matches parents-view) ===== */
+.mini-avatar{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:55px;height:55px;border-radius:50%;overflow:hidden;
+    border:3px solid var(--soft-blue);background:rgba(255,255,255,.55);
+    color:#b0b0c8;font-size:22px;flex:0 0 auto;
+    box-shadow:0 3px 10px rgba(108,140,255,.18);
+}
+.mini-avatar img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;}
+.photo-zoom{transition:transform .15s ease, box-shadow .15s ease;}
+.photo-zoom:hover{transform:scale(1.05);box-shadow:0 6px 18px rgba(108,140,255,.35);}
+.btn-go-student{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 16px;border-radius:10px;
+    font-size:13px;font-weight:700;line-height:1;white-space:nowrap;
+    color:#fff;text-decoration:none;
+    background:linear-gradient(135deg,#6C8CFF 0%,#7C6CFF 100%);
+    box-shadow:0 4px 12px rgba(108,140,255,.35);
+    transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+.btn-go-student:hover{color:#fff;text-decoration:none;transform:translateY(-1px);
+    box-shadow:0 8px 18px rgba(108,140,255,.45);filter:brightness(1.05);}
+.btn-go-student:active{transform:translateY(0);}
 </style>
 
 <div class="content-wrapper" style="background: transparent;">
@@ -274,7 +297,13 @@ body {
  <?php foreach($parents as $p): ?>
  <div class="d-flex align-items-center border rounded p-3 mb-2" style="border-color: rgba(108,140,255,0.08) !important;">
  <div class="mr-3">
- <div class="img-circle d-flex align-items-center justify-content-center" style="width:55px;height:55px;border:3px solid var(--soft-blue);background:rgba(255,255,255,0.3);"><i class="fas fa-user" style="color: #b0b0c8;"></i></div>
+ <?php $__pp = parent_photo_url((string) ($p['parent_no'] ?? '')); ?>
+ <?php if ($__pp !== ''): ?>
+ <span class="mini-avatar photo-zoom" style="cursor:zoom-in;" data-photo="<?= esc($__pp) ?>" data-title="<?= esc(full_name($p)) ?>">
+ <img src="<?= esc($__pp) ?>" alt="<?= esc(full_name($p)) ?>">
+ </span>
+ <?php else: ?>
+ <?php endif; ?>
  </div>
  <div class="flex-grow-1">
  <strong style="color: #2d2d4a;"><?= esc(full_name($p)) ?></strong>
@@ -283,8 +312,8 @@ body {
  <?php if(!empty($p['qr_code'])): ?>
  <img src="<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>" style="width:50px;height:50px;border:2px solid var(--soft-blue);border-radius:8px;cursor:pointer;margin-right:5px;" onclick="openQrModal('<?= base_url('uploads/qr/'.$p['qr_code'].'.png') ?>')">
  <?php endif; ?>
- <a href="<?= base_url('parents-view/'.$p['parent_id']) ?>" class="btn btn-outline-secondary btn-xs ml-1" title="Go to Parent">
- <i class="fas fa-user-check"></i> Go to Parent
+ <a href="<?= base_url('parents-view/'.$p['parent_id']) ?>" class="btn-go-student ml-2" title="Open parent profile">
+ <i class="fas fa-arrow-right"></i><span>Go to Parent</span>
  </a>
  </div>
  <?php endforeach; ?>
@@ -305,10 +334,12 @@ body {
  <div class="d-flex align-items-center border rounded p-3 mb-2" style="border-color: rgba(108,140,255,0.08) !important; border-left: 3px solid var(--soft-green) !important;">
  <div class="mr-3">
  <?php $__fp = subfetcher_photo_url($f['id'] ?? 0); ?>
- <?php if ($__fp): ?>
- <img src="<?= esc($__fp) ?>" alt="" class="img-circle" style="width:50px;height:50px;object-fit:cover;border:2px solid var(--soft-green);">
+ <?php if ($__fp !== ''): ?>
+ <span class="mini-avatar photo-zoom" style="cursor:zoom-in;border-color:var(--soft-green);"
+       data-photo="<?= esc($__fp) ?>" data-title="<?= esc(full_name($f)) ?>">
+ <img src="<?= esc($__fp) ?>" alt="<?= esc(full_name($f)) ?>">
+ </span>
  <?php else: ?>
- <div class="img-circle d-flex align-items-center justify-content-center" style="width:50px;height:50px;border:2px solid var(--soft-green);background:rgba(255,255,255,0.3);"><i class="fas fa-user" style="color: #b0b0c8;"></i></div>
  <?php endif; ?>
  </div>
  <div class="flex-grow-1">
@@ -318,6 +349,9 @@ body {
  <?php if(!empty($f['qr_code'])): ?>
  <img src="<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>" style="width:45px;height:45px;border:2px solid var(--soft-green);border-radius:8px;cursor:pointer;" onclick="openQrModal('<?= base_url('uploads/qr/'.$f['qr_code'].'.png') ?>')">
  <?php endif; ?>
+ <a href="<?= base_url('parents-view/'.$f['parent_id']) ?>" class="btn-go-student ml-2" title="Open parent profile">
+ <i class="fas fa-arrow-right"></i><span>Go to Parent</span>
+ </a>
  </div>
  <?php endforeach; ?>
  <?php else: ?>
@@ -379,9 +413,8 @@ body {
  <th style="width:45px;">#</th>
  <th style="width:165px;">Date / Time</th>
  <th style="width:115px;">Session</th>
- <th>Fetched By (Profile)</th>
+ <th>Fetched By</th>
  <th style="width:105px;">Method</th>
- <th style="width:150px;">Released By</th>
  </tr>
  </thead>
  <tbody>
@@ -440,7 +473,6 @@ body {
  <span class="h-time">—</span>
  <?php endif; ?>
  </td>
- <td><?= !empty($h['staff']) ? esc($h['staff']) : '<span class="h-time">—</span>' ?></td>
  </tr>
  <?php endforeach; ?>
  <?php endif; ?>
@@ -494,6 +526,21 @@ body {
  </div>
 </div>
 
+
+<script>
+document.addEventListener('click', function (e) {
+    var z = e.target.closest ? e.target.closest('.photo-zoom') : null;
+    if (!z) { return; }
+    e.preventDefault(); e.stopPropagation();
+    var src = z.getAttribute('data-photo');
+    if (!src) { return; }
+    if (typeof window.openGlobalPhoto === 'function') {
+        window.openGlobalPhoto(src, z.getAttribute('data-title'));
+    } else {
+        window.open(src, '_blank');
+    }
+});
+</script>
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
@@ -513,5 +560,20 @@ function openQrModal(u) {
     $('#qrDownloadBtn').attr('href', u);
     $('#qrModal').modal('show');
 }
+</script>
+
+<script>
+document.addEventListener('click', function (e) {
+    var z = e.target.closest ? e.target.closest('.photo-zoom') : null;
+    if (!z) { return; }
+    e.preventDefault(); e.stopPropagation();
+    var src = z.getAttribute('data-photo');
+    if (!src) { return; }
+    if (typeof window.openGlobalPhoto === 'function') {
+        window.openGlobalPhoto(src, z.getAttribute('data-title'));
+    } else {
+        window.open(src, '_blank');
+    }
+});
 </script>
 <?= $this->endSection() ?>

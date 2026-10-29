@@ -493,7 +493,6 @@
     <nav class="navbar">
         <div class="container navbar-inner">
             <a href="<?= base_url() ?>" class="navbar-left">
-                <div class="nav-icon"><i class="fas fa-child"></i></div>
                 <div class="brand-text">SCAN2FETCH</div>
             </a>
             <div style="display:flex; align-items:center; gap:10px;">
@@ -544,7 +543,6 @@
                     <div class="visual-card">
                         <div class="visual-title">Parent QR Pass</div>
                         <div class="visual-sub">Scan to release your child</div>
-                        <div class="qr-mock"><i class="fas fa-qrcode"></i></div>
                         <div class="visual-status">
                             <i class="fas fa-check-circle"></i> Verified • Ready to fetch
                         </div>
@@ -566,22 +564,18 @@
                 </div>
                 <div class="steps-grid">
                     <div class="step-card">
-                        <div class="step-icon c1"><i class="fas fa-user-plus"></i></div>
                         <h3>Register</h3>
                         <p>School registers the student and their parents or guardians.</p>
                     </div>
                     <div class="step-card">
-                        <div class="step-icon c2"><i class="fas fa-id-card"></i></div>
                         <h3>Get QR Pass</h3>
                         <p>Each guardian receives a unique QR code and account password.</p>
                     </div>
                     <div class="step-card">
-                        <div class="step-icon c3"><i class="fas fa-qrcode"></i></div>
                         <h3>Scan at Pickup</h3>
                         <p>Guardians tap their QR code; the school verifies identity instantly.</p>
                     </div>
                     <div class="step-card">
-                        <div class="step-icon c4"><i class="fas fa-child"></i></div>
                         <h3>Safe Release</h3>
                         <p>The child is released and parents are notified via SMS.</p>
                     </div>

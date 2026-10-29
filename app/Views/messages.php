@@ -196,7 +196,6 @@ html.theme-dark .empty-chat { color: #94a3b8 !important; }
  </button>
  </div>
  </div>
- <div id="msgStatus" class="small mt-1" style="color: var(--muted);"></div>
  </form>
  </div>
  </div>
@@ -284,6 +283,7 @@ html.theme-dark .empty-chat { color: #94a3b8 !important; }
  </button>
  </div>
  </div>
+ <div id="msgStatus" class="small mt-1" style="color: var(--muted);"></div>
  <div id="msgStatus" class="small mt-1" style="color: var(--muted);"></div>
  </form>
  </div>

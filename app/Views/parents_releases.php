@@ -115,6 +115,15 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
     .content-header h1 { font-size: 1.5rem !important; }
     .table td, .table th { padding: 8px 4px !important; font-size: 11px !important; }
 }
+/* Release history avatars */
+.avatar-sm{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:38px;height:38px;min-width:38px;border-radius:50%;overflow:hidden;
+    border:2px solid #6C8CFF;background:rgba(255,255,255,.6);
+    color:#b0b0c8;font-size:15px;flex:0 0 auto;
+}
+.avatar-sm img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;}
+.avatar-sm:hover{transform:scale(1.06);transition:transform .15s ease;}
 </style>
 
 <div class="content-wrapper" style="background: transparent;">
@@ -144,12 +153,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
  <div class="card-body py-2">
  <div class="d-flex align-items-center flex-wrap" style="gap:8px;">
  <div class="input-group input-group-sm" style="max-width:260px;">
- <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-search"></i></span></div>
+ <div class="input-group-prepend"></div>
  <input type="text" class="form-control hist-search" placeholder="Search student, fetcher, relation, method...">
  </div>
  <input type="date" class="form-control form-control-sm hist-date" style="max-width:170px;">
  <button type="button" class="btn btn-sm btn-outline-secondary hist-reset"><i class="fas fa-undo mr-1"></i>Reset</button>
- <span class="ml-auto small text-muted" id="histCount"></span>
  </div>
  </div>
 </div>
@@ -187,16 +195,32 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
  <td style="color: #b0b0c8; font-weight: 700;"><?= $i++ ?></td>
  <td style="color: #8888aa; font-size: 13px;"><?= date('M d, Y h:i A', strtotime($r['time_released'])) ?><?php if (!empty($r['session_type'])): ?> <span class="badge" style="background:<?= $r['session_type'] === 'morning' ? '#fef3c7' : '#e0e7ff' ?>;color:<?= $r['session_type'] === 'morning' ? '#b45309' : '#3730a3' ?>;"><?= strtoupper($r['session_type']) ?></span><?php endif; ?></td>
  <td>
- <strong style="color: #2d2d4a;">
- <?= esc($r['sfname'] ?? '') ?> <?= esc($r['smname'] ?? '') ?> <?= esc($r['slname'] ?? '') ?>
- </strong>
+ <div class="d-flex align-items-center">
+ <?php $__sp = (string) ($r['student_photo'] ?? ''); ?>
+ <?php if ($__sp !== ''): ?>
+ <span class="avatar-sm" style="cursor:zoom-in;" onclick="openGlobalPhoto('<?= esc($__sp) ?>','<?= esc(trim(($r['sfname'] ?? '').' '.($r['smname'] ?? '').' '.($r['slname'] ?? ''))) ?>')">
+ <img src="<?= esc($__sp) ?>" alt="">
+ </span>
+ <?php else: ?>
+ <?php endif; ?>
+ <div class="ml-2">
+ <strong style="color: #2d2d4a;"><?= esc(trim(($r['sfname'] ?? '').' '.($r['smname'] ?? '').' '.($r['slname'] ?? ''))) ?></strong>
  <br>
- <small style="color: #8888aa; font-size: 12px;">
- <?= esc($r['grade_section'] ?? '') ?>
- </small>
+ <small style="color: #8888aa; font-size: 12px;"><?= esc($r['grade_section'] ?? '') ?></small>
+ </div>
+ </div>
  </td>
  <td>
- <?= esc(full_name($r, 'fetcher_')) ?>
+ <div class="d-flex align-items-center">
+ <?php $__fp = (string) ($r['fetcher_photo'] ?? ''); ?>
+ <?php if ($__fp !== ''): ?>
+ <span class="avatar-sm" style="cursor:zoom-in;border-color:#66BB6A;" onclick="openGlobalPhoto('<?= esc($__fp) ?>','<?= esc(full_name($r, 'fetcher_')) ?>')">
+ <img src="<?= esc($__fp) ?>" alt="">
+ </span>
+ <?php else: ?>
+ <?php endif; ?>
+ <span class="ml-2" style="color:#2d2d4a;"><?= esc(full_name($r, 'fetcher_')) ?></span>
+ </div>
  </td>
  <td>
  <span class="badge badge-info"><?= esc($r['fetcher_relation'] ?? 'Parent') ?></span>
@@ -228,6 +252,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
  </div>
  </div>
  </section>
+ <span class="ml-auto small text-muted" id="histCount"></span>
 </div>
 <?= $this->endSection() ?>
 

@@ -296,6 +296,54 @@ body {
 @media (max-width: 480px) {
     .card { border-radius: 16px !important; }
 }
+
+/* ===== UNIFIED EDIT MODAL (register look) ===== */
+
+.reg-avatar {
+    position: relative; width: 92px; height: 92px; margin: 0 auto;
+    border-radius: 50%; overflow: hidden; cursor: pointer;
+    background: #eef2ff; border: 3px solid rgba(108,140,255,.25);
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .2s ease, transform .15s ease;
+}
+.reg-avatar:hover { border-color: var(--soft-blue); transform: scale(1.03); }
+.reg-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+.reg-avatar-placeholder { font-size: 30px; color: #a5b4fc; }
+.reg-avatar-overlay {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 4px 0;
+    background: rgba(63,43,150,.72); color: #fff; font-size: 10.5px;
+    font-weight: 700; text-align: center; opacity: 0; transition: opacity .2s ease;
+}
+.reg-avatar:hover .reg-avatar-overlay { opacity: 1; }
+
+/* fields inside editTeacherModal match the register page */
+#editTeacherModal .modal-body { padding: 1.35rem 1.5rem 0.5rem !important; }
+#editTeacherModal .row { margin-left: -7px; margin-right: -7px; }
+#editTeacherModal .row > [class*="col-"] { padding-left: 7px; padding-right: 7px; }
+#editTeacherModal .form-group { margin-bottom: 14px; }
+#editTeacherModal label {
+    display: block; font-size: 12.5px; font-weight: 700;
+    color: #4a4a68 !important; margin-bottom: 6px !important;
+}
+#editTeacherModal label i { color: var(--soft-blue); margin-right: 5px; font-size: 11.5px; }
+#editTeacherModal .form-control {
+    border: 1px solid rgba(108,140,255,.28) !important;
+    border-radius: 11px !important;
+    padding: 9px 13px !important;
+    font-size: 13.5px !important;
+    color: #2d2d4a !important;
+    background: #fff !important;
+    transition: border-color .16s ease, box-shadow .16s ease;
+}
+#editTeacherModal .form-control:focus {
+    border-color: var(--soft-blue) !important;
+    box-shadow: 0 0 0 3px rgba(108,140,255,.16) !important;
+}
+#editTeacherModal small.text-muted {
+    display: block; margin-top: 5px; font-size: 10.5px !important; color: #9a9ab8 !important;
+}
+#editTeacherModal .modal-footer { border-top: 1px solid rgba(108,140,255,.14); padding: 14px 1.5rem; }
+#editTeacherModal .modal-footer .btn { border-radius: 11px !important; font-weight: 700; }
 </style>
 
 <div class="content-wrapper" style="background: transparent;">
@@ -352,15 +400,9 @@ body {
                                                 title="Send passwords to teachers who haven't received one yet"
                                                 onclick="return confirm('Send passwords to all teachers who have not received one yet?')">
  <i class="fas fa-sms mr-1"></i> Send All Passwords
- </a>
- <?php if (session('role') == 'admin'): ?>
- <a href="<?= base_url('teachers-delete-all') ?>" class="btn btn-danger btn-sm"
-                                                title="Delete ALL teacher accounts"
-                                                onclick="return confirm('DELETE ALL TEACHERS?\n\nThis will permanently delete ALL teacher accounts.\n\nThis cannot be undone!')">
- <i class="fas fa-trash-alt mr-1"></i> Delete All
- </a>
- <?php endif; ?>
+                                </a>
  <button type="button" class="btn btn-kid-primary btn-sm" data-toggle="modal" data-target="#addTeacherModal">
+
  <i class="fas fa-plus mr-1"></i> Add Teacher
  </button>
  </div>
@@ -375,7 +417,6 @@ body {
  <label class="filter-label">Search Teacher</label>
  <div class="input-group input-group-sm">
  <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-search"></i></span>
  </div>
  <input type="text" id="searchTeacher" class="form-control form-control-sm" placeholder="Search name, phone or grade...">
  </div>
@@ -436,11 +477,11 @@ body {
  <span class="badge badge-soft"><?= (int) ($studentCounts[$teacher['id']] ?? 0) ?></span>
  </td>
  <td class="text-center">
- <?php if (!empty($teacher['password_sent'])): ?>
- <span class="badge badge-soft" title="Password already sent" style="color:#2e7d32;"><i class="fas fa-check"></i></span>
- <?php else: ?>
- <span class="badge badge-soft" title="Password not yet sent" style="color:#c2185b;"><i class="fas fa-times"></i></span>
- <?php endif; ?>
+  <?php if (!empty($teacher['password_sent'])): ?>
+  <span class="badge" style="background:var(--soft-green);color:#fff;font-weight:600;"><i class="fas fa-check-circle mr-1"></i>Sent</span>
+  <?php else: ?>
+  <span class="badge" style="background:var(--soft-orange);color:#fff;font-weight:600;"><i class="fas fa-clock mr-1"></i>Not sent</span>
+  <?php endif; ?>
  </td>
  <td class="text-center">
  <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
@@ -497,7 +538,6 @@ body {
  <td colspan="8" class="text-center py-5 empty-state">
  <i class="fas fa-chalkboard-teacher fa-3x mb-3 d-block"></i>
  <h5>No teachers yet</h5>
- <p>Click "Add Teacher" to register a new teacher.</p>
  </td>
  </tr>
  <?php endif; ?>
@@ -562,7 +602,6 @@ body {
  <label>Teacher ID <span class="text-muted" style="font-weight:400;">(optional — auto T-####)</span></label>
  <div class="input-group">
  <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
  </div>
  <input type="text" name="teacher_no" class="form-control" placeholder="T-1002">
  </div>
@@ -573,7 +612,6 @@ body {
  <label>Phone Number <span class="text-danger">*</span></label>
  <div class="input-group">
  <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-phone"></i></span>
  </div>
  <input type="text" name="phone" class="form-control" placeholder="09XXXXXXXXX" required>
  </div>
@@ -616,11 +654,6 @@ body {
  </div>
  </div>
  </div>
- <div class="alert" style="background: rgba(168,192,255,0.12); border: 1.5px dashed rgba(63,43,150,0.18); border-radius: 12px; margin-bottom: 0; padding: 12px 14px; font-size: 13px; color: var(--ink);">
- <i class="fas fa-info-circle mr-1" style="color: var(--soft-blue);"></i>
-                        The teacher is linked to the grade/section above, so their students and parents connect automatically.
-                        Passwords are not sent automatically — use "Send Password" / "Send All Passwords" to deliver them.
- </div>
  </div>
  <div class="modal-footer">
  <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">Cancel</button>
@@ -633,126 +666,115 @@ body {
  </div>
 </div>
 
-<!-- ===== EDIT TEACHER MODAL ===== -->
+<!-- ===== EDIT Teacher MODAL (unified layout) ===== -->
 <div class="modal fade" id="editTeacherModal" tabindex="-1">
- <div class="modal-dialog modal-dialog-centered">
- <div class="modal-content">
- <form action="<?= base_url('teachers-update') ?>" method="post" enctype="multipart/form-data">
- <?= csrf_field() ?>
- <input type="hidden" name="id" id="editId">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="<?= base_url('teachers-update') ?>" method="post" enctype="multipart/form-data">
+                <?= csrf_field() ?>
+                <input type="hidden" name="id" id="editId">
 
- <!-- ===== Teacher profile picture (add / change / remove) ===== -->
- <div class="text-center mb-3">
- <div id="teacherPicBox" title="Click to add or change the picture" style="position:relative;width:96px;height:96px;margin:0 auto;border-radius:50%;overflow:hidden;border:3px solid rgba(108,140,255,0.25);background:#eef2ff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
- <img id="teacherPicImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-chalkboard-user mr-2" style="color: var(--soft-blue);"></i>Edit Teacher
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="reg-avatar-wrap text-center mb-3">
+                        <div class="reg-avatar" id="teacherPicBox" title="Click to add or change the picture">
+                            <img class="reg-avatar-img" id="teacherPicImg" src="" alt="" style="display:none;">
+                            <span class="reg-avatar-overlay">Add picture</span>
+                        </div>
+                        <input type="file" class="reg-avatar-file" id="teacherPicFile" accept="image/*" style="display:none;">
+                        <input type="hidden" name="teacher_picture_data" id="teacherPicData" value="">
+                        <input type="hidden" name="teacher_picture_remove" id="teacherPicRemove" value="0">
+                        <div>
+                            <button type="button" class="btn btn-link btn-sm reg-avatar-remove-btn" id="teacherPicRemoveBtn"
+                                    style="display:none; color:#b23c4d; padding:0; font-size:12px;">
+                                <i class="fas fa-trash-alt mr-1"></i>Remove picture
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editTeacherNo"><i class="fas fa-id-badge"></i>Teacher ID <span class="text-danger">*</span></label>
+                        <input type="text" name="teacher_no" id="editTeacherNo" class="form-control" placeholder="T-0001" maxlength="20" required>
+                        <small class="text-muted">Format T-#### - also used as the photo filename.</small>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="editFname"><i class="fas fa-user"></i>First Name <span class="text-danger">*</span></label>
+                                <input type="text" name="fname" id="editFname" class="form-control" placeholder="Teacher" required>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="editMname"><i class="fas fa-user"></i>Middle Name</label>
+                                <input type="text" name="mname" id="editMname" class="form-control" placeholder="Santos">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="editLname"><i class="fas fa-user"></i>Last Name <span class="text-danger">*</span></label>
+                                <input type="text" name="lname" id="editLname" class="form-control" placeholder="One" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPhone"><i class="fas fa-phone"></i>Phone Number <span class="text-danger">*</span></label>
+                        <input type="text" name="phone" id="editPhone" class="form-control" placeholder="09XXXXXXXXX" required>
+                        <small class="text-muted">Used for the teacher login and SMS notifications.</small>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label for="editGrade"><i class="fas fa-graduation-cap"></i>Grade &amp; Section <span class="text-danger">*</span></label>
+                        <select name="grade_section" id="editGrade" class="form-control" required>
+                            <option value="">- Select Grade &amp; Section -</option>
+                            <optgroup label="Kindergarten">
+                                <option>Kindergarten - A</option>
+                                <option>Kindergarten - B</option>
+                            </optgroup>
+                            <optgroup label="Grade 1">
+                                <option>Grade 1 - A</option>
+                                <option>Grade 1 - B</option>
+                            </optgroup>
+                            <optgroup label="Grade 2">
+                                <option>Grade 2 - A</option>
+                                <option>Grade 2 - B</option>
+                            </optgroup>
+                            <optgroup label="Grade 3">
+                                <option>Grade 3 - A</option>
+                                <option>Grade 3 - B</option>
+                            </optgroup>
+                            <optgroup label="Grade 4">
+                                <option>Grade 4 - A</option>
+                                <option>Grade 4 - B</option>
+                            </optgroup>
+                            <optgroup label="Grade 5">
+                                <option>Grade 5 - A</option>
+                                <option>Grade 5 - B</option>
+                            </optgroup>
+                            <optgroup label="Grade 6">
+                                <option>Grade 6 - A</option>
+                                <option>Grade 6 - B</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn btn-kid-warning btn-sm px-4">
+                        <i class="fas fa-check mr-1"></i>Update Teacher
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
  <i class="fas fa-camera" id="teacherPicPh" style="font-size:28px;color:#a5b4fc;"></i>
- <span style="position:absolute;left:0;right:0;bottom:0;padding:3px 0;background:rgba(63,43,150,0.72);color:#fff;font-size:10px;font-weight:700;text-align:center;">Change</span>
- </div>
- <input type="file" id="teacherPicFile" accept="image/*" style="display:none;">
- <input type="hidden" name="teacher_picture_data" id="teacherPicData" value="">
- <input type="hidden" name="teacher_picture_remove" id="teacherPicRemove" value="0">
- <div><button type="button" id="teacherPicRemoveBtn" style="display:none;border:none;background:none;color:#b23c4d;font-size:12px;padding:0;margin-top:4px;"><i class="fas fa-trash-alt mr-1"></i>Remove picture</button></div>
- </div>
- <div class="modal-header">
- <h5 class="modal-title">
- <i class="fas fa-user-edit mr-2" style="color: var(--soft-orange);"></i>
-                        Edit Teacher
- </h5>
- <button type="button" class="close" data-dismiss="modal" style="color: var(--ink);">&times;</button>
- </div>
- <div class="modal-body">
- <div class="row">
- <div class="col-4">
- <div class="form-group">
- <label>First Name <span class="text-danger">*</span></label>
- <input type="text" name="fname" id="editFname" class="form-control" required>
- </div>
- </div>
- <div class="col-4">
- <div class="form-group">
- <label>Middle Name</label>
- <input type="text" name="mname" id="editMname" class="form-control">
- </div>
- </div>
- <div class="col-4">
- <div class="form-group">
- <label>Last Name <span class="text-danger">*</span></label>
- <input type="text" name="lname" id="editLname" class="form-control" required>
- </div>
- </div>
- </div>
- <div class="row">
- <div class="col-6">
- <div class="form-group">
- <label>Teacher ID</label>
- <div class="input-group">
- <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
- </div>
- <input type="text" name="teacher_no" id="editTeacherNo" class="form-control">
- </div>
- </div>
- </div>
- <div class="col-6">
- <div class="form-group">
- <label>Phone Number <span class="text-danger">*</span></label>
- <div class="input-group">
- <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-phone"></i></span>
- </div>
- <input type="text" name="phone" id="editPhone" class="form-control" required>
- </div>
- </div>
- </div>
- <div class="col-6">
- <div class="form-group mb-0">
- <label>Grade / Section <span class="text-danger">*</span></label>
- <select name="grade_section" id="editGrade" class="form-control" required>
- <option value="">— Select Grade & Section —</option>
- <optgroup label="Kindergarten">
- <option>Kindergarten - A</option>
- <option>Kindergarten - B</option>
- </optgroup>
- <optgroup label=" Grade 1">
- <option>Grade 1 - A</option>
- <option>Grade 1 - B</option>
- </optgroup>
- <optgroup label=" Grade 2">
- <option>Grade 2 - A</option>
- <option>Grade 2 - B</option>
- </optgroup>
- <optgroup label=" Grade 3">
- <option>Grade 3 - A</option>
- <option>Grade 3 - B</option>
- </optgroup>
- <optgroup label=" Grade 4">
- <option>Grade 4 - A</option>
- <option>Grade 4 - B</option>
- </optgroup>
- <optgroup label=" Grade 5">
- <option>Grade 5 - A</option>
- <option>Grade 5 - B</option>
- </optgroup>
- <optgroup label=" Grade 6">
- <option>Grade 6 - A</option>
- <option>Grade 6 - B</option>
- </optgroup>
- </select>
- </div>
- </div>
- </div>
- </div>
- <div class="modal-footer">
- <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">Cancel</button>
- <button type="submit" class="btn btn-kid-warning btn-sm px-4">
- <i class="fas fa-check mr-1"></i> Update Teacher
- </button>
- </div>
- </form>
- </div>
- </div>
 </div>
-
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>

@@ -111,6 +111,15 @@ body { display:flex; align-items:center; justify-content:center; }
 .pp-photo{width:min(30vw,320px);height:min(30vw,320px);margin:0 auto;border-radius:50%;overflow:hidden;
  background:#1e293b;border:6px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:clamp(28px,6vw,64px);}
 .pp-photo img{width:100%;height:100%;object-fit:cover;}
+/* Right-hand side: one card per child picked up (1..N) */
+.pp-students{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:flex-start;max-height:64vh;overflow-y:auto;}
+.pp-kid{text-align:center;flex:0 0 auto;}
+.pp-kid .pp-photo{width:min(12vw,150px);height:min(12vw,150px);margin:0 auto;border-width:5px;}
+.pp-kid .pp-photo i{font-size:clamp(20px,3.4vw,38px);}
+.pp-kid .pp-name{margin-top:8px;font-size:clamp(11px,1.3vw,17px);}
+.pp-kid .pp-meta{margin-top:2px;font-size:clamp(10px,1.05vw,13px);}
+/* children side may need more room than the fetcher side when 3+ kids are picked up */
+#pickupPanel .pp-side:last-child{max-width:50vw;}
 .pp-name{margin-top:18px;color:#fff;font-weight:800;font-size:clamp(18px,2.6vw,34px);line-height:1.2;}
 .pp-meta{margin-top:6px;color:#94a3b8;font-size:clamp(13px,1.6vw,20px);text-transform:uppercase;letter-spacing:.08em;}
 .pp-mid{text-align:center;color:#4ade80;}
@@ -124,6 +133,9 @@ body { display:flex; align-items:center; justify-content:center; }
 </head>
 <body>
 
+<!-- Camera viewport: Html5Qrcode('reader') injects the <video> here.
+     This element MUST exist or the constructor throws synchronously and the
+     kiosk stays frozen on "Starting camera...". -->
 <div id="reader"></div>
 
 <div id="topBar">
@@ -136,40 +148,48 @@ body { display:flex; align-items:center; justify-content:center; }
 <div id="status">Starting camera...</div>
 
 <div id="flash">
-  <div class="big"><span class="ck"></span></div>
+  <div class="big"></div>
   <div class="nm" id="flashName"></div>
   <div class="sub" id="flashSub"></div>
 </div>
 
 <div id="pickupPanel">
- <div class="pp-side">
-  <div class="pp-photo" id="ppFetcherPhoto"><i class="fas fa-user"></i></div>
-  <div class="pp-name" id="ppFetcherName"></div>
-  <div class="pp-meta" id="ppFetcherRel"></div>
- </div>
- <div class="pp-mid">
-  <div class="pp-check"><span class="ck"></span></div>
-  <div class="pp-released">RELEASED</div>
-  <div class="pp-timer"><span id="ppCount">10</span>s</div>
- </div>
- <div class="pp-side">
-  <div class="pp-photo" id="ppStudentPhoto"><i class="fas fa-user-graduate"></i></div>
-  <div class="pp-name" id="ppStudentName"></div>
-  <div class="pp-meta" id="ppStudentGrade"></div>
- </div>
+  <div class="pp-side">
+   <div class="pp-photo" id="ppFetcherPhoto"><i class="fas fa-user"></i></div>
+   <div class="pp-name" id="ppFetcherName"></div>
+   <div class="pp-meta" id="ppFetcherRel"></div>
+  </div>
+  <div class="pp-mid">
+   <div class="pp-check"></div>
+   <div class="pp-released">RELEASED</div>
+   <div class="pp-timer"><span id="ppCount">10</span>s</div>
+  </div>
+  <div class="pp-side">
+   <div class="pp-students" id="ppStudents"></div>
+  </div>
 </div>
 
 <div id="sheet">
   <h3 id="sheetTitle">Students to release</h3>
-  <div class="sub" id="sheetSub"></div>
   <div id="sheetList"></div>
+  <div class="sub" id="sheetSub"></div>
   <button id="releaseBtn">Release selected</button>
 </div>
+
 
 <script>
 var BASE_URL  = '<?= rtrim(base_url(), '/') ?>/';
 var CSRF_NAME = '<?= csrf_token() ?>';
 var CSRF_HASH = '<?= csrf_hash() ?>';
+/* With csrfProtection='cookie' the live token is the csrf_cookie_name cookie,
+   and it is re-issued whenever the session regenerates. A kiosk tab sits open
+   for hours, so the value printed at page load goes stale and every POST then
+   dies with "The action you requested is not allowed." Always send the
+   current cookie value instead. */
+function csrfToken() {
+  var m = document.cookie.match(/(?:^|;\s*)csrf_cookie_name=([^;]+)/);
+  return m ? decodeURIComponent(m[1]) : CSRF_HASH;
+}
 var GATE_OK   = <?= empty($gateAllowed) ? 'false' : 'true' ?>;
 
 var scanner = null, scanning = false, lockout = false;
@@ -192,6 +212,12 @@ function hideSay() { document.getElementById('status').className = ''; }
  * jsQR is the fallback. */
 function buildScanner() {
   if (scanner) { try { scanner.clear(); } catch(e){} }
+  // Fail loudly instead of throwing an opaque error later: without the host
+  // element Html5Qrcode throws and the caller used to hang on
+  // "Starting camera..." with scanning stuck at true.
+  if (!document.getElementById('reader')) {
+    throw new Error('scanner container #reader is missing from the page');
+  }
   // NO formatsToSupport filter - this library build numbers QR_CODE as 11,
   // not 0 (0 = AZTEC). The old "[0]" filter made it decode AZTEC only, so it
   // could NEVER read a QR code. Unfiltered = scans QR + everything else.
@@ -203,7 +229,13 @@ function start() {
   if (!GATE_OK) { say('Scanner is closed right now.', 'err'); return; }
   scanning = true; lockout = false;
   say('Starting camera...');
-  buildScanner();
+  try {
+    buildScanner();
+  } catch (e) {
+    scanning = false;
+    say('Camera init failed: ' + ((e && e.message) || e), 'err');
+    return;
+  }
 
   var camera    = { facingMode: 'environment' };
   var scanCfg   = {
@@ -253,7 +285,13 @@ function startLowRes() {
   if (scanning) return;
   scanning = true; lockout = false;
   say('Starting camera (low-res mode)...');
-  buildScanner();
+  try {
+    buildScanner();
+  } catch (e) {
+    scanning = false;
+    say('Camera init failed: ' + ((e && e.message) || e), 'err');
+    return;
+  }
 
   var camera  = { facingMode: 'environment' };
   var scanCfg = {
@@ -283,12 +321,15 @@ function startLowRes() {
 
 function resume() {
   lockout = false;
-  setTimeout(start, 400);
+  // The 10s success screen + 2s ready gap are already sequenced by showPickup,
+  // so restart the camera straight away.
+  setTimeout(start, 0);
 }
 
 /* ===== VERIFY + AUTO-RELEASE ===== */
 /* ===== TIMINGS (edit these to balance the overlays) ===== */
-var PICKUP_MS  = 10;   // seconds the pickup panel (photos) stays up
+var PICKUP_MS  = 10;    // seconds the success screen (fetchar + child photos) stays up
+var READY_GAP_MS = 2000; // ms of "ready for next scan" pause after the success screen
 var FLASH_MS   = 10000; // ms the green check flash stays up (normal)
 var FLASH_ALREADY_MS = 2000; // ms the flash stays up (already released)
 
@@ -296,7 +337,7 @@ function verify(qr) {
   say('Verifying...');
   var fd = new FormData();
   fd.append('qr_code', qr);
-  fd.append(CSRF_NAME, CSRF_HASH);
+  fd.append(CSRF_NAME, csrfToken());
   fetch(BASE_URL + 'scan/verify', { method:'POST', body: fd })
   .then(function(r){ return r.json(); })
   .then(function(res) {
@@ -320,19 +361,17 @@ function verify(qr) {
       setTimeout(resume, 2500);
       return;
     }
-    if (list.length === 1) {
-      var snm1 = [list[0].fname, list[0].mname, list[0].lname].filter(Boolean).join(' ');
-      if (list[0].already_released) {
-        flash(snm1, 'Picked up by ' + who + ' - ALREADY RELEASED this ' + sessName + ' session.', true);
-        say('Already released - ' + snm1, 'warn');
-        setTimeout(resume, FLASH_ALREADY_MS + 200);
-        return;
-      }
-      flash(snm1, 'Picked up by ' + who);
-      releaseAll(list, p.id, qr, who);
+    // No confirmation sheet any more: one scan releases EVERY child linked to
+    // this fetcher (parent / guardian / sub-fetcher). The success screen then
+    // shows one photo per child.
+    var pending = list.filter(function (s) { return !s.already_released; });
+    if (!pending.length) {
+      flash(who, 'All ' + list.length + ' child(ren) were ALREADY RELEASED this ' + sessName + ' session.', true);
+      say('Already released - ' + who, 'warn');
+      setTimeout(resume, FLASH_ALREADY_MS + 2000);
       return;
     }
-    openSheet(who, list, p.id, qr, sessName);
+    releaseAll(list, p.id, qr, who);
   })
   .catch(function() {
     say('Connection error', 'err');
@@ -395,17 +434,42 @@ function openSheet(who, list, pid, qr, sessName) {
 }
 
 var __ppTimer = null, __ppTick = null;
-function showPickup(fetcher, relation, student, seconds) {
-  function fill(imgId, url) {
-    var box = document.getElementById(imgId);
-    box.innerHTML = url ? '<img src="' + url + '" alt="">' : '<i class="fas fa-user"></i>';
+function showPickup(fetcher, relation, kids, seconds) {
+  function paint(box, url) {
+    box.innerHTML = '';
+    if (url) {
+      var img = document.createElement('img');
+      img.src = url; img.alt = '';
+      box.appendChild(img);
+    } else {
+      var ic = document.createElement('i');
+      ic.className = 'fas fa-user';
+      box.appendChild(ic);
+    }
   }
   document.getElementById('ppFetcherName').textContent = fetcher.name || '';
   document.getElementById('ppFetcherRel').textContent = relation || '';
-  document.getElementById('ppStudentName').textContent = student.name || '';
-  document.getElementById('ppStudentGrade').textContent = student.grade || '';
-  fill('ppFetcherPhoto', fetcher.photo);
-  fill('ppStudentPhoto', student.photo);
+  paint(document.getElementById('ppFetcherPhoto'), fetcher.photo);
+
+  // One card per child being picked up: 1 child = 1 photo, 2 = 2 photos, ...
+  var wrap = document.getElementById('ppStudents');
+  wrap.innerHTML = '';
+  (kids || []).forEach(function (k) {
+    var card = document.createElement('div');
+    card.className = 'pp-kid';
+    var ph = document.createElement('div');
+    ph.className = 'pp-photo';
+    paint(ph, k.photo);
+    var nm = document.createElement('div');
+    nm.className = 'pp-name';
+    nm.textContent = k.name || '';
+    var gr = document.createElement('div');
+    gr.className = 'pp-meta';
+    gr.textContent = k.grade || '';
+    card.appendChild(ph); card.appendChild(nm); card.appendChild(gr);
+    wrap.appendChild(card);
+  });
+
   var panel = document.getElementById('pickupPanel');
   panel.classList.add('show');
   var left = seconds;
@@ -413,13 +477,15 @@ function showPickup(fetcher, relation, student, seconds) {
   var tick = setInterval(function () {
     left--; if (left < 0) { left = 0; }
     document.getElementById('ppCount').textContent = left;
-    if (left <= 0) { clearInterval(tick); }
+    if (left <= 0) { clearInterval(tick); if (__ppTick === tick) { __ppTick = null; } }
   }, 1000);
+  __ppTick = tick;
   __ppTimer = setTimeout(function () {
     if (__ppTick) { clearInterval(__ppTick); __ppTick = null; }
     __ppTimer = null;
     panel.classList.remove('show');
-    resume();
+    // "Ready for next scan" gap before the camera comes back
+    setTimeout(resume, READY_GAP_MS);
   }, seconds * 1000);
 }
 
@@ -430,11 +496,18 @@ function releaseAll(students, pid, qr, who) {
     if (i >= students.length) {
       document.getElementById('sheet').classList.remove('show');
       if (ok > 0) {
-        var first = students.filter(function (x) { return !x.already_released; })[0] || students[0];
+        var released = students.filter(function (x) { return !x.already_released; });
+        if (!released.length) { released = students.slice(); }
         showPickup(
           { name: (window.lastFetcher && window.lastFetcher.name) || who, photo: (window.lastFetcher && window.lastFetcher.photo) || '' },
           (window.lastFetcher && window.lastFetcher.relation) || '',
-          { name: [first.fname, first.mname, first.lname].filter(Boolean).join(' '), grade: first.grade_section || '', photo: first.photo || '' },
+          released.map(function (s) {
+            return {
+              name: [s.fname, s.mname, s.lname].filter(Boolean).join(' '),
+              grade: s.grade_section || '',
+              photo: s.photo || ''
+            };
+          }),
           PICKUP_MS
         );
         say(who + ' - Released ' + ok + ' student(s).', 'ok');
@@ -458,7 +531,7 @@ function releaseAll(students, pid, qr, who) {
     fd.append('student_id', s.student_id || s.id);
     fd.append('parent_id', pid);
     fd.append('qr_code', qr);
-    fd.append(CSRF_NAME, CSRF_HASH);
+    fd.append(CSRF_NAME, csrfToken());
     fetch(BASE_URL + 'scan/release', { method:'POST', body: fd })
     .then(function(r){ return r.json(); })
     .then(function(res) {

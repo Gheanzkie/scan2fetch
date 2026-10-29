@@ -635,9 +635,6 @@ html.theme-dark .sms-mode-panel { background: #1e293b; border-color: #334155; }
  <div class="col-lg-6 col-6 mb-2">
  <a href="<?= base_url('scan-monitor?date='.($selectedDate ?? date('Y-m-d')).'&tab=released') ?>" style="text-decoration:none;color:inherit;">
  <div class="info-box d-flex align-items-center <?= ($activeTab ?? 'released') == 'released' ? 'active' : '' ?>">
- <span class="info-box-icon mr-3" style="background:#16a34a;">
- <i class="fas fa-check-circle"></i>
- </span>
  <div>
  <div class="info-box-text">Released</div>
  <div class="info-box-number"><?= $releasedToday ?? 0 ?></div>
@@ -649,9 +646,6 @@ html.theme-dark .sms-mode-panel { background: #1e293b; border-color: #334155; }
  <div class="col-lg-6 col-6 mb-2">
  <a href="<?= base_url('scan-monitor?date='.($selectedDate ?? date('Y-m-d')).'&tab=pending') ?>" style="text-decoration:none;color:inherit;">
  <div class="info-box d-flex align-items-center <?= ($activeTab ?? 'released') == 'pending' ? 'active' : '' ?>">
- <span class="info-box-icon mr-3" style="background:#d97706;">
- <i class="fas fa-clock"></i>
- </span>
  <div>
  <div class="info-box-text">Pending</div>
  <div class="info-box-number"><?= $pendingCount ?? 0 ?></div>
@@ -1021,8 +1015,6 @@ html.theme-dark .sms-mode-panel { background: #1e293b; border-color: #334155; }
  <div class="modal-body text-center py-4">
  <i class="fas fa-check-circle fa-4x mb-3" style="color: var(--soft-green);"></i>
  <h4>SMS Notifications Sent!</h4>
- <p id="smsResultMessage"></p>
- <div id="smsResultDetails" style="max-height: 200px; overflow-y: auto; text-align: left; font-size: 13px;"></div>
  </div>
  <div class="modal-footer">
  <button type="button" class="btn btn-outline-kid btn-sm" data-dismiss="modal">Close</button>
@@ -1047,6 +1039,8 @@ html.theme-dark .sms-mode-panel { background: #1e293b; border-color: #334155; }
  </div>
  </div>
  </div>
+ <div id="smsResultDetails" style="max-height: 200px; overflow-y: auto; text-align: left; font-size: 13px;"></div>
+ <p id="smsResultMessage"></p>
 </div>
 <?= $this->endSection() ?>
 

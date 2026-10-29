@@ -89,17 +89,23 @@ class Parents extends BaseController
         $db = \Config\Database::connect();
         
         $data['students'] = $db->table('student_parents')
-            ->select('student_parents.*, students.fname, students.mname, students.lname, students.grade_section, students.id as student_id')
+            ->select('student_parents.*, students.fname, students.mname, students.lname, students.grade_section, students.student_no, students.id as student_id')
             ->join('students', 'students.id = student_parents.student_id')
             ->where('student_parents.parent_id', $id)
             ->get()
             ->getResultArray();
 
+        // Profile picture for every linked student (filename-based lookup)
+        foreach ($data['students'] as &$__st) {
+            $__st['photo'] = student_photo_url((string) ($__st['student_no'] ?? ''));
+        }
+        unset($__st);
+
         $teachers = $db->table('teachers')->get()->getResultArray();
         $teacherMap = [];
         foreach ($teachers as $t) {
             if (!isset($teacherMap[$t['grade_section']])) {
-                $teacherMap[$t['grade_section']] = $t['fname'] . ' ' . $t['lname'];
+                $teacherMap[$t['grade_section']] = full_name($t);
             }
         }
         $data['teacherMap'] = $teacherMap;
@@ -248,54 +254,6 @@ class Parents extends BaseController
             'Updated parent: ' . $data['fname'] . ' ' . $data['lname'] . ' (ID: ' . $id . ')'
         );
         return redirect()->to('/parents')->with('msg', 'Parent updated');
-    }
-
-    // ========== DELETE ALL PARENTS (ADMIN ONLY) ==========
-    public function deleteAll()
-    {
-        if (session('role') != 'admin') {
-            return redirect()->to('/parents')->with('error', 'Admin only.');
-        }
-
-        $db = \Config\Database::connect();
-        $db->transStart();
-
-        try {
-            $count = $this->parentsModel->countAllResults();
-
-            // DELETE, never TRUNCATE. MySQL refuses to TRUNCATE a table that
-            // is referenced by a foreign key, which is why this used to die
-            // with "Cannot truncate a table referenced in a foreign key
-            // constraint (... fk_fetchlogs_parent ...)" and roll back.
-            // Children must go first. wipeTable() runs a bare DELETE FROM,
-            // which honours ON DELETE CASCADE / SET NULL on every FK.
-            $this->wipeTable('fetch_logs');
-            $this->wipeTable('sub_fetchers');
-            $this->wipeTable('student_parents');
-
-            $studentCount = $db->table('students')->countAllResults();
-            $this->wipeTable('students');
-
-            $this->wipeTable('parents');
-
-            $db->transComplete();
-
-            if ($db->transStatus() === false) {
-                throw new \Exception('Transaction failed');
-            }
-
-            $this->logModel->addLog(
-                session('user_id'), session('fname') . ' ' . session('lname'), session('role'),
-                'delete', 'parent',
-                "DELETED ALL parents ($count) with linked students ($studentCount), sub-fetchers and logs"
-            );
-
-            return redirect()->to('/parents')->with('msg', "All $count parent(s) deleted. $studentCount orphaned student(s) also removed.");
-        } catch (\Exception $e) {
-            $db->transRollback();
-            log_message('error', 'Delete all parents failed: ' . $e->getMessage());
-            return redirect()->to('/parents')->with('error', 'Delete all failed: ' . $e->getMessage());
-        }
     }
 
     // ========== DELETE PARENT (With Student Deletion) ==========
@@ -454,7 +412,7 @@ class Parents extends BaseController
         if (!empty($studentIds)) {
             $fetchLogModel = new \App\Models\FetchLogModel();
             $query = $fetchLogModel
-                ->select('fetch_logs.*, students.fname AS sfname, students.mname AS smname, students.lname AS slname, students.grade_section')
+                ->select('fetch_logs.*, students.fname AS sfname, students.mname AS smname, students.lname AS slname, students.grade_section, students.student_no')
                 ->join('students', 'students.id = fetch_logs.student_id', 'left')
                 ->whereIn('fetch_logs.student_id', $studentIds);
 
@@ -467,9 +425,28 @@ class Parents extends BaseController
                 ->limit(100)
                 ->findAll();
 
+            // Profile pictures: student avatar + fetcher avatar (sub-fetcher, else this parent)
+            helper('photo');
+            $sfPhotoMap = [];
+            foreach ($subFetchers as $sf) {
+                $sfPlain = strtolower(trim(($sf['fname'] ?? '') . ' ' . ($sf['lname'] ?? '')));
+                $sfFull  = strtolower(trim(($sf['fname'] ?? '') . ' ' . ($sf['mname'] ?? '') . ' ' . ($sf['lname'] ?? '')));
+                foreach ([$sfPlain, $sfFull] as $sfKey) {
+                    if ($sfKey !== '') {
+                        $sfPhotoMap[$sfKey] = subfetcher_photo_url($sf['id'] ?? 0);
+                    }
+                }
+            }
+            $myParent = $this->parentsModel->find($userId);
+            $myParentPhoto = parent_photo_url((string) ($myParent['parent_no'] ?? ''));
             foreach ($releases as &$release) {
                 $release['action'] = 'release';
+                $release['student_photo'] = student_photo_url((string) ($release['student_no'] ?? ''));
+                $relPlain = strtolower(trim(($release['fetcher_fname'] ?? '') . ' ' . ($release['fetcher_lname'] ?? '')));
+                $relFull  = strtolower(trim(($release['fetcher_fname'] ?? '') . ' ' . ($release['fetcher_mname'] ?? '') . ' ' . ($release['fetcher_lname'] ?? '')));
+                $release['fetcher_photo'] = $sfPhotoMap[$relPlain] ?? $sfPhotoMap[$relFull] ?? $myParentPhoto;
             }
+            unset($release);
             $data['releases'] = $releases;
         }
 
@@ -604,16 +581,35 @@ class Parents extends BaseController
         if (!empty($studentIds)) {
             $fetchLogModel = new \App\Models\FetchLogModel();
             $releases = $fetchLogModel
-                ->select('fetch_logs.*, students.fname AS sfname, students.mname AS smname, students.lname AS slname, students.grade_section')
+                ->select('fetch_logs.*, students.fname AS sfname, students.mname AS smname, students.lname AS slname, students.grade_section, students.student_no')
                 ->join('students', 'students.id = fetch_logs.student_id', 'left')
                 ->whereIn('fetch_logs.student_id', $studentIds)
                 ->orderBy('time_released', 'DESC')
                 ->limit(50)
                 ->findAll();
 
+            // Profile pictures: student avatar + fetcher avatar (sub-fetcher, else this parent)
+            helper('photo');
+            $sfPhotoMap = [];
+            foreach ($subFetchers as $sf) {
+                $sfPlain = strtolower(trim(($sf['fname'] ?? '') . ' ' . ($sf['lname'] ?? '')));
+                $sfFull  = strtolower(trim(($sf['fname'] ?? '') . ' ' . ($sf['mname'] ?? '') . ' ' . ($sf['lname'] ?? '')));
+                foreach ([$sfPlain, $sfFull] as $sfKey) {
+                    if ($sfKey !== '') {
+                        $sfPhotoMap[$sfKey] = subfetcher_photo_url($sf['id'] ?? 0);
+                    }
+                }
+            }
+            $myParent = $this->parentsModel->find($userId);
+            $myParentPhoto = parent_photo_url((string) ($myParent['parent_no'] ?? ''));
             foreach ($releases as &$release) {
                 $release['action'] = 'release';
+                $release['student_photo'] = student_photo_url((string) ($release['student_no'] ?? ''));
+                $relPlain = strtolower(trim(($release['fetcher_fname'] ?? '') . ' ' . ($release['fetcher_lname'] ?? '')));
+                $relFull  = strtolower(trim(($release['fetcher_fname'] ?? '') . ' ' . ($release['fetcher_mname'] ?? '') . ' ' . ($release['fetcher_lname'] ?? '')));
+                $release['fetcher_photo'] = $sfPhotoMap[$relPlain] ?? $sfPhotoMap[$relFull] ?? $myParentPhoto;
             }
+            unset($release);
             $data['releases'] = $releases;
         }
 
@@ -693,7 +689,7 @@ class Parents extends BaseController
         $teacherMap = [];
         foreach ($db->table('teachers')->select('grade_section, fname, lname')->get()->getResultArray() as $t) {
             if (!isset($teacherMap[$t['grade_section']])) {
-                $teacherMap[$t['grade_section']] = $t['fname'] . ' ' . $t['lname'];
+                $teacherMap[$t['grade_section']] = full_name($t);
             }
         }
 

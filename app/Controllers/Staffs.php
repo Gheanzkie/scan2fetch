@@ -62,15 +62,27 @@ class Staffs extends BaseController
     {
         $model = new StaffsModel();
         $id = $this->request->getPost('id');
+        $__oldStaff = $model->find($id);
         $data = ['fname' => $this->request->getPost('fname'), 'mname' => $this->request->getPost('mname'), 'lname' => $this->request->getPost('lname'), 'phone' => $this->request->getPost('phone')];
         $staffNo = strtoupper(trim((string) $this->request->getPost('staff_no')));
         if ($staffNo !== '') {
+            if (! str_starts_with($staffNo, 'S-')) {
+                $staffNo = preg_match('/(\d+)$/', $staffNo, $__sm) ? 'S-' . $__sm[1] : 'S-' . $staffNo;
+            }
+            if ($model->where('staff_no', $staffNo)->where('id !=', $id)->countAllResults() > 0) {
+                return redirect()->to('/staffs')->with('error', 'Staff ID ' . $staffNo . ' is already taken.');
+            }
             $data['staff_no'] = $staffNo;
         }
-        if ($this->request->getPost('password')) {
-            $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
-        }
+        // Passwords are never edited here - the admin sends/resets them via SMS.
         $model->update($id, $data);
+
+        // ===== ID changed: carry the profile picture over to the new file name =====
+        helper('photo');
+        if (! empty($__oldStaff['staff_no']) && isset($data['staff_no'])
+            && strtoupper((string) $__oldStaff['staff_no']) !== strtoupper((string) $data['staff_no'])) {
+            photo_carry_over_id('staffs', (string) $__oldStaff['staff_no'], (string) $data['staff_no'], 'S-');
+        }
 
         // ===== Staff profile picture (add / change / remove) =====
         helper('photo');
@@ -124,16 +136,4 @@ class Staffs extends BaseController
         return redirect()->to('/staffs')->with('msg', 'Staff deleted');
     }
 
-    // ========== DELETE ALL STAFF (ADMIN ONLY) ==========
-    public function deleteAll()
-    {
-        if (session('role') != 'admin') {
-            return redirect()->to('/staffs')->with('error', 'Admin only.');
-        }
-        $model = new StaffsModel();
-        $count = $model->countAllResults();
-        $model->truncate();
-        $this->logModel->addLog(session('user_id'), session('fname').' '.session('lname'), session('role'), 'delete', 'staff', "DELETED ALL staff accounts ($count)");
-        return redirect()->to('/staffs')->with('msg', "All $count staff account(s) deleted.");
-    }
 }

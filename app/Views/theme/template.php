@@ -814,6 +814,100 @@ td img.avatar-round,
 .table td img {
     cursor: zoom-in;
 }
+
+/* ================= UNIFORM TOOLBAR CONTROLS ================= */
+/* every search box, filter, date picker and small select shares one size + colour */
+.input-group.input-group-sm { min-height: 40px; }
+
+.input-group-sm > .form-control,
+.input-group-sm > .custom-select,
+.input-group-sm > .input-group-append > .btn {
+    height: 40px !important;
+    font-size: 13px !important;
+    border-radius: 10px !important;
+    padding: 8px 13px !important;
+}
+
+.input-group-sm > .input-group-prepend > .input-group-text,
+.input-group-sm > .input-group-text {
+    height: 40px !important;
+    display: flex; align-items: center;
+    padding: 0 12px !important;
+    font-size: 12.5px !important;
+    color: #6b7194 !important;
+    background: #eef2ff !important;
+    border: 1px solid rgba(108,140,255,.28) !important;
+    border-right: none !important;
+    border-radius: 10px 0 0 10px !important;
+}
+
+.input-group-sm > .input-group-append > .input-group-text {
+    border-left: none !important;
+    border-right: 1px solid rgba(108,140,255,.28) !important;
+    border-radius: 0 10px 10px 0 !important;
+}
+
+.input-group-sm .form-control,
+.input-group-sm .custom-select,
+.form-control-sm {
+    border: 1px solid rgba(108,140,255,.28) !important;
+    border-radius: 10px !important;
+    font-size: 13px !important;
+    color: #2d2d4a !important;
+    background: #fff !important;
+}
+
+.form-control-sm {
+    height: 40px !important;
+    padding: 8px 13px !important;
+}
+
+.form-control-sm:focus,
+.input-group-sm .form-control:focus,
+input[type="date"].form-control:focus {
+    border-color: var(--soft-blue) !important;
+    box-shadow: 0 0 0 3px rgba(108,140,255,.16) !important;
+}
+
+.form-control-sm::placeholder { color: #9a9ab8 !important; font-weight: 500 !important; }
+
+/* date pickers, everywhere */
+input[type="date"].form-control,
+input[type="date"].form-control-sm,
+input[type="month"].form-control,
+input[type="search"].form-control {
+    height: 40px !important;
+    min-height: 40px;
+    border: 1px solid rgba(108,140,255,.28) !important;
+    border-radius: 10px !important;
+    padding: 8px 13px !important;
+    font-size: 13px !important;
+    color: #2d2d4a !important;
+    background: #fff !important;
+}
+
+/* small selects used as filters */
+select.form-control-sm,
+select.form-control {
+    background-image: none;
+}
+
+/* toolbar buttons sit flush with the 40px controls */
+.input-group-sm > .input-group-append > .btn,
+.toolbar .btn-sm,
+.filter-bar .btn-sm {
+    height: 40px !important;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 10px !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    padding: 0 14px !important;
+}
+
+/* card headers that hold toolbars */
+.card-header .input-group,
+.card-header .form-control,
+.card-header .form-control-sm { margin-bottom: 0 !important; }
 </style>
 
 <script>

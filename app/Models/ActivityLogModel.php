@@ -8,11 +8,16 @@ class ActivityLogModel extends Model
 {
     protected $table = 'activity_logs';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['user_id', 'user_name', 'role', 'action', 'module', 'description', 'ip_address', 'created_at'];
+    protected $allowedFields = ['user_id', 'user_name', 'role', 'action', 'module', 'description', 'ip_address', 'user_agent', 'device', 'brand', 'browser', 'platform', 'created_at'];
     protected $useTimestamps = false;
 
     public function addLog($userId, $userName, $role, $action, $module, $description = '')
     {
+        helper('ua');
+
+        $agent = (string) ($_SERVER['HTTP_USER_AGENT'] ?? '');
+        $ua    = parse_user_agent($agent);
+
         return $this->insert([
             'user_id'     => $userId,
             'user_name'   => $userName,
@@ -20,7 +25,12 @@ class ActivityLogModel extends Model
             'action'      => $action,
             'module'      => $module,
             'description' => $description,
-            'ip_address'  => $_SERVER['REMOTE_ADDR'] ?? null,
+            'ip_address'  => client_ip(),
+            'user_agent'  => $agent !== '' ? $agent : null,
+            'device'      => $ua['device'],
+            'brand'       => $ua['brand'],
+            'browser'     => $ua['browser'],
+            'platform'    => $ua['platform'],
         ]);
     }
 

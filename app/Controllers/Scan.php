@@ -132,9 +132,12 @@ class Scan extends BaseController
             ]);
         }
 
-        $qrCode = $this->request->getPost('qr_code');
-        
-        if (empty($qrCode)) {
+        // Manual entry is typed by hand and often pasted with stray spaces,
+        // so normalise here instead of relying on the browser: uppercase and
+        // strip ALL whitespace (" QR-QAJUA " / "qr - qajua") before lookup.
+        $qrCode = strtoupper(preg_replace('/\s+/', '', (string) $this->request->getPost('qr_code')));
+
+        if ($qrCode === '') {
             return $this->response->setJSON(['success' => false, 'message' => 'QR code is required']);
         }
 

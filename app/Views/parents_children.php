@@ -111,7 +111,7 @@ body {
  <?php endforeach; ?>
  </div>
  <?php else: ?>
- <p class="mb-0" style="color:#94a3b8;">No linked children yet â€” contact the school admin to link your child.</p>
+ <p class="mb-0" style="color:#94a3b8;">No linked children yet — contact the school admin to link your child.</p>
  <?php endif; ?>
  </div>
  </div>

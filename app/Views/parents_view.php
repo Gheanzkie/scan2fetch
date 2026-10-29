@@ -161,7 +161,7 @@ body {
 .breadcrumb-item a { color: #8888aa !important; font-weight: 600 !important; font-size: 15px !important; }
 .breadcrumb-item a:hover { color: var(--soft-purple) !important; }
 .breadcrumb-item.active { color: #2d2d4a !important; font-weight: 700 !important; font-size: 15px !important; }
-.breadcrumb-item + .breadcrumb-item::before { color: #c0c0d8 !important; content: "â€º" !important; }
+.breadcrumb-item + .breadcrumb-item::before { color: #c0c0d8 !important; content: "›" !important; }
 
 /* ===== CONTENT HEADER ===== */
 .content-header h1 {
@@ -276,6 +276,35 @@ body {
     .photo-preview { width: 50px; height: 50px; }
     .modal-body { padding: 1rem !important; }
     .btn { font-size: 11px !important; padding: 4px 10px !important; }
+}
+/* ===== Linked student card: Go to Student + avatar ===== */
+.student-cell{display:flex;align-items:center;justify-content:flex-end;gap:12px;}
+.btn-go-student{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 16px;border-radius:10px;
+    font-size:13px;font-weight:700;line-height:1;white-space:nowrap;
+    color:#fff;text-decoration:none;
+    background:linear-gradient(135deg,#6C8CFF 0%,#7C6CFF 100%);
+    box-shadow:0 4px 12px rgba(108,140,255,.35);
+    transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+.btn-go-student:hover{color:#fff;text-decoration:none;transform:translateY(-1px);
+    box-shadow:0 8px 18px rgba(108,140,255,.45);filter:brightness(1.05);}
+.btn-go-student:active{transform:translateY(0);box-shadow:0 3px 8px rgba(108,140,255,.35);}
+.student-thumb{
+    flex:0 0 auto;width:84px;height:84px;border-radius:50%;overflow:hidden;
+    display:inline-flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.55);
+    border:3px solid var(--soft-blue);
+    box-shadow:0 4px 14px rgba(108,140,255,.25);
+    color:#b0b0c8;font-size:30px;text-decoration:none;
+    transition:transform .15s ease, box-shadow .15s ease;
+}
+.student-thumb:hover{transform:scale(1.05);box-shadow:0 6px 20px rgba(108,140,255,.4);text-decoration:none;}
+.student-thumb img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;}
+@media (max-width: 767.98px){
+    .student-cell{margin-top:14px;justify-content:flex-start;}
+    .student-thumb{width:72px;height:72px;font-size:26px;}
 }
 </style>
 
@@ -428,13 +457,15 @@ body {
  <small style="color: #b0b0c8; font-size: 13px;">(<?= esc($s['grade_section']) ?>)</small>
  </a>
  </h5>
- <a href="<?= base_url('students-view/'.$s['student_id']) ?>" class="btn btn-outline-info btn-xs">
- <i class="fas fa-eye"></i> Go to Student
- </a>
  </div>
  <div class="card-body">
- <div class="row">
- <div class="col-md-6">
+ <div class="row align-items-center">
+ <div class="col-md-7">
+ <p class="mb-1"><strong style="color: #2d2d4a;">Student ID:</strong>
+ <span class="badge badge-light" style="color:#5a5280;font-weight:700;">
+ <i class="fas fa-id-card mr-1"></i><?= esc($s['student_no'] ?? '') ?>
+ </span>
+ </p>
  <p class="mb-1"><strong style="color: #2d2d4a;">Student:</strong>
  <a href="<?= base_url('students-view/'.$s['student_id']) ?>" style="color: var(--soft-purple); font-weight:700; text-decoration:none;">
  <?= esc(full_name($s)) ?>
@@ -446,13 +477,26 @@ body {
  <?php endif; ?>
  <p class="mb-0"><strong style="color: #2d2d4a;">Relation:</strong> <span class="badge badge-primary"><?= esc($s['relation'] ?? 'Parent') ?></span></p>
  </div>
- <div class="col-md-6 text-right">
- <a href="<?= base_url('students-view/'.$s['student_id']) ?>">
- <div class="img-circle d-inline-flex align-items-center justify-content-center" 
-                                              style="width:70px;height:70px;border:3px solid var(--soft-blue);background:rgba(255,255,255,0.3);cursor:pointer;">
- <i class="fas fa-child fa-2x" style="color: #b0b0c8;"></i>
- </div>
+ <div class="col-md-5">
+ <div class="student-cell">
+ <a href="<?= base_url('students-view/'.$s['student_id']) ?>" class="btn-go-student">
+ <i class="fas fa-arrow-right"></i>
+ <span>Go to Student</span>
  </a>
+ <?php $__sPhoto = (string) ($s['photo'] ?? ''); ?>
+ <?php if ($__sPhoto !== ''): ?>
+ <span class="student-thumb photo-zoom" style="cursor:zoom-in;"
+       data-photo="<?= esc($__sPhoto) ?>"
+       data-title="<?= esc(full_name($s)) ?>"
+       title="Click to view full size">
+ <img src="<?= esc($__sPhoto) ?>" alt="<?= esc(full_name($s)) ?>">
+ </span>
+ <?php else: ?>
+ <span class="student-thumb" title="<?= esc(full_name($s)) ?> (no photo)">
+ <i class="fas fa-user-graduate"></i>
+ </span>
+ <?php endif; ?>
+ </div>
  </div>
  </div>
  </div>
@@ -608,6 +652,28 @@ body {
  </div>
 </div>
 
+
+<script>
+/* Student avatar: click opens the shared full-size photo lightbox (no navigation) */
+document.addEventListener('click', function (e) {
+    var z = e.target.closest ? e.target.closest('.photo-zoom') : null;
+    if (!z) { return; }
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof window.openGlobalPhoto === 'function') {
+        window.openGlobalPhoto(z.getAttribute('data-photo'), z.getAttribute('data-title'));
+    } else {
+        window.open(z.getAttribute('data-photo'), '_blank');
+    }
+});
+
+/* Only the Go to Student button navigates */
+document.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.btn-go-student') : null;
+    if (!b) { return; }
+    window.location.href = b.getAttribute('href');
+});
+</script>
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
@@ -693,6 +759,28 @@ $(function(){
         $('#qrDownloadBtn').attr('href', u);
         $('#qrModal').modal('show');
     };
+});
+</script>
+
+<script>
+/* Student avatar: click opens the shared full-size photo lightbox (no navigation) */
+document.addEventListener('click', function (e) {
+    var z = e.target.closest ? e.target.closest('.photo-zoom') : null;
+    if (!z) { return; }
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof window.openGlobalPhoto === 'function') {
+        window.openGlobalPhoto(z.getAttribute('data-photo'), z.getAttribute('data-title'));
+    } else {
+        window.open(z.getAttribute('data-photo'), '_blank');
+    }
+});
+
+/* Only the Go to Student button navigates */
+document.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.btn-go-student') : null;
+    if (!b) { return; }
+    window.location.href = b.getAttribute('href');
 });
 </script>
 <?= $this->endSection() ?>

@@ -513,7 +513,6 @@ select.form-control option {
  <label class="filter-label"> Search</label>
  <div class="input-group input-group-sm">
  <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-search"></i></span>
  </div>
 <input type="text" name="q" class="form-control form-control-sm" placeholder="Search user, action, module or description..." value="<?= esc($q) ?>" oninput="autoSubmitForm(this.form)">
   </div>
@@ -572,6 +571,9 @@ select.form-control option {
  <th style="width:80px;"> Role</th>
  <th style="width:100px;"> Action</th>
  <th style="width:100px;"> Module</th>
+ <th style="width:130px;"> IP Address</th>
+ <th style="width:150px;"> Device</th>
+ <th style="width:130px;"> Browser</th>
  <th> Description</th>
  </tr>
  </thead>
@@ -602,13 +604,33 @@ select.form-control option {
  <td><span class="badge badge-<?= $rb ?>"><?= ucfirst($role ?: '—') ?></span></td>
  <td><span class="badge badge-<?= $ab ?>"><?= $ai ?> <?= ucfirst($action) ?></span></td>
  <td><span class="badge badge-light"><?= ucfirst(str_replace('_', ' ', $log['module'] ?? '')) ?></span></td>
+ <td style="font-size:12px; color:#2d2d4a;">
+ <code style="color:#3b4a9e; background:rgba(108,140,255,.08); padding:2px 6px; border-radius:6px;">
+ <?= esc($log['ip_address'] ?? '—') ?>
+ </code>
+ </td>
+ <td style="font-size:12px; color:#2d2d4a;">
+ <?php
+     $dev   = (string) ($log['device'] ?? '');
+     $brand = (string) ($log['brand'] ?? '');
+     $plat  = (string) ($log['platform'] ?? '');
+     $icon  = $dev === 'Phone' ? 'fa-mobile-alt' : ($dev === 'Tablet' ? 'fa-tablet-alt' : ($dev === 'Bot' ? 'fa-robot' : 'fa-laptop'));
+ ?>
+ <i class="fas <?= $icon ?> mr-1" style="color:#7a5ad0;"></i>
+ <strong><?= esc($dev ?: 'Unknown') ?></strong>
+ <?php if ($brand !== ''): ?><br><small style="color:#7a7a9a;"><?= esc($brand) ?></small><?php endif; ?>
+ <?php if ($plat !== ''): ?><br><small style="color:#b0b0c8;"><?= esc($plat) ?></small><?php endif; ?>
+ </td>
+ <td style="font-size:12px; color:#2d2d4a;">
+ <i class="fas fa-globe mr-1" style="color:#4FC3F7;"></i><?= esc($log['browser'] ?? 'Unknown') ?>
+ </td>
  <td class="desc-cell" style="color: #2d2d4a; font-size: 13px;">
  <?= esc($log['description'] ?? '') ?>
  </td>
  </tr>
  <?php endforeach; else: ?>
  <tr>
- <td colspan="7" class="text-center py-5">
+ <td colspan="10" class="text-center py-5">
  <i class="fas fa-clipboard-list fa-3x mb-3 d-block" style="color: rgba(160,160,180,0.15);"></i>
  <h5 style="color: #7a7a9a;">No activity logs found</h5>
  <p style="color: #b0b0c8; font-size: 14px;">Perform actions in the system to see logs here.</p>

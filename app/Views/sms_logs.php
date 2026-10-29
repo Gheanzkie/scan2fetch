@@ -365,7 +365,6 @@ body {
  <label class="filter-label"> Search</label>
  <div class="input-group input-group-sm">
  <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-search"></i></span>
  </div>
  <input type="text" id="searchFilter" class="form-control form-control-sm" placeholder="Search phone or message...">
  </div>

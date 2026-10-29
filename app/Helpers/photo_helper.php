@@ -381,6 +381,51 @@ if (! function_exists('photo_save_staff_dataurl')) {
         return photo_save_person_dataurl($dataUrl, 'uploads/staffs/', $staffNo, $max, 'S-', 'staff_photo_delete');
     }
 }
+if (! function_exists('photo_carry_over_id')) {
+    /**
+     * Move every photo variant from an old id to a new one (ID rename).
+     * uploads/{folder}/{old}.jpg -> uploads/{folder}/{new}.jpg
+     * Returns how many files were carried over.
+     */
+    function photo_carry_over_id(string $folder, string $oldNo, string $newNo, string $prefix = ''): int
+    {
+        $clean = static function ($v) {
+            return strtoupper(preg_replace('/[^A-Za-z0-9\-]/', '', trim((string) $v)));
+        };
+
+        $old = $clean($oldNo);
+        $new = $clean($newNo);
+
+        if ($prefix !== '') {
+            if ($old !== '' && ! str_starts_with($old, $prefix)) { $old = $prefix . $old; }
+            if ($new !== '' && ! str_starts_with($new, $prefix)) { $new = $prefix . $new; }
+        }
+
+        if ($old === '' || $new === '' || $old === $new) {
+            return 0;
+        }
+
+        $dir = uploads_path($folder);
+        if (! is_dir($dir)) {
+            return 0;
+        }
+
+        $moved = 0;
+        foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
+            $from = $dir . $old . '.' . $ext;
+            if (! is_file($from)) {
+                continue;
+            }
+            $to = $dir . $new . '.' . $ext;
+            if (@copy($from, $to)) {
+                @unlink($from);
+                $moved++;
+            }
+        }
+
+        return $moved;
+    }
+}
 if (! function_exists('subfetcher_photo_delete')) {
     /** Remove every extension variant of a sub-fetcher picture (uploads/subfetchers/{id}.jpg). */
     function subfetcher_photo_delete($id): int

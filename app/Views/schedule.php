@@ -250,7 +250,7 @@ body { background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%) !important;
         $firstDow  = (int) date('w', strtotime($month . '-01'));
         $daysInMo  = (int) date('t', strtotime($month . '-01'));
         for ($i = 0; $i < $firstDow; $i++) {
-            echo '<div class="cal-day empty"></div>';
+            echo '';
         }
         for ($day = 1; $day <= $daysInMo; $day++) {
             $ds = sprintf('%s-%02d', $month, $day);
@@ -272,7 +272,7 @@ body { background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%) !important;
             echo '<span class="dstatus st-' . $status . '">' . strtoupper($status) . '</span>';
             echo '<span class="dhours' . ($hasHours ? '' : ' blank') . '">'
                 . ($hasHours ? $hoursTxt : 'not set') . '</span>';
-            if ($row && !empty($row['notes'])) echo '<span class="ddot" title="Has notes"></span>';
+            if ($row && !empty($row['notes'])) echo '';
             echo '<button type="button" class="cal-edit" title="Edit this date"><i class="fas fa-pen"></i></button>';
             echo '</div>';
         }
@@ -337,7 +337,6 @@ body { background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%) !important;
               data-session="<?= esc($scanSession ?? 'morning') ?>">
           <span class="session2way-label lbl-left">Morning</span>
           <span class="session2way-label lbl-right">Afternoon</span>
-          <span class="session2way-knob" aria-hidden="true"></span>
          </div>
          <span class="badge" id="scanSessionState"
                style="background:#eef2ff;color:#4338ca;font-weight:700;">—</span>
@@ -398,7 +397,6 @@ body { background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%) !important;
           <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
          </div>
          <div class="modal-body" id="histModalBody">
-          <div class="text-center py-3"><i class="fas fa-spinner fa-spin fa-2x text-muted"></i></div>
          </div>
         </div>
        </div>
@@ -413,7 +411,6 @@ body { background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%) !important;
           <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
          </div>
          <div class="modal-body" id="infoModalBody">
-          <div class="text-center py-3"><i class="fas fa-spinner fa-spin fa-2x text-muted"></i></div>
          </div>
         </div>
        </div>
@@ -722,7 +719,7 @@ function showModalSafely($m) {
 
 function openInfo(date) {
     $('#infoDateLabel').text(date);
-    $('#infoModalBody').html('<div class="text-center py-3"><i class="fas fa-spinner fa-spin fa-2x text-muted"></i></div>');
+    $('#infoModalBody').html('');
     infoModalOpen = true;
     showModalSafely($('#infoModal'));
     $.getJSON('schedule/day?date=' + encodeURIComponent(date), function (d) {
@@ -736,7 +733,7 @@ function openInfo(date) {
 /* ===== SEE HISTORY — the existing day history, opened on demand ===== */
 function openHistory(date) {
     $('#histDateLabel').text(date);
-    $('#histModalBody').html('<div class="text-center py-3"><i class="fas fa-spinner fa-spin fa-2x text-muted"></i></div>');
+    $('#histModalBody').html('');
     showModalSafely($('#histModal'));
 
     $.getJSON('schedule/day?date=' + encodeURIComponent(date), function (d) {

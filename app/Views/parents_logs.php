@@ -190,12 +190,11 @@ body {
  <div class="card-body py-2">
  <div class="d-flex align-items-center flex-wrap" style="gap:8px;">
  <div class="input-group input-group-sm" style="max-width:260px;">
- <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-search"></i></span></div>
+ <div class="input-group-prepend"></div>
  <input type="text" class="form-control hist-search" placeholder="Search student, fetcher, relation, method...">
  </div>
  <input type="date" class="form-control form-control-sm hist-date" style="max-width:170px;">
  <button type="button" class="btn btn-sm btn-outline-secondary hist-reset"><i class="fas fa-undo mr-1"></i>Reset</button>
- <span class="ml-auto small text-muted" id="histCount"></span>
  </div>
  </div>
 </div>
@@ -327,6 +326,7 @@ body {
 
  </div>
  </section>
+ <span class="ml-auto small text-muted" id="histCount"></span>
 </div>
 
 <?= $this->endSection() ?>

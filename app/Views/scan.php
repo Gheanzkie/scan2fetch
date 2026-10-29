@@ -315,8 +315,8 @@ body {
  <div class="container-fluid">
 
  <!-- ===== ALERT AREA ===== -->
- <div id="alertArea" style="display:none;"></div>
 
+ <div id="alertArea" style="display:none;"></div>
  <!-- ===== DAY STATUS BANNER (Date Management gate) ===== -->
  <?php if (empty($gateAllowed)): ?>
  <div class="alert alert-danger mb-3" style="border-radius:12px;" id="gateClosedBanner">
@@ -344,7 +344,6 @@ body {
  <i class="fas fa-lock-open mr-1"></i>OPEN
  </span>
  </div>
- <div id="scanResult" style="font-size:13px;"></div>
  </div>
  </div>
 
@@ -360,9 +359,6 @@ body {
  </h5>
  </div>
  <div class="card-body d-flex flex-column align-items-center justify-content-center text-center" style="min-height:420px;">
- <div style="width:110px;height:110px;border-radius:28px;background:linear-gradient(135deg,rgba(168,192,255,0.25),rgba(240,147,251,0.18));display:flex;align-items:center;justify-content:center;margin-bottom:22px;">
- <i class="fas fa-expand-arrows-alt fa-3x" style="color: var(--soft-purple);"></i>
- </div>
  <h4 style="color: var(--ink); font-weight:800; margin-bottom:6px;">Open the live camera scanner</h4>
  <p style="color: var(--muted); font-size:14px; max-width:440px; margin:0 auto 26px; line-height:1.6;">
  Fullscreen camera in a new tab - no sidebar, no menus. Detects QR codes anywhere in view,
@@ -395,16 +391,15 @@ body {
  </p>
  <div class="input-group mb-3">
  <div class="input-group-prepend">
- <span class="input-group-text"><i class="fas fa-qrcode"></i></span>
  </div>
  <input type="text" id="qrInput" class="form-control text-center font-weight-bold"
- placeholder="e.g. QR-4A2B8C3D1E5F"
+ autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+ placeholder="e.g. QR-QAJUA"
  style="text-transform:uppercase;">
  </div>
  <button class="btn btn-kid-primary btn-block" id="verifyQrBtn" style="padding:12px;">
  <i class="fas fa-search mr-1"></i> Verify QR Code
  </button>
- <div class="mt-3 text-center" id="qrResult"></div>
  </div>
  </div>
  </div>
@@ -438,13 +433,8 @@ body {
  <div class="text-center mb-4">
  <div id="parentPhotoContainer" onclick="openImageViewer($('#parentPic').attr('src'), $('#parentName').text())">
  <img id="parentPic" src="" style="display:none;">
- <div id="parentNoPic">
- <i class="fas fa-user fa-4x text-white"></i>
- </div>
  </div>
  <h4 class="mt-3 mb-1" id="parentName" style="color: var(--ink); font-weight: 700;"></h4>
- <p class="mb-1" id="parentPhone" style="color: var(--muted);"></p>
- <span class="badge badge-pill mt-1" id="fetcherType" style="display:none;"></span>
  </div>
 
  <hr style="border-color: rgba(63,43,150,0.08);">
@@ -455,7 +445,6 @@ body {
                                 Students to Release
  <span class="badge badge-light ml-1" id="studentCount">0</span>
  </h5>
- <div id="studentsList"></div>
  </div>
  </div>
  </div>
@@ -483,6 +472,14 @@ body {
  </div>
  </div>
  </div>
+ <div id="studentsList"></div>
+ <span class="badge badge-pill mt-1" id="fetcherType" style="display:none;"></span>
+ <p class="mb-1" id="parentPhone" style="color: var(--muted);"></p>
+ <div id="parentNoPic">
+ <i class="fas fa-user fa-4x text-white"></i>
+ </div>
+ <div class="mt-3 text-center" id="qrResult"></div>
+ <div id="scanResult" style="font-size:13px;"></div>
 </div>
 
 <?= $this->endSection() ?>
@@ -494,6 +491,13 @@ body {
 var BASE_URL = '<?= base_url() ?>/';
 var CSRF_NAME = '<?= csrf_token() ?>';
 var CSRF_HASH = '<?= csrf_hash() ?>';
+/* Same as the kiosk: send the CURRENT csrf_cookie_name value, not the hash
+   baked when the page was rendered, or long-lived tabs start getting
+   "The action you requested is not allowed." */
+function csrfToken() {
+  var m = document.cookie.match(/(?:^|;\s*)csrf_cookie_name=([^;]+)/);
+  return m ? decodeURIComponent(m[1]) : CSRF_HASH;
+}
 
 $(function() {
     var html5QrCode, isScanning = false, pendingStudentId = null, pendingParentId = null;
@@ -507,7 +511,10 @@ $(function() {
 
     // Manual verify
     $('#verifyQrBtn').click(function() {
-        var qr = $('#qrInput').val().trim().toUpperCase();
+        // Strip every space, not just the ends: codes are printed as
+        // "QR-XXXXX" and hand-typed input picks up stray spaces.
+        var qr = $('#qrInput').val().replace(/\s+/g, '').toUpperCase();
+        $('#qrInput').val(qr);
         if (!qr) {
             showAlert('Please enter a QR code.', 'warning');
             return;
@@ -671,7 +678,7 @@ $(function() {
 
         var formData = new FormData();
         formData.append('qr_code', qrCode);
-        formData.append(CSRF_NAME, CSRF_HASH);
+        formData.append(CSRF_NAME, csrfToken());
 
         fetch(BASE_URL + 'scan/verify', { method: 'POST', body: formData })
         .then(response => response.json())
@@ -727,7 +734,7 @@ $(function() {
                         var sid = s.student_id || s.id;
                         html += '<div class="d-flex align-items-center border rounded p-3 mb-2 student-item">';
                         html += '<div class="mr-3">';
-                        html += '<div class="img-circle d-flex align-items-center justify-content-center" style="width:56px;height:56px;border:3px solid rgba(129,199,132,0.35);background:rgba(129,199,132,0.10);"><i class="fas fa-child" style="color: var(--soft-green); font-size:22px;"></i></div>';
+                        html += '';
                         html += '</div>';
                         html += '<div class="flex-grow-1"><strong style="font-size:1.05rem; color: var(--ink);">' + [s.fname, s.mname, s.lname].filter(Boolean).join(' ') + '</strong><br><span class="badge badge-light" style="font-size:12px; padding:5px 12px;">' + (s.grade_section || 'N/A') + '</span></div>';
 
@@ -857,7 +864,8 @@ $(function() {
             formData.append('student_id', sid);
             formData.append('parent_id', parentId);
             formData.append('qr_code', qrCode);
-            formData.append(CSRF_NAME, CSRF_HASH);
+        formData.append(CSRF_NAME, csrfToken());
+
 
             fetch(BASE_URL + 'scan/release', { method: 'POST', body: formData })
             .then(response => response.json())

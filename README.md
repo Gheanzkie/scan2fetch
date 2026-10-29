@@ -185,3 +185,64 @@ git clone https://github.com/Gheanzkie/scan2fetch.git
 - Global CSRF protection (cookie mode) on all POST/requests
 - Passwords: `password_hash()` bcrypt
 - Role checks in controllers as second layer (parent/teacher cannot reach admin/staff modules — verified by URL matrix tests for every role)
+
+---
+
+## Update - 2026-10-30
+
+### Demo accounts (seeded in `scan2fetch.sql`)
+
+| Role | ID | Full name | Login (phone) | Password |
+|------|----|-----------|---------------|----------|
+| Admin | - | Ghea Admin | `ghea123` | `ghea123` |
+| Staff | S-1 | Reynaldo Bautista Santos | `09170000001` | `staff123` |
+| Staff | S-2 | Marilou Cruz Villanueva | `09170000002` | `staff123` |
+| Teacher | T-1 | Aileen Reyes Cruz (Grade 1 - A) | `09170000011` | `teacher123` |
+| Teacher | T-2 | Ramon Dela Torres (Grade 1 - B) | `09170000012` | `teacher123` |
+
+The original `admin` account (login `admin`) is also present with its bcrypt hash.
+All seeded accounts have `password_sent = 1` and **no profile picture** - add
+`public/uploads/staffs/S-1.jpg`, `public/uploads/teachers/T-1.jpg`, etc. when ready.
+
+### Database
+
+`scan2fetch.sql` in the project root is a fresh dump of the current schema plus the
+seeded data above. Import it to reproduce this state exactly. All student/parent
+tables are intentionally empty - import `template.xlsx` from Register -> Import from Excel.
+
+### Changes in this update
+
+- **Security** - removed the `*-delete-all` mass-delete routes and handlers for
+  students, parents, staffs and teachers; they were reachable over plain GET with no
+  confirmation. `students-add` (dead link) removed; Register is the single
+  parent+student entry point.
+- **Kiosk** - added the missing `#reader` element (camera never started before), added
+  failure guards so `scanning` cannot stick, rebuilt the pickup panel markup, and the
+  success screen now shows the fetcher photo plus one avatar per child released.
+  Flow: scan -> success 10 s (`PICKUP_MS`) -> 2 s ready gap (`READY_GAP_MS`) -> camera.
+  No confirmation sheet for multiple children - one scan releases them all.
+- **Kiosk/staff CSRF** - POSTs now send the live `csrf_cookie_name` value instead of the
+  hash baked at page load, fixing "The action you requested is not allowed." on
+  long-lived tabs.
+- **Manual QR entry** - server normalises input (`strtoupper` + strip whitespace) so
+  " qr - qajua " resolves; placeholder matches the real `QR-XXXXX` format.
+- **Parents** - restored the missing card header and added **Send All Passwords**
+  (route and controller already existed).
+- **Dashboards** - added a **My Profile** card to the parent and teacher dashboards
+  (photo, name, ID, phone, QR for parents); the existing teacher profile inside
+  My Students was left untouched.
+- **UI** - compacted the Excel/ZIP import cards into one row, removed the dead
+  `sample.xlsx` link, fixed the login input overflow (flex `min-width: 0`), restored
+  the password-status badges on the parents/staffs/teachers lists.
+- **Photo Station** (`htdocs/photo-station`) - proper tab title, name and inline SVG
+  favicon.
+- **template.xlsx** - rebuilt with two sections: `Grade 1 - A` (rows 2-5) and
+  `Grade 2 - B` (rows 6-9), new student/parent names, blue header, banded sections,
+  phone/IDs as Text.
+
+### Known issues still open
+
+- Notification/SMS `Delete All` endpoints (`parents-notifications-clear`,
+  `teachers-notifications-clear`, `sms-logs/clear`) are still reachable via GET.
+- `BaseController::deliverPassword()` writes the plaintext password into `sms_logs`.
+- `.env` still ships `CI_ENVIRONMENT = development` with the debugbar active.

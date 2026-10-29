@@ -277,8 +277,6 @@ body {
  </span>
 
  <?php if (session('role') == 'teacher'): ?>
- <div class="mt-4">
- </div>
  <?php else: ?>
  <div class="mt-4">
  <a href="<?= base_url('teachers') ?>" class="btn btn-primary btn-sm px-4">
@@ -331,7 +329,6 @@ body {
  <div class="col-auto pr-2">
  <div class="input-group input-group-sm" style="border-radius:50px;overflow:hidden;border:2px solid rgba(108,140,255,0.12);background:rgba(255,255,255,0.7);">
  <div class="input-group-prepend">
- <span class="input-group-text" style="background:transparent;border:none;padding:6px 12px;"><i class="fas fa-calendar-alt" style="color:var(--soft-purple);font-size:13px;"></i></span>
  </div>
  <input type="date" name="date" value="<?= esc($selectedDate) ?>" class="form-control border-0" style="background:transparent;font-size:13px;font-weight:600;color:var(--ink);padding:6px 8px;max-width:170px;" onchange="document.getElementById('filterForm').submit()">
  </div>
