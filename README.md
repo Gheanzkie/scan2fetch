@@ -246,3 +246,17 @@ tables are intentionally empty - import `template.xlsx` from Register -> Import 
   `teachers-notifications-clear`, `sms-logs/clear`) are still reachable via GET.
 - `BaseController::deliverPassword()` writes the plaintext password into `sms_logs`.
 - `.env` still ships `CI_ENVIRONMENT = development` with the debugbar active.
+
+### Troubleshooting
+
+`CodeIgniter\Cache\Exceptions\CacheException: Cache unable to write to ".../writable/cache/"`
+means the runtime folders are missing (happens on a fresh clone, because git does
+not store empty directories). It is now prevented by `.gitkeep` files, but on an
+existing checkout run once:
+
+```bash
+mkdir -p writable/cache writable/session writable/logs writable/debugbar writable/uploads
+chmod -R 775 writable
+```
+
+On Windows/XAMPP just make sure the `writable` folder is not read-only.
