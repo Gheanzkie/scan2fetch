@@ -229,9 +229,9 @@ class Parents extends BaseController
         $this->parentsModel->update($id, $data);
 
         if (!empty($__oldParent) && isset($data['parent_no'])) {
-            $__from = uploads_path('parents') . strtoupper((string) ($__oldParent['parent_no'] ?? '')) . '.jpg';
-            $__to   = uploads_path('parents') . strtoupper((string) $data['parent_no']) . '.jpg';
-            if (is_file($__from)) { @copy($__from, $__to); }
+            // Move every photo variant to the new P-#### id - no leftovers.
+            helper('photo');
+            photo_carry_over_id('parents', (string) ($__oldParent['parent_no'] ?? ''), (string) $data['parent_no'], 'P-');
         }
 
         // Profile picture (edit modal): save new image or remove the old one.

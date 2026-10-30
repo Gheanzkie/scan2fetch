@@ -476,4 +476,42 @@ class Schedule extends BaseController
             'override' => $override,
         ]);
     }
+
+    // POST /schedule/defaults - system default hours for dates with nothing set
+    public function saveDefaults()
+    {
+        if (! $this->guard()) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Forbidden']);
+        }
+
+        $open  = trim((string) $this->request->getPost('default_open'));
+        $close = trim((string) $this->request->getPost('default_close'));
+
+        if (! preg_match('/^\d{2}:\d{2}$/', $open) || ! preg_match('/^\d{2}:\d{2}$/', $close)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Invalid time format (HH:MM).']);
+        }
+
+        if ($open >= $close) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Opening time must be earlier than closing time.']);
+        }
+
+        $this->settingsModel->setSetting('default_open_time', $open);
+        $this->settingsModel->setSetting('default_close_time', $close);
+
+        $this->logModel->addLog(
+            session('user_id'),
+            session('fname') . ' ' . session('lname'),
+            session('role'),
+            'update',
+            'schedule',
+            'System default hours set to ' . $open . ' - ' . $close
+        );
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'Default hours saved: ' . $open . ' - ' . $close,
+            'open'    => $open,
+            'close'   => $close,
+        ]);
+    }
 }

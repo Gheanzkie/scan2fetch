@@ -979,8 +979,9 @@ class Students extends BaseController
         $studentNo = (string) ($this->studentModel->find($id)['student_no'] ?? '');
         $oldNo = strtoupper((string) ($oldStudent['student_no'] ?? ''));
         if ($oldNo !== '' && $studentNo !== '' && $oldNo !== strtoupper($studentNo)) {
-            $oldFile = uploads_path('students') . $oldNo . '.jpg';
-            if (is_file($oldFile)) { @copy($oldFile, uploads_path('students') . $studentNo . '.jpg'); }
+            // Move every photo variant (jpg/jpeg/png/webp) to the new id - no leftovers.
+            helper('photo');
+            photo_carry_over_id('students', student_photo_id($oldNo), student_photo_id($studentNo));
         }
         if ($studentNo !== '') {
             helper('photo');

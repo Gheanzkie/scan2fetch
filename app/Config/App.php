@@ -65,7 +65,18 @@ class App extends BaseConfig
      *
      * @var list<string>
      */
-    public array $allowedHostnames = [];
+    public array $allowedHostnames = [
+        // local dev
+        'localhost',
+        '127.0.0.1',
+        // public tunnels (ngrok / cloudflared / localtunnel)
+        '*.ngrok-free.dev',
+        '*.ngrok-free.app',
+        '*.ngrok.app',
+        '*.ngrok.io',
+        '*.trycloudflare.com',
+        '*.loca.lt',
+    ];
 
     /**
      * --------------------------------------------------------------------------

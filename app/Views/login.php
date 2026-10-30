@@ -255,6 +255,16 @@
             font-size: 14px;
         }
 
+
+        .field-icon {
+            flex: 0 0 auto;
+            padding-left: 15px;
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1;
+        }
+        .input-wrapper:focus-within .field-icon { color: var(--primary); }
+
         .input-field {
             /* flex:1 + min-width:0 is what stops the field overrunning the pill
                when an icon and the eye toggle sit beside it */
@@ -421,13 +431,16 @@
  <div class="form-group">
  <label class="form-label">Phone Number</label>
  <div class="input-wrapper">
- <input type="text" name="phone" class="input-field" placeholder="0917xxxxxxx" required autofocus>
+ <i class="fas fa-phone field-icon"></i>
+  <input type="text" name="phone" class="input-field" placeholder="0917xxxxxxx" required autofocus>
  </div>
  </div>
  <div class="form-group">
  <label class="form-label">Password</label>
  <div class="input-wrapper">
- <input type="password" name="password" class="input-field" id="password" placeholder="Enter your password" required>
+ <i class="fas fa-lock field-icon"></i>
+  <input type="password" name="password" class="input-field" id="password" placeholder="Enter your password" required>
+ <span class="toggle-password" onclick="togglePassword()" title="Show / hide password"><i class="fas fa-eye" id="toggleIcon"></i></span>
  </div>
  </div>
  <button type="submit" class="btn-signin"><i class="fas fa-sign-in-alt"></i> Sign In</button>
@@ -442,7 +455,7 @@
  </div>
 
  <div class="footer-note">&copy; <?= date('Y') ?> Scan2Fetch</div>
- <span class="toggle-password" onclick="togglePassword()"><i class="fas fa-eye" id="toggleIcon"></i></span>
+
  </div>
 
  <script>

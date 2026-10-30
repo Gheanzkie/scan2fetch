@@ -325,7 +325,7 @@ class Scan extends BaseController
         ]);
 
         
-        $message = "Your child {$student['fname']} {$student['lname']} has been released at " . date('h:i A') . ". - BCC Scan2Fetch";
+        $message = "Your child {$student['fname']} {$student['lname']} has been released at " . date('h:i A') . ". - Scan2Fetch";
         $this->sendLocalSms($parent['phone'], $message);
 
         
@@ -400,7 +400,7 @@ class Scan extends BaseController
         $userRole = session('role');
 
         
-        $message = "Pickup attempt for {$student['fname']} {$student['lname']} has been DECLINED at " . date('h:i A') . ". - BCC Scan2Fetch";
+        $message = "Pickup attempt for {$student['fname']} {$student['lname']} has been DECLINED at " . date('h:i A') . ". - Scan2Fetch";
         $this->sendLocalSms($parent['phone'], $message);
 
         

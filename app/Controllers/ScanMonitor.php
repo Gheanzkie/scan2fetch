@@ -495,7 +495,7 @@ class ScanMonitor extends BaseController
         $logModel = new \App\Models\ActivityLogModel();
         
         foreach ($pendingStudents as $student) {
-            $message = "Reminder: Your child {$student['fname']} {$student['lname']} has not been picked up yet. Please fetch your child from school. - BCC Scan2Fetch";
+            $message = "Reminder: Your child {$student['fname']} {$student['lname']} has not been picked up yet. Please fetch your child from school. - Scan2Fetch";
             
             if (!empty($customMessage)) {
                 $message .= "\n\n" . $customMessage;
@@ -541,7 +541,7 @@ class ScanMonitor extends BaseController
                     ->get()
                     ->getRowArray();
                 if (!empty($teacher)) {
-                    $teacherMessage = "Reminder: {$student['fname']} {$student['lname']} ({$student['grade_section']}) has not been picked up yet and is still at school. - BCC Scan2Fetch";
+                    $teacherMessage = "Reminder: {$student['fname']} {$student['lname']} ({$student['grade_section']}) has not been picked up yet and is still at school. - Scan2Fetch";
                     if (!empty($customMessage)) {
                         $teacherMessage .= "\n\n" . $customMessage;
                     }

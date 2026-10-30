@@ -219,9 +219,9 @@ body { background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%) !important;
          <i class="fas fa-cog"></i>
         </button>
         <?php endif; ?>
-        <a href="?m=<?= date('Y-m', strtotime($month . '-01 -1 month')) ?>" class="btn btn-sm btn-outline-secondary"><i class="fas fa-chevron-left"></i></a>
-        <a href="?m=<?= date('Y-m') ?>" class="btn btn-sm btn-outline-secondary">Today</a>
-        <a href="?m=<?= date('Y-m', strtotime($month . '-01 +1 month')) ?>" class="btn btn-sm btn-outline-secondary"><i class="fas fa-chevron-right"></i></a>
+        <a href="<?= base_url('schedule?m=' . date('Y-m', strtotime($month . '-01 -1 month'))) ?>" class="btn btn-sm btn-outline-secondary"><i class="fas fa-chevron-left"></i></a>
+        <a href="<?= base_url('schedule?m=' . date('Y-m') . '&d=' . date('Y-m-d')) ?>" class="btn btn-sm btn-outline-secondary" id="btnToday" title="Go back to today">Today</a>
+        <a href="<?= base_url('schedule?m=' . date('Y-m', strtotime($month . '-01 +1 month'))) ?>" class="btn btn-sm btn-outline-secondary"><i class="fas fa-chevron-right"></i></a>
        </div>
        <?php if (session('role') == 'admin'): ?>
        <!-- Small floating box, katabi ng <> buttons -->
@@ -232,9 +232,12 @@ body { background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%) !important;
          <span style="font-weight:700;color:#7a7a9a;">—</span>
          <input type="time" id="defClose" class="form-control form-control-sm" value="<?= $defaultClose ?>">
         </div>
+        <button type="button" class="btn btn-sm btn-kid-primary btn-block mt-2" id="btnDefSave">
+         <i class="fas fa-save mr-1"></i> Save Default Time
+        </button>
         <small class="d-block mt-2" style="color:#94a3b8;font-size:11px;">
-         Auto-saved. Applies only to dates with no hours set.
-         <span class="saved-flag ml-1" id="defFlag"><i class="fas fa-check-circle"></i> Saved</span>
+         Applies only to dates with no hours set.
+         <span class="saved-flag ml-1" id="defFlag" style="display:none;"><i class="fas fa-check-circle"></i> Saved</span>
         </small>
        </div>
        <?php endif; ?>
@@ -784,6 +787,52 @@ function openHistory(date) {
 }
 
 $(function () {
+    /* ===== restore the date from ?d= (Today button) ===== */
+    (function () {
+        var d = new URLSearchParams(window.location.search).get('d');
+        if (!d) { return; }
+        var cell = $('.cal-day[data-date="' + d + '"]');
+        if (!cell.length) { return; }
+        $('.cal-day').removeClass('selected');
+        cell.addClass('selected');
+        loadDay(d);
+    })();
+
+    /* ===== SYSTEM DEFAULT HOURS: save button ===== */
+    $('#btnDefSave').on('click', function () {
+        var $btn = $(this);
+        var open = $('#defOpen').val();
+        var close = $('#defClose').val();
+
+        if (!open || !close) {
+            toast('Set both opening and closing time.', false);
+            return;
+        }
+
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Saving...');
+
+        $.post('<?= base_url('schedule/defaults') ?>', {
+            '<?= csrf_token() ?>': '<?= csrf_hash() ?>',
+            default_open: open,
+            default_close: close
+        }, 'json').done(function (res) {
+            if (res && res.success) {
+                DEF_OPEN  = res.open;
+                DEF_CLOSE = res.close;
+                $('#editHoursHint').text('Using default time ' + DEF_OPEN + ' - ' + DEF_CLOSE + '.');
+                $('#defFlag').show();
+                toast(res.message || 'Default time saved.', true);
+                setTimeout(function () { $('#defFlag').fadeOut(); }, 2500);
+            } else {
+                toast((res && res.message) || 'Could not save the default time.', false);
+            }
+        }).fail(function () {
+            toast('Could not save the default time.', false);
+        }).always(function () {
+            $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Save Default Time');
+        });
+    });
+
     // Calendar click — select the date, edit panel animates in
     $(document).on('click', '.cal-day:not(.empty)', function (e) {
         if ($(e.target).closest('.cal-edit').length) return; // pen handles itself
@@ -948,31 +997,6 @@ $(function () {
                 : 'Session switch save failed.';
             toast(msg, false);
         });
-    });
-
-    // Admin system-wide defaults (header box) — debounced defaults-ONLY save
-    var defTimer = null;
-    $(document).on('change', '#defOpen, #defClose', function () {
-        clearTimeout(defTimer);
-        defTimer = setTimeout(function () {
-                $.post((window.BASE_URL || '/') + 'schedule/save', {
-                defaults_only: 1,
-                default_open: $('#defOpen').val() || '',
-                default_close: $('#defClose').val() || '',
-                [CSRF_NAME]: CSRF_HASH
-            }, function (d) {
-                if (d.success) {
-                    var f = $('#defFlag');
-                    if (f.length) {
-                        f.removeClass('show');
-                        void f[0].offsetWidth;
-                        f.addClass('show');
-                        clearTimeout(f.data('hideTimer'));
-                        f.data('hideTimer', setTimeout(function () { f.removeClass('show'); }, 1800));
-                    }
-                } else { toast(d.message || 'Failed', false); }
-            }, 'json').fail(function () { toast('Save request failed', false); });
-        }, 600);
     });
 
     // Toggle ng system-default box (gilid ng <> buttons)

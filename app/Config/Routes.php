@@ -102,6 +102,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('schedule/close', 'Schedule::closeDay');
     $routes->post('schedule/save', 'Schedule::save');
     $routes->post('schedule/save-sessions', 'Schedule::saveSessions');
+$routes->post('schedule/defaults', 'Schedule::saveDefaults');
     // Session switch lives here now (admin-only via schedule ACL) since
     // /scan/* is staff-only — scan/set-session is kept for staff use too.
     $routes->post('schedule/set-session', 'Scan::setSession');

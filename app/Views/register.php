@@ -835,6 +835,7 @@ label .text-danger { color: #dc2626 !important; }
   <div class="reg-avatar-wrap text-center mb-3">
   <div class="reg-avatar" title="Click to add or change the picture">
   <img class="reg-avatar-img" src="" alt="" style="display:none;">
+  <span class="reg-avatar-placeholder"><i class="fas fa-camera"></i></span>
   <span class="reg-avatar-overlay">Add picture</span>
   </div>
   <input type="file" class="reg-avatar-file" accept="image/*" style="display:none;">
@@ -941,6 +942,7 @@ label .text-danger { color: #dc2626 !important; }
  <div class="reg-avatar-wrap text-center mb-2">
  <div class="reg-avatar" title="Click to add or change the picture">
  <img class="reg-avatar-img" src="" alt="" style="display:none;">
+  <span class="reg-avatar-placeholder"><i class="fas fa-camera"></i></span>
  <span class="reg-avatar-overlay">Add picture</span>
  </div>
  <input type="file" class="reg-avatar-file" accept="image/*" style="display:none;">
@@ -1222,7 +1224,7 @@ $(function(){
         var v = (this.value || '').toUpperCase().replace(/\s+/g, '');
         if (v === '') { return; }
         var m = v.match(/(\d+)$/);
-        this.value = m &mdash; ('P-' + m[1]) : (v.indexOf('P-') === 0 &mdash; v : 'P-' + v);
+        this.value = m ? ('P-' + m[1]) : (v.indexOf('P-') === 0 ? v : 'P-' + v);
     });
     $(document).on('blur', 'input.student-no', function(){
         this.value = (this.value || '').trim();
@@ -1272,7 +1274,7 @@ $(function(){
 
     // ===== IMPORT FORM FILE LABEL =====
     $('#excelFileInput').on('change', function(){
-        var name = this.files && this.files[0] &mdash; this.files[0].name : 'Choose .xlsx file';
+        var name = this.files && this.files[0] ? this.files[0].name : 'Choose .xlsx file';
         $('.custom-file-label').text(name);
     });
 
@@ -1328,7 +1330,7 @@ $(function(){
 
     // ===== ZIP IMPORT =====
     $('#zipFileInput').on('change', function(){
-        var name = this.files && this.files[0] &mdash; this.files[0].name : 'Choose .zip file';
+        var name = this.files && this.files[0] ? this.files[0].name : 'Choose .zip file';
         $('#zipFileLabel').text(name);
     });
 
